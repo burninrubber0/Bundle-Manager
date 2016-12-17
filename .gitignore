@@ -1,0 +1,7 @@
+*.sdf
+/BND2Master/obj
+/BundleFormat/obj
+/BurnoutImage/obj
+/ComponentTester/obj
+/HexEditor/obj
+/StandardExtension/obj

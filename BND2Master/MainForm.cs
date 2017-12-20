@@ -16,8 +16,11 @@ namespace BND2Master
     public partial class MainForm : Form
     {
         private BND2Archive _archive;
+
         private delegate BND2Archive GetArchive();
+
         private delegate void SetArchive(BND2Archive archive);
+
         private BND2Archive CurrentArchive
         {
             get
@@ -28,7 +31,7 @@ namespace BND2Master
                     {
                         return _archive;
                     };
-                    return (BND2Archive)Invoke(method);
+                    return (BND2Archive) Invoke(method);
                 }
                 else
                 {
@@ -55,8 +58,11 @@ namespace BND2Master
         }
 
         private string _currentFileName;
+
         private delegate string GetString();
+
         private delegate void SetString(string archive);
+
         private string currentFileName
         {
             get
@@ -67,7 +73,7 @@ namespace BND2Master
                     {
                         return _currentFileName;
                     };
-                    return (string)Invoke(method);
+                    return (string) Invoke(method);
                 }
                 else
                 {
@@ -94,8 +100,11 @@ namespace BND2Master
         }
 
         private bool __console;
+
         private delegate bool GetBool();
+
         private delegate void SetBool(bool value);
+
         public bool _console
         {
             get
@@ -106,7 +115,7 @@ namespace BND2Master
                     {
                         return __console;
                     };
-                    return (bool)Invoke(method);
+                    return (bool) Invoke(method);
                 }
                 else
                 {
@@ -175,24 +184,29 @@ namespace BND2Master
             if (CurrentArchive == null)
             {
                 return true;
-            } else if (CurrentArchive.Dirty)
+            }
+            else if (CurrentArchive.Dirty)
             {
-                DialogResult result = MessageBox.Show(this, "There are unsaved changes!\nWould you like to save?", "Save", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                DialogResult result = MessageBox.Show(this, "There are unsaved changes!\nWould you like to save?",
+                    "Save", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
                 if (result == DialogResult.Yes)
                 {
                     return save();
-                } else if (result == DialogResult.No)
+                }
+                else if (result == DialogResult.No)
                 {
                     CurrentArchive = null;
                     currentFileName = null;
                     UpdateDisplay();
                     return true;
-                } else
+                }
+                else
                 {
                     return false;
                 }
-                
-            } else
+
+            }
+            else
             {
                 return true;
             }
@@ -205,7 +219,9 @@ namespace BND2Master
             //CurrentArchive = new BND2Archive();
             //UpdateDisplay();
 
-            MessageBox.Show(this, "This feature is currently not avaliable because we don't know enough about the Bundle format to create them from scratch yet.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(this,
+                "This feature is currently not avaliable because we don't know enough about the Bundle format to create them from scratch yet.",
+                "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         public void open(bool console)
@@ -220,9 +236,10 @@ namespace BND2Master
         }
 
         private Thread OpenSaveThread;
+
         private void Ofd_FileOk(object sender, CancelEventArgs e)
         {
-            OpenFileDialog ofd = (OpenFileDialog)sender;
+            OpenFileDialog ofd = (OpenFileDialog) sender;
 
             if (ofd.FileName == null || ofd.FileName.Length <= 0 || !File.Exists(ofd.FileName))
                 return;
@@ -246,18 +263,19 @@ namespace BND2Master
             }
             else
             {
-                object[] values = (object[])value;
-                CurrentArchive = (BND2Archive)values[0];
+                object[] values = (object[]) value;
+                CurrentArchive = (BND2Archive) values[0];
 
                 if (CurrentArchive == null)
                 {
-                    MessageBox.Show(this, "There was an error opening archive: " + (string)values[1], "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(this, "There was an error opening archive: " + (string) values[1], "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
                     currentFileName = null;
                     Text = "Bundle Manager";
                 }
                 else
                 {
-                    currentFileName = (string)values[1];
+                    currentFileName = (string) values[1];
                     Text = "Bundle Manager - " + currentFileName;
                 }
             }
@@ -267,7 +285,15 @@ namespace BND2Master
         //private delegate void VoidMethod();
         public void DoOpenBundle(LoadingDialog loader, string path)
         {
-            Stream s = File.Open(path, FileMode.Open);
+            Stream s = null;
+            try
+            {
+                s = File.Open(path, FileMode.Open);
+            }
+            catch (IOException ex)
+            {
+                MessageBox.Show(this, "Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             if (s == null)
                 return;
 

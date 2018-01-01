@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using BundleFormat;
 using System.Threading;
+using VehicleList;
+using Util = BundleFormat.Util;
 
 namespace BND2Master
 {
@@ -480,10 +482,26 @@ namespace BND2Master
 
             int index = lstEntries.SelectedIndices[0];
 
-            EntryEditor editor = new EntryEditor();
-            editor.ForceHex = forceHex;
-            Task.Run(()=>openEditor(editor, index));
-            editor.ShowDialog(this);
+            BND2Entry entry = GetEntry(index);
+            if (entry.Type == EntryType.VehicleList && !forceHex)
+            {
+                VehicleListForm vehicleList = new VehicleListForm();
+                vehicleList.Edit += () =>
+                {
+                    entry = vehicleList.Write(entry.Console);
+                    CurrentArchive.Entries[index] = entry;
+                    CurrentArchive.Entries[index].Dirty = true;
+                };
+                vehicleList.Open(entry, entry.Console);
+                vehicleList.ShowDialog(this);
+            }
+            else
+            {
+                EntryEditor editor = new EntryEditor();
+                editor.ForceHex = forceHex;
+                Task.Run(() => openEditor(editor, index));
+                editor.ShowDialog(this);
+            }
         }
 
         public void openEditor(EntryEditor editor, int index)
@@ -548,7 +566,7 @@ namespace BND2Master
 
         private void previewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            editSelectedEntry( false);
+            editSelectedEntry(false);
         }
 
         private void viewDataToolStripMenuItem_Click(object sender, EventArgs e)

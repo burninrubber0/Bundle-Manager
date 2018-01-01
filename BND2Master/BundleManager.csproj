@@ -124,6 +124,10 @@
       <Project>{1d9c18c6-b506-4cb7-9e3e-e22fbb24ac3b}</Project>
       <Name>StandardExtension</Name>
     </ProjectReference>
+    <ProjectReference Include="..\VehicleList\VehicleList.csproj">
+      <Project>{557fc08f-7acd-44d7-ac1f-fb815a267a36}</Project>
+      <Name>VehicleList</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\CopyHS.png" />

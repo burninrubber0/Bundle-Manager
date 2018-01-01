@@ -59,6 +59,8 @@
             this.colPreview = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.mnuLst = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.previewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+            this.viewDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuMain.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.mnuLst.SuspendLayout();
@@ -166,7 +168,7 @@
             // patchImagesToolStripMenuItem
             // 
             this.patchImagesToolStripMenuItem.Name = "patchImagesToolStripMenuItem";
-            this.patchImagesToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
+            this.patchImagesToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.patchImagesToolStripMenuItem.Text = "Convert PS3 Images To PC";
             this.patchImagesToolStripMenuItem.Click += new System.EventHandler(this.patchImagesToolStripMenuItem_Click);
             // 
@@ -287,17 +289,31 @@
             // mnuLst
             // 
             this.mnuLst.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.previewToolStripMenuItem});
+            this.previewToolStripMenuItem,
+            this.toolStripMenuItem4,
+            this.viewDataToolStripMenuItem});
             this.mnuLst.Name = "mnuLst";
-            this.mnuLst.Size = new System.Drawing.Size(121, 26);
+            this.mnuLst.Size = new System.Drawing.Size(127, 54);
             // 
             // previewToolStripMenuItem
             // 
             this.previewToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.previewToolStripMenuItem.Name = "previewToolStripMenuItem";
-            this.previewToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
+            this.previewToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.previewToolStripMenuItem.Text = "Preview";
             this.previewToolStripMenuItem.Click += new System.EventHandler(this.previewToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(123, 6);
+            // 
+            // viewDataToolStripMenuItem
+            // 
+            this.viewDataToolStripMenuItem.Name = "viewDataToolStripMenuItem";
+            this.viewDataToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.viewDataToolStripMenuItem.Text = "View Data";
+            this.viewDataToolStripMenuItem.Click += new System.EventHandler(this.viewDataToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -353,6 +369,8 @@
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem patchImagesToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader colType;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
+        private System.Windows.Forms.ToolStripMenuItem viewDataToolStripMenuItem;
     }
 }
 

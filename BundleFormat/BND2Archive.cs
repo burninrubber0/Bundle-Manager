@@ -62,7 +62,8 @@ namespace BundleFormat
     {
         public int Index;
 
-        public long Unknown9;
+        public int ID;
+        public int Checksum;
         public int Unknown11;
         public int Unknown12;
         public int Unknown13;
@@ -73,7 +74,7 @@ namespace BundleFormat
         public int StartOff;
         public long ExtraStartOff;
         public int Unknown21;
-        public int Unknown22;
+        //public int FileDef;
         public int Unknown23;
         public int Unknown24;
         public int Unknown25;
@@ -90,20 +91,23 @@ namespace BundleFormat
         public bool DataCompressed;
         public bool ExtraDataCompressed;
 
-        public EntryType Type
-        {
-            get
-            {
-                if (ExtraData != null && ((Console && Data.Length == 48) || (!Console && Data.Length == 32)))
-                {
-                    return EntryType.Image;
-                }
-                else
-                {
-                    return EntryType.Unknown;
-                }
-            }
-        }
+        //public EntryType Type
+        //{
+        //    get
+        //    {
+        //        /*if (ExtraData != null && ((Console && Data.Length == 48) || (!Console && Data.Length == 32)))
+        //        {
+        //            return EntryType.Image;
+        //        }
+        //        else
+        //        {
+        //            return EntryType.Unknown;
+        //        }*/
+        //        return FileDef;
+        //    }
+        //}
+
+        public EntryType Type;
 
         public bool Console;
 
@@ -112,7 +116,46 @@ namespace BundleFormat
 
     public enum EntryType
     {
-        Unknown,
-        Image
+        Texture = 0x00,
+        Material = 0x01,
+        ResourceStringTable = 0x03,
+        Model = 0x0C,
+        Shader = 0x12,
+        AttribSysVault = 0x1C,
+        Flash = 0x1E,
+        Font = 0x21,
+        LuaCode = 0x22,
+        CollisionMeshData = 0x24,
+        IDList = 0x25,
+        Language = 0x27,
+        Tile = 0x28,
+        TileDirectory = 0x29,
+        ColourCube = 0x2B,
+        HudMessage = 0x2C,
+        HudMessageDictionary = 0x2D,
+        HudMessageSequence = 0x2E,
+        HudMessageSequenceDictionary = 0x2F,
+        WorldPainter2D = 0x30,
+        Registry = 0xA000,
+        GenericWaveContent = 0xA020,
+        GinsuWaveContent = 0xA021,
+        AEMSBank = 0xA022,
+        CSIS = 0xA023,
+        SplicerData = 0xA024,
+        LoopModel = 0x10000,
+        AIMapData = 0x10001,
+        TrafficData = 0x10002,
+        TriggerData = 0x10003,
+        DeformationModel = 0x10004,
+        VehicleList = 0x10005,
+        ParticleDescriptionCollection = 0x10008,
+        WheelList = 0x10009,
+        TextureNameMap = 0x1000B,
+        ICEList = 0x1000C,
+        ICEData = 0x1000D,
+        ProgressionData = 0x1000E,
+        EnvironmentKeyframe = 0x10012,
+        EnvironmentTimeLine = 0x10013,
+        EnvironmentDictionary = 0x10014
     }
 }

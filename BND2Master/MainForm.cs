@@ -166,13 +166,15 @@ namespace BND2Master
             for (int i = 0; i < CurrentArchive.Entries.Count; i++)
             {
                 BND2Entry entry = CurrentArchive.Entries[i];
-                string[] values = new string[6];
-                values[0] = i.ToString("d3");
-                values[1] = entry.Type.ToString();
-                values[2] = entry.DataCompressed ? "Yes" : "No";
-                values[3] = entry.ExtraData == null ? "No" : "Yes";
-                values[4] = entry.ExtraDataCompressed ? "Yes" : "No";
-                values[5] = entry.Data.MakePreview(0, 16);
+                string[] values = new string[]
+                {
+                    i.ToString("d3"),
+                    entry.Type.ToString(),
+                    entry.DataCompressed ? "Yes" : "No",
+                    entry.ExtraData == null ? "No" : "Yes",
+                    entry.ExtraDataCompressed ? "Yes" : "No",
+                    entry.Data.MakePreview(0, 16)
+                };
 
                 ListViewItem item = new ListViewItem(values);
                 lstEntries.Items.Add(item);
@@ -470,7 +472,7 @@ namespace BND2Master
             }
         }
 
-        public void editSelectedEntry()//bool forceHex)
+        public void editSelectedEntry(bool forceHex)
         {
             int count = lstEntries.SelectedIndices.Count;
             if (count <= 0)
@@ -479,7 +481,7 @@ namespace BND2Master
             int index = lstEntries.SelectedIndices[0];
 
             EntryEditor editor = new EntryEditor();
-            //editor.ForceHex = forceHex;
+            editor.ForceHex = forceHex;
             Task.Run(()=>openEditor(editor, index));
             editor.ShowDialog(this);
         }
@@ -541,18 +543,18 @@ namespace BND2Master
 
         private void lstEntries_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            editSelectedEntry();// false);
+            editSelectedEntry(false);
         }
 
         private void previewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            editSelectedEntry();// false);
+            editSelectedEntry( false);
         }
 
-        /*private void viewDataToolStripMenuItem_Click(object sender, EventArgs e)
+        private void viewDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
             editSelectedEntry(true);
-        }*/
+        }
 
         private void patchImagesToolStripMenuItem_Click(object sender, EventArgs e)
         {

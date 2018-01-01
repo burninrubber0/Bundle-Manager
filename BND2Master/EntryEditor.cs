@@ -57,11 +57,11 @@ namespace BND2Master
             }
         }
 
-        /*public bool ForceHex
+        public bool ForceHex
         {
             get;
             set;
-        }*/
+        }
 
         public EntryEditor()
         {
@@ -199,6 +199,40 @@ namespace BND2Master
         {
             get
             {
+                if (pboImage.InvokeRequired)
+                {
+                    GetBool method = () =>
+                    {
+                        return pboImage.Visible;
+                    };
+                    return (bool)Invoke(method);
+                }
+                else
+                {
+                    return pboImage.Visible;
+                }
+            }
+            set
+            {
+                if (pboImage.InvokeRequired)
+                {
+                    SetBool method = (bool visible) =>
+                    {
+                        pboImage.Visible = visible;
+                    };
+                    Invoke(method, value);
+                }
+                else
+                {
+                    pboImage.Visible = value;
+                }
+            }
+        }
+
+        /*private bool ImageVisible
+        {
+            get
+            {
                 if (tabList.InvokeRequired)
                 {
                     GetBool method = () =>
@@ -240,7 +274,7 @@ namespace BND2Master
                     }
                 }
             }
-        }
+        }*/
 
         private delegate void SetTitleText(string val);
         private string Title
@@ -334,32 +368,32 @@ namespace BND2Master
         {
             get
             {
-                if (mnuBinary.InvokeRequired)
+                if (mnuBar.InvokeRequired)
                 {
                     GetBool method = () =>
                     {
-                        return exportToolStripMenuItem.Enabled;
+                        return imageToolStripMenuItem.Visible;
                     };
                     return (bool)Invoke(method);
                 }
                 else
                 {
-                    return exportToolStripMenuItem.Enabled;
+                    return imageToolStripMenuItem.Visible;
                 }
             }
             set
             {
-                if (mnuBinary.InvokeRequired)
+                if (mnuBar.InvokeRequired)
                 {
                     SetBool method = (bool enabled) =>
                     {
-                        exportToolStripMenuItem.Enabled = enabled;
+                        imageToolStripMenuItem.Visible = enabled;
                     };
                     Invoke(method, value);
                 }
                 else
                 {
-                    exportToolStripMenuItem.Enabled = value;
+                    imageToolStripMenuItem.Visible = value;
                 }
             }
         }
@@ -368,32 +402,66 @@ namespace BND2Master
         {
             get
             {
-                if (mnuBinary.InvokeRequired)
+                if (mnuBar.InvokeRequired)
                 {
                     GetBool method = () =>
                     {
-                        return mnuBinary.Visible;
+                        return binaryToolStripMenuItem.Visible;
                     };
                     return (bool)Invoke(method);
                 }
                 else
                 {
-                    return mnuBinary.Visible;
+                    return mnuBar.Visible;
                 }
             }
             set
             {
-                if (mnuBinary.InvokeRequired)
+                if (mnuBar.InvokeRequired)
                 {
                     SetBool method = (bool visible) =>
                     {
-                        mnuBinary.Visible = visible;
+                        binaryToolStripMenuItem.Visible = visible;
                     };
                     Invoke(method, value);
                 }
                 else
                 {
-                    mnuBinary.Visible = value;
+                    mnuBar.Visible = value;
+                }
+            }
+        }
+
+        private bool MenuVisible
+        {
+            get
+            {
+                if (mnuBar.InvokeRequired)
+                {
+                    GetBool method = () =>
+                    {
+                        return mnuBar.Visible;
+                    };
+                    return (bool)Invoke(method);
+                }
+                else
+                {
+                    return mnuBar.Visible;
+                }
+            }
+            set
+            {
+                if (mnuBar.InvokeRequired)
+                {
+                    SetBool method = (bool visible) =>
+                    {
+                        mnuBar.Visible = visible;
+                    };
+                    Invoke(method, value);
+                }
+                else
+                {
+                    mnuBar.Visible = value;
                 }
             }
         }
@@ -402,13 +470,12 @@ namespace BND2Master
         {
             Title = "Edit Entry: " + _entry.Index.ToString("d3");
             
-            /*if (ForceHex)
+            if (ForceHex)
             {
                 ImageVisible = false;
-                TabsVisible = true;
             }
-            else
-            {*/
+            else if (_entry.Type == EntryType.Texture)
+            {
                 if (_entry.Console)
                     Image = GameImage.GetImagePS3(_entry.Data, _entry.ExtraData);
                 else
@@ -416,7 +483,8 @@ namespace BND2Master
 
                 ImageVisible = Image != null;
 
-                TabsVisible = true;//!ImageVisible;
+            }
+            TabsVisible = !ImageVisible;
             //}
             ImageMenuVisible = ImageVisible;
             BinaryMenuVisible = TabsVisible;
@@ -426,6 +494,8 @@ namespace BND2Master
                 DataHex = _entry.Data;//.AsString();
                 ExtraDataHex = _entry.ExtraData;//.AsString();
             }
+
+            MenuVisible = true;
         }
 
         private void exportToolStripMenuItem_Click(object sender, EventArgs e)

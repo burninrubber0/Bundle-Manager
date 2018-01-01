@@ -203,7 +203,8 @@ namespace BundleFormat
 
                 entry.Console = console;
 
-                entry.Unknown9 = self.ReadInt64();
+                entry.ID = self.ReadInt32();
+                entry.Checksum = self.ReadInt32();
                 entry.Unknown11 = self.ReadInt32();
                 entry.Unknown12 = self.ReadInt32();
                 entry.Unknown13 = self.ReadInt32();
@@ -214,12 +215,13 @@ namespace BundleFormat
                 entry.StartOff = self.ReadInt32();
                 entry.ExtraStartOff = self.ReadInt64();
                 entry.Unknown21 = self.ReadInt32();
-                entry.Unknown22 = self.ReadInt32();
+                int FileDef = self.ReadInt32();
                 entry.Unknown23 = self.ReadInt32();
 
                 if (console)
                 {
-                    entry.Unknown9 = Util.ReverseBytes(entry.Unknown9);
+                    entry.ID = Util.ReverseBytes(entry.ID);
+                    entry.Checksum = Util.ReverseBytes(entry.Checksum);
                     entry.Unknown11 = Util.ReverseBytes(entry.Unknown11);
                     entry.Unknown12 = Util.ReverseBytes(entry.Unknown12);
                     entry.Unknown13 = Util.ReverseBytes(entry.Unknown13);
@@ -230,9 +232,11 @@ namespace BundleFormat
                     entry.StartOff = Util.ReverseBytes(entry.StartOff);
                     entry.ExtraStartOff = Util.ReverseBytes(entry.ExtraStartOff);
                     entry.Unknown21 = Util.ReverseBytes(entry.Unknown21);
-                    entry.Unknown22 = Util.ReverseBytes(entry.Unknown22);
+                    FileDef = Util.ReverseBytes(FileDef);
                     entry.Unknown23 = Util.ReverseBytes(entry.Unknown23);
                 }
+
+                entry.Type = (EntryType) FileDef;
 
                 // Data
                 long offset = self.BaseStream.Position;
@@ -392,7 +396,8 @@ namespace BundleFormat
                     }
                 }
 
-                self.Write(entry.Unknown9);
+                self.Write(entry.ID);
+                self.Write(entry.Checksum);
                 self.Write(entry.Unknown11);
                 self.Write(entry.Unknown12);
                 self.Write(entry.Unknown13);
@@ -408,7 +413,7 @@ namespace BundleFormat
                 self.Write((long)0);
                 
                 self.Write(entry.Unknown21);
-                self.Write(entry.Unknown22);
+                self.Write((int)entry.Type);
                 self.Write(entry.Unknown23);
 
                 //64;

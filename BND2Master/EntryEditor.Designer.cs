@@ -45,6 +45,9 @@
             this.imageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.infoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.infoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportObjToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stsMain = new System.Windows.Forms.StatusStrip();
             this.pbMain = new System.Windows.Forms.ProgressBar();
             this.pboImage = new System.Windows.Forms.PictureBox();
@@ -97,7 +100,7 @@
             this.tabExtraData.Location = new System.Drawing.Point(4, 22);
             this.tabExtraData.Name = "tabExtraData";
             this.tabExtraData.Padding = new System.Windows.Forms.Padding(3);
-            this.tabExtraData.Size = new System.Drawing.Size(616, 369);
+            this.tabExtraData.Size = new System.Drawing.Size(616, 393);
             this.tabExtraData.TabIndex = 2;
             this.tabExtraData.Text = "Extra Data";
             this.tabExtraData.UseVisualStyleBackColor = true;
@@ -112,7 +115,7 @@
             this.hexExtraData.HexData = null;
             this.hexExtraData.Location = new System.Drawing.Point(3, 3);
             this.hexExtraData.Name = "hexExtraData";
-            this.hexExtraData.Size = new System.Drawing.Size(610, 363);
+            this.hexExtraData.Size = new System.Drawing.Size(610, 387);
             this.hexExtraData.TabIndex = 0;
             // 
             // lblLoading
@@ -130,7 +133,8 @@
             // 
             this.mnuBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.binaryToolStripMenuItem,
-            this.imageToolStripMenuItem});
+            this.imageToolStripMenuItem,
+            this.infoToolStripMenuItem});
             this.mnuBar.Location = new System.Drawing.Point(0, 0);
             this.mnuBar.Name = "mnuBar";
             this.mnuBar.Size = new System.Drawing.Size(624, 24);
@@ -204,6 +208,29 @@
             this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.importToolStripMenuItem.Text = "Import";
             this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
+            // 
+            // infoToolStripMenuItem
+            // 
+            this.infoToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.infoToolStripMenuItem1,
+            this.exportObjToolStripMenuItem});
+            this.infoToolStripMenuItem.Name = "infoToolStripMenuItem";
+            this.infoToolStripMenuItem.Size = new System.Drawing.Size(53, 20);
+            this.infoToolStripMenuItem.Text = "Model";
+            // 
+            // infoToolStripMenuItem1
+            // 
+            this.infoToolStripMenuItem1.Name = "infoToolStripMenuItem1";
+            this.infoToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.infoToolStripMenuItem1.Text = "Info";
+            this.infoToolStripMenuItem1.Click += new System.EventHandler(this.infoToolStripMenuItem_Click);
+            // 
+            // exportObjToolStripMenuItem
+            // 
+            this.exportObjToolStripMenuItem.Name = "exportObjToolStripMenuItem";
+            this.exportObjToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exportObjToolStripMenuItem.Text = "Export Obj";
+            this.exportObjToolStripMenuItem.Click += new System.EventHandler(this.exportObjToolStripMenuItem_Click);
             // 
             // stsMain
             // 
@@ -285,5 +312,8 @@
         private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
         private System.Windows.Forms.PictureBox pboImage;
+        private System.Windows.Forms.ToolStripMenuItem infoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem infoToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem exportObjToolStripMenuItem;
     }
 }

@@ -61,6 +61,7 @@
             this.previewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.viewDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.potatoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuMain.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.mnuLst.SuspendLayout();
@@ -70,7 +71,8 @@
             // 
             this.mnuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.editToolStripMenuItem});
+            this.editToolStripMenuItem,
+            this.potatoToolStripMenuItem});
             this.mnuMain.Location = new System.Drawing.Point(0, 0);
             this.mnuMain.Name = "mnuMain";
             this.mnuMain.Size = new System.Drawing.Size(784, 24);
@@ -315,6 +317,13 @@
             this.viewDataToolStripMenuItem.Text = "View Data";
             this.viewDataToolStripMenuItem.Click += new System.EventHandler(this.viewDataToolStripMenuItem_Click);
             // 
+            // potatoToolStripMenuItem
+            // 
+            this.potatoToolStripMenuItem.Name = "potatoToolStripMenuItem";
+            this.potatoToolStripMenuItem.Size = new System.Drawing.Size(89, 20);
+            this.potatoToolStripMenuItem.Text = "Model Count";
+            this.potatoToolStripMenuItem.Click += new System.EventHandler(this.modelCountToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -371,6 +380,7 @@
         private System.Windows.Forms.ColumnHeader colType;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem viewDataToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem potatoToolStripMenuItem;
     }
 }
 

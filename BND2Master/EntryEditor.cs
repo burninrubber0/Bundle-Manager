@@ -803,5 +803,161 @@ namespace BND2Master
         {
             FocusTab();
         }
+
+        private struct Vertex
+        {
+            public float X, Y, Z;
+        }
+
+        private void infoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Entry.Type != EntryType.Model)
+                return;
+
+            string modelInfo = "";
+
+            byte[] header = Entry.Data;
+
+            MemoryStream ms = new MemoryStream(header);
+            BinaryReader br = new BinaryReader(ms);
+
+            int vertexSize = 32;
+
+            br.BaseStream.Position = 0x24;
+            int offset = br.ReadInt32();
+            br.BaseStream.Position = offset;
+
+            int vertexBlockOff = br.ReadInt32();
+            int dummy = br.ReadInt32();
+            int vertexBlockSize = br.ReadInt32();
+
+            long paddingCount = 16 - (br.BaseStream.Position % 16);
+            br.BaseStream.Position += paddingCount;
+
+            long blablaOff = br.BaseStream.Position;
+
+            br.BaseStream.Position = blablaOff + 0x4C;
+            int vertexCount = br.ReadInt32();
+            br.BaseStream.Position = blablaOff + 0x54;
+            int polyCount = br.ReadInt32();
+            int indexCount = polyCount * 3;
+
+            br.Close();
+            ms.Close();
+
+            modelInfo = "Model Info:\n";
+            modelInfo += "Vertex Block Offset: " + vertexBlockOff.ToString("X8") + "\n";
+            modelInfo += "Vertex Block Size: " + vertexBlockSize.ToString("X8") + "\n";
+            modelInfo += "Vertex Count: " + vertexCount.ToString() + "\n";
+            modelInfo += "Polygon Count: " + polyCount.ToString() + "\n";
+            modelInfo += "Index Count: " + indexCount.ToString() + "\n";
+
+            MessageBox.Show(this, modelInfo, "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void exportObjToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Entry.Type != EntryType.Model)
+                return;
+
+            string modelInfo = "";
+
+            byte[] header = Entry.Data;
+
+            MemoryStream ms = new MemoryStream(header);
+            BinaryReader br = new BinaryReader(ms);
+
+            int vertexSize = 32;
+
+            br.BaseStream.Position = 0x24;
+            int offset = br.ReadInt32();
+            br.BaseStream.Position = offset;
+
+            int vertexBlockOff = br.ReadInt32();
+            int dummy = br.ReadInt32();
+            int vertexBlockSize = br.ReadInt32();
+
+            long paddingCount = 16 - (br.BaseStream.Position % 16);
+            br.BaseStream.Position += paddingCount;
+
+            long blablaOff = br.BaseStream.Position;
+
+            br.BaseStream.Position = blablaOff + 0x4C;
+            int vertexCount = br.ReadInt32();
+            br.BaseStream.Position = blablaOff + 0x54;
+            int polyCount = br.ReadInt32();
+            int indexCount = polyCount * 3;
+
+            br.Close();
+            ms.Close();
+
+            try
+            {
+
+                byte[] data = Entry.ExtraData;
+                ms = new MemoryStream(data);
+                br = new BinaryReader(ms);
+
+                List<short> indices = new List<short>();
+
+                for (int i = 0; i < indexCount; i++)
+                {
+                    indices.Add((short)(br.ReadInt16() + 1));
+                }
+
+                br.BaseStream.Position = vertexBlockOff;
+
+                List<Vertex> vertices = new List<Vertex>();
+
+                for (int i = 0; i < vertexCount; i++)
+                {
+                    br.BaseStream.Position = vertexBlockOff + vertexSize * i;
+                    Vertex vertex = new Vertex();
+                    vertex.X = br.ReadSingle();
+                    vertex.Y = br.ReadSingle();
+                    vertex.Z = br.ReadSingle();
+                    vertices.Add(vertex);
+                }
+
+                br.Close();
+                ms.Close();
+
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.Filter = "Wavefront OBJ|*.obj|All Files|*.*";
+                DialogResult result = sfd.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    Stream s = File.Open(sfd.FileName, FileMode.Create);
+                    StreamWriter sw = new StreamWriter(s);
+
+                    for (int i = 0; i < vertices.Count; i++)
+                    {
+                        Vertex v = vertices[i];
+                        sw.WriteLine("v " + v.X + " " + v.Y + " " + v.Z);
+                    }
+
+                    sw.WriteLine();
+                    sw.WriteLine("g submesh_0");
+
+                    for (int i = 0; i < indices.Count; i += 3)
+                    {
+                        int index1 = indices[i + 0];
+                        int index2 = indices[i + 1];
+                        int index3 = indices[i + 2];
+                        sw.WriteLine("f " + index1 + " " + index2 + " " + index3);
+                    }
+
+                    sw.WriteLine();
+
+                    sw.Flush();
+                    sw.Close();
+                    sw.Close();
+                }
+            }
+            catch (IOException ex)
+            {
+                MessageBox.Show(this, "Error: " + ex.Message + "\n\n" + ex.StackTrace, "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 }

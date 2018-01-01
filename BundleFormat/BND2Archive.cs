@@ -119,6 +119,7 @@ namespace BundleFormat
         Texture = 0x00,
         Material = 0x01,
         ResourceStringTable = 0x03,
+        VertexDesc = 0xA,
         Model = 0x0C,
         Shader = 0x12,
         AttribSysVault = 0x1C,

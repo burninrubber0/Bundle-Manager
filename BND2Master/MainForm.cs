@@ -586,5 +586,17 @@ namespace BND2Master
                 e.Cancel = true;
             }
         }
+
+        private void modelCountToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int modelCount = 0;
+            foreach (BND2Entry entry in CurrentArchive.Entries)
+            {
+                if (entry.Type == EntryType.Model)
+                    modelCount++;
+            }
+
+            MessageBox.Show(this, "Model Count: " + modelCount, "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     }
 }

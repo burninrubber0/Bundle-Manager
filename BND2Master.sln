@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandardExtension", "Standa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleList", "VehicleList\VehicleList.csproj", "{557FC08F-7ACD-44D7-AC1F-FB815A267A36}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaultFormat", "VaultFormat\VaultFormat.csproj", "{47381AB0-8EEC-49E2-AC2F-D8AD2AC0F2DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{557FC08F-7ACD-44D7-AC1F-FB815A267A36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{557FC08F-7ACD-44D7-AC1F-FB815A267A36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{557FC08F-7ACD-44D7-AC1F-FB815A267A36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47381AB0-8EEC-49E2-AC2F-D8AD2AC0F2DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47381AB0-8EEC-49E2-AC2F-D8AD2AC0F2DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47381AB0-8EEC-49E2-AC2F-D8AD2AC0F2DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47381AB0-8EEC-49E2-AC2F-D8AD2AC0F2DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

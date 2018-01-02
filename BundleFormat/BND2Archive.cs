@@ -60,6 +60,8 @@ namespace BundleFormat
 
     public class BND2Entry
     {
+        public BND2Archive Archive;
+
         public int Index;
 
         public int ID;
@@ -112,6 +114,11 @@ namespace BundleFormat
         public bool Console;
 
         public bool Dirty;
+
+        public BND2Entry(BND2Archive archive)
+        {
+            Archive = archive;
+        }
     }
 
     public enum EntryType

@@ -809,6 +809,52 @@ namespace BND2Master
             public float X, Y, Z;
         }
 
+        private int GetVertexSize()
+        {
+            List<int> vertexSizes = new List<int>();
+            foreach (BND2Entry entry in Entry.Archive.Entries)
+            {
+                if (entry.Type != EntryType.VertexDesc)
+                    continue;
+
+                byte[] entryData = entry.Data;
+
+                MemoryStream ems = new MemoryStream(entryData);
+                BinaryReader ebr = new BinaryReader(ems);
+
+                ebr.BaseStream.Position += 17;
+                int vSize = ebr.ReadByte();
+
+                ebr.Close();
+                ems.Close();
+
+                if (!vertexSizes.Contains(vSize))
+                    vertexSizes.Add(vSize);
+            }
+
+            vertexSizes.Reverse();
+
+            int vertexSize;
+
+            if (vertexSizes.Count > 1)
+            {
+                VertexSizePicker picker = new VertexSizePicker();
+                picker.VertexSizeList = vertexSizes;
+                picker.ShowDialog(this);
+                vertexSize = picker.VertexSize;
+            }
+            else if (vertexSizes.Count == 1)
+            {
+                vertexSize = vertexSizes[0];
+            }
+            else
+            {
+                vertexSize = -1;
+            }
+
+            return vertexSize;
+        }
+
         private void infoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Entry.Type != EntryType.Model)
@@ -820,8 +866,6 @@ namespace BND2Master
 
             MemoryStream ms = new MemoryStream(header);
             BinaryReader br = new BinaryReader(ms);
-
-            int vertexSize = 32;
 
             br.BaseStream.Position = 0x24;
             int offset = br.ReadInt32();
@@ -860,14 +904,19 @@ namespace BND2Master
             if (Entry.Type != EntryType.Model)
                 return;
 
+            int vertexSize = GetVertexSize();
+            if (vertexSize == -1)
+            {
+                MessageBox.Show(this, "No VertexDesc was found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             string modelInfo = "";
 
             byte[] header = Entry.Data;
 
             MemoryStream ms = new MemoryStream(header);
             BinaryReader br = new BinaryReader(ms);
-
-            int vertexSize = 32;
 
             br.BaseStream.Position = 0x24;
             int offset = br.ReadInt32();

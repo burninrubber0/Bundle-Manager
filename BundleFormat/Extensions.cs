@@ -197,7 +197,7 @@ namespace BundleFormat
 
             for (int i = 0; i < result.FileCount; i++)
             {
-                BND2Entry entry = new BND2Entry();
+                BND2Entry entry = new BND2Entry(result);
 
                 entry.Index = i;
 

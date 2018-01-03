@@ -129,6 +129,10 @@
       <Project>{586c3542-1c47-46a6-81f3-323bcfed9a9a}</Project>
       <Name>HexEditor</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PVSFormat\PVSFormat.csproj">
+      <Project>{07e80234-b95f-42dc-99a3-a89a929dddbf}</Project>
+      <Name>PVSFormat</Name>
+    </ProjectReference>
     <ProjectReference Include="..\StandardExtension\StandardExtension.csproj">
       <Project>{1d9c18c6-b506-4cb7-9e3e-e22fbb24ac3b}</Project>
       <Name>StandardExtension</Name>

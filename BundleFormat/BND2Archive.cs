@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -119,6 +120,11 @@ namespace BundleFormat
         {
             Archive = archive;
         }
+
+        public MemoryStream MakeStream()
+        {
+            return new MemoryStream(Data);
+        }
     }
 
     public enum EntryType
@@ -150,6 +156,7 @@ namespace BundleFormat
         AEMSBank = 0xA022,
         CSIS = 0xA023,
         SplicerData = 0xA024,
+        PVSData = 0xB000, // Proper Name?
         LoopModel = 0x10000,
         AIMapData = 0x10001,
         TrafficData = 0x10002,

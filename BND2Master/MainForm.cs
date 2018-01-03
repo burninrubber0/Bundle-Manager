@@ -12,6 +12,7 @@ using BundleFormat;
 using System.Threading;
 using VehicleList;
 using Util = BundleFormat.Util;
+using PVSFormat;
 
 namespace BND2Master
 {
@@ -494,6 +495,12 @@ namespace BND2Master
                 };
                 vehicleList.Open(entry, entry.Console);
                 vehicleList.ShowDialog(this);
+            }
+            else if (entry.Type == EntryType.PVSData && !forceHex)
+            {
+                PVSEditor pvsForm = new PVSEditor();
+                pvsForm.Open(entry, entry.Console);
+                pvsForm.ShowDialog(this);
             }
             else
             {

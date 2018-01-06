@@ -78,7 +78,7 @@ namespace PVSFormat
             Entries = new List<PVSEntry>();
         }
 
-        public static PVS Read(BND2Entry entry, bool console)
+        public static PVS Read(BundleEntry entry, bool console)
         {
             PVS result = new PVS();
 
@@ -177,7 +177,7 @@ namespace PVSFormat
             return result;
         }
 
-        public static BND2Entry Write(BND2Entry entry)
+        public static BundleEntry Write(BundleEntry entry)
         {
             return entry;
         }

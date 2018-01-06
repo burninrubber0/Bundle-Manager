@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using BundleFormat;
 
 namespace PVSFormat
@@ -25,7 +17,7 @@ namespace PVSFormat
             dbgMain.SelectedObject = _currentPVS;
         }
 
-        public void Open(BND2Entry entry, bool console)
+        public void Open(BundleEntry entry, bool console)
         {
             _currentPVS = PVS.Read(entry, console);
 

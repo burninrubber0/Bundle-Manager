@@ -157,11 +157,11 @@ namespace BundleFormat
             return false;
         }
 
-        public static BND2Archive ReadBND2Archive(this BinaryReader self, bool console = false)
+        public static BundleArchive ReadBND2Archive(this BinaryReader self, bool console = false)
         {
-            BND2Archive result = new BND2Archive();
+            BundleArchive result = new BundleArchive();
 
-            if (!self.VerifyMagic(BND2Archive.MAGIC))
+            if (!self.VerifyMagic(BundleArchive.MAGIC))
                 return null;
 
             result.Console = console;
@@ -170,11 +170,11 @@ namespace BundleFormat
             result.Unknown2 = self.ReadInt32();
             result.Unknown3 = self.ReadInt32();
             result.FileCount = self.ReadInt32();
-            result.Unknown4 = self.ReadInt32();
-            result.DataStart = self.ReadInt32();
-            result.ExtraDataStart = self.ReadInt32();
+            result.MetadataStart = self.ReadInt32();
+            result.HeadStart = self.ReadInt32();
+            result.BodyStart = self.ReadInt32();
             result.ArchiveSize = self.ReadInt32();
-            result.Unknown6 = self.ReadInt32();
+            int CompressionType = self.ReadInt32();
             result.Unknown7 = self.ReadInt32();
             result.Unknown8 = self.ReadInt32();
 
@@ -184,20 +184,22 @@ namespace BundleFormat
                 result.Unknown2 = Util.ReverseBytes(result.Unknown2);
                 result.Unknown3 = Util.ReverseBytes(result.Unknown3);
                 result.FileCount = Util.ReverseBytes(result.FileCount);
-                result.Unknown4 = Util.ReverseBytes(result.Unknown4);
-                result.DataStart = Util.ReverseBytes(result.DataStart);
-                result.ExtraDataStart = Util.ReverseBytes(result.ExtraDataStart);
+                result.MetadataStart = Util.ReverseBytes(result.MetadataStart);
+                result.HeadStart = Util.ReverseBytes(result.HeadStart);
+                result.BodyStart = Util.ReverseBytes(result.BodyStart);
                 result.ArchiveSize = Util.ReverseBytes(result.ArchiveSize);
-                result.Unknown6 = Util.ReverseBytes(result.Unknown6);
+                CompressionType = Util.ReverseBytes(CompressionType);
                 result.Unknown7 = Util.ReverseBytes(result.Unknown7);
                 result.Unknown8 = Util.ReverseBytes(result.Unknown8);
             }
 
-            //long dataOffset = result.DataStart;
+            result.CompressionType = (CompressionType) CompressionType;
+
+            //long dataOffset = result.HeadStart;
 
             for (int i = 0; i < result.FileCount; i++)
             {
-                BND2Entry entry = new BND2Entry(result);
+                BundleEntry entry = new BundleEntry(result);
 
                 entry.Index = i;
 
@@ -205,44 +207,51 @@ namespace BundleFormat
 
                 entry.ID = self.ReadInt32();
                 entry.Checksum = self.ReadInt32();
-                entry.Unknown11 = self.ReadInt32();
+                entry.References = self.ReadInt32();
                 entry.Unknown12 = self.ReadInt32();
-                entry.Unknown13 = self.ReadInt32();
-                entry.Unknown14 = self.ReadInt32();
+                int uncompressedHeaderSize = self.ReadInt32();
+                int uncompressedBodySize = self.ReadInt32();
                 entry.Unknown15 = self.ReadInt32();
-                entry.FileSize = self.ReadInt32();
-                entry.ExtraSize = self.ReadInt64();
-                entry.StartOff = self.ReadInt32();
-                entry.ExtraStartOff = self.ReadInt64();
-                entry.Unknown21 = self.ReadInt32();
-                int FileDef = self.ReadInt32();
-                entry.Unknown23 = self.ReadInt32();
+                entry.HeaderSize = self.ReadInt32();
+                entry.BodySize = self.ReadInt64();
+                entry.HeadOffset = self.ReadInt32();
+                entry.BodyOffset = self.ReadInt64();
+                entry.DependenciesListOffset = self.ReadInt32();
+                int fileType = self.ReadInt32();
+                entry.DependencyCount = self.ReadInt16();
+                entry.Unknown = self.ReadInt16();
 
                 if (console)
                 {
                     entry.ID = Util.ReverseBytes(entry.ID);
                     entry.Checksum = Util.ReverseBytes(entry.Checksum);
-                    entry.Unknown11 = Util.ReverseBytes(entry.Unknown11);
+                    entry.References = Util.ReverseBytes(entry.References);
                     entry.Unknown12 = Util.ReverseBytes(entry.Unknown12);
-                    entry.Unknown13 = Util.ReverseBytes(entry.Unknown13);
-                    entry.Unknown14 = Util.ReverseBytes(entry.Unknown14);
+                    uncompressedHeaderSize = Util.ReverseBytes(uncompressedHeaderSize);
+                    uncompressedBodySize = Util.ReverseBytes(uncompressedBodySize);
                     entry.Unknown15 = Util.ReverseBytes(entry.Unknown15);
-                    entry.FileSize = Util.ReverseBytes(entry.FileSize);
-                    entry.ExtraSize = Util.ReverseBytes(entry.ExtraSize);
-                    entry.StartOff = Util.ReverseBytes(entry.StartOff);
-                    entry.ExtraStartOff = Util.ReverseBytes(entry.ExtraStartOff);
-                    entry.Unknown21 = Util.ReverseBytes(entry.Unknown21);
-                    FileDef = Util.ReverseBytes(FileDef);
-                    entry.Unknown23 = Util.ReverseBytes(entry.Unknown23);
+                    entry.HeaderSize = Util.ReverseBytes(entry.HeaderSize);
+                    entry.BodySize = Util.ReverseBytes(entry.BodySize);
+                    entry.HeadOffset = Util.ReverseBytes(entry.HeadOffset);
+                    entry.BodyOffset = Util.ReverseBytes(entry.BodyOffset);
+                    entry.DependenciesListOffset = Util.ReverseBytes(entry.DependenciesListOffset);
+                    fileType = Util.ReverseBytes(fileType);
+                    entry.DependencyCount = Util.ReverseBytes(entry.DependencyCount);
+                    entry.Unknown = Util.ReverseBytes(entry.Unknown);
                 }
 
-                entry.Type = (EntryType) FileDef;
+                entry.UncompressedHeaderSize = uncompressedHeaderSize & 0x0FFFFFFF;
+                entry.UncompressedHeaderSizeCache = uncompressedHeaderSize >> 16;
+                entry.UncompressedBodySize = uncompressedBodySize & 0x0FFFFFFF;
+                entry.UncompressedBodySizeCache = uncompressedBodySize >> 16;
 
-                // Data
+                entry.Type = (EntryType) fileType;
+
+                // Header
                 long offset = self.BaseStream.Position;
-                self.BaseStream.Seek(result.DataStart + entry.StartOff, SeekOrigin.Begin);
+                self.BaseStream.Seek(result.HeadStart + entry.HeadOffset, SeekOrigin.Begin);
 
-                byte[] data = self.ReadBytes(entry.FileSize);
+                byte[] data = self.ReadBytes(entry.HeaderSize);
 
                 try
                 {
@@ -259,7 +268,7 @@ namespace BundleFormat
                 catch (EndOfStreamException) { }
 
 
-                entry.CData = data;
+                entry.CompressedHeader = data;
 
                 /*entry.Unknown24 = self.ReadInt32();
                 List<byte> unk = new List<byte>();
@@ -271,11 +280,11 @@ namespace BundleFormat
                 //entry.Unknown24 = self.ReadInt32();
                 //entry.Unknown25 = self.ReadInt32();
 
-                entry.Data = data.Decompress();
-                if (entry.Data == null)
+                entry.Header = data.Decompress();
+                if (entry.Header == null)
                 {
                     entry.DataCompressed = false;
-                    entry.Data = data;
+                    entry.Header = data;
                 }
                 else
                 {
@@ -283,13 +292,13 @@ namespace BundleFormat
                 }
                 self.BaseStream.Seek(offset, SeekOrigin.Begin);
 
-                // Extra Data
-                if (entry.ExtraSize > 0 && result.ExtraDataStart != 0)
+                // Extra Header
+                if (entry.BodySize > 0 && result.BodyStart != 0)
                 {
-                    self.BaseStream.Seek(result.ExtraDataStart + entry.ExtraStartOff, SeekOrigin.Begin);
+                    self.BaseStream.Seek(result.BodyStart + entry.BodyOffset, SeekOrigin.Begin);
                     //try
                     //{
-                    byte[] extra = self.ReadBytes((int)entry.ExtraSize);
+                    byte[] extra = self.ReadBytes((int)entry.BodySize);
                     try
                     {
                         //if (i < result.FileCount - 1)
@@ -304,7 +313,7 @@ namespace BundleFormat
                     }
                     catch (EndOfStreamException) { }
 
-                    entry.CExtraData = extra;
+                    entry.CompressedBody = extra;
 
                     //entry.Unknown26 = self.ReadBytes(32);
                     /*List<byte> unk2 = new List<byte>();
@@ -313,11 +322,11 @@ namespace BundleFormat
                         unk2.Add(x2);
                     entry.Unknown27 = unk2.ToArray();*/
 
-                    entry.ExtraData = extra.Decompress();
-                    if (entry.ExtraData == null)
+                    entry.Body = extra.Decompress();
+                    if (entry.Body == null)
                     {
                         entry.ExtraDataCompressed = false;
-                        entry.ExtraData = extra;
+                        entry.Body = extra;
                     }
                     else
                     {
@@ -329,7 +338,7 @@ namespace BundleFormat
                 }
                 else
                 {
-                    entry.ExtraData = null;
+                    entry.Body = null;
                 }
 
                 entry.Dirty = false;
@@ -340,14 +349,14 @@ namespace BundleFormat
             return result;
         }
 
-        public static void WriteBND2Archive(this BinaryWriter self, BND2Archive result)
+        public static void WriteBND2Archive(this BinaryWriter self, BundleArchive result)
         {
-            self.Write(BND2Archive.MAGIC);
+            self.Write(BundleArchive.MAGIC);
             self.Write(result.Version);
             self.Write(result.Unknown2);
             self.Write(result.Unknown3);
             self.Write(result.Entries.Count);
-            self.Write(result.Unknown4);
+            self.Write(result.MetadataStart);
 
             long dataStartOffset = self.BaseStream.Position;
             self.Write((int)0);
@@ -359,7 +368,7 @@ namespace BundleFormat
             long archiveSizeOffset = self.BaseStream.Position;
             self.Write((int)0);
 
-            self.Write(result.Unknown6);
+            self.Write((int)result.CompressionType);
             self.Write(result.Unknown7);
             self.Write(result.Unknown8);
 
@@ -368,43 +377,52 @@ namespace BundleFormat
 
             for (int i = 0; i < result.Entries.Count; i++)
             {
-                BND2Entry entry = result.Entries[i];
+                BundleEntry entry = result.Entries[i];
 
                 if (entry.Dirty)
                 {
-                    byte[] compressedData = entry.Data;
-                    byte[] compressedExtraData = entry.ExtraData;
+                    byte[] compressedData = entry.Header;
+                    byte[] compressedExtraData = entry.Body;
                     if (entry.DataCompressed)
                         compressedData = compressedData.Compress();
                     if (entry.ExtraDataCompressed)
                         compressedExtraData = compressedExtraData.Compress();
 
-                    entry.CData = compressedData;
-                    entry.CExtraData = compressedExtraData;
-                    entry.FileSize = compressedData.Length;// + 2;
+                    entry.CompressedHeader = compressedData;
+                    entry.CompressedBody = compressedExtraData;
+                    entry.HeaderSize = compressedData.Length;// + 2;
                     //if (entry.DataCompressed)
-                    //    entry.FileSize += 2;
+                    //    entry.HeaderSize += 2;
                     if (compressedExtraData == null)
                     {
-                        entry.ExtraSize = 0;
+                        entry.BodySize = 0;
                     }
                     else
                     {
-                        entry.ExtraSize = compressedExtraData.Length;// + 32;
+                        entry.BodySize = compressedExtraData.Length;// + 32;
                         //if (entry.ExtraDataCompressed)
-                        //    entry.ExtraSize += 2;
+                        //    entry.BodySize += 2;
                     }
                 }
 
                 self.Write(entry.ID);
                 self.Write(entry.Checksum);
-                self.Write(entry.Unknown11);
+                self.Write(entry.References);
                 self.Write(entry.Unknown12);
-                self.Write(entry.Unknown13);
-                self.Write(entry.Unknown14);
+
+                int uncompressedHeaderSize = entry.UncompressedHeaderSize;
+                int uncompressedHeaderSizeCache = entry.UncompressedHeaderSizeCache;
+                int uncompressedHeaderSizeAndCache = (uncompressedHeaderSizeCache << 16) | uncompressedHeaderSize;
+
+                self.Write(uncompressedHeaderSizeAndCache);
+
+                int uncompressedBodySize = entry.UncompressedBodySize;
+                int uncompressedBodySizeCache = entry.UncompressedBodySizeCache;
+                int uncompressedBodySizeAndCache = (uncompressedBodySizeCache << 16) | uncompressedBodySize;
+                self.Write(uncompressedBodySizeAndCache);
                 self.Write(entry.Unknown15);
-                self.Write(entry.FileSize);
-                self.Write(entry.ExtraSize);
+                self.Write(entry.HeaderSize);
+                self.Write(entry.BodySize);
 
                 startOffOffsets[i] = self.BaseStream.Position;
                 self.Write((int)0);
@@ -412,9 +430,10 @@ namespace BundleFormat
                 extraStartOffOffsets[i] = self.BaseStream.Position;
                 self.Write((long)0);
                 
-                self.Write(entry.Unknown21);
+                self.Write(entry.DependenciesListOffset);
                 self.Write((int)entry.Type);
-                self.Write(entry.Unknown23);
+                self.Write(entry.DependencyCount);
+                self.Write(entry.Unknown);
 
                 //64;
 
@@ -429,16 +448,16 @@ namespace BundleFormat
 
             for (int i = 0; i < result.Entries.Count; i++)
             {
-                BND2Entry entry = result.Entries[i];
+                BundleEntry entry = result.Entries[i];
 
                 /*if (i == 0)
                 {
-                    entry.StartOff = 0;
+                    entry.HeadOffset = 0;
                 }
                 else
                 {
-                    BND2Entry prevEntry = result.Entries[i - 1];
-                    entry.StartOff = prevEntry.StartOff + prevEntry.FileSize + 1;
+                    BundleEntry prevEntry = result.Entries[i - 1];
+                    entry.HeadOffset = prevEntry.HeadOffset + prevEntry.HeaderSize + 1;
                 }*/
 
                 currentOffset = self.BaseStream.Position;
@@ -446,9 +465,9 @@ namespace BundleFormat
                 self.Write(currentOffset - startData);
                 self.Seek((int)currentOffset, SeekOrigin.Begin);
 
-                self.Write(entry.CData);
+                self.Write(entry.CompressedHeader);
                 self.Write(entry.Unknown24);
-                int numPadding = 16 - (entry.CData.Length + 4) % 16;
+                int numPadding = 16 - (entry.CompressedHeader.Length + 4) % 16;
                 for (int j = 0; j < numPadding; j++)
                     self.Write((byte)0);
                 //self.Write(entry.Unknown24);
@@ -459,7 +478,7 @@ namespace BundleFormat
                 //self.Write(entry.Unknown24);
                 //self.Write(entry.Unknown25);
                 //self.Write((byte)0);
-                //int numPadding = entry.Data.Length % 16;
+                //int numPadding = entry.Header.Length % 16;
                 //for (int j = 0; j < numPadding; j++)
                 //    self.Write((byte)0);
             }
@@ -481,8 +500,8 @@ namespace BundleFormat
 
             for (int i = 0; i < result.Entries.Count; i++)
             {
-                BND2Entry entry = result.Entries[i];
-                if (entry.CExtraData == null || entry.ExtraData == null)
+                BundleEntry entry = result.Entries[i];
+                if (entry.CompressedBody == null || entry.Body == null)
                     continue;
 
                 currentOffset = self.BaseStream.Position;
@@ -490,12 +509,12 @@ namespace BundleFormat
                 self.Write(currentOffset - startExtraData);
                 self.Seek((int)currentOffset, SeekOrigin.Begin);
 
-                self.Write(entry.CExtraData);
+                self.Write(entry.CompressedBody);
                 self.Write(entry.Unknown25);
                 //self.Write(entry.Unknown26);
                 //self.Write(entry.Unknown27);
                 //self.Write((byte)0);
-                int numPadding = 16 - (entry.CExtraData.Length + 4) % 16;
+                int numPadding = 16 - (entry.CompressedBody.Length + 4) % 16;
                 for (int j = 0; j < numPadding; j++)
                     self.Write((byte)0);
 

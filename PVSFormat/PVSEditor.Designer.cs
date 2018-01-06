@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.dbgMain = new BurnoutVaultEditor.DebugViewer();
+            this.dbgMain = new DebugViewerLib.DebugViewer();
             this.stsMain = new System.Windows.Forms.StatusStrip();
             this.SuspendLayout();
             // 
@@ -69,7 +69,7 @@
 
         #endregion
 
-        private BurnoutVaultEditor.DebugViewer dbgMain;
+        private DebugViewerLib.DebugViewer dbgMain;
         private System.Windows.Forms.StatusStrip stsMain;
     }
 }

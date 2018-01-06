@@ -20,7 +20,7 @@ namespace VehicleList
         public delegate void OnEdit();
         public event OnEdit Edit;
 
-        private BND2Entry Entry;
+        private BundleEntry Entry;
         private VehicleListData currentList;
 
         public VehicleListForm()
@@ -75,10 +75,10 @@ namespace VehicleList
             lstVehicles.Sort();
         }
 
-        public void Open(BND2Entry entry, bool console = false)
+        public void Open(BundleEntry entry, bool console = false)
         {
             Entry = entry;
-            byte[] data = entry.Data;
+            byte[] data = entry.Header;
             MemoryStream ms = new MemoryStream(data);
             BinaryReader mbr = new BinaryReader(ms);
             currentList = mbr.ReadVehicleList(console);
@@ -87,7 +87,7 @@ namespace VehicleList
             UpdateDisplay();
         }
 
-        public BND2Entry Write(bool console)
+        public BundleEntry Write(bool console)
         {
             MemoryStream ms = new MemoryStream();
             BinaryWriter mbw = new BinaryWriter(ms);
@@ -95,7 +95,7 @@ namespace VehicleList
             byte[] data = ms.ToArray();
             mbw.Close();
 
-            Entry.Data = data;
+            Entry.Header = data;
 
             return Entry;
         }

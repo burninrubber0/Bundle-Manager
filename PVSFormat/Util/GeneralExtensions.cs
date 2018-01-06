@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace BurnoutVaultEditor.Util
+namespace PVSFormat.Util
 {
     public static class GeneralExtensions
     {

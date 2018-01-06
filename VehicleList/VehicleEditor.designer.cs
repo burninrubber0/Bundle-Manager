@@ -294,7 +294,7 @@
             "Unknown2",
             "Upgrade",
             "Unknown3",
-            "Unknown4",
+            "MetadataStart",
             "Unknown5"});
             this.cboLockByte.Location = new System.Drawing.Point(89, 273);
             this.cboLockByte.Name = "cboLockByte";

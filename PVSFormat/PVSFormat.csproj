@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DebugHelper">
+      <HintPath>..\..\..\Lib\DotNet\DebugViewer\DebugHelper.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -57,10 +60,6 @@
     <ProjectReference Include="..\BundleFormat\BundleFormat.csproj">
       <Project>{49b81828-760c-42db-9fad-96755597c871}</Project>
       <Name>BundleFormat</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DebugViewer\DebugViewerLib.csproj">
-      <Project>{ba225270-2f1e-4f2c-85f8-5e10325c12b0}</Project>
-      <Name>DebugViewerLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1129,9 +1129,7 @@ namespace BundleManager
                 MessageBox.Show(this, "No VertexDesc was found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-
-            string modelInfo = "";
-
+            
             byte[] header = Entry.Header;
 
             MemoryStream ms = new MemoryStream(header);

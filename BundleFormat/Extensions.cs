@@ -205,7 +205,7 @@ namespace BundleFormat
 
                 entry.Console = console;
 
-                entry.ID = self.ReadInt32();
+                entry.ID = self.ReadUInt32();
                 entry.Checksum = self.ReadInt32();
                 entry.References = self.ReadInt32();
                 entry.Unknown12 = self.ReadInt32();

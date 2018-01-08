@@ -83,6 +83,16 @@ namespace BundleManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap icon {
+            get {
+                object obj = ResourceManager.GetObject("icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap NewDocumentHS {
             get {
                 object obj = ResourceManager.GetObject("NewDocumentHS", resourceCulture);
@@ -96,6 +106,16 @@ namespace BundleManager.Properties {
         internal static System.Drawing.Bitmap NewFolderHS {
             get {
                 object obj = ResourceManager.GetObject("NewFolderHS", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap openfolderHS {
+            get {
+                object obj = ResourceManager.GetObject("openfolderHS", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

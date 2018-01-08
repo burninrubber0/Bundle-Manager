@@ -25,9 +25,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathLib", "MathLib\MathLib.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nexus", "Nexus\Nexus.csproj", "{08721BF1-E76B-4773-BF59-7A435DF47DA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugViewerLib", "DebugViewer\DebugViewerLib.csproj", "{BA225270-2F1E-4F2C-85F8-5E10325C12B0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BundleUtilities", "BundleUtilities\BundleUtilities.csproj", "{34471573-F236-4A7C-ABD9-C1FE4686B37E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IconLibrary", "IconLibrary\IconLibrary.csproj", "{A56B769D-941F-4B1E-9905-F5A981FA6EAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelViewer", "ModelViewer\ModelViewer.csproj", "{463D5389-3704-473E-B4C3-B334474CEFDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,14 +81,18 @@ Global
 		{08721BF1-E76B-4773-BF59-7A435DF47DA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08721BF1-E76B-4773-BF59-7A435DF47DA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08721BF1-E76B-4773-BF59-7A435DF47DA2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BA225270-2F1E-4F2C-85F8-5E10325C12B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA225270-2F1E-4F2C-85F8-5E10325C12B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BA225270-2F1E-4F2C-85F8-5E10325C12B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BA225270-2F1E-4F2C-85F8-5E10325C12B0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{34471573-F236-4A7C-ABD9-C1FE4686B37E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{34471573-F236-4A7C-ABD9-C1FE4686B37E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34471573-F236-4A7C-ABD9-C1FE4686B37E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34471573-F236-4A7C-ABD9-C1FE4686B37E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A56B769D-941F-4B1E-9905-F5A981FA6EAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A56B769D-941F-4B1E-9905-F5A981FA6EAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A56B769D-941F-4B1E-9905-F5A981FA6EAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A56B769D-941F-4B1E-9905-F5A981FA6EAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{463D5389-3704-473E-B4C3-B334474CEFDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{463D5389-3704-473E-B4C3-B334474CEFDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{463D5389-3704-473E-B4C3-B334474CEFDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{463D5389-3704-473E-B4C3-B334474CEFDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using BundleFormat;
 using BundleUtilities;
-using DebugViewerLib.Util;
+using DebugHelper;
+using ModelViewer;
+using ModelViewer.SceneData;
 using PVSFormat;
 using VehicleList;
 using Util = BundleFormat.Util;
@@ -17,6 +19,33 @@ namespace BundleManager
 {
     public partial class MainForm : Form
     {
+        private bool _subForm;
+        public bool SubForm
+        {
+            get { return _subForm; }
+            set
+            {
+                _subForm = value;
+
+                tsbNew.Visible = !value;
+                toolStripSeparator1.Visible = !value;
+                tsbOpen.Visible = !value;
+                tsbOpenConsole.Visible = !value;
+                toolStripSeparator2.Visible = !value;
+                toolStripSeparator3.Visible = !value;
+                tsbSwitchMode.Visible = !value;
+
+                newToolStripMenuItem.Visible = !value;
+                toolStripMenuItem3.Visible = !value;
+                openToolStripMenuItem.Visible = !value;
+                openConsoleToolStripMenuItem.Visible = !value;
+                toolStripMenuItem1.Visible = !value;
+
+                exitToolStripMenuItem.Visible = !value;
+                closeToolStripMenuItem.Visible = value;
+            }
+        }
+
         private BundleArchive _archive;
 
         private delegate BundleArchive GetArchive();
@@ -65,7 +94,7 @@ namespace BundleManager
 
         private delegate void SetString(string archive);
 
-        private string currentFileName
+        private string CurrentFileName
         {
             get
             {
@@ -200,7 +229,7 @@ namespace BundleManager
                 else if (result == DialogResult.No)
                 {
                     CurrentArchive = null;
-                    currentFileName = null;
+                    CurrentFileName = null;
                     UpdateDisplay();
                     return true;
                 }
@@ -262,7 +291,7 @@ namespace BundleManager
             {
                 _openSaveThread?.Abort();
                 CurrentArchive = null;
-                currentFileName = null;
+                CurrentFileName = null;
             }
             else
             {
@@ -273,13 +302,13 @@ namespace BundleManager
                 {
                     MessageBox.Show(this, "There was an error opening archive: " + (string) values[1], "Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    currentFileName = null;
+                    CurrentFileName = null;
                     Text = "Bundle Manager";
                 }
                 else
                 {
-                    currentFileName = (string) values[1];
-                    Text = "Bundle Manager - " + currentFileName;
+                    CurrentFileName = (string) values[1];
+                    Text = "Bundle Manager - " + CurrentFileName;
                 }
             }
             UpdateDisplay();
@@ -317,15 +346,15 @@ namespace BundleManager
                 MessageBox.Show(this, "Nothing to save!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return true;
             }
-            if (string.IsNullOrEmpty(currentFileName))
+            if (string.IsNullOrEmpty(CurrentFileName))
             {
                 return SaveAs();
             }
 
             LoadingDialog loader = new LoadingDialog();
-            loader.Status = "Saving: " + currentFileName;
+            loader.Status = "Saving: " + CurrentFileName;
             loader.Done += Loader_SaveDone;
-            _openSaveThread = new Thread(() => DoSaveBundle(loader, currentFileName));
+            _openSaveThread = new Thread(() => DoSaveBundle(loader, CurrentFileName));
             _openSaveThread.Start();
             loader.ShowDialog(this);
             return true;
@@ -353,8 +382,8 @@ namespace BundleManager
                 _openSaveThread.Start();
                 loader.ShowDialog(this);
 
-                currentFileName = sfd.FileName;
-                Text = "Bundle Manager - " + currentFileName;
+                CurrentFileName = sfd.FileName;
+                Text = "Bundle Manager - " + CurrentFileName;
 
                 return true;
             }
@@ -385,7 +414,7 @@ namespace BundleManager
             loader.IsDone = true;
         }
 
-        public void exit()
+        public void Exit()
         {
             Application.Exit();
         }
@@ -470,7 +499,7 @@ namespace BundleManager
             }
         }
 
-        public void editSelectedEntry(bool forceHex)
+        public void EditSelectedEntry(bool forceHex)
         {
             int count = lstEntries.SelectedIndices.Count;
             if (count <= 0)
@@ -500,7 +529,17 @@ namespace BundleManager
             else if (entry.Type == EntryType.InstanceListResourceType && !forceHex)
             {
                 InstanceList instanceList = InstanceList.Read(entry);
-                DebugUtil.ShowDebug(this, instanceList);
+                //DebugUtil.ShowDebug(this, instanceList);
+                
+                Scene scene = instanceList.MakeScene();
+                ModelViewerForm.ShowModelViewer(this, scene);
+            }
+            else if (entry.Type == EntryType.RwRenderableResourceType && !forceHex)
+            {
+                Renderable renderable = Renderable.Read(entry);
+                Scene scene = renderable.MakeScene();
+
+                ModelViewerForm.ShowModelViewer(this, scene);
             }
             else
             {
@@ -543,7 +582,7 @@ namespace BundleManager
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            exit();
+            Exit();
         }
 
         private void tsbNew_Click(object sender, EventArgs e)
@@ -568,17 +607,17 @@ namespace BundleManager
 
         private void lstEntries_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            editSelectedEntry(false);
+            EditSelectedEntry(false);
         }
 
         private void previewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            editSelectedEntry(false);
+            EditSelectedEntry(false);
         }
 
         private void viewDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            editSelectedEntry(true);
+            EditSelectedEntry(true);
         }
 
         private void patchImagesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -592,6 +631,26 @@ namespace BundleManager
             {
                 e.Cancel = true;
             }
+
+            if (!SubForm)
+                Application.Exit();
+        }
+
+        private void tsbSwitchMode_Click(object sender, EventArgs e)
+        {
+            if (!CheckSave())
+                return;
+
+            CurrentArchive = null;
+            CurrentFileName = null;
+
+            Hide();
+            Program.folderModeForm.Show();
+        }
+
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         /*private void modelCountToolStripMenuItem_Click(object sender, EventArgs e)

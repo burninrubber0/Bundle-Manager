@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace BundleFormat
 {
@@ -59,6 +61,83 @@ namespace BundleFormat
         {
             this.Entries = new List<BundleEntry>();
         }
+
+        public BundleEntry GetEntryByID(uint id)
+        {
+            for (int i = 0; i < Entries.Count; i++)
+            {
+                BundleEntry entry = Entries[i];
+                if (entry.ID == id)
+                    return entry;
+            }
+            return null;
+        }
+
+        public static BundleArchive Read(string path, bool console = false)
+        {
+            Stream s = File.Open(path, FileMode.Open);
+            BinaryReader br = new BinaryReader(s);
+
+            BundleArchive result = br.ReadBND2Archive(console);
+
+            br.Close();
+            s.Close();
+
+            return result;
+        }
+
+        public static bool IsBundle(string path)
+        {
+            bool result;
+
+            try
+            {
+                Stream s = File.Open(path, FileMode.Open);
+                BinaryReader br = new BinaryReader(s);
+
+                result = br.VerifyMagic(MAGIC);
+
+                br.Close();
+                s.Close();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message + "\n\n" + ex.StackTrace);
+                result = false;
+            }
+
+            return result;
+        }
+
+        public static List<uint> GetEntryIDs(string path, bool console = false)
+        {
+            List<uint> result = new List<uint>();
+
+            Stream s = File.Open(path, FileMode.Open);
+            BinaryReader br = new BinaryReader(s);
+
+            if (!br.VerifyMagic(MAGIC))
+                return null;
+
+            br.BaseStream.Position = 0x10;
+            int fileCount = br.ReadInt32();
+            int metaStart = br.ReadInt32();
+
+            br.BaseStream.Position = metaStart;
+
+            for (int i = 0; i < fileCount; i++)
+            {
+                uint ID = br.ReadUInt32();
+                br.BaseStream.Position += 0x3C;
+
+                result.Add(ID);
+            }
+
+            br.Close();
+            s.Close();
+
+            return result;
+        }
     }
 
     public class BundleEntry
@@ -67,7 +146,7 @@ namespace BundleFormat
 
         public int Index;
 
-        public int ID;
+        public uint ID;
         public int Checksum;
         public int References;
         public int Unknown12;
@@ -109,8 +188,10 @@ namespace BundleFormat
             Archive = archive;
         }
 
-        public MemoryStream MakeStream()
+        public MemoryStream MakeStream(bool body = false)
         {
+            if (body)
+                return new MemoryStream(Body);
             return new MemoryStream(Header);
         }
 
@@ -159,9 +240,9 @@ namespace BundleFormat
             switch (Type)
             {
                 case EntryType.RasterResourceType:
-                    break;
+                    return Color.Orange;
                 case EntryType.MaterialResourceType:
-                    break;
+                    return Color.DeepPink;
                 case EntryType.TextFileResourceType:
                     break;
                 case EntryType.RwVertexDescResourceType:
@@ -197,7 +278,7 @@ namespace BundleFormat
                 case EntryType.LuaCodeResourceType:
                     break;
                 case EntryType.InstanceListResourceType:
-                    return Color.Cyan;
+                    return Color.BlueViolet;
                 case EntryType.IDList:
                     break;
                 case EntryType.LanguageResourceType:
@@ -207,7 +288,7 @@ namespace BundleFormat
                 case EntryType.SatNavTileDirectoryResourceType:
                     break;
                 case EntryType.ModelResourceType:
-                    break;
+                    return Color.Blue;
                 case EntryType.RwColourCubeResourceType:
                     break;
                 case EntryType.HudMessageResourceType:
@@ -341,14 +422,32 @@ namespace BundleFormat
         {
             string value = "";
 
+            bool external = Entry == null;
+
+            string extra = "";
+            if (Entry == null)
+            {
+                string file = BundleCache.GetFileByEntryID(EntryID);
+                if (!string.IsNullOrEmpty(file))
+                {
+                    extra = ", Path: " + BundleCache.GetRelativePath(file);
+                    BundleArchive archive = BundleArchive.Read(file, false);
+                    Entry = archive.GetEntryByID(EntryID);
+                }
+            }
+
             if (Entry != null && Entry.Type == EntryType.RwVertexDescResourceType)
             {
                 VertexDesc desc = VertexDesc.Read(Entry);
                 value = ", Stride: " + desc.Stride.ToString("D2");
             }
 
-            string extra = Entry == null ? "(External)" : "(Internal: " + EntryIndex.ToString("D3") + ", " + Entry.Type + value + ")";
-            return "ID: 0x" + EntryID.ToString("X8") + ", PtrOffset: 0x" + EntryPointerOffset.ToString("X8") + " " + extra;
+            string location = external ? "External" : "Internal";
+
+            string info = "(External)";
+            if (Entry != null)
+                info = "(" + location + ": " + EntryIndex.ToString("D3") + ", " + Entry.Type + value + extra + ")";
+            return "ID: 0x" + EntryID.ToString("X8") + ", PtrOffset: 0x" + EntryPointerOffset.ToString("X8") + " " + info;
         }
     }
 

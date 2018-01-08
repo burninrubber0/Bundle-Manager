@@ -2,8 +2,11 @@
 using System.IO;
 using BundleFormat;
 using MathLib;
+using ModelViewer.SceneData;
 using Nexus;
 using Nexus.Graphics.Transforms;
+using OpenTK;
+using Quaternion = Nexus.Quaternion;
 
 namespace BundleManager
 {
@@ -15,10 +18,14 @@ namespace BundleManager
         public int Unknown2;
         public int Unknown3;
         public int Unknown4;
-        public Matrix3D Transform;
+        public Matrix4 Transform;
 
-        public Vector3D Translation => Transform.Translation;
-        public Vector3D Scale
+        public Vector3 Translation => Transform.ExtractTranslation();
+
+        public Vector3 Scale => Transform.ExtractScale();
+
+        public Vector4 Rotation => Transform.ExtractRotation().ToAxisAngle();
+        /*public Vector3D Scale
         {
             get
             {
@@ -29,7 +36,7 @@ namespace BundleManager
             }
         }
 
-        public AxisAngleRotation3D Rotation => new AxisAngleRotation3D(Quaternion.CreateFromRotationMatrix(Transform));
+        public AxisAngleRotation3D Rotation => new AxisAngleRotation3D(Quaternion.CreateFromRotationMatrix(Transform));*/
 
         public static ModelInstance Read(BinaryReader br)
         {
@@ -39,7 +46,7 @@ namespace BundleManager
             result.Unknown2 = br.ReadInt32();
             result.Unknown3 = br.ReadInt32();
             result.Unknown4 = br.ReadInt32();
-            result.Transform = br.ReadMatrix3F();
+            result.Transform = br.ReadMatrix4();
 
             return result;
         }
@@ -61,6 +68,8 @@ namespace BundleManager
 
     public class InstanceList
     {
+        public BundleEntry Entry;
+
         public int Unknown1;
         public List<ModelInstance> Instances;
         public int Unknown2;
@@ -74,6 +83,7 @@ namespace BundleManager
         public static InstanceList Read(BundleEntry entry)
         {
             InstanceList result = new InstanceList();
+            result.Entry = entry;
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader br = new BinaryReader(ms);
@@ -122,6 +132,37 @@ namespace BundleManager
 
             entry.Header = data;
             entry.Dirty = true;
+        }
+
+        public Scene MakeScene()
+        {
+            Scene scene = new Scene();
+
+            foreach (ModelInstance instance in Instances)
+            {
+                BundleEntry modelEntry = Entry.Archive.GetEntryByID(instance.ModelEntryID);
+                if (modelEntry == null)
+                {
+                    string file = BundleCache.GetFileByEntryID(instance.ModelEntryID);
+                    if (!string.IsNullOrEmpty(file))
+                    {
+                        BundleArchive archive = BundleArchive.Read(file, Entry.Console);
+                        modelEntry = archive.GetEntryByID(instance.ModelEntryID);
+                    }
+                }
+
+                if (modelEntry != null)
+                {
+                    BundleEntry renderableEntry = modelEntry.GetDependencies()[0].Entry;
+                    Renderable renderable = Renderable.Read(renderableEntry);
+                    SceneObject sceneObject = new SceneObject(instance.ModelEntryID.ToString("X8"), renderable.Model);
+                    sceneObject.Transform = instance.Transform;
+
+                    scene.AddObject(sceneObject);
+                }
+            }
+
+            return scene;
         }
     }
 }

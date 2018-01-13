@@ -15,6 +15,8 @@ namespace BundleFormat
     {
         public static readonly byte[] MAGIC = new byte[] { 0x62, 0x6E, 0x64, 0x32 };
 
+        public string Path;
+
         public int Version;
         public int Unknown2; // Normally 1
         public int Unknown3; // Normally 30
@@ -79,6 +81,7 @@ namespace BundleFormat
             BinaryReader br = new BinaryReader(s);
 
             BundleArchive result = br.ReadBND2Archive(console);
+            result.Path = path;
 
             br.Close();
             s.Close();
@@ -146,8 +149,7 @@ namespace BundleFormat
 
         public int Index;
 
-        public uint ID;
-        public int Checksum;
+        public ulong ID;
         public int References;
         public int Unknown12;
         public int UncompressedHeaderSize;

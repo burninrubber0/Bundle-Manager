@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -86,11 +88,44 @@ namespace ModelViewer.SceneData
 
         public void ExportWavefrontObj(string path)
         {
-            Stream s = File.Open(path, FileMode.Create);
-            StreamWriter sw = new StreamWriter(s);
+            string fullPath = Path.GetFullPath(path).Replace(Path.GetFileName(path), "");
+            string mtlPath = fullPath + Path.GetFileNameWithoutExtension(path) + ".mtl";
+            string materialDir = Path.GetFileNameWithoutExtension(path) + "_materials\\";
+            string materialDirPath = fullPath + "/" + materialDir;
+            if (!Directory.Exists(materialDirPath))
+                Directory.CreateDirectory(materialDirPath);
 
             List<Material> materials = GetAllMaterials();
 
+            Stream s1 = File.Open(mtlPath, FileMode.Create);
+            StreamWriter sw1 = new StreamWriter(s1);
+            for (int i = 0; i < materials.Count; i++)
+            {
+                Material material = materials[i];
+
+                string materialFileName =  "material" + i + ".png";
+                string materialRelativePathName = materialDir + materialFileName;
+                string materialPathName = materialDirPath + materialFileName;
+
+                sw1.WriteLine("newmtl material" + i);
+                sw1.WriteLine("map_Kd " + materialRelativePathName);
+
+                sw1.WriteLine();
+
+                Image image = material.DiffuseMap;
+                //Bitmap bitmap = new Bitmap(image);
+                image.Save(materialPathName, ImageFormat.Png);
+            }
+
+            sw1.Flush();
+            sw1.Close();
+            s1.Close();
+
+            Stream s = File.Open(path, FileMode.Create);
+            StreamWriter sw = new StreamWriter(s);
+
+            sw.WriteLine("mtllib " + mtlPath);
+            
             int meshIndex = 0;
 
             int usedIndices = 0;

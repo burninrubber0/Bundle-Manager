@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GraphicsScene.cs" />
     <Compile Include="SceneData\Material.cs" />
     <Compile Include="SceneData\Mesh.cs" />
     <Compile Include="SceneData\Model.cs" />

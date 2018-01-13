@@ -56,8 +56,9 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DebugHelper">
-      <HintPath>..\..\..\Lib\DotNet\DebugViewer\DebugHelper.dll</HintPath>
+    <Reference Include="DebugHelper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Lib\DotNet\DebugHelper\DebugHelper.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -76,6 +77,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AptData.cs" />
+    <Compile Include="AptDataAlt.cs" />
     <Compile Include="EntryEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -104,9 +107,13 @@
     <Compile Include="MaterialEntry.cs" />
     <Compile Include="ModelResource.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="ProgressionData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderable.cs" />
     <Compile Include="SaveData.cs" />
+    <Compile Include="StreetData.cs" />
+    <Compile Include="TextureState.cs" />
+    <Compile Include="TriggerData.cs" />
     <Compile Include="VertexSizePicker.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -180,10 +187,6 @@
     <ProjectReference Include="..\ModelViewer\ModelViewer.csproj">
       <Project>{463d5389-3704-473e-b4c3-b334474cefde}</Project>
       <Name>ModelViewer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Nexus\Nexus.csproj">
-      <Project>{08721BF1-E76B-4773-BF59-7A435DF47DA2}</Project>
-      <Name>Nexus</Name>
     </ProjectReference>
     <ProjectReference Include="..\PVSFormat\PVSFormat.csproj">
       <Project>{07e80234-b95f-42dc-99a3-a89a929dddbf}</Project>

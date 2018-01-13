@@ -205,8 +205,7 @@ namespace BundleFormat
 
                 entry.Console = console;
 
-                entry.ID = self.ReadUInt32();
-                entry.Checksum = self.ReadInt32();
+                entry.ID = self.ReadUInt64();
                 entry.References = self.ReadInt32();
                 entry.Unknown12 = self.ReadInt32();
                 int uncompressedHeaderSize = self.ReadInt32();
@@ -224,7 +223,6 @@ namespace BundleFormat
                 if (console)
                 {
                     entry.ID = Util.ReverseBytes(entry.ID);
-                    entry.Checksum = Util.ReverseBytes(entry.Checksum);
                     entry.References = Util.ReverseBytes(entry.References);
                     entry.Unknown12 = Util.ReverseBytes(entry.Unknown12);
                     uncompressedHeaderSize = Util.ReverseBytes(uncompressedHeaderSize);
@@ -406,7 +404,6 @@ namespace BundleFormat
                 }
 
                 self.Write(entry.ID);
-                self.Write(entry.Checksum);
                 self.Write(entry.References);
                 self.Write(entry.Unknown12);
 

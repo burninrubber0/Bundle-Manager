@@ -34,7 +34,7 @@ namespace BundleManager
                     Application.Run(new MainForm());
                 }*/
 
-                Application.Run(folderModeForm);
+                Application.Run(fileModeForm);
             }
             else
             {

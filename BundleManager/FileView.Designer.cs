@@ -42,6 +42,7 @@
             this.tsbSwitchMode = new System.Windows.Forms.ToolStripButton();
             this.lstMain = new System.Windows.Forms.ListView();
             this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuMain.SuspendLayout();
             this.tspMain.SuspendLayout();
             this.SuspendLayout();
@@ -57,7 +58,8 @@
             // mnuMain
             // 
             this.mnuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.testToolStripMenuItem});
             this.mnuMain.Location = new System.Drawing.Point(0, 0);
             this.mnuMain.Name = "mnuMain";
             this.mnuMain.Size = new System.Drawing.Size(582, 24);
@@ -157,6 +159,13 @@
             this.colName.Text = "Name";
             this.colName.Width = 160;
             // 
+            // testToolStripMenuItem
+            // 
+            this.testToolStripMenuItem.Name = "testToolStripMenuItem";
+            this.testToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
+            this.testToolStripMenuItem.Text = "Test";
+            this.testToolStripMenuItem.Click += new System.EventHandler(this.testToolStripMenuItem_Click);
+            // 
             // FileView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -195,5 +204,6 @@
         private System.Windows.Forms.ToolStripButton tsbSwitchMode;
         private System.Windows.Forms.ListView lstMain;
         private System.Windows.Forms.ColumnHeader colName;
+        private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
     }
 }

@@ -3,10 +3,7 @@ using System.IO;
 using BundleFormat;
 using MathLib;
 using ModelViewer.SceneData;
-using Nexus;
-using Nexus.Graphics.Transforms;
 using OpenTK;
-using Quaternion = Nexus.Quaternion;
 
 namespace BundleManager
 {

@@ -274,5 +274,76 @@ namespace BundleManager
                 OpenBundle(lstMain.SelectedIndices[0]);
             }
         }
+
+        private void testToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "Text Files|*.txt";
+            DialogResult result = sfd.ShowDialog(this);
+
+            if (result == DialogResult.OK)
+            {
+                List<string> referenceList = new List<string>();
+
+                string[] files = Directory.GetFiles(_currentPath, "*.*", SearchOption.AllDirectories);
+
+                int i = 0;
+                foreach (string file in files)
+                {
+                    if (!BundleArchive.IsBundle(file))
+                        continue;
+
+                    string fixedPath = file.Replace('\\', '/');
+                    string fixedCurrentPath = _currentPath.Replace('\\', '/');
+
+                    fixedPath = fixedPath.Replace(fixedCurrentPath, "");
+
+                    if (fixedPath.StartsWith("/"))
+                        fixedPath = fixedPath.Substring(1);
+
+                    string[] itemData = new string[]
+                    {
+                        fixedPath
+                    };
+
+                    BundleArchive archive = BundleArchive.Read(file, _console);
+                    referenceList.AddRange(ScanTest(archive));
+
+                    i++;
+                }
+
+                Stream s = File.Open(sfd.FileName, FileMode.Create);
+                StreamWriter sw = new StreamWriter(s);
+
+                foreach (string reference in referenceList)
+                {
+                    sw.WriteLine(reference);
+                }
+
+                sw.Flush();
+                sw.Close();
+                s.Close();
+            }
+        }
+
+        private List<string> ScanTest(BundleArchive archive)
+        {
+            List<string> referenceList = new List<string>();
+            foreach (BundleEntry entry in archive.Entries)
+            {
+                if (entry.Type != EntryType.RwTextureStateResourceType)
+                    continue;
+
+                List<Dependency> dependencies = entry.GetDependencies();
+                foreach (Dependency dependency in dependencies)
+                {
+                    uint id = dependency.EntryID;
+                    string entryFile = BundleCache.GetFileByEntryID(id);
+                    if (entryFile.ToUpper().Contains("WORLDTEX4"))
+                        referenceList.Add(Path.GetFileName(archive.Path));
+                }
+            }
+            return referenceList;
+        }
     }
 }

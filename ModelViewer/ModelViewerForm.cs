@@ -14,13 +14,25 @@ namespace ModelViewer
 {
     public partial class ModelViewerForm : Form
     {
-        public Scene Scene { get; set; }
+        public GraphicsScene GraphicsScene;
 
-        private bool _canRender;
+        public Scene Scene
+        {
+            get => GraphicsScene.Scene;
+            set => GraphicsScene.Scene = value;
+        }
 
         public ModelViewerForm()
         {
             InitializeComponent();
+
+            GraphicsScene = new GraphicsScene(glcMain.Width, glcMain.Height);
+            GraphicsScene.FrameRendered += GraphicsSceneOnFrameRendered;
+        }
+
+        private void GraphicsSceneOnFrameRendered()
+        {
+            glcMain.SwapBuffers();
         }
 
         public static void ShowModelViewer(Scene scene)
@@ -82,28 +94,12 @@ namespace ModelViewer
 
         private void glcMain_Load(object sender, EventArgs e)
         {
-            // TODO: Load Shaders
-
-            if (Scene == null || Scene != null && Scene.InitGraphics())
-                return;
-
-            GL.ClearColor(Color.Black);
-
-            _canRender = true;
+            GraphicsScene.Init();
         }
 
         private void glcMain_Paint(object sender, PaintEventArgs e)
         {
-            GL.Viewport(0, 0, glcMain.Width, glcMain.Height);
-
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            if (_canRender)
-                Scene?.Render();
-
-            GL.Flush();
-
-            glcMain.SwapBuffers();
+            GraphicsScene.Render();
         }
     }
 }

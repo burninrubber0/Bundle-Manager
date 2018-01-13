@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using BundleFormat;
 using MathLib;
 using ModelViewer.SceneData;
-using Nexus;
 using OpenTK;
 
 namespace BundleManager
@@ -79,7 +78,7 @@ namespace BundleManager
 
         public List<short> Indices;
 
-        public uint ID;
+        public ulong ID;
         public Model Model;
 
         public Renderable()
@@ -222,7 +221,7 @@ namespace BundleManager
                     stride = desc.Stride;
                 }
 
-                br.BaseStream.Position = VertexBlockAddress + mesh.VertexOffsetCount * stride;//MeshVertexOffsets[i];//mesh.VerticesOffsetPtr];
+                br.BaseStream.Position = VertexBlockAddress + mesh.VertexOffsetCount * stride;
                 mesh.Vertices = new List<VertexData>();
 
                 for (int j = 0; j < mesh.NumVertices; j++)

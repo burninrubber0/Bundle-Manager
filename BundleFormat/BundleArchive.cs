@@ -77,16 +77,24 @@ namespace BundleFormat
 
         public static BundleArchive Read(string path, bool console = false)
         {
-            Stream s = File.Open(path, FileMode.Open);
-            BinaryReader br = new BinaryReader(s);
+            try
+            {
+                Stream s = File.Open(path, FileMode.Open);
+                BinaryReader br = new BinaryReader(s);
 
-            BundleArchive result = br.ReadBND2Archive(console);
-            result.Path = path;
+                BundleArchive result = br.ReadBND2Archive(console);
+                result.Path = path;
 
-            br.Close();
-            s.Close();
+                br.Close();
+                s.Close();
 
-            return result;
+                return result;
+            }
+            catch (IOException ex)
+            {
+                Debug.WriteLine(ex.Message + "\n" + ex.StackTrace);
+                return null;
+            }
         }
 
         public static bool IsBundle(string path)

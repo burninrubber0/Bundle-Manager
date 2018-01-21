@@ -35,7 +35,8 @@ namespace BundleManager
                     if (!string.IsNullOrEmpty(file))
                     {
                         BundleArchive archive = BundleArchive.Read(file, entry.Console);
-                        descEntry1 = archive.GetEntryByID(id);
+                        if (archive != null)
+                            descEntry1 = archive.GetEntryByID(id);
                     }
                 }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -103,18 +104,25 @@ namespace ModelViewer.SceneData
             {
                 Material material = materials[i];
 
-                string materialFileName =  "material" + i + ".png";
+                string materialFileName =  "material_" + material.Name + ".png";
                 string materialRelativePathName = materialDir + materialFileName;
                 string materialPathName = materialDirPath + materialFileName;
 
-                sw1.WriteLine("newmtl material" + i);
+                sw1.WriteLine("newmtl material_" + material.Name);
                 sw1.WriteLine("map_Kd " + materialRelativePathName);
 
                 sw1.WriteLine();
 
                 Image image = material.DiffuseMap;
                 //Bitmap bitmap = new Bitmap(image);
-                image.Save(materialPathName, ImageFormat.Png);
+                try
+                {
+                    image?.Save(materialPathName, ImageFormat.Png);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message + "\n" + ex.StackTrace);
+                }
             }
 
             sw1.Flush();
@@ -138,23 +146,30 @@ namespace ModelViewer.SceneData
                 for (int i = 0; i < model.Meshes.Count; i++)
                 {
                     Mesh mesh = model.Meshes[i];
-
-                    foreach (Vector3 vertex in mesh.Vertices)
+                    
+                    for (int j = 0; j < mesh.Vertices.Count; j++)
                     {
+                        Vector3 vertex = mesh.Vertices[j];
                         sw.WriteLine("v " + vertex.X + " " + vertex.Y + " " + vertex.Z);
+
+                        /*if (j < mesh.UV1.Count)
+                        {
+                            Vector2 uv1 = mesh.UV1[j];
+                            sw.WriteLine("vt " + uv1.X + " " + uv1.Y);
+                        }*/
                     }
 
                     foreach (Vector2 uv1 in mesh.UV1)
                     {
-                        sw.WriteLine("vt " + uv1.X + " " + uv1.Y);
+                        sw.WriteLine("vt " + uv1.X + " " + -uv1.Y);
                     }
 
                     sw.WriteLine();
                     
                     sw.WriteLine("g mesh" + meshIndex);
 
-                    int materialIndex = materials.IndexOf(mesh.Material);
-                    sw.WriteLine("usemtl material" + materialIndex);
+                    //int materialIndex = materials.IndexOf(mesh.Material);
+                    sw.WriteLine("usemtl material_" + mesh.Material.Name);//materialIndex);
 
                     sw.WriteLine();
 

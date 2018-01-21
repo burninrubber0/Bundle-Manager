@@ -95,7 +95,29 @@ namespace BundleManager
                 lstMain.Items.Clear();
             }
             lstMain.Enabled = Utilities.IsValidPath(_currentPath);
-            
+
+            foreach (string path in BundleCache.Paths)
+            {
+                string fixedPath = path.Replace('\\', '/');
+                string fixedCurrentPath = _currentPath.Replace('\\', '/');
+
+                fixedPath = fixedPath.Replace(fixedCurrentPath, "");
+
+                if (fixedPath.StartsWith("/"))
+                    fixedPath = fixedPath.Substring(1);
+
+                string[] itemData = new string[]
+                {
+                    fixedPath
+                };
+
+                lstMain.Items.Add(new ListViewItem(itemData));
+            }
+        }
+
+        private void LoadFileList()
+        {
+            lstMain.Items.Clear();
             if (HasPath)
             {
                 LoadingDialog loader = new LoadingDialog();
@@ -107,91 +129,106 @@ namespace BundleManager
                         _updateDisplayThread?.Abort();
                         _currentPath = null;
                     }
+                    UpdateDisplay();
                 };
                 _updateDisplayThread = new Thread(() =>
                 {
-                    Invoke(new Action(() =>
-                    {
-                        BundleCache.Files.Clear();
-                        BundleCache.Paths.Clear();
-                        lstMain.Items.Clear();
-                        string[] files = Directory.GetFiles(_currentPath, "*.*", SearchOption.AllDirectories);
+                    DoLoadFileList(loader);
 
-                        int i = 0;
-                        //bool ignoreAllConflicts = false;
-                        foreach (string file in files)
-                        {
-                            try
-                            {
-                                if (!BundleArchive.IsBundle(file))
-                                    continue;
-
-                                string fixedPath = file.Replace('\\', '/');
-                                string fixedCurrentPath = _currentPath.Replace('\\', '/');
-
-                                fixedPath = fixedPath.Replace(fixedCurrentPath, "");
-
-                                if (fixedPath.StartsWith("/"))
-                                    fixedPath = fixedPath.Substring(1);
-
-                                string[] itemData = new string[]
-                                {
-                                    fixedPath
-                                };
-
-                                bool cancel = false;
-                                List<uint> entryIDs = BundleArchive.GetEntryIDs(file, false);
-                                foreach (uint entryID in entryIDs)
-                                {
-                                    if (BundleCache.Files.ContainsKey(entryID))
-                                    {
-                                        /*if (ignoreAllConflicts)
-                                            continue;
-                                        int index = Files[entryID];
-                                        string otherFile = Paths[index];
-                                        DialogResult result = MessageBox.Show(this, "ID Conflict 0x" + entryID.ToString("X8") + " between " +
-                                                        otherFile + " and " + file + "\n\nWould you like to ignore this issue? (May cause other problems)\n\nAbort = Cancel\nRetry = Ignore Once\nIgnore = Ignore All", "ID Conflict", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Warning);
-                                        if (result == DialogResult.Retry)
-                                        {
-                                            continue;
-                                        } else if (result == DialogResult.Abort)
-                                        {
-                                            cancel = true;
-                                            break;
-                                        } else if (result == DialogResult.Ignore)
-                                        {
-                                            ignoreAllConflicts = true;
-                                            continue;
-                                        }*/
-                                        continue;
-                                    }
-                                    BundleCache.Files.Add(entryID, i);
-                                }
-                                if (cancel)
-                                {
-                                    BundleCache.Files.Clear();
-                                    BundleCache.Paths.Clear();
-                                    lstMain.Items.Clear();
-                                    break;
-                                }
-                                BundleCache.Paths.Add(file);
-                                lstMain.Items.Add(new ListViewItem(itemData));
-                            }
-                            catch (ThreadAbortException)
-                            {
-                                _currentPath = null;
-                                UpdateDisplay();
-                                break;
-                            }
-                            i++;
-                        }
-                    }));
-
-                    loader.Value = new object[] {_currentPath};
+                    loader.Value = new object[] { _currentPath };
                     loader.IsDone = true;
                 });
                 _updateDisplayThread.Start();
                 loader.ShowDialog(this);
+            }
+        }
+
+        private void DoLoadFileList(ILoader loader)
+        {
+            BundleCache.Files.Clear();
+            BundleCache.Paths.Clear();
+            //lstMain.Items.Clear();
+            string[] files = Directory.GetFiles(_currentPath, "*.*", SearchOption.AllDirectories);
+
+            int i = 0;
+            int index = 0;
+            //bool ignoreAllConflicts = false;
+            foreach (string file in files)
+            {
+                index++;
+
+                try
+                {
+                    if (!BundleArchive.IsBundle(file))
+                        continue;
+
+
+                    int progress = index * 100 / files.Length;
+                    loader.SetStatus("Loading(" + progress.ToString("D2") + "%): " + Path.GetFileName(file));
+                    loader.SetProgress(progress);
+
+
+                    string fixedPath = file.Replace('\\', '/');
+                    string fixedCurrentPath = _currentPath.Replace('\\', '/');
+
+                    fixedPath = fixedPath.Replace(fixedCurrentPath, "");
+
+                    if (fixedPath.StartsWith("/"))
+                        fixedPath = fixedPath.Substring(1);
+
+                    string[] itemData = new string[]
+                    {
+                        fixedPath
+                    };
+
+                    //bool cancel = false;
+                    List<uint> entryIDs = BundleArchive.GetEntryIDs(file, false);
+                    foreach (uint entryID in entryIDs)
+                    {
+                        if (BundleCache.Files.ContainsKey(entryID))
+                        {
+                            /*if (ignoreAllConflicts)
+                                continue;
+                            int index = Files[entryID];
+                            string otherFile = Paths[index];
+                            DialogResult result = MessageBox.Show(this, "ID Conflict 0x" + entryID.ToString("X8") + " between " +
+                                            otherFile + " and " + file + "\n\nWould you like to ignore this issue? (May cause other problems)\n\nAbort = Cancel\nRetry = Ignore Once\nIgnore = Ignore All", "ID Conflict", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Warning);
+                            if (result == DialogResult.Retry)
+                            {
+                                continue;
+                            } else if (result == DialogResult.Abort)
+                            {
+                                cancel = true;
+                                break;
+                            } else if (result == DialogResult.Ignore)
+                            {
+                                ignoreAllConflicts = true;
+                                continue;
+                            }*/
+                            continue;
+                        }
+                        BundleCache.Files.Add(entryID, i);
+                    }
+                    /*if (cancel)
+                    {
+                        BundleCache.Files.Clear();
+                        BundleCache.Paths.Clear();
+                        lstMain.Items.Clear();
+                        break;
+                    }*/
+                    BundleCache.Paths.Add(file);
+                    //lstMain.Items.Add(new ListViewItem(itemData));
+                }
+                catch (ThreadAbortException)
+                {
+                    BundleCache.Files.Clear();
+                    BundleCache.Paths.Clear();
+                    //lstMain.Items.Clear();
+
+                    _currentPath = null;
+                    break;
+                }
+                i++;
             }
         }
 
@@ -210,7 +247,7 @@ namespace BundleManager
                     SaveData.AddRecentPath(_currentPath);
                     SaveData.Save();
                     _console = console;
-                    UpdateDisplay();
+                    LoadFileList();
                 }
             }
             else
@@ -219,7 +256,7 @@ namespace BundleManager
                 SaveData.AddRecentPath(_currentPath);
                 SaveData.Save();
                 _console = console;
-                UpdateDisplay();
+                LoadFileList();
             }
         }
 

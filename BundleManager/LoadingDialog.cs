@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace BundleManager
 {
-    public partial class LoadingDialog : Form
+    public partial class LoadingDialog : Form, ILoader
     {
         public delegate void OnDone(bool cancelled, object value);
         public event OnDone Done;
@@ -44,30 +44,19 @@ namespace BundleManager
                 }
             }
         }
-        
-        private bool _isDone;
-        public bool IsDone
-        {
-            get
-            {
-                return _isDone;
-            }
-            set
-            {
-                _isDone = value;
-            }
-        }
+
+        public bool IsDone { get; set; }
 
         public string Status
         {
-            get
-            {
-                return lblStatus.Text;
-            }
-            set
-            {
-                lblStatus.Text = value;
-            }
+            get => lblStatus.Text;
+            set => lblStatus.Text = value;
+        }
+
+        public int Progress
+        {
+            get => pboMain.Value;
+            set => pboMain.Value = value;
         }
 
         public LoadingDialog()
@@ -88,10 +77,7 @@ namespace BundleManager
 
         private void LoadingDialog_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Done != null)
-            {
-                Done(!IsDone, Value);
-            }
+            Done?.Invoke(!IsDone, Value);
         }
 
         private void tmrDoneCheck_Tick(object sender, EventArgs e)
@@ -100,6 +86,38 @@ namespace BundleManager
             {
                 tmrDoneCheck.Enabled = false;
                 Close();
+            }
+        }
+
+        private delegate void SetStatusDelegate(string status);
+        public void SetStatus(string status)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new SetStatusDelegate(SetStatus), status);
+            }
+            else
+            {
+                if (Status != status)
+                    Status = status;
+            }
+        }
+
+        private delegate void SetProgressDelegate(int progress);
+        public void SetProgress(int progress)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new SetProgressDelegate(SetProgress), progress);
+            }
+            else
+            {
+                if (Progress != progress)
+                    Progress = progress;
+                if (pboMain.Style == ProgressBarStyle.Marquee)
+                {
+                    pboMain.Style = ProgressBarStyle.Blocks;
+                }
             }
         }
     }

@@ -77,7 +77,7 @@ namespace BundleManager
             Instances = new List<ModelInstance>();
         }
 
-        public static InstanceList Read(BundleEntry entry)
+        public static InstanceList Read(BundleEntry entry, ILoader loader)
         {
             InstanceList result = new InstanceList();
             result.Entry = entry;
@@ -151,7 +151,7 @@ namespace BundleManager
                 if (modelEntry != null)
                 {
                     BundleEntry renderableEntry = modelEntry.GetDependencies()[0].Entry;
-                    Renderable renderable = Renderable.Read(renderableEntry);
+                    Renderable renderable = Renderable.Read(renderableEntry, null); // TODO: Null Loader
                     SceneObject sceneObject = new SceneObject(instance.ModelEntryID.ToString("X8"), renderable.Model);
                     sceneObject.Transform = instance.Transform;
 

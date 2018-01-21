@@ -528,18 +528,75 @@ namespace BundleManager
             }
             else if (entry.Type == EntryType.InstanceListResourceType && !forceHex)
             {
-                InstanceList instanceList = InstanceList.Read(entry);
+                LoadingDialog loader = new LoadingDialog();
+                loader.Status = "Loading: " + entry.ID.ToString("X8");
+
+                Thread loadInstanceThread = null;
+                InstanceList instanceList = null;
+                Scene scene = null;
+                loader.Done += (cancelled, value) =>
+                {
+                    if (cancelled)
+                        loadInstanceThread?.Abort();
+                    else
+                    {
+                        if (instanceList == null)
+                        {
+                            MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                        }
+                        else
+                        {
+                            loader.Hide();
+                            ModelViewerForm.ShowModelViewer(this, scene);
+                        }
+                    }
+                };
+
+                loadInstanceThread = new Thread(() =>
+                {
+                    instanceList = InstanceList.Read(entry, loader);
+                    scene = instanceList.MakeScene();
+                    loader.IsDone = true;
+                });
+                loadInstanceThread.Start();
+                loader.ShowDialog(this);
                 //DebugUtil.ShowDebug(this, instanceList);
-                
-                Scene scene = instanceList.MakeScene();
-                ModelViewerForm.ShowModelViewer(this, scene);
             }
             else if (entry.Type == EntryType.RwRenderableResourceType && !forceHex)
             {
-                Renderable renderable = Renderable.Read(entry);
-                Scene scene = renderable.MakeScene();
+                LoadingDialog loader = new LoadingDialog();
+                loader.Status = "Loading: " + entry.ID.ToString("X8");
 
-                ModelViewerForm.ShowModelViewer(this, scene);
+                Thread loadInstanceThread = null;
+                Renderable renderable = null;
+                loader.Done += (cancelled, value) =>
+                {
+                    if (cancelled)
+                        loadInstanceThread?.Abort();
+                    else
+                    {
+                        if (renderable == null)
+                        {
+                            MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                        }
+                        else
+                        {
+                            loader.Hide();
+                            Scene scene = renderable.MakeScene();
+                            ModelViewerForm.ShowModelViewer(this, scene);
+                        }
+                    }
+                };
+                
+                loadInstanceThread = new Thread(() =>
+                {
+                    renderable = Renderable.Read(entry, loader);
+                    loader.IsDone = true;
+                });
+                loadInstanceThread.Start();
+                loader.ShowDialog(this);
             }
             else if (entry.Type == EntryType.TriggerResourceType && !forceHex)
             {

@@ -103,7 +103,7 @@ namespace BundleManager
                     Image normal = rMesh.Material.NormalMap;
                     Image specular = rMesh.Material.SpecularMap;
 
-                    mesh.Material = new Material(diffuse, normal, specular);
+                    mesh.Material = new Material(rMesh.MaterialID.ToString("X8"), diffuse, normal, specular);
                 }
 
                 mesh.Indices = rMesh.Indices;
@@ -231,7 +231,7 @@ namespace BundleManager
             }
         }
 
-        public static Renderable Read(BundleEntry entry)
+        public static Renderable Read(BundleEntry entry, ILoader loader)
         {
             List<Dependency> dependencies = entry.GetDependencies();
 

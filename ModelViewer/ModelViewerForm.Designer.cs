@@ -79,11 +79,12 @@
             this.collada14ToolStripMenuItem,
             this.wavefrontOBJToolStripMenuItem});
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exportToolStripMenuItem.Text = "Export";
             // 
             // collada14ToolStripMenuItem
             // 
+            this.collada14ToolStripMenuItem.Enabled = false;
             this.collada14ToolStripMenuItem.Name = "collada14ToolStripMenuItem";
             this.collada14ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.collada14ToolStripMenuItem.Text = "Collada 1.4";
@@ -99,12 +100,12 @@
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(104, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.closeToolStripMenuItem.Text = "Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 

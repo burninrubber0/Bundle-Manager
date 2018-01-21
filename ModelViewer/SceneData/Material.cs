@@ -9,12 +9,14 @@ namespace ModelViewer.SceneData
 {
     public class Material
     {
+        public string Name;
         public Image DiffuseMap { get; set; }
         public Image NormalMap { get; set; }
         public Image SpecularMap { get; set; }
 
-        public Material(Image diffuse, Image normal = null, Image specular = null)
+        public Material(string name, Image diffuse, Image normal = null, Image specular = null)
         {
+            Name = name;
             DiffuseMap = diffuse;
             NormalMap = normal;
             SpecularMap = specular;

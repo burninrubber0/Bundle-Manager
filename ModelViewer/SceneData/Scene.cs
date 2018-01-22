@@ -196,14 +196,25 @@ namespace ModelViewer.SceneData
 
         public bool InitGraphics()
         {
-            // TODO: Init Graphics
+            foreach (SceneObject obj in SceneObjects.Values)
+            {
+                if (!obj.InitGraphics())
+                    return false;
+            }
 
             return true;
         }
 
         public void Render()
         {
-            // TODO: Render Scene
+            foreach (SceneObject obj in SceneObjects.Values)
+                obj.Render();
+        }
+
+        public void Dispose()
+        {
+            foreach (SceneObject obj in SceneObjects.Values)
+                obj.Dispose();
         }
     }
 }

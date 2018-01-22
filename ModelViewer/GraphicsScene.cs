@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ModelViewer.SceneData;
-using OpenTK.Graphics.ES20;
+using OpenTK.Graphics.OpenGL4;
 
 namespace ModelViewer
 {
     public class GraphicsScene
     {
+        private Shader _shader;
+
         public delegate void OnFrameRendered();
         public event OnFrameRendered FrameRendered;
 
@@ -29,12 +33,31 @@ namespace ModelViewer
 
         public void Init()
         {
-            // TODO: Load Shaders
+            if (Scene == null)
+                return;
+            
+            try
+            {
+                _shader = new Shader("standard");
+            }
+            catch (IOException ex)
+            {
+                Debug.WriteLine(ex.Message + "\n" + ex.StackTrace);
 
-            if (Scene == null || Scene != null && !Scene.InitGraphics())
+                CanRender = false;
+                return;
+            }
+            _shader.Compile();
+
+            if (!Scene.InitGraphics())
                 return;
 
             GL.ClearColor(Color.Black);
+            GL.ClearDepth(1.0f);
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthFunc(DepthFunction.Lequal);
+            //glShadeModel(GL_SMOOTH);
+            GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
 
             CanRender = true;
         }
@@ -51,11 +74,24 @@ namespace ModelViewer
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             if (CanRender)
+            {
+                _shader.Bind();
+
                 Scene?.Render();
+            }
 
             GL.Flush();
 
             FrameRendered?.Invoke();
+        }
+
+        public void Cleanup()
+        {
+            if (CanRender)
+            {
+                Scene?.Dispose();
+                _shader.Dispose();
+            }
         }
     }
 }

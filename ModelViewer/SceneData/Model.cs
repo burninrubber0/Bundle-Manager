@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
+using OpenTK.Graphics.OpenGL4;
 
 namespace ModelViewer.SceneData
 {
@@ -74,6 +75,26 @@ namespace ModelViewer.SceneData
             }
 
             return result;
+        }
+
+        public bool InitGraphics()
+        {
+            foreach (Mesh mesh in Meshes)
+                mesh.InitGraphics();
+            
+            return true;
+        }
+
+        public void Render(Matrix4 transform)
+        {
+            foreach (Mesh mesh in Meshes)
+                mesh.Render(transform);
+        }
+
+        public void Dispose()
+        {
+            foreach (Mesh mesh in Meshes)
+                mesh.Dispose();
         }
     }
 }

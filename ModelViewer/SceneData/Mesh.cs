@@ -10,6 +10,9 @@ namespace ModelViewer.SceneData
 {
     public class Mesh
     {
+        private int _vertexArray;
+        private int _indexArray;
+
         public Material Material { get; set; }
 
         public List<Vector3> Vertices { get; set; }
@@ -92,6 +95,43 @@ namespace ModelViewer.SceneData
             }
 
             return result;
+        }
+
+        public bool InitGraphics()
+        {
+            // Vertices
+            _vertexArray = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexArray);
+            GL.BufferData(BufferTarget.ArrayBuffer, Vector3.SizeInBytes * Vertices.Count, Vertices.ToArray(), BufferUsageHint.StaticDraw);
+
+            // Indices
+
+            _indexArray = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexArray);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, 4 * Indices.Count, Indices.ToArray(), BufferUsageHint.StaticDraw);
+
+            return true;
+        }
+
+        public void Render(Matrix4 transform)
+        {
+            GL.EnableClientState(ArrayCap.VertexArray);
+            GL.EnableClientState(ArrayCap.IndexArray);
+            
+            GL.VertexAttrib3(0, transform.ExtractTranslation());
+            GL.VertexPointer(3, VertexPointerType.Float, Vector3.SizeInBytes, 0);
+            
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexArray);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexArray);
+            GL.DrawElements(PrimitiveType.Triangles, Indices.Count, DrawElementsType.UnsignedInt, 0);
+
+            GL.DisableClientState(ArrayCap.IndexArray);
+            GL.DisableClientState(ArrayCap.VertexArray);
+        }
+
+        public void Dispose()
+        {
+            GL.DeleteVertexArrays(1, ref _vertexArray);
         }
     }
 }

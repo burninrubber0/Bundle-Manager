@@ -40,6 +40,7 @@ namespace ModelViewer
             ModelViewerForm viewer = new ModelViewerForm();
             viewer.Scene = scene;
             viewer.ShowDialog();
+            viewer.Init();
         }
 
         public static void ShowModelViewer(IWin32Window owner, Scene scene)
@@ -47,6 +48,7 @@ namespace ModelViewer
             ModelViewerForm viewer = new ModelViewerForm();
             viewer.Scene = scene;
             viewer.ShowDialog(owner);
+            viewer.Init();
         }
 
         public void ExportCollada14()
@@ -77,6 +79,11 @@ namespace ModelViewer
             }
         }
 
+        private void Init()
+        {
+            GraphicsScene.Init();
+        }
+
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Close();
@@ -100,6 +107,11 @@ namespace ModelViewer
         private void glcMain_Paint(object sender, PaintEventArgs e)
         {
             GraphicsScene.Render();
+        }
+
+        private void ModelViewerForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            GraphicsScene.Cleanup();
         }
     }
 }

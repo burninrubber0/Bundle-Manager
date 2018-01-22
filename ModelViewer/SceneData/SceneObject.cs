@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
+using OpenTK.Graphics.OpenGL4;
 
 namespace ModelViewer.SceneData
 {
@@ -35,6 +36,23 @@ namespace ModelViewer.SceneData
         public Model MergeMeshesToModel()
         {
             return new Model(MergeMeshes());
+        }
+
+        public bool InitGraphics()
+        {
+            Model.InitGraphics();
+
+            return true;
+        }
+
+        public void Render()
+        {
+            Model.Render(Transform);
+        }
+
+        public void Dispose()
+        {
+            Model.Dispose();
         }
     }
 }

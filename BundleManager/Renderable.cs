@@ -47,7 +47,7 @@ namespace BundleManager
         public int IndexCount => NumFaces * 3;
 
         public MaterialEntry Material;
-        public List<int> Indices;
+        public List<uint> Indices;
         public List<VertexData> Vertices;
     }
 
@@ -204,10 +204,10 @@ namespace BundleManager
 
                 br.BaseStream.Position = mesh.IndexOffset;
 
-                mesh.Indices = new List<int>();
+                mesh.Indices = new List<uint>();
                 for (int j = 0; j < mesh.IndexCount; j++)
                 {
-                    int index = br.ReadInt16() - mesh.VertexOffsetCount;
+                    uint index = br.ReadUInt16() - (uint)mesh.VertexOffsetCount;
 
                     mesh.Indices.Add(index);
                 }

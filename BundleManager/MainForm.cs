@@ -563,6 +563,43 @@ namespace BundleManager
                 loader.ShowDialog(this);
                 //DebugUtil.ShowDebug(this, instanceList);
             }
+            else if (entry.Type == EntryType.GraphicsSpecResourceType && !forceHex)
+            {
+                LoadingDialog loader = new LoadingDialog();
+                loader.Status = "Loading: " + entry.ID.ToString("X8");
+
+                Thread loadInstanceThread = null;
+                GraphicsSpec instanceList = null;
+                Scene scene = null;
+                loader.Done += (cancelled, value) =>
+                {
+                    if (cancelled)
+                        loadInstanceThread?.Abort();
+                    else
+                    {
+                        if (instanceList == null)
+                        {
+                            MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                        }
+                        else
+                        {
+                            loader.Hide();
+                            ModelViewerForm.ShowModelViewer(this, scene);
+                        }
+                    }
+                };
+
+                loadInstanceThread = new Thread(() =>
+                {
+                    instanceList = GraphicsSpec.Read(entry, loader);
+                    scene = instanceList.MakeScene();
+                    loader.IsDone = true;
+                });
+                loadInstanceThread.Start();
+                loader.ShowDialog(this);
+                //DebugUtil.ShowDebug(this, instanceList);
+            }
             else if (entry.Type == EntryType.RwRenderableResourceType && !forceHex)
             {
                 LoadingDialog loader = new LoadingDialog();

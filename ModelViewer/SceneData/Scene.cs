@@ -7,12 +7,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 using OpenTK;
 
 namespace ModelViewer.SceneData
 {
     public class Scene
     {
+        public Vector3 Center { get; private set; }
+        public float HorizSize { get; private set; }
+        public float VertSize { get; private set; }
+
         internal Dictionary<string, SceneObject> SceneObjects;
         
         public int ObjectCount => SceneObjects.Count;
@@ -20,6 +25,10 @@ namespace ModelViewer.SceneData
         public Scene()
         {
             SceneObjects = new Dictionary<string, SceneObject>();
+
+            Center = Vector3.Zero;
+            HorizSize = 3.0f;
+            VertSize = 1.0f;
         }
 
         public void ClearObjects()
@@ -34,6 +43,8 @@ namespace ModelViewer.SceneData
                 obj.Name += "_";
             }
             SceneObjects.Add(obj.Name, obj);
+
+            UpdateSizing();
         }
 
         public void RemoveObject(string name)
@@ -136,7 +147,7 @@ namespace ModelViewer.SceneData
             
             int meshIndex = 0;
 
-            int usedIndices = 0;
+            uint usedIndices = 0;
             foreach (SceneObject obj in SceneObjects.Values)
             {
                 string name = obj.Name;
@@ -175,13 +186,13 @@ namespace ModelViewer.SceneData
 
                     for (int j = 0; j < mesh.Indices.Count; j += 3)
                     {
-                        int v0 = mesh.Indices[j + 0] + 1 + usedIndices;
-                        int v1 = mesh.Indices[j + 1] + 1 + usedIndices;
-                        int v2 = mesh.Indices[j + 2] + 1 + usedIndices;
+                        uint v0 = mesh.Indices[j + 0] + 1 + usedIndices;
+                        uint v1 = mesh.Indices[j + 1] + 1 + usedIndices;
+                        uint v2 = mesh.Indices[j + 2] + 1 + usedIndices;
                         sw.WriteLine("f " + v0 + "/" + v0 + " " + v1 + "/" + v1 + " " + v2 + "/" + v2);
                     }
 
-                    usedIndices += mesh.Vertices.Count;
+                    usedIndices += (uint)mesh.Vertices.Count;
 
                     sw.WriteLine();
 
@@ -192,6 +203,56 @@ namespace ModelViewer.SceneData
             sw.Flush();
             sw.Close();
             s.Close();
+        }
+
+        public void UpdateSizing()
+        {
+            float highestAbsHorizSize = 0.0f;
+            float highestVertSize = 0.0f;
+
+            float maxX = 0.0f;
+            float minX = float.MaxValue;
+            float maxY = 0.0f;
+            float minY = float.MaxValue;
+            float maxZ = 0.0f;
+            float minZ = float.MaxValue;
+
+            Vector3 closestToCenter = new Vector3(float.NaN);
+
+            foreach (SceneObject obj in SceneObjects.Values)
+            {
+                foreach (Mesh mesh in obj.Model.Meshes)
+                {
+                    for (int i = 0; i < mesh.Vertices.Count; i++)
+                    {
+                        Vector3 vert = mesh.Vertices[i];
+
+                        float absX = Math.Abs(vert.X);
+                        float absZ = Math.Abs(vert.Z);
+
+                        float maxHoriz = Math.Max(absX, absZ);
+
+                        highestAbsHorizSize = Math.Max(maxHoriz, highestAbsHorizSize);
+                        highestVertSize = Math.Max(vert.Y, highestVertSize);
+
+                        maxX = Math.Max(vert.X, maxX);
+                        minX = Math.Min(vert.X, minX);
+                        maxY = Math.Max(vert.Y, maxY);
+                        minY = Math.Min(vert.Y, minY);
+                        maxZ = Math.Max(vert.Z, maxZ);
+                        minZ = Math.Min(vert.Z, minZ);
+                    }
+                }
+            }
+
+            float midX = (minX + maxX) / 2;
+            float midY = (minY + maxY) / 2;
+            float midZ = (minZ + maxZ) / 2;
+
+            HorizSize = highestAbsHorizSize + 1;
+            VertSize = highestVertSize + 1;
+
+            Center = new Vector3(midX, midY, midZ);
         }
 
         public bool InitGraphics()
@@ -205,10 +266,16 @@ namespace ModelViewer.SceneData
             return true;
         }
 
-        public void Render()
+        public void Update()
         {
             foreach (SceneObject obj in SceneObjects.Values)
-                obj.Render();
+                obj.Update();
+        }
+
+        public void Render(ICamera camera)
+        {
+            foreach (SceneObject obj in SceneObjects.Values)
+                obj.Render(camera);
         }
 
         public void Dispose()

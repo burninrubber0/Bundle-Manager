@@ -1,24 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 
 namespace ModelViewer.SceneData
 {
+    public struct TexturedVertex
+    {
+        public static readonly int SizeInBytes = Vector3.SizeInBytes + Vector2.SizeInBytes;
+
+        public Vector3 Pos;
+        public Vector2 UV;
+
+        public TexturedVertex(Vector3 pos, Vector2 uv)
+        {
+            Pos = pos;
+            UV = uv;
+        }
+    }
+
     public class Mesh
     {
         private int _vertexArray;
         private int _indexArray;
+        private int _texture;
 
         public Material Material { get; set; }
 
         public List<Vector3> Vertices { get; set; }
         public List<Vector3> Normals { get; set; }
         public List<Vector3> Normals2 { get; set; }
-        public List<int> Indices { get; set; }
+        public List<uint> Indices { get; set; }
         public List<Vector2> UV1 { get; set; }
         public List<Vector2> UV2 { get; set; }
         public int ID1 { get; set; }
@@ -29,7 +48,7 @@ namespace ModelViewer.SceneData
             Vertices = new List<Vector3>();
             Normals = new List<Vector3>();
             Normals2 = new List<Vector3>();
-            Indices = new List<int>();
+            Indices = new List<uint>();
             UV1 = new List<Vector2>();
             UV2 = new List<Vector2>();
             ID1 = 0;
@@ -45,7 +64,7 @@ namespace ModelViewer.SceneData
             result.Vertices = new List<Vector3>(Vertices);
             result.Normals = new List<Vector3>(Normals);
             result.Normals2 = new List<Vector3>(Normals2);
-            result.Indices = new List<int>(Indices);
+            result.Indices = new List<uint>(Indices);
             result.UV1 = new List<Vector2>(UV1);
             result.UV2 = new List<Vector2>(UV2);
             result.ID1 = ID1;
@@ -61,7 +80,7 @@ namespace ModelViewer.SceneData
             for (int i = 0; i < mesh.Indices.Count; i++)
             {
                 // TODO: Verify
-                result.Indices.Add(result.Vertices.Count + mesh.Indices[i]);
+                result.Indices.Add((uint)result.Vertices.Count + mesh.Indices[i]);
             }
 
             result.Vertices.AddRange(mesh.Vertices);
@@ -99,34 +118,175 @@ namespace ModelViewer.SceneData
 
         public bool InitGraphics()
         {
+            /*List<TexturedVertex> vertices = new List<TexturedVertex>();
+
+            for (int i = 0; i < Vertices.Count; i++)
+            {
+                Vector3 pos = Vertices[i];
+                Vector2 uv = Vector2.Zero;
+                if (i < UV1.Count)
+                    uv = UV1[i];
+                vertices.Add(new TexturedVertex(pos, uv));
+            }
+
             // Vertices
             _vertexArray = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexArray);
-            GL.BufferData(BufferTarget.ArrayBuffer, Vector3.SizeInBytes * Vertices.Count, Vertices.ToArray(), BufferUsageHint.StaticDraw);
-
+            GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex.SizeInBytes * vertices.Count, vertices.ToArray(), BufferUsageHint.StaticDraw);
+            
             // Indices
-
             _indexArray = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexArray);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, 4 * Indices.Count, Indices.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * Indices.Count, Indices.ToArray(), BufferUsageHint.StaticDraw);
+            */
+
+            List<uint> indices = Indices;
+            //indices.Reverse();
+
+            List<TexturedVertex> vertices = new List<TexturedVertex>();
+            for (int i = 0; i < indices.Count; i++)
+            {
+                Vector3 pos = Vertices[(int) indices[i]];
+                //Vector2 uv = new Vector2();
+                //if (UV1.Count < indices[i])
+                //    uv = UV1[(int) indices[i]];
+                Vector2 uv1 = UV1[(int)indices[i]];
+
+                Vector2 uv = new Vector2(uv1.X, uv1.Y);
+
+                vertices.Add(new TexturedVertex(pos, uv));
+            }
+
+            _vertexArray = GL.GenVertexArray();
+            int buffer = GL.GenBuffer();
+            GL.BindVertexArray(_vertexArray);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
+
+            GL.NamedBufferStorage(buffer, TexturedVertex.SizeInBytes*vertices.Count, vertices.ToArray(), BufferStorageFlags.MapWriteBit);
+
+            GL.VertexArrayAttribBinding(_vertexArray, 0, 0);
+            GL.EnableVertexArrayAttrib(_vertexArray, 0);
+            GL.VertexArrayAttribFormat(_vertexArray, 0, 3, VertexAttribType.Float, false, 0);
+
+            GL.VertexArrayAttribBinding(_vertexArray, 1, 0);
+            GL.EnableVertexArrayAttrib(_vertexArray, 1);
+            GL.VertexArrayAttribFormat(_vertexArray, 1, 2, VertexAttribType.Float, false, Vector3.SizeInBytes);
+
+            GL.VertexArrayVertexBuffer(_vertexArray, 0, buffer, IntPtr.Zero, TexturedVertex.SizeInBytes);
+
+
+
+            //_indexArray = GL.GenBuffer();
+            //GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexArray);
+            //GL.NamedBufferStorage(_indexArray, sizeof(uint) * Indices.Count, Indices.ToArray(), BufferStorageFlags.MapWriteBit);
+
+            if (Material?.DiffuseMap != null)
+            {
+                int width = Material.DiffuseMap.Width;
+                int height = Material.DiffuseMap.Height;
+
+                _texture = GL.GenTexture();
+                GL.BindTexture(TextureTarget.Texture2D, _texture);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int) All.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int) All.Linear);
+
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Bgra,
+                    PixelType.UnsignedByte, IntPtr.Zero);
+                Bitmap bitmap = new Bitmap(Material.DiffuseMap);
+                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
+                    System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, width, height, PixelFormat.Bgra,
+                    PixelType.UnsignedByte, data.Scan0);
+
+                bitmap.UnlockBits(data);
+
+                bitmap.Dispose();
+
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+
+                GL.Enable(EnableCap.Texture2D);
+            }
+            else
+            {
+                int width = 16;
+                int height = 16;
+
+                _texture = GL.GenTexture();
+                GL.BindTexture(TextureTarget.Texture2D, _texture);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
+
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Bgra,
+                    PixelType.UnsignedByte, IntPtr.Zero);
+                Bitmap bitmap = new Bitmap(width, height);
+                for (int y = 0; y < height; y++)
+                    for (int x = 0; x < width; x++)
+                        bitmap.SetPixel(x, y, Color.DarkGray);
+
+                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
+                    System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, width, height, PixelFormat.Bgra,
+                    PixelType.UnsignedByte, data.Scan0);
+
+                bitmap.UnlockBits(data);
+
+                bitmap.Dispose();
+
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+
+                GL.Enable(EnableCap.Texture2D);
+            }
 
             return true;
         }
 
-        public void Render(Matrix4 transform)
+        public void Update()
         {
-            GL.EnableClientState(ArrayCap.VertexArray);
-            GL.EnableClientState(ArrayCap.IndexArray);
             
+        }
+
+        public void Render(ICamera camera, Matrix4 transform)
+        {
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, _texture);
+            //GL.Uniform1(21, 0);
+            
+            Matrix4 translation = Matrix4.CreateTranslation(transform.ExtractTranslation());
+            Matrix4 rotation = Matrix4.CreateFromQuaternion(transform.ExtractRotation());
+            Matrix4 scale = Matrix4.CreateScale(transform.ExtractScale());
+
+            Matrix4 modelView = rotation * scale * translation;
+            if (camera != null)
+                modelView *= camera.LookAtMatrix;
+
+            GL.UniformMatrix4(21, false, ref modelView);
+
+            GL.BindVertexArray(_vertexArray);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, Indices.Count);
+
+            /*GL.EnableClientState(ArrayCap.VertexArray);
+            GL.EnableClientState(ArrayCap.IndexArray);
+
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, TexturedVertex.SizeInBytes, IntPtr.Zero);
+
+            GL.EnableVertexAttribArray(1);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, TexturedVertex.SizeInBytes, Vector3.SizeInBytes);
+
             GL.VertexAttrib3(0, transform.ExtractTranslation());
-            GL.VertexPointer(3, VertexPointerType.Float, Vector3.SizeInBytes, 0);
+            GL.VertexPointer(5, VertexPointerType.Float, TexturedVertex.SizeInBytes, 0);
             
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexArray);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexArray);
             GL.DrawElements(PrimitiveType.Triangles, Indices.Count, DrawElementsType.UnsignedInt, 0);
 
+            GL.DisableVertexAttribArray(1);
+            GL.DisableVertexAttribArray(0);
+
             GL.DisableClientState(ArrayCap.IndexArray);
-            GL.DisableClientState(ArrayCap.VertexArray);
+            GL.DisableClientState(ArrayCap.VertexArray);*/
         }
 
         public void Dispose()

@@ -92,6 +92,7 @@
       <DependentUpon>FileView.cs</DependentUpon>
     </Compile>
     <Compile Include="ILoader.cs" />
+    <Compile Include="GraphicsSpec.cs" />
     <Compile Include="InstanceList.cs" />
     <Compile Include="LoadingDialog.cs">
       <SubType>Form</SubType>

@@ -113,5 +113,21 @@ namespace ModelViewer
         {
             GraphicsScene.Cleanup();
         }
+
+        private int _updateCount;
+        private void tmrUpdate_Tick(object sender, EventArgs e)
+        {
+            if (_updateCount < 2)
+                tmrUpdate.Interval = 17;
+            else
+            {
+                tmrUpdate.Interval = 16;
+                _updateCount = 0;
+            }
+            _updateCount++;
+
+            GraphicsScene?.Update();
+            glcMain.Refresh();
+        }
     }
 }

@@ -85,10 +85,16 @@ namespace ModelViewer.SceneData
             return true;
         }
 
-        public void Render(Matrix4 transform)
+        public void Update()
         {
             foreach (Mesh mesh in Meshes)
-                mesh.Render(transform);
+                mesh.Update();
+        }
+
+        public void Render(ICamera camera, Matrix4 transform)
+        {
+            foreach (Mesh mesh in Meshes)
+                mesh.Render(camera, transform);
         }
 
         public void Dispose()

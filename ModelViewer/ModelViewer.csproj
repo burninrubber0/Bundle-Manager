@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="GraphicsScene.cs" />
     <Compile Include="GraphicsUtil.cs" />
+    <Compile Include="ICamera.cs" />
     <Compile Include="SceneData\Material.cs" />
     <Compile Include="SceneData\Mesh.cs" />
     <Compile Include="SceneData\Model.cs" />
@@ -63,6 +64,9 @@
     <Compile Include="SceneData\Scene.cs" />
     <Compile Include="SceneData\SceneObject.cs" />
     <Compile Include="Shader.cs" />
+    <Compile Include="StaticCamera.cs" />
+    <Compile Include="OrbitCamera.cs" />
+    <Compile Include="ThirdPersonCamera.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ModelViewerForm.resx">

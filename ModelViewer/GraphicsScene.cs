@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ModelViewer.SceneData;
+using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 
 namespace ModelViewer
@@ -14,6 +15,9 @@ namespace ModelViewer
     public class GraphicsScene
     {
         private Shader _shader;
+
+        private ICamera _camera;
+        private Matrix4 _projection;
 
         public delegate void OnFrameRendered();
         public event OnFrameRendered FrameRendered;
@@ -31,10 +35,19 @@ namespace ModelViewer
             Height = height;
         }
 
+        private void CreateProjection()
+        {
+            float aspectRatio = (float)Width / Height;
+            _projection =
+                Matrix4.CreatePerspectiveFieldOfView(60.0f * ((float) Math.PI / 180.0f), aspectRatio, 0.1f, 4000.0f);
+        }
+
         public void Init()
         {
             if (Scene == null)
                 return;
+
+            CreateProjection();
             
             try
             {
@@ -52,8 +65,12 @@ namespace ModelViewer
             if (!Scene.InitGraphics())
                 return;
 
-            GL.ClearColor(Color.Black);
+            _camera = new OrbitCamera(Scene);
+            //_camera = new StaticCamera(new Vector3(0, 2, -5), new Vector3(0, 0, 0));
+
+            GL.ClearColor(Color.CornflowerBlue);
             GL.ClearDepth(1.0f);
+            GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
             //glShadeModel(GL_SMOOTH);
@@ -64,7 +81,13 @@ namespace ModelViewer
 
         public void Update()
         {
-            // TODO: Call and Implement
+            if (!CanRender)
+                return;
+
+            _camera?.Update();
+            Scene?.Update();
+
+            // TODO: Implement
         }
 
         public void Render()
@@ -72,12 +95,14 @@ namespace ModelViewer
             GL.Viewport(0, 0, Width, Height);
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
+            
             if (CanRender)
             {
                 _shader.Bind();
 
-                Scene?.Render();
+                GL.UniformMatrix4(20, false, ref _projection);
+
+                Scene?.Render(_camera);
             }
 
             GL.Flush();

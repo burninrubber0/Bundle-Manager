@@ -358,7 +358,7 @@ namespace BundleFormat
                 case EntryType.VehicleListResourceType:
                     break;
                 case EntryType.GraphicsSpecResourceType:
-                    break;
+                    return Color.SeaGreen;
                 case EntryType.ParticleDescriptionCollectionResourceType:
                     break;
                 case EntryType.WheelListResourceType:

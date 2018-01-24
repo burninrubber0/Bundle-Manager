@@ -312,7 +312,7 @@ namespace BundleManager
             }
         }
 
-        private void testToolStripMenuItem_Click(object sender, EventArgs e)
+        /*private void testToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "Text Files|*.txt";
@@ -361,7 +361,7 @@ namespace BundleManager
                 sw.Close();
                 s.Close();
             }
-        }
+        }*/
 
         private List<string> ScanTest(BundleArchive archive)
         {

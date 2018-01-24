@@ -319,7 +319,7 @@ namespace BundleManager
             Stream s = null;
             try
             {
-                s = File.Open(path, FileMode.Open);
+                s = File.Open(path, FileMode.Open, FileAccess.Read);
             }
             catch (IOException ex)
             {

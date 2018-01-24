@@ -79,7 +79,7 @@ namespace BundleFormat
         {
             try
             {
-                Stream s = File.Open(path, FileMode.Open);
+                Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
                 BinaryReader br = new BinaryReader(s);
 
                 BundleArchive result = br.ReadBND2Archive(console);
@@ -103,7 +103,7 @@ namespace BundleFormat
 
             try
             {
-                Stream s = File.Open(path, FileMode.Open);
+                Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
                 BinaryReader br = new BinaryReader(s);
 
                 result = br.VerifyMagic(MAGIC);
@@ -124,7 +124,7 @@ namespace BundleFormat
         {
             List<uint> result = new List<uint>();
 
-            Stream s = File.Open(path, FileMode.Open);
+            Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
             BinaryReader br = new BinaryReader(s);
 
             if (!br.VerifyMagic(MAGIC))

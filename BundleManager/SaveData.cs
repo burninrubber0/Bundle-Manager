@@ -36,7 +36,7 @@ namespace BundleManager
             if (!File.Exists(RecentFilesPath))
                 return;
 
-            Stream s = File.Open(RecentFilesPath, FileMode.Open);
+            Stream s = File.Open(RecentFilesPath, FileMode.Open, FileAccess.Read);
             StreamReader sr = new StreamReader(s);
 
             while (!sr.EndOfStream)

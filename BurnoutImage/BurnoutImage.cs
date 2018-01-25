@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using BundleUtilities;
 
 namespace BurnoutImage
 {
@@ -132,6 +133,7 @@ namespace BurnoutImage
 
                     byte[] pixels = extraData;
 
+                    //DebugTimer t = DebugTimer.Start("Decompress[" + width + "x" + height + "]");
                     if (type == CompressionType.DXT1)
                     {
                         pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT1);
@@ -144,69 +146,41 @@ namespace BurnoutImage
                     {
                         pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT5);
                     }
-
-                    //ms = new MemoryStream(pixels);
-                    //br = new BinaryReader(ms);
+                    //t.StopLog();
 
                     Bitmap bitmap = new Bitmap(width, height);
-                    //bitmap.
+
                     int index = 0;
                     for (int i = 0; i < height; i++)
                     {
                         for (int j = 0; j < width; j++)
                         {
+                            //DebugTimer t = DebugTimer.Start("Pixel[" + width + "x" + height + "]");
                             byte red;
                             byte green;
                             byte blue;
                             byte alpha;
                             if (type == CompressionType.BGRA)
                             {
-                                //blue = br.ReadByte();
-                                //green = br.ReadByte();
-                                //red = br.ReadByte();
-                                //alpha = br.ReadByte();
                                 blue = pixels[index + 0];
                                 green = pixels[index + 1];
                                 red = pixels[index + 2];
                                 alpha = pixels[index + 3];
                             }
-                            else// if (type == CompressionType.ARGB)
+                            else
                             {
-                                //alpha = br.ReadByte();
-                                //red = br.ReadByte();
-                                //green = br.ReadByte();
-                                //blue = br.ReadByte();
-
                                 alpha = pixels[index + 0];
                                 red = pixels[index + 1];
                                 green = pixels[index + 2];
                                 blue = pixels[index + 3];
                             }
-                            //else
-                            //{
-                                //red = br.ReadByte();
-                                //green = br.ReadByte();
-                                //blue = br.ReadByte();
-                                //alpha = br.ReadByte();
-
-                                /*red = pixels[index + 0];
-                                alpha = pixels[index + 1];
-                                blue = pixels[index + 2];
-                                green = pixels[index + 3];*/
-
-                                //red = pixels[index + 0];
-                                //green = pixels[index + 1];
-                               // blue = pixels[index + 2];
-                              //  alpha = pixels[index + 3];
-                            //}
 
                             Color color = Color.FromArgb(alpha, red, green, blue);
                             bitmap.SetPixel(j, i, color);
                             index += 4;
+                            //t.StopLog();
                         }
                     }
-
-                    //br.Close();
                     return bitmap;
                 }
                 catch
@@ -228,7 +202,7 @@ namespace BurnoutImage
                 {
                     MemoryStream ms = new MemoryStream(data);
                     BinaryReader br = new BinaryReader(ms);
-                    //br.BaseStream.Seek(0x10, SeekOrigin.Begin);
+
                     byte compression = br.ReadByte();
                     byte[] unknown1 = br.ReadBytes(3);
                     CompressionType type = CompressionType.UNKNOWN;
@@ -247,34 +221,7 @@ namespace BurnoutImage
                     int unknown2 = Util.ReverseBytes(br.ReadInt32());
                     int width = Util.ReverseBytes(br.ReadInt16());
                     int height = Util.ReverseBytes(br.ReadInt16());
-                    /*byte[] compression = br.ReadBytes(4);
-                    string compressionString = Encoding.ASCII.GetString(compression);
-                    if (compression.Matches(new byte[] { 0x15, 0x00, 0x00, 0x00 }))
-                    {
-                        type = CompressionType.BGRA;
-                    }
-                    else if (compression.Matches(new byte[] { 0xFF, 0x00, 0x00, 0x00 }))
-                    {
-                        type = CompressionType.ARGB;
-                    }
-                    else if (compressionString.StartsWith("DXT"))
-                    {
-                        switch (compressionString[3])
-                        {
-                            case '1':
-                                type = CompressionType.DXT1;
-                                break;
-                            case '3':
-                                type = CompressionType.DXT3;
-                                break;
-                            case '5':
-                                type = CompressionType.DXT5;
-                                break;
-                        }
-                    }
-
-                    int width = br.ReadInt16();
-                    int height = br.ReadInt16();*/
+                    
                     br.Close();
 
                     byte[] pixels = extraData;
@@ -292,11 +239,8 @@ namespace BurnoutImage
                         pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT5);
                     }
 
-                    //ms = new MemoryStream(pixels);
-                    //br = new BinaryReader(ms);
-
                     Bitmap bitmap = new Bitmap(width, height);
-                    //bitmap.
+
                     int index = 0;
                     for (int i = 0; i < height; i++)
                     {
@@ -308,47 +252,26 @@ namespace BurnoutImage
                             byte alpha;
                             if (type == CompressionType.BGRA)
                             {
-                                //blue = br.ReadByte();
-                                //green = br.ReadByte();
-                                //red = br.ReadByte();
-                                //alpha = br.ReadByte();
                                 blue = pixels[index + 0];
                                 green = pixels[index + 1];
                                 red = pixels[index + 2];
                                 alpha = pixels[index + 3];
                             }
-                            else //if (type == CompressionType.ARGB)
+                            else
                             {
-                                //alpha = br.ReadByte();
-                                //red = br.ReadByte();
-                                //green = br.ReadByte();
-                                //blue = br.ReadByte();
 
                                 alpha = pixels[index + 0];
                                 red = pixels[index + 1];
                                 green = pixels[index + 2];
                                 blue = pixels[index + 3];
                             }
-                            //else
-                            //{
-                                //red = br.ReadByte();
-                                //green = br.ReadByte();
-                                //blue = br.ReadByte();
-                                //alpha = br.ReadByte();
-
-                               // red = pixels[index + 0];
-                                //green = pixels[index + 1];
-                               // blue = pixels[index + 2];
-                               // alpha = pixels[index + 3];
-                            //}
 
                             Color color = Color.FromArgb(alpha, red, green, blue);
                             bitmap.SetPixel(j, i, color);
                             index += 4;
                         }
                     }
-
-                    //br.Close();
+                    
                     return bitmap;
 
                 }

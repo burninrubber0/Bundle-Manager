@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using BundleFormat;
+using BundleUtilities;
 using MathLib;
 using ModelViewer.SceneData;
 using OpenTK;
@@ -90,17 +93,43 @@ namespace BundleManager
             result.Unknown2 = br.ReadInt32();
             result.Unknown3 = br.ReadInt32();
 
+            //List<uint> UsedEntries = new List<uint>();
+            //Dictionary<uint, int> MultiEntries = new Dictionary<uint, int>();
+
             for (int i = 0; i < instanceCount; i++)
             {
                 ModelInstance instance = ModelInstance.Read(br);
 
                 instance.ModelEntryID = entry.GetDependencies()[i].EntryID;
 
+                /*if (UsedEntries.Contains(instance.ModelEntryID))
+                {
+                    if (MultiEntries.ContainsKey(instance.ModelEntryID))
+                    {
+                        MultiEntries[instance.ModelEntryID]++;
+                    }
+                    else
+                    {
+                        MultiEntries.Add(instance.ModelEntryID, 1);
+                    }
+                }
+                else
+                {
+                    UsedEntries.Add(instance.ModelEntryID);
+                }*/
+
                 result.Instances.Add(instance);
             }
 
             br.Close();
             ms.Close();
+
+            /*foreach (uint key in MultiEntries.Keys)
+            {
+                int timesUsed = MultiEntries[key];
+
+                Debug.WriteLine("EntryID: 0x" + key.ToString("X8") + " was used " + timesUsed + " times");
+            }*/
 
             return result;
         }
@@ -131,33 +160,62 @@ namespace BundleManager
             entry.Dirty = true;
         }
 
-        public Scene MakeScene()
+        public Scene MakeScene(ILoader loader = null)
         {
+            //TextureState.ResetCache();
+
             Scene scene = new Scene();
 
+            Dictionary<uint, Renderable> models = new Dictionary<uint, Renderable>();
+
+            int index = 1;
             foreach (ModelInstance instance in Instances)
             {
-                BundleEntry modelEntry = Entry.Archive.GetEntryByID(instance.ModelEntryID);
-                if (modelEntry == null)
-                {
-                    string file = BundleCache.GetFileByEntryID(instance.ModelEntryID);
-                    if (!string.IsNullOrEmpty(file))
-                    {
-                        BundleArchive archive = BundleArchive.Read(file, Entry.Console);
-                        modelEntry = archive.GetEntryByID(instance.ModelEntryID);
-                    }
-                }
+                int progress = (index - 1) * 100 / Instances.Count;
+                loader?.SetProgress(progress);
 
-                if (modelEntry != null)
+                loader?.SetStatus("Loading(" + progress.ToString("D2") + "%): ModelInstance: " + index + "/" + Instances.Count);
+                DebugTimer t = DebugTimer.Start("ModelInstance[" + index + "/" + Instances.Count + "]");
+                index++;
+
+                if (models.ContainsKey(instance.ModelEntryID))
                 {
-                    BundleEntry renderableEntry = modelEntry.GetDependencies()[0].Entry;
-                    Renderable renderable = Renderable.Read(renderableEntry, null); // TODO: Null Loader
+                    Renderable renderable = models[instance.ModelEntryID];
                     SceneObject sceneObject = new SceneObject(instance.ModelEntryID.ToString("X8"), renderable.Model);
                     sceneObject.Transform = instance.Transform;
 
                     scene.AddObject(sceneObject);
                 }
+                else
+                {
+                    BundleEntry modelEntry = Entry.Archive.GetEntryByID(instance.ModelEntryID);
+                    if (modelEntry == null)
+                    {
+                        string file = BundleCache.GetFileByEntryID(instance.ModelEntryID);
+                        if (!string.IsNullOrEmpty(file))
+                        {
+                            BundleArchive archive = BundleArchive.Read(file, Entry.Console);
+                            modelEntry = archive.GetEntryByID(instance.ModelEntryID);
+                        }
+                    }
+
+                    if (modelEntry != null)
+                    {
+                        BundleEntry renderableEntry = modelEntry.GetDependencies()[0].Entry;
+                        Renderable renderable = Renderable.Read(renderableEntry, null); // TODO: Null Loader
+                        models.Add(instance.ModelEntryID, renderable);
+                        SceneObject sceneObject =
+                            new SceneObject(instance.ModelEntryID.ToString("X8"), renderable.Model);
+                        sceneObject.Transform = instance.Transform;
+
+                        scene.AddObject(sceneObject);
+                    }
+                }
+                t.StopLog();
             }
+            loader?.SetProgress(100);
+
+            //TextureState.ResetCache();
 
             return scene;
         }

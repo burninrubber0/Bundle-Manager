@@ -12,11 +12,23 @@ namespace BundleManager
 {
     public class TextureState
     {
+        private static readonly Dictionary<uint, Image> _cachedTextures = new Dictionary<uint, Image>();
+
         public Image Texture;
 
         public TextureState()
         {
             
+        }
+
+        public static void ResetCache()
+        {
+            foreach (uint key in _cachedTextures.Keys)
+            {
+                Image img = _cachedTextures[key];
+                img.Dispose();
+            }
+            _cachedTextures.Clear();
         }
 
         public static TextureState Read(BundleEntry entry)
@@ -28,26 +40,35 @@ namespace BundleManager
             {
                 uint id = dependency.EntryID;
 
-                BundleEntry descEntry1 = entry.Archive.GetEntryByID(id);
-                if (descEntry1 == null)
+                if (_cachedTextures.ContainsKey(id))
                 {
-                    string file = BundleCache.GetFileByEntryID(id);
-                    if (!string.IsNullOrEmpty(file))
-                    {
-                        BundleArchive archive = BundleArchive.Read(file, entry.Console);
-                        if (archive != null)
-                            descEntry1 = archive.GetEntryByID(id);
-                    }
+                    result.Texture = _cachedTextures[id];
                 }
-
-                if (descEntry1 != null && descEntry1.Type == EntryType.RasterResourceType)
+                else
                 {
-                    if (entry.Console)
-                        result.Texture = GameImage.GetImagePS3(descEntry1.Header, descEntry1.Body);
-                    else
-                        result.Texture = GameImage.GetImagePC(descEntry1.Header, descEntry1.Body);
+                    BundleEntry descEntry1 = entry.Archive.GetEntryByID(id);
+                    if (descEntry1 == null)
+                    {
+                        string file = BundleCache.GetFileByEntryID(id);
+                        if (!string.IsNullOrEmpty(file))
+                        {
+                            BundleArchive archive = BundleArchive.Read(file, entry.Console);
+                            if (archive != null)
+                                descEntry1 = archive.GetEntryByID(id);
+                        }
+                    }
 
-                    break;
+                    if (descEntry1 != null && descEntry1.Type == EntryType.RasterResourceType)
+                    {
+                        if (entry.Console)
+                            result.Texture = GameImage.GetImagePS3(descEntry1.Header, descEntry1.Body);
+                        else
+                            result.Texture = GameImage.GetImagePC(descEntry1.Header, descEntry1.Body);
+
+                        _cachedTextures.Add(id, result.Texture);
+
+                        break;
+                    }
                 }
             }
 

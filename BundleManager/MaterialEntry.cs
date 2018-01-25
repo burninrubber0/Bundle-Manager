@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BundleFormat;
+using BundleUtilities;
 
 namespace BundleManager
 {
@@ -31,6 +32,7 @@ namespace BundleManager
             {
                 uint id = dependency.EntryID;
 
+                //DebugTimer t = DebugTimer.Start("LoadDep");
                 BundleEntry descEntry1 = entry.Archive.GetEntryByID(id);
                 if (descEntry1 == null)
                 {
@@ -41,13 +43,16 @@ namespace BundleManager
                         descEntry1 = archive.GetEntryByID(id);
                     }
                 }
+                //t.StopLog();
 
+                //DebugTimer t2 = DebugTimer.Start("LoadTextureState");
                 if (descEntry1 != null && descEntry1.Type == EntryType.RwTextureStateResourceType)
                 {
                     TextureState state = TextureState.Read(descEntry1);
 
                     result.TextureStates.Add(state);
                 }
+                //t2.StopLog();
             }
 
             MemoryStream ms = entry.MakeStream();

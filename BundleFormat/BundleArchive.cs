@@ -99,6 +99,39 @@ namespace BundleFormat
 
         public static bool IsBundle(string path)
         {
+            /*string ext = System.IO.Path.GetExtension(path)?.ToUpper();
+            if (ext == null)
+                return false;
+
+            if (ext == ".BUNDLE" || ext == ".BNDL" || ext == ".FONT" || ext == ".TEX")
+                return new FileInfo(path).Length > 0;
+
+            if ((ext == ".DAT" || ext == ".RV2") && new FileInfo(path).Length > 0)
+            {
+
+                bool result;
+    
+                try
+                {
+                    Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
+                    BinaryReader br = new BinaryReader(s);
+    
+                    result = br.VerifyMagic(MAGIC);
+    
+                    br.Close();
+                    s.Close();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message + "\n\n" + ex.StackTrace);
+                    result = false;
+                }
+    
+                return result;
+            }
+
+            return false;*/
+
             bool result;
 
             try

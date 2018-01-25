@@ -36,12 +36,15 @@
             this.recentSeparatorToolStripMenu = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ignoreIDConflictsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tspMain = new System.Windows.Forms.ToolStrip();
             this.tsbOpen = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsbSwitchMode = new System.Windows.Forms.ToolStripButton();
             this.lstMain = new System.Windows.Forms.ListView();
             this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.loadMaterialsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuMain.SuspendLayout();
             this.tspMain.SuspendLayout();
             this.SuspendLayout();
@@ -57,7 +60,8 @@
             // mnuMain
             // 
             this.mnuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.viewToolStripMenuItem});
             this.mnuMain.Location = new System.Drawing.Point(0, 0);
             this.mnuMain.Name = "mnuMain";
             this.mnuMain.Size = new System.Drawing.Size(582, 24);
@@ -100,6 +104,24 @@
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // viewToolStripMenuItem
+            // 
+            this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ignoreIDConflictsToolStripMenuItem,
+            this.loadMaterialsToolStripMenuItem});
+            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.viewToolStripMenuItem.Text = "View";
+            // 
+            // ignoreIDConflictsToolStripMenuItem
+            // 
+            this.ignoreIDConflictsToolStripMenuItem.Checked = true;
+            this.ignoreIDConflictsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ignoreIDConflictsToolStripMenuItem.Name = "ignoreIDConflictsToolStripMenuItem";
+            this.ignoreIDConflictsToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.ignoreIDConflictsToolStripMenuItem.Text = "Ignore ID Conflicts";
+            this.ignoreIDConflictsToolStripMenuItem.Click += new System.EventHandler(this.ignoreIDConflictsToolStripMenuItem_Click);
             // 
             // tspMain
             // 
@@ -155,7 +177,16 @@
             // colName
             // 
             this.colName.Text = "Name";
-            this.colName.Width = 160;
+            this.colName.Width = 480;
+            // 
+            // loadMaterialsToolStripMenuItem
+            // 
+            this.loadMaterialsToolStripMenuItem.Checked = true;
+            this.loadMaterialsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.loadMaterialsToolStripMenuItem.Name = "loadMaterialsToolStripMenuItem";
+            this.loadMaterialsToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.loadMaterialsToolStripMenuItem.Text = "Load Materials";
+            this.loadMaterialsToolStripMenuItem.Click += new System.EventHandler(this.loadMaterialsToolStripMenuItem_Click);
             // 
             // FileView
             // 
@@ -195,5 +226,8 @@
         private System.Windows.Forms.ToolStripButton tsbSwitchMode;
         private System.Windows.Forms.ListView lstMain;
         private System.Windows.Forms.ColumnHeader colName;
+        private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ignoreIDConflictsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadMaterialsToolStripMenuItem;
     }
 }

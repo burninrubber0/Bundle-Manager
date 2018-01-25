@@ -528,6 +528,7 @@ namespace BundleManager
             }
             else if (entry.Type == EntryType.InstanceListResourceType && !forceHex)
             {
+                TextureState.ResetCache();
                 LoadingDialog loader = new LoadingDialog();
                 loader.Status = "Loading: " + entry.ID.ToString("X8");
 
@@ -551,12 +552,13 @@ namespace BundleManager
                             ModelViewerForm.ShowModelViewer(this, scene);
                         }
                     }
+                    TextureState.ResetCache();
                 };
 
                 loadInstanceThread = new Thread(() =>
                 {
                     instanceList = InstanceList.Read(entry, loader);
-                    scene = instanceList.MakeScene();
+                    scene = instanceList.MakeScene(loader);
                     loader.IsDone = true;
                 });
                 loadInstanceThread.Start();
@@ -565,6 +567,7 @@ namespace BundleManager
             }
             else if (entry.Type == EntryType.GraphicsSpecResourceType && !forceHex)
             {
+                TextureState.ResetCache();
                 LoadingDialog loader = new LoadingDialog();
                 loader.Status = "Loading: " + entry.ID.ToString("X8");
 
@@ -588,6 +591,8 @@ namespace BundleManager
                             ModelViewerForm.ShowModelViewer(this, scene);
                         }
                     }
+
+                    TextureState.ResetCache();
                 };
 
                 loadInstanceThread = new Thread(() =>
@@ -602,6 +607,7 @@ namespace BundleManager
             }
             else if (entry.Type == EntryType.RwRenderableResourceType && !forceHex)
             {
+                TextureState.ResetCache();
                 LoadingDialog loader = new LoadingDialog();
                 loader.Status = "Loading: " + entry.ID.ToString("X8");
 
@@ -625,6 +631,7 @@ namespace BundleManager
                             ModelViewerForm.ShowModelViewer(this, scene);
                         }
                     }
+                    TextureState.ResetCache();
                 };
                 
                 loadInstanceThread = new Thread(() =>

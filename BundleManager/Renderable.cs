@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BundleFormat;
+using BundleUtilities;
 using MathLib;
 using ModelViewer.SceneData;
 using OpenTK;
@@ -53,6 +54,8 @@ namespace BundleManager
 
     public class Renderable
     {
+        public static bool LoadMaterials => FileView.LoadMaterials;
+
         public float Unknown1;
         public float Unknown2;
         public float Unknown3;
@@ -323,25 +326,26 @@ namespace BundleManager
             br.Close();
             ms.Close();
             
-            
-
             for (int i = 0; i < result.Meshes.Count; i++)
             {
                 RenderableMesh mesh = result.Meshes[i];
 
-                BundleEntry descEntry1 = entry.Archive.GetEntryByID(mesh.MaterialID);
-                if (descEntry1 == null)
+                if (LoadMaterials)
                 {
-                    string file = BundleCache.GetFileByEntryID(mesh.MaterialID);
-                    if (!string.IsNullOrEmpty(file))
+                    BundleEntry descEntry1 = entry.Archive.GetEntryByID(mesh.MaterialID);
+                    if (descEntry1 == null)
                     {
-                        BundleArchive archive = BundleArchive.Read(file, entry.Console);
-                        descEntry1 = archive.GetEntryByID(mesh.MaterialID);
+                        string file = BundleCache.GetFileByEntryID(mesh.MaterialID);
+                        if (!string.IsNullOrEmpty(file))
+                        {
+                            BundleArchive archive = BundleArchive.Read(file, entry.Console);
+                            descEntry1 = archive.GetEntryByID(mesh.MaterialID);
+                        }
                     }
-                }
 
-                if (descEntry1 != null)
-                    mesh.Material = MaterialEntry.Read(descEntry1);
+                    if (descEntry1 != null)
+                        mesh.Material = MaterialEntry.Read(descEntry1);
+                }
 
                 mesh.VertexDescriptions = new VertexDesc[6];
                 for (int j = 0; j < mesh.VertexDescriptions.Length; j++)

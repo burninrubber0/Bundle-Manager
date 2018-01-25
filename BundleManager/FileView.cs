@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,12 @@ namespace BundleManager
 {
     public partial class FileView : Form
     {
+        private static FileView _instance;
+
+        public static bool LoadMaterials => _instance.loadMaterialsToolStripMenuItem.CheckState == CheckState.Checked;
+
+        private bool AlwaysIgnore => ignoreIDConflictsToolStripMenuItem.CheckState == CheckState.Checked;
+
         private string _currentPath
         {
             get => BundleCache.CurrentPath;
@@ -32,6 +39,8 @@ namespace BundleManager
         public FileView()
         {
             InitializeComponent();
+
+            _instance = this;
 
             UpdateRecentFiles();
         }
@@ -143,31 +152,96 @@ namespace BundleManager
             }
         }
 
+        private struct ConflictChoice
+        {
+            public bool Cancel { get; set; }
+            public bool IgnoreAll { get; set; }
+
+            public ConflictChoice(bool cancel, bool ignoreAll)
+            {
+                Cancel = cancel;
+                IgnoreAll = ignoreAll;
+            }
+        }
+
+        private ConflictChoice ResolveConflict(uint entryID, string file1, string file2)
+        {
+            if (AlwaysIgnore)
+                return new ConflictChoice(false, true);
+            bool isSet = false;
+            DialogResult result = DialogResult.None;
+            Invoke(new Action(() =>
+            {
+                result = MessageBox.Show(this, "ID Conflict 0x" + entryID.ToString("X8") + " between " +
+                                                            file2 + " and " + file1 +
+                                                            "\n\nWould you like to ignore this issue? (May cause other problems)\n\nAbort = Cancel\nRetry = Ignore Once\nIgnore = Ignore All",
+                    "ID Conflict", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Warning);
+                isSet = true;
+            }));
+            while (!isSet);
+            if (result == DialogResult.Retry)
+            {
+                return new ConflictChoice(false, false);
+            } else if (result == DialogResult.Abort)
+            {
+                return new ConflictChoice(true, false);
+            } else if (result == DialogResult.Ignore)
+            {
+                return new ConflictChoice(false, true);
+            }
+
+            return new ConflictChoice(false, false);
+        }
+
         private void DoLoadFileList(ILoader loader)
         {
             BundleCache.Files.Clear();
             BundleCache.Paths.Clear();
-            //lstMain.Items.Clear();
+
             string[] files = Directory.GetFiles(_currentPath, "*.*", SearchOption.AllDirectories);
+            
+            Dictionary<string, bool> fileTypes = new Dictionary<string, bool>();
+
+            string cachePath = _currentPath + "/files.bmcache";
+            if (File.Exists(cachePath))
+            {
+                string[] lines = File.ReadAllLines(cachePath);
+                foreach (string line in lines)
+                {
+                    string[] data = line.Split('|');
+                    if (data.Length < 2)
+                        continue;
+
+                    if (File.Exists(data[0]))
+                        fileTypes.Add(data[0], data[1] == "bundle");
+                }
+            }
 
             int i = 0;
             int index = 0;
-            //bool ignoreAllConflicts = false;
+            bool ignoreAllConflicts = false;
             foreach (string file in files)
             {
                 index++;
 
                 try
                 {
-                    if (!BundleArchive.IsBundle(file))
+                    if (!fileTypes.ContainsKey(file))
+                    {
+                        bool isBundle = BundleArchive.IsBundle(file);
+                        fileTypes.Add(file, isBundle);
+
+                        if (!isBundle)
+                            continue;
+                    } else if (!fileTypes[file])
+                    {
                         continue;
-
-
+                    }
+                    
                     int progress = index * 100 / files.Length;
                     loader.SetStatus("Loading(" + progress.ToString("D2") + "%): " + Path.GetFileName(file));
                     loader.SetProgress(progress);
-
-
+                    
                     string fixedPath = file.Replace('\\', '/');
                     string fixedCurrentPath = _currentPath.Replace('\\', '/');
 
@@ -181,54 +255,66 @@ namespace BundleManager
                         fixedPath
                     };
 
-                    //bool cancel = false;
+                    bool cancel = false;
+
                     List<uint> entryIDs = BundleArchive.GetEntryIDs(file, false);
+
                     foreach (uint entryID in entryIDs)
                     {
                         if (BundleCache.Files.ContainsKey(entryID))
                         {
-                            /*if (ignoreAllConflicts)
+                            if (ignoreAllConflicts)
                                 continue;
-                            int index = Files[entryID];
-                            string otherFile = Paths[index];
-                            DialogResult result = MessageBox.Show(this, "ID Conflict 0x" + entryID.ToString("X8") + " between " +
-                                            otherFile + " and " + file + "\n\nWould you like to ignore this issue? (May cause other problems)\n\nAbort = Cancel\nRetry = Ignore Once\nIgnore = Ignore All", "ID Conflict", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Warning);
-                            if (result == DialogResult.Retry)
-                            {
-                                continue;
-                            } else if (result == DialogResult.Abort)
+                            int index1 = BundleCache.Files[entryID];
+                            string otherFile = BundleCache.Paths[index1];
+                            ConflictChoice choice = ResolveConflict(entryID, file, otherFile);
+                            if (choice.Cancel)
                             {
                                 cancel = true;
                                 break;
-                            } else if (result == DialogResult.Ignore)
-                            {
+                            }
+                            if (choice.IgnoreAll)
                                 ignoreAllConflicts = true;
-                                continue;
-                            }*/
                             continue;
                         }
                         BundleCache.Files.Add(entryID, i);
                     }
-                    /*if (cancel)
+
+                    if (cancel)
                     {
                         BundleCache.Files.Clear();
                         BundleCache.Paths.Clear();
                         lstMain.Items.Clear();
                         break;
-                    }*/
+                    }
                     BundleCache.Paths.Add(file);
-                    //lstMain.Items.Add(new ListViewItem(itemData));
                 }
                 catch (ThreadAbortException)
                 {
                     BundleCache.Files.Clear();
                     BundleCache.Paths.Clear();
-                    //lstMain.Items.Clear();
 
                     _currentPath = null;
                     break;
                 }
                 i++;
+            }
+
+            try
+            {
+                Stream s = File.Open(cachePath, FileMode.Create, FileAccess.Write);
+                StreamWriter sw = new StreamWriter(s);
+
+                foreach (string key in fileTypes.Keys)
+                    sw.WriteLine(key + "|" + (fileTypes[key] ? "bundle" : "other"));
+
+                sw.Flush();
+                sw.Close();
+                s.Close();
+            }
+            catch (IOException ex)
+            {
+                Invoke(new Action(() => MessageBox.Show(this, "Failed to cache file types:\n" + ex.Message + "\n" + ex.StackTrace)));
             }
         }
 
@@ -381,6 +467,22 @@ namespace BundleManager
                 }
             }
             return referenceList;
+        }
+
+        private void ignoreIDConflictsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ignoreIDConflictsToolStripMenuItem.CheckState == CheckState.Checked)
+                ignoreIDConflictsToolStripMenuItem.CheckState = CheckState.Unchecked;
+            else
+                ignoreIDConflictsToolStripMenuItem.CheckState = CheckState.Checked;
+        }
+
+        private void loadMaterialsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (loadMaterialsToolStripMenuItem.CheckState == CheckState.Checked)
+                loadMaterialsToolStripMenuItem.CheckState = CheckState.Unchecked;
+            else
+                loadMaterialsToolStripMenuItem.CheckState = CheckState.Checked;
         }
     }
 }

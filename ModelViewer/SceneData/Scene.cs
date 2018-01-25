@@ -106,6 +106,8 @@ namespace ModelViewer.SceneData
             for (int i = 0; i < materials.Count; i++)
             {
                 Material material = materials[i];
+                if (material == null)
+                    continue;
 
                 string materialFileName = "material_" + material.Name + ".png";
                 string materialRelativePathName = materialDir + materialFileName;
@@ -177,7 +179,8 @@ namespace ModelViewer.SceneData
 
                         sw.WriteLine("g mesh" + meshIndex);
 
-                        sw.WriteLine("usemtl material_" + mesh.Material.Name);
+                        if (mesh.Material != null)
+                            sw.WriteLine("usemtl material_" + mesh.Material.Name);
 
                         sw.WriteLine();
 

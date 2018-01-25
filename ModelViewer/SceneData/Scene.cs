@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using OpenTK;
 
@@ -98,24 +99,15 @@ namespace ModelViewer.SceneData
             // TODO: Implement Collada Export
         }
 
-        public void ExportWavefrontObj(string path)
+        private void ExportMTL(string mtlPath, string materialDir, string materialDirPath, List<Material> materials)
         {
-            string fullPath = Path.GetFullPath(path).Replace(Path.GetFileName(path), "");
-            string mtlPath = fullPath + Path.GetFileNameWithoutExtension(path) + ".mtl";
-            string materialDir = Path.GetFileNameWithoutExtension(path) + "_materials\\";
-            string materialDirPath = fullPath + "/" + materialDir;
-            if (!Directory.Exists(materialDirPath))
-                Directory.CreateDirectory(materialDirPath);
-
-            List<Material> materials = GetAllMaterials();
-
             Stream s1 = File.Open(mtlPath, FileMode.Create);
             StreamWriter sw1 = new StreamWriter(s1);
             for (int i = 0; i < materials.Count; i++)
             {
                 Material material = materials[i];
 
-                string materialFileName =  "material_" + material.Name + ".png";
+                string materialFileName = "material_" + material.Name + ".png";
                 string materialRelativePathName = materialDir + materialFileName;
                 string materialPathName = materialDirPath + materialFileName;
 
@@ -139,70 +131,80 @@ namespace ModelViewer.SceneData
             sw1.Flush();
             sw1.Close();
             s1.Close();
+        }
 
-            Stream s = File.Open(path, FileMode.Create);
-            StreamWriter sw = new StreamWriter(s);
+        public void ExportWavefrontObj(string path)
+        {
+            string fullPath = Path.GetFullPath(path).Replace(Path.GetFileName(path), "");
+            string mtlPath = fullPath + Path.GetFileNameWithoutExtension(path) + ".mtl";
+            string materialDir = Path.GetFileNameWithoutExtension(path) + "_materials\\";
+            string materialDirPath = fullPath + "/" + materialDir;
+            if (!Directory.Exists(materialDirPath))
+                Directory.CreateDirectory(materialDirPath);
 
-            sw.WriteLine("mtllib " + mtlPath);
-            
-            int meshIndex = 0;
+            List<Material> materials = GetAllMaterials();
+            ExportMTL(mtlPath, materialDir, materialDirPath, materials);
 
-            uint usedIndices = 0;
-            foreach (SceneObject obj in SceneObjects.Values)
+            try
             {
-                string name = obj.Name;
-                sw.WriteLine("# Model " + name);
+                Stream s = File.Open(path, FileMode.Create);
+                StreamWriter sw = new StreamWriter(s);
 
-                Model model = obj.Model.Transformed(obj.Transform);
-                for (int i = 0; i < model.Meshes.Count; i++)
+                sw.WriteLine("mtllib " + mtlPath);
+
+                int meshIndex = 0;
+
+                uint usedIndices = 0;
+                foreach (SceneObject obj in SceneObjects.Values)
                 {
-                    Mesh mesh = model.Meshes[i];
-                    
-                    for (int j = 0; j < mesh.Vertices.Count; j++)
-                    {
-                        Vector3 vertex = mesh.Vertices[j];
-                        sw.WriteLine("v " + vertex.X + " " + vertex.Y + " " + vertex.Z);
+                    string name = obj.Name;
+                    sw.WriteLine("# Model " + name);
 
-                        /*if (j < mesh.UV1.Count)
+                    Model model = obj.Model.Transformed(obj.Transform);
+                    foreach (Mesh mesh in model.Meshes)
+                    {
+                        foreach (Vector3 vertex in mesh.Vertices)
                         {
-                            Vector2 uv1 = mesh.UV1[j];
-                            sw.WriteLine("vt " + uv1.X + " " + uv1.Y);
-                        }*/
+                            sw.WriteLine("v " + vertex.X + " " + vertex.Y + " " + vertex.Z);
+                        }
+
+                        foreach (Vector2 uv1 in mesh.UV1)
+                        {
+                            sw.WriteLine("vt " + uv1.X + " " + -uv1.Y);
+                        }
+
+                        sw.WriteLine();
+
+                        sw.WriteLine("g mesh" + meshIndex);
+
+                        sw.WriteLine("usemtl material_" + mesh.Material.Name);
+
+                        sw.WriteLine();
+
+                        for (int j = 0; j < mesh.Indices.Count; j += 3)
+                        {
+                            uint v0 = mesh.Indices[j + 0] + 1 + usedIndices;
+                            uint v1 = mesh.Indices[j + 1] + 1 + usedIndices;
+                            uint v2 = mesh.Indices[j + 2] + 1 + usedIndices;
+                            sw.WriteLine("f " + v0 + "/" + v0 + " " + v1 + "/" + v1 + " " + v2 + "/" + v2);
+                        }
+
+                        usedIndices += (uint) mesh.Vertices.Count;
+
+                        sw.WriteLine();
+
+                        meshIndex++;
                     }
-
-                    foreach (Vector2 uv1 in mesh.UV1)
-                    {
-                        sw.WriteLine("vt " + uv1.X + " " + -uv1.Y);
-                    }
-
-                    sw.WriteLine();
-                    
-                    sw.WriteLine("g mesh" + meshIndex);
-
-                    //int materialIndex = materials.IndexOf(mesh.Material);
-                    sw.WriteLine("usemtl material_" + mesh.Material.Name);//materialIndex);
-
-                    sw.WriteLine();
-
-                    for (int j = 0; j < mesh.Indices.Count; j += 3)
-                    {
-                        uint v0 = mesh.Indices[j + 0] + 1 + usedIndices;
-                        uint v1 = mesh.Indices[j + 1] + 1 + usedIndices;
-                        uint v2 = mesh.Indices[j + 2] + 1 + usedIndices;
-                        sw.WriteLine("f " + v0 + "/" + v0 + " " + v1 + "/" + v1 + " " + v2 + "/" + v2);
-                    }
-
-                    usedIndices += (uint)mesh.Vertices.Count;
-
-                    sw.WriteLine();
-
-                    meshIndex++;
                 }
-            }
 
-            sw.Flush();
-            sw.Close();
-            s.Close();
+                sw.Flush();
+                sw.Close();
+                s.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\r\n" + ex.StackTrace, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public void UpdateSizing()

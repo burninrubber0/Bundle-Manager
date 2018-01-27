@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BundleUtilities;
 
 namespace BundleFormat
 {
@@ -161,7 +162,11 @@ namespace BundleFormat
             BinaryReader br = new BinaryReader(s);
 
             if (!br.VerifyMagic(MAGIC))
+            {
+                br.Close();
+                s.Close();
                 return null;
+            }
 
             br.BaseStream.Position = 0x10;
             int fileCount = br.ReadInt32();
@@ -171,16 +176,110 @@ namespace BundleFormat
 
             for (int i = 0; i < fileCount; i++)
             {
-                uint ID = br.ReadUInt32();
+                uint id = br.ReadUInt32();
                 br.BaseStream.Position += 0x3C;
 
-                result.Add(ID);
+                result.Add(id);
             }
 
             br.Close();
             s.Close();
 
             return result;
+        }
+
+        public static List<EntryInfo> GetEntryInfos(string path, bool console = false)
+        {
+            List<EntryInfo> result = new List<EntryInfo>();
+
+            Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
+            BinaryReader br = new BinaryReader(s);
+
+            if (!br.VerifyMagic(MAGIC))
+            {
+                br.Close();
+                s.Close();
+                return null;
+            }
+
+            br.BaseStream.Position = 0x10;
+            int fileCount = br.ReadInt32();
+            int metaStart = br.ReadInt32();
+
+            br.BaseStream.Position = metaStart;
+
+            for (int i = 0; i < fileCount; i++)
+            {
+                uint id = br.ReadUInt32();
+                br.BaseStream.Position += 0x34;
+                EntryType type = (EntryType)br.ReadUInt32();
+                br.BaseStream.Position += 0x4;
+
+                result.Add(new EntryInfo(id, type, path));
+            }
+
+            br.Close();
+            s.Close();
+
+            return result;
+        }
+
+        public static EntryType GetEntryType(string path, uint id, bool console = false)
+        {
+            DebugTimer timer = DebugTimer.Start("GetEntryType");
+            EntryType result = EntryType.Invalid;
+
+            Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
+            BinaryReader br = new BinaryReader(s);
+
+            if (!br.VerifyMagic(MAGIC))
+            {
+                timer.StopLog();
+                br.Close();
+                s.Close();
+                return EntryType.Invalid;
+            }
+
+            br.BaseStream.Position = 0x10;
+            int fileCount = br.ReadInt32();
+            int metaStart = br.ReadInt32();
+
+            br.BaseStream.Position = metaStart;
+
+            for (int i = 0; i < fileCount; i++)
+            {
+                uint id2 = br.ReadUInt32();
+                br.BaseStream.Position += 0x34;
+                EntryType type = (EntryType) br.ReadUInt32();
+                br.BaseStream.Position += 0x4;
+
+                if (id2 == id)
+                {
+                    result = type;
+                    break;
+                }
+            }
+
+            br.Close();
+            s.Close();
+
+            timer.StopLog();
+
+            return result;
+        }
+    }
+
+    public class EntryInfo
+    {
+        public uint ID;
+        public EntryType Type;
+        public string Path;
+
+        public EntryInfo(uint id, EntryType type, string path)
+        {
+            ID = id;
+            Type = type;
+            Path = path;
         }
     }
 
@@ -323,7 +422,7 @@ namespace BundleFormat
                 case EntryType.InstanceListResourceType:
                     return Color.BlueViolet;
                 case EntryType.IDList:
-                    break;
+                    return Color.Tomato;
                 case EntryType.LanguageResourceType:
                     break;
                 case EntryType.SatNavTileResourceType:
@@ -353,7 +452,7 @@ namespace BundleFormat
                 case EntryType.VideoDataResourceType:
                     break;
                 case EntryType.PolygonSoupListResourceType:
-                    break;
+                    return Color.Goldenrod;
                 case EntryType.CommsToolListDefinitionResourceType:
                     break;
                 case EntryType.CommsToolListResourceType:
@@ -577,7 +676,9 @@ namespace BundleFormat
         VehicleAnimationResourceType = 0x10023,
         BodypartRemappingResourceType = 0x10024,
         LUAListResourceType = 0x10025,
-        LUAScriptResourceType = 0x10026
+        LUAScriptResourceType = 0x10026,
+
+        Invalid = 0x99999
     }
 
     public enum CompressionType

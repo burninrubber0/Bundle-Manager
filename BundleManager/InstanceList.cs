@@ -10,7 +10,7 @@ using OpenTK;
 
 namespace BundleManager
 {
-    public struct ModelInstance
+    public class ModelInstance
     {
         public uint ModelEntryID;
 
@@ -75,6 +75,8 @@ namespace BundleManager
         public int Unknown2;
         public int Unknown3;
 
+        public byte[] RemainingBytes;
+
         public InstanceList()
         {
             Instances = new List<ModelInstance>();
@@ -121,6 +123,8 @@ namespace BundleManager
                 result.Instances.Add(instance);
             }
 
+            result.RemainingBytes = br.ReadBytes((int)(br.BaseStream.Length - br.BaseStream.Position));
+
             br.Close();
             ms.Close();
 
@@ -130,6 +134,78 @@ namespace BundleManager
 
                 Debug.WriteLine("EntryID: 0x" + key.ToString("X8") + " was used " + timesUsed + " times");
             }*/
+
+            /*{
+                ModelInstance inst = result.Instances[318];
+                Vector4 originalCol = inst.Transform.Column3;
+                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
+                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
+                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
+                inst.Transform = r * s * t;
+                inst.Transform.Column3 = originalCol;
+            }
+
+            {
+                ModelInstance inst = result.Instances[316];
+                Vector4 originalCol = inst.Transform.Column3;
+                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
+                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
+                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
+                inst.Transform = r * s * t;
+                inst.Transform.Column3 = originalCol;
+            }
+
+            {
+                ModelInstance inst = result.Instances[148];
+                Vector4 originalCol = inst.Transform.Column3;
+                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
+                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
+                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
+                inst.Transform = r * s * t;
+                inst.Transform.Column3 = originalCol;
+            }
+
+            {
+                ModelInstance inst = result.Instances[147];
+                Vector4 originalCol = inst.Transform.Column3;
+                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
+                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
+                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
+                inst.Transform = r * s * t;
+                inst.Transform.Column3 = originalCol;
+            }
+
+            {
+                ModelInstance inst = result.Instances[146];
+                Vector4 originalCol = inst.Transform.Column3;
+                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
+                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
+                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
+                inst.Transform = r * s * t;
+                inst.Transform.Column3 = originalCol;
+            }
+
+            {
+                ModelInstance inst = result.Instances[145];
+                Vector4 originalCol = inst.Transform.Column3;
+                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
+                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
+                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
+                inst.Transform = r * s * t;
+                inst.Transform.Column3 = originalCol;
+            }
+
+            {
+                ModelInstance inst = result.Instances[144];
+                Vector4 originalCol = inst.Transform.Column3;
+                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
+                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
+                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
+                inst.Transform = r * s * t;
+                inst.Transform.Column3 = originalCol;
+            }
+
+            result.Write(entry);*/
 
             return result;
         }
@@ -151,6 +227,8 @@ namespace BundleManager
                 instance.Write(bw);
             }
 
+            bw.Write(RemainingBytes);
+
             bw.Flush();
             byte[] data = ms.GetBuffer();
             bw.Close();
@@ -168,6 +246,7 @@ namespace BundleManager
 
             Dictionary<uint, Renderable> models = new Dictionary<uint, Renderable>();
 
+            int i = 0;
             int index = 1;
             foreach (ModelInstance instance in Instances)
             {
@@ -175,13 +254,14 @@ namespace BundleManager
                 loader?.SetProgress(progress);
 
                 loader?.SetStatus("Loading(" + progress.ToString("D2") + "%): ModelInstance: " + index + "/" + Instances.Count);
-                DebugTimer t = DebugTimer.Start("ModelInstance[" + index + "/" + Instances.Count + "]");
+                //DebugTimer t = DebugTimer.Start("ModelInstance[" + index + "/" + Instances.Count + "]");
                 index++;
 
                 if (models.ContainsKey(instance.ModelEntryID))
                 {
                     Renderable renderable = models[instance.ModelEntryID];
                     SceneObject sceneObject = new SceneObject(instance.ModelEntryID.ToString("X8"), renderable.Model);
+                    sceneObject.ID = i.ToString();
                     sceneObject.Transform = instance.Transform;
 
                     scene.AddObject(sceneObject);
@@ -206,12 +286,14 @@ namespace BundleManager
                         models.Add(instance.ModelEntryID, renderable);
                         SceneObject sceneObject =
                             new SceneObject(instance.ModelEntryID.ToString("X8"), renderable.Model);
+                        sceneObject.ID = i.ToString();
                         sceneObject.Transform = instance.Transform;
 
                         scene.AddObject(sceneObject);
                     }
                 }
-                t.StopLog();
+                i++;
+                //t.StopLog();
             }
             loader?.SetProgress(100);
 

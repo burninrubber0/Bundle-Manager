@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
@@ -203,6 +204,7 @@ namespace BundleManager
                     i.ToString("d3"),
                     "0x" + entry.ID.ToString("X8"),
                     entry.Type.ToString(),
+                    entry.Header.Length.ToString(),
                     entry.Header.MakePreview(0, 16)
                 };
 
@@ -563,7 +565,7 @@ namespace BundleManager
                 });
                 loadInstanceThread.Start();
                 loader.ShowDialog(this);
-                //DebugUtil.ShowDebug(this, instanceList);
+                //DebugUtil.ShowDebug(this, InstanceList.Read(entry, null));
             }
             else if (entry.Type == EntryType.GraphicsSpecResourceType && !forceHex)
             {
@@ -663,7 +665,35 @@ namespace BundleManager
             {
                 ProgressionData progression = ProgressionData.Read(entry);
                 DebugUtil.ShowDebug(this, progression);
+            } else if (entry.Type == EntryType.PolygonSoupListResourceType && !forceHex)
+            {
+                PolygonSoupList list = PolygonSoupList.Read(entry);
+                DebugUtil.ShowDebug(this, list);
             }
+            else if (entry.Type == EntryType.IDList && !forceHex)
+            {
+                IDList list = IDList.Read(entry);
+                DebugUtil.ShowDebug(this, list);
+            }
+            /* else if (entry.Type == EntryType.ModelResourceType && !forceHex)
+            {
+                for (int i = 0; i < CurrentArchive.Entries.Count; i++)
+                {
+                    BundleEntry entry2 = CurrentArchive.Entries[i];
+                    if (entry2.Type == EntryType.ModelResourceType)
+                    {
+                        List<Dependency> dependencies = entry2.GetDependencies();
+                        foreach (Dependency dep in dependencies)
+                        {
+                            uint id = dep.EntryID;
+                            if (id == 0x172E1475 || id == 0x6D5CEDB6 || id == 0xF2DCDF89)
+                            {
+                                MessageBox.Show(this, "Found: 0x" + id.ToString("X8") + " in 0x" + entry2.ID.ToString("X8"));
+                            }
+                        }
+                    }
+                }
+            }*/
             else
             {
                 EntryEditor editor = new EntryEditor();

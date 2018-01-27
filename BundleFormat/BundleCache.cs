@@ -12,12 +12,20 @@ namespace BundleFormat
         public static string CurrentPath;
         public static List<string> Paths = new List<string>();
         public static Dictionary<uint, int> Files = new Dictionary<uint, int>();
+        public static Dictionary<uint, EntryInfo> EntryInfos = new Dictionary<uint, EntryInfo>();
 
         public static string GetFileByEntryID(uint entryID)
         {
             if (!Files.ContainsKey(entryID))
                 return null;
             return Paths[Files[entryID]];
+        }
+
+        public static EntryInfo GetInfoByEntryID(uint entryID)
+        {
+            if (!EntryInfos.ContainsKey(entryID))
+                return null;
+            return EntryInfos[entryID];
         }
 
         public static string GetRelativePath(string path)

@@ -50,6 +50,7 @@ namespace BundleManager
             _currentPath = null;
             BundleCache.Files.Clear();
             BundleCache.Paths.Clear();
+            BundleCache.EntryInfos.Clear();
             lstMain.Items.Clear();
         }
 
@@ -101,6 +102,7 @@ namespace BundleManager
             {
                 BundleCache.Files.Clear();
                 BundleCache.Paths.Clear();
+                BundleCache.EntryInfos.Clear();
                 lstMain.Items.Clear();
             }
             lstMain.Enabled = Utilities.IsValidPath(_currentPath);
@@ -197,6 +199,7 @@ namespace BundleManager
         {
             BundleCache.Files.Clear();
             BundleCache.Paths.Clear();
+            BundleCache.EntryInfos.Clear();
 
             string[] files = Directory.GetFiles(_currentPath, "*.*", SearchOption.AllDirectories);
             
@@ -257,10 +260,10 @@ namespace BundleManager
 
                     bool cancel = false;
 
-                    List<uint> entryIDs = BundleArchive.GetEntryIDs(file, false);
-
-                    foreach (uint entryID in entryIDs)
+                    List<EntryInfo> entryIDs = BundleArchive.GetEntryInfos(file, false);
+                    foreach (EntryInfo info in entryIDs)
                     {
+                        uint entryID = info.ID;
                         if (BundleCache.Files.ContainsKey(entryID))
                         {
                             if (ignoreAllConflicts)
@@ -277,6 +280,8 @@ namespace BundleManager
                                 ignoreAllConflicts = true;
                             continue;
                         }
+                        if (!BundleCache.EntryInfos.ContainsKey(entryID))
+                            BundleCache.EntryInfos.Add(entryID, info);
                         BundleCache.Files.Add(entryID, i);
                     }
 
@@ -284,6 +289,7 @@ namespace BundleManager
                     {
                         BundleCache.Files.Clear();
                         BundleCache.Paths.Clear();
+                        BundleCache.EntryInfos.Clear();
                         lstMain.Items.Clear();
                         break;
                     }
@@ -293,6 +299,7 @@ namespace BundleManager
                 {
                     BundleCache.Files.Clear();
                     BundleCache.Paths.Clear();
+                    BundleCache.EntryInfos.Clear();
 
                     _currentPath = null;
                     break;
@@ -483,6 +490,68 @@ namespace BundleManager
                 loadMaterialsToolStripMenuItem.CheckState = CheckState.Unchecked;
             else
                 loadMaterialsToolStripMenuItem.CheckState = CheckState.Checked;
+        }
+
+        private void dumpInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_currentPath == null)
+            {
+                MessageBox.Show("Please load a folder first!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "Text Files|*.txt|All Files|*.*";
+            DialogResult result = sfd.ShowDialog(this);
+            if (result == DialogResult.OK)
+            {
+                string path = sfd.FileName;
+
+                Stream s = File.Open(path, FileMode.Create, FileAccess.Write);
+                StreamWriter sw = new StreamWriter(s);
+
+                int maxLength = -1;
+
+                Array types = Enum.GetValues(typeof(EntryType));
+
+                foreach (EntryType type in types)
+                {
+                    int len = type.ToString().Length;
+
+                    maxLength = Math.Max(len, maxLength);
+                }
+
+                foreach (uint key in BundleCache.EntryInfos.Keys)
+                {
+                    EntryInfo info = BundleCache.EntryInfos[key];
+
+                    string thePath = info.Path;
+                    string fixedPath = thePath.Replace('\\', '/');
+                    string fixedCurrentPath = _currentPath.Replace('\\', '/');
+
+                    fixedPath = fixedPath.Replace(fixedCurrentPath, "");
+
+                    if (fixedPath.StartsWith("/"))
+                        fixedPath = fixedPath.Substring(1);
+
+                    string typeName = info.Type.ToString();
+
+                    int len = typeName.Length;
+
+                    int lenDiff = maxLength - len;
+
+                    string typeString = typeName;
+
+                    for (int i = 0; i < lenDiff; i++)
+                        typeString += " ";
+
+                    sw.WriteLine("0x" + info.ID.ToString("X8") + "\t\t" + typeString + "\t\t" + fixedPath);
+                }
+
+                sw.Flush();
+                sw.Close();
+                s.Close();
+            }
         }
     }
 }

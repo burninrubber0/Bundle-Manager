@@ -91,6 +91,7 @@
     <Compile Include="FileView.Designer.cs">
       <DependentUpon>FileView.cs</DependentUpon>
     </Compile>
+    <Compile Include="IDList.cs" />
     <Compile Include="ILoader.cs" />
     <Compile Include="GraphicsSpec.cs" />
     <Compile Include="InstanceList.cs" />
@@ -147,6 +148,7 @@
     <EmbeddedResource Include="VertexSizePicker.resx">
       <DependentUpon>VertexSizePicker.cs</DependentUpon>
     </EmbeddedResource>
+    <Compile Include="PolygonSoupList.cs" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

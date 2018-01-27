@@ -93,23 +93,20 @@ namespace ModelViewer.SceneData
 
         public Mesh Transformed(Matrix4 transform)
         {
+            Vector3 scale = transform.ExtractScale();
+            Vector3 translation = transform.ExtractTranslation();
+            Quaternion rotation = transform.ExtractRotation();
+
             Mesh result = Copy();
 
             result.Vertices.Clear();
-            
+
             for (int i = 0; i < Vertices.Count; i++)
             {
-                //transform.ClearProjection();
-                /*Vector4 vertex = new Vector4(Vertices[i], 1);
-                Vector4 mult = transform * vertex;
-                Vector3 v = new Vector3(mult.X / mult.W, mult.Y / mult.W , mult.Z / mult.W);*/
-
-                //Vector3 v = Vector3.TransformPerspective(Vertices[i], transform);
-                //Vector3 v = new Vector3(mult.X, mult.Y, mult.Z);
                 Vector3 v = Vertices[i];
-                v *= transform.ExtractScale();
-                v += transform.ExtractTranslation();
-                v = Vector3.Transform(v, transform.ExtractRotation());
+                v *= scale;
+                v = Vector3.Transform(v, rotation);
+                v += translation;
                 result.Vertices.Add(v);
             }
 

@@ -177,7 +177,10 @@ namespace ModelViewer.SceneData
 
                         sw.WriteLine();
 
-                        sw.WriteLine("g mesh" + meshIndex);
+                        if (string.IsNullOrEmpty(obj.ID))
+                            sw.WriteLine("g mesh" + meshIndex);
+                        else
+                            sw.WriteLine("g mesh" + meshIndex + "_" + obj.ID);
 
                         if (mesh.Material != null)
                             sw.WriteLine("usemtl material_" + mesh.Material.Name);

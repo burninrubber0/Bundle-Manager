@@ -38,13 +38,14 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ignoreIDConflictsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadMaterialsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tspMain = new System.Windows.Forms.ToolStrip();
             this.tsbOpen = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsbSwitchMode = new System.Windows.Forms.ToolStripButton();
             this.lstMain = new System.Windows.Forms.ListView();
             this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.loadMaterialsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dumpInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuMain.SuspendLayout();
             this.tspMain.SuspendLayout();
             this.SuspendLayout();
@@ -72,6 +73,7 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openFolderToolStripMenuItem,
+            this.dumpInfoToolStripMenuItem,
             this.recentSeparatorToolStripMenu,
             this.toolStripMenuItem1,
             this.exitToolStripMenuItem});
@@ -122,6 +124,15 @@
             this.ignoreIDConflictsToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
             this.ignoreIDConflictsToolStripMenuItem.Text = "Ignore ID Conflicts";
             this.ignoreIDConflictsToolStripMenuItem.Click += new System.EventHandler(this.ignoreIDConflictsToolStripMenuItem_Click);
+            // 
+            // loadMaterialsToolStripMenuItem
+            // 
+            this.loadMaterialsToolStripMenuItem.Checked = true;
+            this.loadMaterialsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.loadMaterialsToolStripMenuItem.Name = "loadMaterialsToolStripMenuItem";
+            this.loadMaterialsToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.loadMaterialsToolStripMenuItem.Text = "Load Materials";
+            this.loadMaterialsToolStripMenuItem.Click += new System.EventHandler(this.loadMaterialsToolStripMenuItem_Click);
             // 
             // tspMain
             // 
@@ -179,14 +190,12 @@
             this.colName.Text = "Name";
             this.colName.Width = 480;
             // 
-            // loadMaterialsToolStripMenuItem
+            // dumpInfoToolStripMenuItem
             // 
-            this.loadMaterialsToolStripMenuItem.Checked = true;
-            this.loadMaterialsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.loadMaterialsToolStripMenuItem.Name = "loadMaterialsToolStripMenuItem";
-            this.loadMaterialsToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
-            this.loadMaterialsToolStripMenuItem.Text = "Load Materials";
-            this.loadMaterialsToolStripMenuItem.Click += new System.EventHandler(this.loadMaterialsToolStripMenuItem_Click);
+            this.dumpInfoToolStripMenuItem.Name = "dumpInfoToolStripMenuItem";
+            this.dumpInfoToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.dumpInfoToolStripMenuItem.Text = "Dump Info";
+            this.dumpInfoToolStripMenuItem.Click += new System.EventHandler(this.dumpInfoToolStripMenuItem_Click);
             // 
             // FileView
             // 
@@ -229,5 +238,6 @@
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ignoreIDConflictsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadMaterialsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem dumpInfoToolStripMenuItem;
     }
 }

@@ -62,6 +62,7 @@
             this.previewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.viewDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.colSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.mnuMain.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.mnuLst.SuspendLayout();
@@ -274,6 +275,7 @@
             this.colIndex,
             this.colID,
             this.colType,
+            this.colSize,
             this.colPreview});
             this.lstEntries.ContextMenuStrip = this.mnuLst;
             this.lstEntries.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -336,6 +338,10 @@
             this.viewDataToolStripMenuItem.Text = "View Header";
             this.viewDataToolStripMenuItem.Click += new System.EventHandler(this.viewDataToolStripMenuItem_Click);
             // 
+            // colSize
+            // 
+            this.colSize.Text = "Size";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -393,6 +399,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripButton tsbSwitchMode;
         private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
+        private System.Windows.Forms.ColumnHeader colSize;
     }
 }
 

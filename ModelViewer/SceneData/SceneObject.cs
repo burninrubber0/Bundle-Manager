@@ -19,6 +19,8 @@ namespace ModelViewer.SceneData
         public Quaternion Rotation => Transform.ExtractRotation();
         public Vector3 Direction { get; set; }
 
+        public string ID { get; set; }
+
         public SceneObject(string name, Model model)
         {
             Name = name;

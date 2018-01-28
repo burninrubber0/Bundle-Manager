@@ -200,8 +200,8 @@ namespace ModelViewer.SceneData
 
                         for (int j = 0; j < inds.Count; j += 3)
                         {
-                            if (j + 3 < inds.Count && inds[j + 3] == 0xFF)
-                                sw.WriteLine("g broken_" + meshIndex);
+                            //if (j + 3 < inds.Count && inds[j + 3] == 0xFF)
+                                //sw.WriteLine("g broken_" + meshIndex);
                             //if (inds[j] == 0xFF)
                             //    continue;
                             if (j + 2 >= inds.Count)

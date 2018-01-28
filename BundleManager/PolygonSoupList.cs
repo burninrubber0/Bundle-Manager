@@ -133,18 +133,9 @@ namespace BundleManager
                 mesh.Indices.Add(property.Indices[2]);
                 if (property.Indices[3] != 0xFF)
                 {
-                    mesh.Indices.Add(property.Indices[1]);
-                    mesh.Indices.Add(property.Indices[2]);
                     mesh.Indices.Add(property.Indices[3]);
-                }
-                else
-                {
-                    mesh.Indices.Add(0xFF);
-                    mesh.Indices.Add(0xFF);
-                    mesh.Indices.Add(0xFF);
-                    //mesh.Indices.Add(property.Indices[1]);
-                    //mesh.Indices.Add(property.Indices[2]);
-                    //mesh.Indices.Add(property.Indices[3]);
+                    mesh.Indices.Add(property.Indices[2]);
+                    mesh.Indices.Add(property.Indices[1]);
                 }
                 
                 //DebugUtil.ShowDebug(mesh);

@@ -38,7 +38,7 @@ namespace MathLib
             }
         }
 
-        public static Vector3 ReadVector3(this BinaryReader self)
+        public static Vector3 ReadVector3F(this BinaryReader self)
         {
             Vector3 result = new Vector3();
 
@@ -56,12 +56,48 @@ namespace MathLib
             self.Write(value.Z);
         }
 
+        public static Vector3I ReadVector3I(this BinaryReader self)
+        {
+            Vector3I result = new Vector3I();
+
+            result.X = self.ReadInt32();
+            result.Y = self.ReadInt32();
+            result.Z = self.ReadInt32();
+
+            return result;
+        }
+
+        public static void Write(this BinaryWriter self, Vector3I value)
+        {
+            self.Write(value.X);
+            self.Write(value.Y);
+            self.Write(value.Z);
+        }
+
+        public static Vector3S ReadVector3S(this BinaryReader self)
+        {
+            Vector3S result = new Vector3S();
+
+            result.X = self.ReadInt16();
+            result.Y = self.ReadInt16();
+            result.Z = self.ReadInt16();
+
+            return result;
+        }
+
+        public static void Write(this BinaryWriter self, Vector3S value)
+        {
+            self.Write(value.X);
+            self.Write(value.Y);
+            self.Write(value.Z);
+        }
+
         public static BoxF ReadBoxF(this BinaryReader self)
         {
             BoxF result = new BoxF();
 
-            result.Min = self.ReadVector3();
-            result.Max = self.ReadVector3();
+            result.Min = self.ReadVector3F();
+            result.Max = self.ReadVector3F();
 
             return result;
         }

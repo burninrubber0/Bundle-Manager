@@ -11,8 +11,8 @@ namespace BundleManager
 {
     public class IDList
     {
-        public int Unknown1;
-        public int Unknown2;
+        public int ReferenceEntryIDOffset;
+        public int Unknown2; // Might be a count of some sort
         public int Unknown3;
         public int Unknown4;
         public ulong ReferenceEntryID;
@@ -32,7 +32,7 @@ namespace BundleManager
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            result.Unknown1 = br.ReadInt32();
+            result.ReferenceEntryIDOffset = br.ReadInt32();
             result.Unknown2 = br.ReadInt32();
             result.Unknown3 = br.ReadInt32();
             result.Unknown4 = br.ReadInt32();
@@ -51,7 +51,7 @@ namespace BundleManager
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
-            bw.Write(Unknown1);
+            bw.Write(ReferenceEntryIDOffset);
             bw.Write(Unknown2);
             bw.Write(Unknown3);
             bw.Write(Unknown4);

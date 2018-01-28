@@ -185,7 +185,7 @@ namespace BundleManager
             {
                 StreetInfo section3 = new StreetInfo();
 
-                section3.Coords = br.ReadVector3();
+                section3.Coords = br.ReadVector3F();
                 section3.Unknown4 = br.ReadInt32();
                 section3.Unknown5 = br.ReadInt64();
                 section3.Unknown6 = br.ReadInt64();

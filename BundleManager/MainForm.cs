@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -211,6 +214,9 @@ namespace BundleManager
                 ListViewItem item = new ListViewItem(values);
                 item.BackColor = color;
                 lstEntries.Items.Add(item);
+
+                lstEntries.ListViewItemSorter = new EntrySorter(0);
+                lstEntries.Sort();
             }
         }
 
@@ -507,7 +513,11 @@ namespace BundleManager
             if (count <= 0)
                 return;
 
-            int index = lstEntries.SelectedIndices[0];
+            int index;
+            if (!int.TryParse(lstEntries.SelectedItems[0].Text, out index))
+                return;
+
+            //int index = lstEntries.SelectedIndices[0];
 
             BundleEntry entry = GetEntry(index);
             if (entry.Type == EntryType.VehicleListResourceType && !forceHex)
@@ -668,7 +678,9 @@ namespace BundleManager
             } else if (entry.Type == EntryType.PolygonSoupListResourceType && !forceHex)
             {
                 PolygonSoupList list = PolygonSoupList.Read(entry);
-                DebugUtil.ShowDebug(this, list);
+                Scene scene = list.MakeScene();
+                ModelViewerForm.ShowModelViewer(this, scene);
+                //DebugUtil.ShowDebug(this, list);
             }
             else if (entry.Type == EntryType.IDList && !forceHex)
             {
@@ -817,5 +829,80 @@ namespace BundleManager
 
             MessageBox.Show(this, "Model Count: " + modelCount, "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }*/
+
+        private void lstEntries_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            int column = e.Column;
+            
+            bool direction = false;
+
+            if (lstEntries.ListViewItemSorter is EntrySorter sorter)
+            {
+                if (sorter.Column == column)
+                {
+                    sorter.Swap();
+                    lstEntries.Sort();
+                    return;
+                }
+                direction = sorter.Direction;
+            }
+
+            EntrySorter newSorter = new EntrySorter(column)
+            {
+                Direction = !direction
+            };
+            lstEntries.ListViewItemSorter = newSorter;
+            lstEntries.Sort();
+        }
+
+        private class EntrySorter : IComparer
+        {
+            public readonly int Column;
+            public bool Direction;
+
+            public EntrySorter(int column)
+            {
+                this.Column = column;
+                this.Direction = false;
+            }
+
+            public int Compare(object x, object y)
+            {
+                ListViewItem itemX = (ListViewItem)x;
+                ListViewItem itemY = (ListViewItem)y;
+
+                if (Column > itemX?.SubItems.Count || Column > itemY?.SubItems.Count)
+                {
+                    if (this.Direction)
+                        return -1;
+                    return 1;
+                }
+
+                string iX = itemX?.SubItems[Column].Text;
+                string iY = itemY?.SubItems[Column].Text;
+
+                if (int.TryParse(iX, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var iXint))
+                {
+                    if (int.TryParse(iY, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var iYint))
+                    {
+                        int val2 = iXint.CompareTo(iYint);
+                        if (this.Direction)
+                            return val2 * -1;
+                        return val2;
+                    }
+                }
+
+                int val = string.CompareOrdinal(iX, iY);
+                if (this.Direction)
+                    return val * -1;
+                return val;
+
+            }
+
+            public void Swap()
+            {
+                this.Direction = !this.Direction;
+            }
+        }
     }
 }

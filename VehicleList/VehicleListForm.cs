@@ -162,30 +162,36 @@ namespace VehicleList
         {
             int column = e.Column;
 
-            if (lstVehicles.ListViewItemSorter is VehicleSorter)
+            bool direction = false;
+
+            if (lstVehicles.ListViewItemSorter is VehicleSorter sorter)
             {
-                VehicleSorter sorter = (VehicleSorter)lstVehicles.ListViewItemSorter;
-                if (sorter.column == column)
+                if (sorter.Column == column)
                 {
-                    sorter.swap();
+                    sorter.Swap();
                     lstVehicles.Sort();
                     return;
                 }
+                direction = sorter.Direction;
             }
 
-            lstVehicles.ListViewItemSorter = new VehicleSorter(column);
+            VehicleSorter newSorter = new VehicleSorter(column)
+            {
+                Direction = !direction
+            };
+            lstVehicles.ListViewItemSorter = newSorter;
             lstVehicles.Sort();
         }
 
         private class VehicleSorter : IComparer
         {
-            public int column;
-            private bool direction;
+            public readonly int Column;
+            public bool Direction;
 
             public VehicleSorter(int column)
             {
-                this.column = column;
-                this.direction = false;
+                this.Column = column;
+                this.Direction = false;
             }
 
             public int Compare(object x, object y)
@@ -193,15 +199,15 @@ namespace VehicleList
                 ListViewItem itemX = (ListViewItem)x;
                 ListViewItem itemY = (ListViewItem)y;
 
-                if (column > itemX.SubItems.Count || column > itemY.SubItems.Count)
+                if (Column > itemX.SubItems.Count || Column > itemY.SubItems.Count)
                 {
-                    if (this.direction)
+                    if (this.Direction)
                         return -1;
                     return 1;
                 }
 
-                string iX = itemX.SubItems[column].Text;
-                string iY = itemY.SubItems[column].Text;
+                string iX = itemX.SubItems[Column].Text;
+                string iY = itemY.SubItems[Column].Text;
 
                 int iXint;
                 int iYint;
@@ -211,21 +217,21 @@ namespace VehicleList
                     if (int.TryParse(iY, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out iYint))
                     {
                         int val2 = iXint.CompareTo(iYint);
-                        if (this.direction)
+                        if (this.Direction)
                             return val2 * -1;
                         return val2;
                     }
                 }
 
                 int val = String.CompareOrdinal(iX, iY);
-                if (this.direction)
+                if (this.Direction)
                     return val * -1;
                 return val;
             }
 
-            public void swap()
+            public void Swap()
             {
-                this.direction = !this.direction;
+                this.Direction = !this.Direction;
             }
         }
 

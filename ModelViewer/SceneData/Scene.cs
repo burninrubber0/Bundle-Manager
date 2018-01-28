@@ -187,15 +187,34 @@ namespace ModelViewer.SceneData
 
                         sw.WriteLine();
 
-                        for (int j = 0; j < mesh.Indices.Count; j += 3)
+                        List<Vector3> verts = mesh.Vertices;
+                        List<uint> inds = mesh.Indices;
+
+                        if (inds.Count == 0)
                         {
-                            uint v0 = mesh.Indices[j + 0] + 1 + usedIndices;
-                            uint v1 = mesh.Indices[j + 1] + 1 + usedIndices;
-                            uint v2 = mesh.Indices[j + 2] + 1 + usedIndices;
+                            for (int i = 0; i < verts.Count; i++)
+                            {
+                                inds.Add((uint)i);
+                            }
+                        }
+
+                        for (int j = 0; j < inds.Count; j += 3)
+                        {
+                            if (j + 3 < inds.Count && inds[j + 3] == 0xFF)
+                                sw.WriteLine("g broken_" + meshIndex);
+                            //if (inds[j] == 0xFF)
+                            //    continue;
+                            if (j + 2 >= inds.Count)
+                                break;
+
+
+                            uint v0 = inds[j + 0] + 1 + usedIndices;
+                            uint v1 = inds[j + 1] + 1 + usedIndices;
+                            uint v2 = inds[j + 2] + 1 + usedIndices;
                             sw.WriteLine("f " + v0 + "/" + v0 + " " + v1 + "/" + v1 + " " + v2 + "/" + v2);
                         }
 
-                        usedIndices += (uint) mesh.Vertices.Count;
+                        usedIndices += (uint)verts.Count;
 
                         sw.WriteLine();
 

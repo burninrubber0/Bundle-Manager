@@ -6,97 +6,109 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BundleFormat;
+using DebugHelper;
 using MathLib;
+using ModelViewer.SceneData;
 using OpenTK;
 using StandardExtension;
 
 namespace BundleManager
 {
-    public class PolygonSoupUnknown
+    public class PolygonSoupProperty
     {
-        public uint ID;
-        public Vector3 Vertex;
+        public ushort UnknownProperty1;
+        public ushort UnknownProperty2;
+        public byte[] Indices;
+        public uint Unknown1;
 
-        public PolygonSoupUnknown()
+        public PolygonSoupProperty()
         {
-            
+            Indices = new byte[4];
         }
 
-        public static PolygonSoupUnknown Read(BinaryReader br)
+        public static PolygonSoupProperty Read(BinaryReader br)
         {
-            PolygonSoupUnknown result = new PolygonSoupUnknown();
+            PolygonSoupProperty result = new PolygonSoupProperty();
 
-            result.ID = br.ReadUInt32();
-            result.Vertex = br.ReadVector3();
+            result.UnknownProperty1 = br.ReadUInt16();
+            result.UnknownProperty2 = br.ReadUInt16();
+
+            for (int i = 0; i < result.Indices.Length; i++)
+            {
+                result.Indices[i] = br.ReadByte();
+            }
+
+            result.Unknown1 = br.ReadUInt32();
 
             return result;
         }
 
-        public void Write(BinaryWriter bw)
+        public override string ToString()
         {
-            bw.Write(ID);
-            bw.Write(Vertex);
+            return "Prop1: " + UnknownProperty1.ToString("X2") + ", Prop2: " + UnknownProperty2.ToString("X2");
         }
+    }
+
+    public class PolygonSoupBoundingBox
+    {
+        public BoxF Box;
+        public int Unknown;
 
         public override string ToString()
         {
-            return "ID: 0x" + ID.ToString("X8") + ", Vertex: " + Vertex.ToString();
+            return Box.ToString() + ", " + Unknown;
         }
     }
 
     public class PolygonSoupChunk
     {
-        public int Unknown1;
-        public int Unknown2;
-        public int Unknown3;
-        public int Unknown4;
-        public uint IntListStart;
-        public uint ShortListStart;
+        public Vector3I Position;
+        public float Scale;
+        public uint PropertyListStart;
+        public uint PointListStart;
         public short Unknown7;
         public byte Unknown8;
         public byte Unknown9;
-        public int Unknown10;
+        public int PointCount;
 
-        public List<short> UnknownShorts;
-        public List<int> UnknownInts;
+        public List<Vector3S> PointList;
+        public List<PolygonSoupProperty> PropertyList;
 
         public PolygonSoupChunk()
         {
-            UnknownShorts = new List<short>();
-            UnknownInts = new List<int>();
+            PointList = new List<Vector3S>();
+            PropertyList = new List<PolygonSoupProperty>();
         }
 
         public static PolygonSoupChunk Read(BinaryReader br)
         {
             PolygonSoupChunk result = new PolygonSoupChunk();
 
-            result.Unknown1 = br.ReadInt32();
-            result.Unknown2 = br.ReadInt32();
-            result.Unknown3 = br.ReadInt32();
-            result.Unknown4 = br.ReadInt32();
-            result.IntListStart = br.ReadUInt32();
-            result.ShortListStart = br.ReadUInt32();
+            result.Position = br.ReadVector3I();
+            result.Scale = br.ReadSingle();
+            result.PropertyListStart = br.ReadUInt32();
+            result.PointListStart = br.ReadUInt32();
             result.Unknown7 = br.ReadInt16();
             result.Unknown8 = br.ReadByte();
             result.Unknown9 = br.ReadByte();
-            result.Unknown10 = br.ReadInt32();
+            result.PointCount = br.ReadInt32();
 
-            br.BaseStream.Position = result.ShortListStart;
-            while (br.BaseStream.Position < result.IntListStart)
+            br.BaseStream.Position = result.PointListStart;
+            for (int i = 0; i < result.PointCount; i++)
             {
-                short s = br.ReadInt16();
-                if (s == 0)
-                    break;
-                result.UnknownShorts.Add(s);
+                result.PointList.Add(br.ReadVector3S());
             }
 
-            br.BaseStream.Position = result.IntListStart;
-            while (!br.BaseStream.EOF())
+            br.BaseStream.Position = result.PropertyListStart;
+
+            int count = (result.Unknown9 >> 1) * 2 +
+                        (result.Unknown9 - (result.Unknown9 >> 1) * 2) +
+                        ((result.Unknown8 - result.Unknown9) >> 2) +
+                        ((result.Unknown8 - result.Unknown9) - ((result.Unknown8 - result.Unknown9) >> 2) * 4);
+
+            for (int i = 0; i < count; i++)
             {
-                int num = br.ReadInt32();
-                if (num == 0)
-                    break;
-                result.UnknownInts.Add(num);
+                result.PropertyList.Add(PolygonSoupProperty.Read(br));
             }
 
             return result;
@@ -106,31 +118,79 @@ namespace BundleManager
         {
             // TODO: Write PolygonSoupChunk
         }
+
+        public Mesh BuildMesh(Vector3I pos, float scale)
+        {
+            Mesh mesh = new Mesh();
+
+            // TODO: Build Mesh
+            
+            for (int i = 0; i < PropertyList.Count; i++)
+            {
+                PolygonSoupProperty property = PropertyList[i];
+                mesh.Indices.Add(property.Indices[0]);
+                mesh.Indices.Add(property.Indices[1]);
+                mesh.Indices.Add(property.Indices[2]);
+                if (property.Indices[3] != 0xFF)
+                {
+                    mesh.Indices.Add(property.Indices[1]);
+                    mesh.Indices.Add(property.Indices[2]);
+                    mesh.Indices.Add(property.Indices[3]);
+                }
+                else
+                {
+                    mesh.Indices.Add(0xFF);
+                    mesh.Indices.Add(0xFF);
+                    mesh.Indices.Add(0xFF);
+                    //mesh.Indices.Add(property.Indices[1]);
+                    //mesh.Indices.Add(property.Indices[2]);
+                    //mesh.Indices.Add(property.Indices[3]);
+                }
+                
+                //DebugUtil.ShowDebug(mesh);
+            }
+
+            List<Vector3S> points = PointList;
+            //points.Reverse();
+
+            for (int i = 0; i < points.Count; i++)
+            {
+                Vector3S vert = points[i];
+                //mesh.Vertices.Add(new Vector3(vert.X * scale + pos.X, vert.Y * scale + pos.Y, vert.Z * scale + pos.Z));
+                mesh.Vertices.Add(new Vector3((vert.X + pos.X) * scale, (vert.Y + pos.Y) * scale, (vert.Z + pos.Z) * scale));
+                //mesh.Vertices.Add(new Vector3((vert.X) * scale, (vert.Y) * scale, (vert.Z) * scale));
+                //mesh.Vertices.Add(new Vector3((vert.X) * scale, (vert.Z) * scale, (vert.Y) * scale));
+                //mesh.Vertices.Add(new Vector3((vert.X + pos.X) * scale, (vert.Z + pos.Z) * scale, (vert.Y + pos.Y) * scale));
+            }
+
+            return mesh;
+        }
+
+        public override string ToString()
+        {
+            return "Pos: " + Position + ", Scale: " + Scale + ", Unk7: " + Unknown7 + ", PointCount: " + PointCount;
+        }
     }
 
     public class PolygonSoupList
     {
-        public float Unknown1;
-        public float Unknown2;
-        public float Unknown3;
+        public Vector3 Min;
         public int Unknown4;
-        public float Unknown5;
-        public float Unknown6;
-        public float Unknown7;
+        public Vector3 Max;
         public int Unknown8;
-        public int ChunkPointerStart;
-        public int UnknownSectionStart;
+        public uint ChunkPointerStart;
+        public uint BoxListStart;
         public int ChunkCount;
-        public int FileSize;
+        public uint FileSize;
 
         public List<uint> ChunkPointers;
-        public List<PolygonSoupUnknown> Unknowns;
+        public List<PolygonSoupBoundingBox> BoundingBoxes;
         public List<PolygonSoupChunk> Chunks;
 
         public PolygonSoupList()
         {
             ChunkPointers = new List<uint>();
-            Unknowns = new List<PolygonSoupUnknown>();
+            BoundingBoxes = new List<PolygonSoupBoundingBox>();
             Chunks = new List<PolygonSoupChunk>();
         }
 
@@ -141,21 +201,17 @@ namespace BundleManager
             MemoryStream ms = entry.MakeStream();
             BinaryReader br = new BinaryReader(ms);
 
-            result.Unknown1 = br.ReadSingle();
-            result.Unknown2 = br.ReadSingle();
-            result.Unknown3 = br.ReadSingle();
+            result.Min = br.ReadVector3F();
             result.Unknown4 = br.ReadInt32();
-            result.Unknown5 = br.ReadSingle();
-            result.Unknown6 = br.ReadSingle();
-            result.Unknown7 = br.ReadSingle();
+            result.Max = br.ReadVector3F();
             result.Unknown8 = br.ReadInt32();
-            result.ChunkPointerStart = br.ReadInt32();
-            result.UnknownSectionStart = br.ReadInt32();
+            result.ChunkPointerStart = br.ReadUInt32();
+            result.BoxListStart = br.ReadUInt32();
             result.ChunkCount = br.ReadInt32();
-            result.FileSize = br.ReadInt32();
+            result.FileSize = br.ReadUInt32();
 
             // No Data
-            if (result.ChunkPointerStart == 0)
+            if (result.ChunkCount == 0)
             {
                 br.Close();
                 ms.Close();
@@ -170,14 +226,41 @@ namespace BundleManager
             }
 
             //br.BaseStream.Position += (16 - br.BaseStream.Position % 16);
-            br.BaseStream.Position = result.UnknownSectionStart;
+            //br.BaseStream.Position = result.BoxListStart;
 
-            while (!br.BaseStream.EOF())
+            for (int i = 0; i < result.ChunkCount; i++)
             {
-                PolygonSoupUnknown unk = PolygonSoupUnknown.Read(br);
-                if (unk.ID == 0xFFFFFFFF)
-                    break;
-                result.Unknowns.Add(unk);
+                // Read Vertically
+
+                long pos = result.BoxListStart + 0x70 * (i / 4) + 4 * (i % 4);
+
+                PolygonSoupBoundingBox box = new PolygonSoupBoundingBox();
+
+                BoxF boundingBox = new BoxF();
+                br.BaseStream.Position = pos;
+                float minX = br.ReadSingle();
+                br.BaseStream.Position += 12;
+                float minY = br.ReadSingle();
+                br.BaseStream.Position += 12;
+                float minZ = br.ReadSingle();
+
+                boundingBox.Min = new Vector3(minX, minY, minZ);
+
+                br.BaseStream.Position += 12;
+                float maxX = br.ReadSingle();
+                br.BaseStream.Position += 12;
+                float maxY = br.ReadSingle();
+                br.BaseStream.Position += 12;
+                float maxZ = br.ReadSingle();
+
+                boundingBox.Max = new Vector3(maxX, maxY, maxZ);
+
+                box.Box = boundingBox;
+
+                br.BaseStream.Position += 12;
+                box.Unknown = br.ReadInt32();
+
+                result.BoundingBoxes.Add(box);
             }
 
             for (int i = 0; i < result.ChunkPointers.Count; i++)
@@ -196,6 +279,32 @@ namespace BundleManager
         public void Write(BundleEntry entry)
         {
             // TODO: Write PolygonSoupList
+        }
+
+        public Scene MakeScene(ILoader loader = null)
+        {
+            Scene scene = new Scene();
+
+            int index = 0;
+            foreach (PolygonSoupChunk chunk in Chunks)
+            {
+                string id = index.ToString();
+
+                Vector3I pos = chunk.Position;
+                float scale = chunk.Scale;
+                Model model = new Model(chunk.BuildMesh(pos, scale));
+                SceneObject sceneObject = new SceneObject(id, model);
+                sceneObject.ID = id;
+                //sceneObject.Transform = Matrix4.CreateScale(scale) *
+                //                        Matrix4.CreateTranslation(new Vector3(pos.X, pos.Y, pos.Z));
+                scene.AddObject(sceneObject);
+                index++;
+
+                // TODO: TEMP
+                //break;
+            }
+
+            return scene;
         }
     }
 }

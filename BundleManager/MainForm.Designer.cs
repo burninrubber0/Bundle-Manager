@@ -57,12 +57,12 @@
             this.colIndex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colPreview = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.mnuLst = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.previewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.viewDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.colSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.mnuMain.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.mnuLst.SuspendLayout();
@@ -288,6 +288,7 @@
             this.lstEntries.TabIndex = 2;
             this.lstEntries.UseCompatibleStateImageBehavior = false;
             this.lstEntries.View = System.Windows.Forms.View.Details;
+            this.lstEntries.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lstEntries_ColumnClick);
             this.lstEntries.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lstEntries_MouseDoubleClick);
             // 
             // colIndex
@@ -303,6 +304,10 @@
             // 
             this.colType.Text = "Type";
             this.colType.Width = 200;
+            // 
+            // colSize
+            // 
+            this.colSize.Text = "Size";
             // 
             // colPreview
             // 
@@ -337,10 +342,6 @@
             this.viewDataToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.viewDataToolStripMenuItem.Text = "View Header";
             this.viewDataToolStripMenuItem.Click += new System.EventHandler(this.viewDataToolStripMenuItem_Click);
-            // 
-            // colSize
-            // 
-            this.colSize.Text = "Size";
             // 
             // MainForm
             // 

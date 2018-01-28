@@ -141,13 +141,30 @@ namespace ModelViewer.SceneData
             //indices.Reverse();
 
             List<TexturedVertex> vertices = new List<TexturedVertex>();
+            if (indices.Count == 0)
+            {
+                for (int i = 0; i < Vertices.Count; i++)
+                {
+                    indices.Add((uint)i);
+                }
+            }
+
             for (int i = 0; i < indices.Count; i++)
             {
+                if (indices[i] > Vertices.Count)
+                {
+                    //MessageBox.Show("Index too large: " + indices[i].ToString("X2") + " > " + Vertices.Count.ToString("X8"));
+                    continue;
+                }
                 Vector3 pos = Vertices[(int) indices[i]];
                 //Vector2 uv = new Vector2();
                 //if (UV1.Count < indices[i])
                 //    uv = UV1[(int) indices[i]];
-                Vector2 uv1 = UV1[(int)indices[i]];
+                Vector2 uv1;
+                if (indices[i] < UV1.Count)
+                    uv1 = UV1[(int) indices[i]];
+                else
+                    uv1 = new Vector2(0, 0);
 
                 Vector2 uv = new Vector2(uv1.X, uv1.Y);
 
@@ -261,6 +278,7 @@ namespace ModelViewer.SceneData
             GL.UniformMatrix4(21, false, ref modelView);
 
             GL.BindVertexArray(_vertexArray);
+            //GL.PointSize(4.0f);
             GL.DrawArrays(PrimitiveType.Triangles, 0, Indices.Count);
 
             /*GL.EnableClientState(ArrayCap.VertexArray);

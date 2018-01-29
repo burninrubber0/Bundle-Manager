@@ -6,13 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BundleFormat;
+using BundleUtilities;
 using BurnoutImage;
 
 namespace BundleManager
 {
     public class TextureState
     {
-        private static readonly Dictionary<uint, Image> _cachedTextures = new Dictionary<uint, Image>();
+        private static readonly Dictionary<ulong, Image> _cachedTextures = new Dictionary<ulong, Image>();
 
         public Image Texture;
 
@@ -35,10 +36,10 @@ namespace BundleManager
         {
             TextureState result = new TextureState();
 
-            List<Dependency> dependencies = entry.GetDependencies();
-            foreach (Dependency dependency in dependencies)
+            List<BundleDependency> dependencies = entry.GetDependencies();
+            foreach (BundleDependency dependency in dependencies)
             {
-                uint id = dependency.EntryID;
+                ulong id = dependency.EntryID;
 
                 if (_cachedTextures.ContainsKey(id))
                 {
@@ -52,7 +53,7 @@ namespace BundleManager
                         string file = BundleCache.GetFileByEntryID(id);
                         if (!string.IsNullOrEmpty(file))
                         {
-                            BundleArchive archive = BundleArchive.Read(file, entry.Console);
+                            BundleArchive archive = BundleArchive.Read(file);
                             if (archive != null)
                                 descEntry1 = archive.GetEntryByID(id);
                         }
@@ -73,7 +74,8 @@ namespace BundleManager
             }
 
             MemoryStream ms = entry.MakeStream();
-            BinaryReader br = new BinaryReader(ms);
+            BinaryReader2 br = new BinaryReader2(ms);
+            br.BigEndian = entry.Console;
 
             // TODO: Read Texture State
 

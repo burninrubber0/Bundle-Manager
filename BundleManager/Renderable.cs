@@ -40,8 +40,8 @@ namespace BundleManager
         public int VerticesOffsetPtr;
         public int[] VertexDescriptionsInternal;
 
-        public uint MaterialID;
-        public uint[] VertexDescriptionIDs;
+        public ulong MaterialID;
+        public ulong[] VertexDescriptionIDs;
         public VertexDesc[] VertexDescriptions;
 
         public int IndexOffset => IndexOffsetCount * 2;
@@ -65,12 +65,14 @@ namespace BundleManager
         public int StartOffset;
         public int Unknown8;
         public int Unknown9;
-        public int Unknown10;
+        public short Unknown10;
+        public short Unknown10_1;
         public int Unknown11;
         public int Unknown12;
         public int Unknown13;
         public List<int> MeshVertexOffsets;
         public int NumIndices;
+        //public short Unknown; // Console Only (PS3, X360?)
         public int Unknown15;
         public int Unknown16;
         public int Unknown17;
@@ -236,13 +238,14 @@ namespace BundleManager
 
         public static Renderable Read(BundleEntry entry, ILoader loader)
         {
-            List<Dependency> dependencies = entry.GetDependencies();
+            List<BundleDependency> dependencies = entry.GetDependencies();
 
             Renderable result = new Renderable();
             result.ID = entry.ID;
 
             MemoryStream ms = entry.MakeStream();
-            BinaryReader br = new BinaryReader(ms);
+            BinaryReader2 br = new BinaryReader2(ms);
+            br.BigEndian = entry.Console;
 
             result.Unknown1 = br.ReadSingle();
             result.Unknown2 = br.ReadSingle();
@@ -253,7 +256,8 @@ namespace BundleManager
             result.StartOffset = br.ReadInt32();
             result.Unknown8 = br.ReadInt32();
             result.Unknown9 = br.ReadInt32();
-            result.Unknown10 = br.ReadInt32();
+            result.Unknown10 = br.ReadInt16();
+            result.Unknown10_1 = br.ReadInt16();
             result.Unknown11 = br.ReadInt32();
             result.Unknown12 = br.ReadInt32();
             result.Unknown13 = br.ReadInt32();
@@ -266,7 +270,17 @@ namespace BundleManager
                 result.MeshVertexOffsets.Add(offset);
             }
 
-            result.NumIndices = br.ReadInt32();
+            /*if (entry.Platform == BundlePlatform.PS3)
+            {
+                br.BaseStream.Position += 16 - (br.BaseStream.Position % 16);
+                result.NumIndices = br.ReadInt16();
+                result.Unknown = br.ReadInt16();
+            }
+            else
+            {*/
+                result.NumIndices = br.ReadInt32();
+            //}
+
             result.Unknown15 = br.ReadInt32();
             result.Unknown16 = br.ReadInt32();
             result.Unknown17 = br.ReadInt32();
@@ -290,7 +304,7 @@ namespace BundleManager
                 mesh.NumFaces = br.ReadInt32();
                 int cPos = (int)br.BaseStream.Position;
                 mesh.MaterialIDInternal = br.ReadInt32();
-                foreach (Dependency dependency in dependencies)
+                foreach (BundleDependency dependency in dependencies)
                 {
                     if (dependency.EntryPointerOffset == cPos)
                     {
@@ -304,11 +318,11 @@ namespace BundleManager
                 mesh.VerticesOffsetPtr = br.ReadInt32();
 
                 mesh.VertexDescriptionsInternal = new int[6];
-                mesh.VertexDescriptionIDs = new uint[6];
+                mesh.VertexDescriptionIDs = new ulong[6];
                 for (int j = 0; j < mesh.VertexDescriptionsInternal.Length; j++)
                 {
                     int pos = (int)br.BaseStream.Position;
-                    foreach (Dependency dependency in dependencies)
+                    foreach (BundleDependency dependency in dependencies)
                     {
                         if (dependency.EntryPointerOffset == pos)
                         {
@@ -338,7 +352,7 @@ namespace BundleManager
                         string file = BundleCache.GetFileByEntryID(mesh.MaterialID);
                         if (!string.IsNullOrEmpty(file))
                         {
-                            BundleArchive archive = BundleArchive.Read(file, entry.Console);
+                            BundleArchive archive = BundleArchive.Read(file);
                             descEntry1 = archive.GetEntryByID(mesh.MaterialID);
                         }
                     }
@@ -350,14 +364,14 @@ namespace BundleManager
                 mesh.VertexDescriptions = new VertexDesc[6];
                 for (int j = 0; j < mesh.VertexDescriptions.Length; j++)
                 {
-                    uint vertexDescID = mesh.VertexDescriptionIDs[j];
+                    ulong vertexDescID = mesh.VertexDescriptionIDs[j];
                     BundleEntry descEntry = entry.Archive.GetEntryByID(vertexDescID);
                     if (descEntry == null)
                     {
                         string file = BundleCache.GetFileByEntryID(vertexDescID);
                         if (!string.IsNullOrEmpty(file))
                         {
-                            BundleArchive archive = BundleArchive.Read(file, entry.Console);
+                            BundleArchive archive = BundleArchive.Read(file);
                             descEntry = archive.GetEntryByID(vertexDescID);
                         }
                     }
@@ -368,7 +382,8 @@ namespace BundleManager
             }
 
             ms = entry.MakeStream(true);
-            br = new BinaryReader(ms);
+            br = new BinaryReader2(ms);
+            br.BigEndian = entry.Console;
             result.ReadBody(br);
             br.Close();
             ms.Close();

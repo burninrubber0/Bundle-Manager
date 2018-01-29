@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BundleFormat;
+using BundleUtilities;
 using DebugHelper;
 using MathLib;
 using ModelViewer.SceneData;
@@ -190,7 +191,8 @@ namespace BundleManager
             PolygonSoupList result = new PolygonSoupList();
 
             MemoryStream ms = entry.MakeStream();
-            BinaryReader br = new BinaryReader(ms);
+            BinaryReader2 br = new BinaryReader2(ms);
+            br.BigEndian = entry.Console;
 
             result.Min = br.ReadVector3F();
             result.Unknown4 = br.ReadInt32();

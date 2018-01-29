@@ -17,9 +17,9 @@ namespace PVSFormat
             dbgMain.SelectedObject = _currentPVS;
         }
 
-        public void Open(BundleEntry entry, bool console)
+        public void Open(BundleEntry entry)
         {
-            _currentPVS = PVS.Read(entry, console);
+            _currentPVS = PVS.Read(entry);
 
             UpdateDisplay();
         }

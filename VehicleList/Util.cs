@@ -123,66 +123,6 @@ namespace VehicleList
             return (h << 32) + l;
         }
 
-        /*public static bool HasEncryptionData => File.Exists("encryptionData.bin");
-
-        private static int[] _encryptionData;
-        public static int[] EncryptionData
-        {
-            get
-            {
-                if (_encryptionData == null)
-                    LoadEncryptionData();
-
-                return _encryptionData;
-            }
-        }
-
-        private static void LoadEncryptionData()
-        {
-            if (!HasEncryptionData)
-                return;
-
-            _encryptionData = new int[256];
-
-            Stream s = File.Open("encryptionData.bin", FileMode.Open, FileAccess.Read);
-            BinaryReader br = new BinaryReader(s);
-
-            for (int i = 0; i < _encryptionData.Length; i++)
-            {
-                _encryptionData[i] = br.ReadInt32();
-            }
-
-            br.Close();
-            s.Close();
-        }
-
-        public static string GetEngineFilenameByID(string ID)
-        {
-            if (!HasEncryptionData)
-                return "<Unable to decrypt>";
-            string result = "";// = "Engines/";
-
-            unchecked
-            {
-                uint v4 = (uint)-1;
-                for (int i = 0; i < ID.Length; i++)
-                {
-                    byte c = (byte)ID[i];
-                    if ((byte)(c - 65) <= 0x19)
-                        c += 32;
-                    int v5 = c ^ (byte)v4;
-                    v4 = (uint)(EncryptionData[v5] ^ (v4 >> 8));
-                }
-                v4 = ~v4;
-
-                result += v4.ToString("X8");
-            }
-
-            result += ".bundle";
-            return result;
-        }*/
-
-
         public static string GetEngineFilenameByID(string engineID)
         {
             string encryptedNameHex = EncryptionData.EncryptString(engineID).ToString("X8");

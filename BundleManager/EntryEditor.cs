@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BundleFormat;
+using BundleUtilities;
 using BurnoutImage;
 
 namespace BundleManager
@@ -366,7 +367,7 @@ namespace BundleManager
             }
         }
 
-        private bool ModelMenuVisible
+        /*private bool ModelMenuVisible
         {
             get
             {
@@ -398,7 +399,7 @@ namespace BundleManager
                     modelToolStripMenuItem.Visible = value;
                 }
             }
-        }
+        }*/
 
         private bool ImageMenuVisible
         {
@@ -650,14 +651,14 @@ namespace BundleManager
             sb.AppendLine("Type: " + _entry.Type);
             sb.AppendLine("Has Header: " + _entry.HasHeader);
             sb.AppendLine("Has Body: " + _entry.HasBody);
-            List<Dependency> dependencies = _entry.GetDependencies();
+            List<BundleDependency> dependencies = _entry.GetDependencies();
             if (dependencies.Count > 0)
             {
                 sb.AppendLine("Dependencies[" + dependencies.Count + "] = {");
                 for (int i = 0; i < dependencies.Count; i++)
                 {
-                    Dependency dependency = dependencies[i];
-                    sb.AppendLine("    " + dependency.ToString());
+                    BundleDependency bundleDependency = dependencies[i];
+                    sb.AppendLine("    " + bundleDependency.ToString());
                 }
                 sb.AppendLine("}");
             }
@@ -692,7 +693,7 @@ namespace BundleManager
             ImageMenuVisible = ImageVisible;
             BinaryMenuVisible = TabsVisible;
 
-            ModelMenuVisible = _entry.Type == EntryType.RwRenderableResourceType;
+            //ModelMenuVisible = _entry.Type == EntryType.RwRenderableResourceType;
 
             if (TabsVisible)
             {
@@ -767,7 +768,9 @@ namespace BundleManager
             BinaryMenuVisible = false;
 
             MemoryStream ms = new MemoryStream(_entry.Header);
-            BinaryReader br = new BinaryReader(ms);
+            BinaryReader2 br = new BinaryReader2(ms);
+            br.BigEndian = _entry.Console;
+
             int unknown1 = br.ReadInt32();
             int unknown2 = br.ReadInt32();
             int unknown3 = br.ReadInt32();
@@ -1039,7 +1042,8 @@ namespace BundleManager
                 byte[] entryData = entry.Header;
 
                 MemoryStream ems = new MemoryStream(entryData);
-                BinaryReader ebr = new BinaryReader(ems);
+                BinaryReader2 ebr = new BinaryReader2(ems);
+                ebr.BigEndian = entry.Console;
 
                 ebr.BaseStream.Position += 17;
                 int vSize = ebr.ReadByte();
@@ -1084,7 +1088,8 @@ namespace BundleManager
             byte[] header = Entry.Header;
 
             MemoryStream ms = new MemoryStream(header);
-            BinaryReader br = new BinaryReader(ms);
+            BinaryReader2 br = new BinaryReader2(ms);
+            br.BigEndian = Entry.Console;
 
             br.BaseStream.Position = 0x24;
             int offset = br.ReadInt32();
@@ -1133,7 +1138,8 @@ namespace BundleManager
             byte[] header = Entry.Header;
 
             MemoryStream ms = new MemoryStream(header);
-            BinaryReader br = new BinaryReader(ms);
+            BinaryReader2 br = new BinaryReader2(ms);
+            br.BigEndian = Entry.Console;
 
             br.BaseStream.Position = 0x24;
             int offset = br.ReadInt32();
@@ -1162,7 +1168,8 @@ namespace BundleManager
 
                 byte[] data = Entry.Body;
                 ms = new MemoryStream(data);
-                br = new BinaryReader(ms);
+                br = new BinaryReader2(ms);
+                br.BigEndian = Entry.Console;
 
                 List<short> indices = new List<short>();
 

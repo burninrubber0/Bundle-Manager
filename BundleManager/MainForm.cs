@@ -34,7 +34,6 @@ namespace BundleManager
                 tsbNew.Visible = !value;
                 toolStripSeparator1.Visible = !value;
                 tsbOpen.Visible = !value;
-                tsbOpenConsole.Visible = !value;
                 toolStripSeparator2.Visible = !value;
                 toolStripSeparator3.Visible = !value;
                 tsbSwitchMode.Visible = !value;
@@ -42,7 +41,6 @@ namespace BundleManager
                 newToolStripMenuItem.Visible = !value;
                 toolStripMenuItem3.Visible = !value;
                 openToolStripMenuItem.Visible = !value;
-                openConsoleToolStripMenuItem.Visible = !value;
                 toolStripMenuItem1.Visible = !value;
 
                 exitToolStripMenuItem.Visible = !value;
@@ -134,47 +132,11 @@ namespace BundleManager
             }
         }
 
-        private bool __console;
-
         private delegate bool GetBool();
 
         private delegate void SetBool(bool value);
 
-        public bool _console
-        {
-            get
-            {
-                if (InvokeRequired)
-                {
-                    GetBool method = () =>
-                    {
-                        return __console;
-                    };
-                    return (bool) Invoke(method);
-                }
-                else
-                {
-                    return __console;
-                }
-            }
-            set
-            {
-                if (InvokeRequired)
-                {
-                    SetBool method = (bool val) =>
-                    {
-                        __console = val;
-                        //Task.Run(() => UpdateDisplay());
-                    };
-                    Invoke(method, value);
-                }
-                else
-                {
-                    __console = value;
-                    UpdateDisplay();
-                }
-            }
-        }
+        public bool _console => CurrentArchive.Console;
 
         public MainForm()
         {
@@ -182,6 +144,41 @@ namespace BundleManager
 
             //doNew();
             UpdateDisplay();
+        }
+
+        private void Search()
+        {
+            if (CurrentArchive == null)
+                return;
+
+            SearchDialog search = new SearchDialog();
+            search.Search += id =>
+            {
+                BundleEntry entry = CurrentArchive.GetEntryByID(id);
+                if (entry == null)
+                {
+                    MessageBox.Show(this, "Entry not found!", "Information", MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                    return;
+                }
+
+                string indexText = CurrentArchive.Entries.IndexOf(entry).ToString("D3");
+                int listIndex = -1;
+                for (int i = 0; i < lstEntries.Items.Count; i++)
+                {
+                    ListViewItem item = lstEntries.Items[i];
+                    if (item.Text == indexText)
+                    {
+                        listIndex = i;
+                        break;
+                    }
+                }
+
+                lstEntries.SelectedIndices.Clear();
+                lstEntries.SelectedIndices.Add(listIndex);
+                lstEntries.EnsureVisible(listIndex);
+            };
+            search.ShowDialog(this);
         }
 
         private void UpdateDisplay()
@@ -266,11 +263,10 @@ namespace BundleManager
         }
 
         private Thread _openSaveThread;
-        private void Open(bool console = false)
+        private void Open()
         {
             if (!CheckSave())
                 return;
-            _console = console;
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "Supported Files|*.BUNDLE;*.BIN;*.BNDL;*.DAT;*.TEX|All Files|*.*";
             DialogResult result = ofd.ShowDialog(this);
@@ -279,11 +275,11 @@ namespace BundleManager
                 if (!Utilities.FileExists(ofd.FileName))
                     return;
 
-                Open(ofd.FileName, console);
+                Open(ofd.FileName);
             }
         }
 
-        public void Open(string path, bool console = false)
+        public void Open(string path)
         {
             LoadingDialog loader = new LoadingDialog();
             loader.Status = "Loading: " + path;
@@ -336,9 +332,9 @@ namespace BundleManager
             if (s == null)
                 return;
 
-            BinaryReader br = new BinaryReader(s);
-            
-            BundleArchive archive = br.ReadBND2Archive(_console);
+            BinaryReader2 br = new BinaryReader2(s);
+
+            BundleArchive archive = BundleArchive.Read(br);
 
             loader.Value = new object[] { archive, path };
 
@@ -442,7 +438,9 @@ namespace BundleManager
                     if (entry.Header.Length == 48 && entry.Body != null && entry.BodySize > 0)
                     {
                         MemoryStream ms = new MemoryStream(entry.Header);
-                        BinaryReader br = new BinaryReader(ms);
+                        BinaryReader2 br = new BinaryReader2(ms);
+                        br.BigEndian = entry.Console;
+
                         byte compression = br.ReadByte();
                         byte[] unknown1 = br.ReadBytes(3);
                         byte[] type = Encoding.ASCII.GetBytes("DXT1");
@@ -529,13 +527,13 @@ namespace BundleManager
                     CurrentArchive.Entries[index] = entry;
                     CurrentArchive.Entries[index].Dirty = true;
                 };
-                vehicleList.Open(entry, entry.Console);
+                vehicleList.Open(entry);
                 vehicleList.ShowDialog(this);
             }
             else if (entry.Type == EntryType.ZoneListResourceType && !forceHex)
             {
                 PVSEditor pvsForm = new PVSEditor();
-                pvsForm.Open(entry, entry.Console);
+                pvsForm.Open(entry);
                 pvsForm.ShowDialog(this);
             }
             else if (entry.Type == EntryType.InstanceListResourceType && !forceHex)
@@ -727,12 +725,7 @@ namespace BundleManager
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Open(false);
-        }
-
-        private void openConsoleToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Open(true);
+            Open();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -757,12 +750,7 @@ namespace BundleManager
 
         private void tsbOpen_Click(object sender, EventArgs e)
         {
-            Open(false);
-        }
-
-        private void tsbOpenConsole_Click(object sender, EventArgs e)
-        {
-            Open(true);
+            Open();
         }
 
         private void tsbSave_Click(object sender, EventArgs e)
@@ -902,6 +890,59 @@ namespace BundleManager
             public void Swap()
             {
                 this.Direction = !this.Direction;
+            }
+        }
+
+        private void searchForEntryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Search();
+        }
+
+        private void dumpAllCollisionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (CurrentArchive == null)
+                return;
+
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            DialogResult result = fbd.ShowDialog(this);
+            if (result == DialogResult.OK)
+            {
+                string path = fbd.SelectedPath;
+
+                for (int i = 0; ; i++)
+                {
+                    string idListName = "trk_clil" + i;
+                    string polyName = "trk_col_" + i;
+
+                    ulong idListID = Crc32.HashCrc32B(idListName);
+                    ulong polyID = Crc32.HashCrc32B(polyName);
+
+                    BundleEntry entry = CurrentArchive.GetEntryByID(idListID);
+                    if (entry == null)
+                        break;
+                    Stream outFile = File.Open(path + "/" + idListName + ".bin", FileMode.Create, FileAccess.Write);
+                    BinaryWriter bw = new BinaryWriter(outFile);
+                    bw.Write(entry.Header);
+                    bw.Flush();
+                    bw.Close();
+                    outFile.Close();
+
+                    BundleEntry polyEntry = CurrentArchive.GetEntryByID(polyID);
+                    if (polyEntry == null)
+                        break;
+                    Stream outFilePoly = File.Open(path + "/" + polyName + ".bin", FileMode.Create, FileAccess.Write);
+                    BinaryWriter bwPoly = new BinaryWriter(outFilePoly);
+                    bwPoly.Write(polyEntry.Header);
+                    bwPoly.Flush();
+                    bwPoly.Close();
+                    outFilePoly.Close();
+
+                    PolygonSoupList poly = PolygonSoupList.Read(polyEntry);
+                    Scene scene = poly.MakeScene();
+                    scene.ExportWavefrontObj(path + "/" + polyName + ".obj");
+                }
+
+                MessageBox.Show(this, "Done!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
     }

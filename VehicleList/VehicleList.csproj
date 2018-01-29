@@ -84,6 +84,10 @@
       <Project>{49b81828-760c-42db-9fad-96755597c871}</Project>
       <Name>BundleFormat</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BundleUtilities\BundleUtilities.csproj">
+      <Project>{34471573-f236-4a7c-abd9-c1fe4686b37e}</Project>
+      <Name>BundleUtilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AddTableHS.png" />

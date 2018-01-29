@@ -48,7 +48,7 @@ namespace BundleManager
                     string file = BundleCache.GetFileByEntryID(instance);
                     if (!string.IsNullOrEmpty(file))
                     {
-                        BundleArchive archive = BundleArchive.Read(file, Entry.Console);
+                        BundleArchive archive = BundleArchive.Read(file);
                         modelEntry = archive.GetEntryByID(instance);
                     }
                 }

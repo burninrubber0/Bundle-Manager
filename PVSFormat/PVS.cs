@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BundleFormat;
+using BundleUtilities;
 
 namespace PVSFormat
 {
@@ -78,12 +79,13 @@ namespace PVSFormat
             Entries = new List<PVSEntry>();
         }
 
-        public static PVS Read(BundleEntry entry, bool console)
+        public static PVS Read(BundleEntry entry)
         {
             PVS result = new PVS();
 
             Stream s = entry.MakeStream();
-            BinaryReader br = new BinaryReader(s);
+            BinaryReader2 br = new BinaryReader2(s);
+            br.BigEndian = entry.Console;
 
             result.Unknown1 = br.ReadInt32();
             result.Unknown2 = br.ReadInt32();

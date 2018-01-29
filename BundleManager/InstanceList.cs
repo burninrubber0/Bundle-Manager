@@ -12,7 +12,7 @@ namespace BundleManager
 {
     public class ModelInstance
     {
-        public uint ModelEntryID;
+        public ulong ModelEntryID;
 
         public int ModelEntryPtr;
         public int Unknown2;
@@ -88,7 +88,8 @@ namespace BundleManager
             result.Entry = entry;
 
             MemoryStream ms = entry.MakeStream();
-            BinaryReader br = new BinaryReader(ms);
+            BinaryReader2 br = new BinaryReader2(ms);
+            br.BigEndian = entry.Console;
 
             result.Unknown1 = br.ReadInt32();
             int instanceCount = br.ReadInt32();
@@ -244,7 +245,7 @@ namespace BundleManager
 
             Scene scene = new Scene();
 
-            Dictionary<uint, Renderable> models = new Dictionary<uint, Renderable>();
+            Dictionary<ulong, Renderable> models = new Dictionary<ulong, Renderable>();
 
             int i = 0;
             int index = 1;
@@ -274,7 +275,7 @@ namespace BundleManager
                         string file = BundleCache.GetFileByEntryID(instance.ModelEntryID);
                         if (!string.IsNullOrEmpty(file))
                         {
-                            BundleArchive archive = BundleArchive.Read(file, Entry.Console);
+                            BundleArchive archive = BundleArchive.Read(file);
                             modelEntry = archive.GetEntryByID(instance.ModelEntryID);
                         }
                     }

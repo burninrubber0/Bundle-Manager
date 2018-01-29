@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BundleFormat;
+using BundleUtilities;
 
 namespace BundleFormat
 {
@@ -31,7 +32,8 @@ namespace BundleFormat
             VertexDesc result = new VertexDesc();
 
             MemoryStream ms = entry.MakeStream();
-            BinaryReader br = new BinaryReader(ms);
+            BinaryReader2 br = new BinaryReader2(ms);
+            br.BigEndian = entry.Console;
 
             result.Unknown1 = br.ReadInt32();
             result.Unknown2 = br.ReadInt32();

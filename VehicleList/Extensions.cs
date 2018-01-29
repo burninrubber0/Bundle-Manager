@@ -34,11 +34,9 @@ namespace VehicleList
             return sb.ToString();
         }
 
-        public static EncryptedString ReadEncryptedString(this BinaryReader self, bool xbox = false)
+        public static EncryptedString ReadEncryptedString(this BinaryReader self)
         {
             ulong value = self.ReadUInt64();
-            if (xbox)
-                value = Util.ReverseBytes(value);
             EncryptedString id = new EncryptedString(value);
             return id;
         }
@@ -64,7 +62,7 @@ namespace VehicleList
             self.Write((byte)info.Type);
         }
 
-        public static VehicleListData ReadVehicleList(this BinaryReader self, bool xbox = false)
+        public static VehicleListData ReadVehicleList(this BinaryReader self)
         {
             VehicleListData list = new VehicleListData();
 
@@ -74,21 +72,13 @@ namespace VehicleList
             list.Unknown1 = self.ReadInt32();
             list.Unknown2 = self.ReadInt32();
 
-            if (xbox)
-            {
-                count = Util.ReverseBytes(count);
-                startOff = Util.ReverseBytes(startOff);
-                list.Unknown1 = Util.ReverseBytes(list.Unknown1);
-                list.Unknown2 = Util.ReverseBytes(list.Unknown2);
-            }
-
             for (int i = 0; i < count; i++)
             {
                 Vehicle vehicle = new Vehicle();
 
                 vehicle.Index = i;
 
-                vehicle.ID = self.ReadEncryptedString(xbox);//ReadInt64();
+                vehicle.ID = self.ReadEncryptedString();//ReadInt64();
                 vehicle.Unknown3 = self.ReadInt64();
                 vehicle.WheelType = Encoding.ASCII.GetString(self.ReadBytes(32));
                 vehicle.CarName = Encoding.ASCII.GetString(self.ReadBytes(56));
@@ -103,11 +93,11 @@ namespace VehicleList
                 vehicle.Unknown9 = self.ReadInt32();
                 vehicle.Unknown10 = self.ReadInt32();
                 //vehicle.ExhauseID = self.ReadInt64();
-                vehicle.ExhauseID = self.ReadEncryptedString(xbox);
+                vehicle.ExhauseID = self.ReadEncryptedString();
                 vehicle.GroupID = self.ReadInt64();
                 vehicle.GroupIDAlt = self.ReadInt64();
                 //vehicle.EngineID = self.ReadInt64();
-                vehicle.EngineID = self.ReadEncryptedString(xbox);
+                vehicle.EngineID = self.ReadEncryptedString();
                 vehicle.Unknown15 = self.ReadInt32();
                 vehicle.Unknown16 = self.ReadInt32();
                 vehicle.Unknown17 = self.ReadInt64();
@@ -127,36 +117,6 @@ namespace VehicleList
                 vehicle.DisplayBoost = self.ReadByte();
                 vehicle.Color = self.ReadColorInfo();
                 vehicle.Unknown28 = self.ReadInt32();
-
-                if (xbox)
-                {
-                    //vehicle.ID = Util.ReverseBytes(vehicle.ID);
-                    vehicle.Unknown3 = Util.ReverseBytes(vehicle.Unknown3);
-                    vehicle.NewUnknown = Util.ReverseBytes(vehicle.NewUnknown);
-                    vehicle.Unknown4 = Util.ReverseBytes(vehicle.Unknown4);
-                    vehicle.Flags = Util.ReverseBytes(vehicle.Flags);
-                    vehicle.Unknown6 = Util.ReverseBytes(vehicle.Unknown6);
-                    vehicle.Unknown8 = Util.ReverseBytes(vehicle.Unknown8);
-                    vehicle.Unknown9 = Util.ReverseBytes(vehicle.Unknown9);
-                    vehicle.Unknown10 = Util.ReverseBytes(vehicle.Unknown10);
-                    //vehicle.ExhauseID = Util.ReverseBytes(vehicle.ExhauseID);
-                    vehicle.GroupID = Util.ReverseBytes(vehicle.GroupID);
-                    vehicle.GroupIDAlt = Util.ReverseBytes(vehicle.GroupIDAlt);
-                    //vehicle.EngineID = Util.ReverseBytes(vehicle.EngineID);
-                    vehicle.Unknown15 = Util.ReverseBytes(vehicle.Unknown15);
-                    vehicle.Unknown16 = Util.ReverseBytes(vehicle.Unknown16);
-                    vehicle.Unknown17 = Util.ReverseBytes(vehicle.Unknown17);
-                    vehicle.Unknown18 = Util.ReverseBytes(vehicle.Unknown18);
-                    vehicle.Unknown19 = Util.ReverseBytes(vehicle.Unknown19);
-                    vehicle.Unknown20 = Util.ReverseBytes(vehicle.Unknown20);
-                    vehicle.Unknown21 = Util.ReverseBytes(vehicle.Unknown21);
-                    vehicle.Unknown22 = Util.ReverseBytes(vehicle.Unknown22);
-                    vehicle.Unknown23 = Util.ReverseBytes(vehicle.Unknown23);
-                    vehicle.Unknown24 = Util.ReverseBytes(vehicle.Unknown24);
-                    vehicle.Category = Util.ReverseBytes(vehicle.Category);
-                    //vehicle.Unknown26 = Util.ReverseBytes(vehicle.Unknown26);
-                    vehicle.Unknown28 = Util.ReverseBytes(vehicle.Unknown28);
-                }
 
                 list.Entries.Add(vehicle);
             }

@@ -11,17 +11,17 @@ namespace BundleFormat
     {
         public static string CurrentPath;
         public static List<string> Paths = new List<string>();
-        public static Dictionary<uint, int> Files = new Dictionary<uint, int>();
-        public static Dictionary<uint, EntryInfo> EntryInfos = new Dictionary<uint, EntryInfo>();
+        public static Dictionary<ulong, int> Files = new Dictionary<ulong, int>();
+        public static Dictionary<ulong, EntryInfo> EntryInfos = new Dictionary<ulong, EntryInfo>();
 
-        public static string GetFileByEntryID(uint entryID)
+        public static string GetFileByEntryID(ulong entryID)
         {
             if (!Files.ContainsKey(entryID))
                 return null;
             return Paths[Files[entryID]];
         }
 
-        public static EntryInfo GetInfoByEntryID(uint entryID)
+        public static EntryInfo GetInfoByEntryID(ulong entryID)
         {
             if (!EntryInfos.ContainsKey(entryID))
                 return null;

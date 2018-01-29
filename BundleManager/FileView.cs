@@ -34,8 +34,6 @@ namespace BundleManager
 
         private Thread _updateDisplayThread;
 
-        private bool _console;
-
         public FileView()
         {
             InitializeComponent();
@@ -325,7 +323,7 @@ namespace BundleManager
             }
         }
 
-        public void Open(string path = "", bool console = false)
+        public void Open(string path = "")
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -339,7 +337,6 @@ namespace BundleManager
                     _currentPath = fbd.SelectedPath;
                     SaveData.AddRecentPath(_currentPath);
                     SaveData.Save();
-                    _console = console;
                     LoadFileList();
                 }
             }
@@ -348,7 +345,6 @@ namespace BundleManager
                 _currentPath = path;
                 SaveData.AddRecentPath(_currentPath);
                 SaveData.Save();
-                _console = console;
                 LoadFileList();
             }
         }
@@ -359,7 +355,7 @@ namespace BundleManager
 
             MainForm form = new MainForm();
             form.SubForm = true;
-            form.Open(file, _console);
+            form.Open(file);
 
             form.ShowDialog(this);
         }
@@ -464,10 +460,10 @@ namespace BundleManager
                 if (entry.Type != EntryType.RwTextureStateResourceType)
                     continue;
 
-                List<Dependency> dependencies = entry.GetDependencies();
-                foreach (Dependency dependency in dependencies)
+                List<BundleDependency> dependencies = entry.GetDependencies();
+                foreach (BundleDependency dependency in dependencies)
                 {
-                    uint id = dependency.EntryID;
+                    ulong id = dependency.EntryID;
                     string entryFile = BundleCache.GetFileByEntryID(id);
                     if (entryFile.ToUpper().Contains("WORLDTEX4"))
                         referenceList.Add(Path.GetFileName(archive.Path));

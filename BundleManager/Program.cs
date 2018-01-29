@@ -47,12 +47,12 @@ namespace BundleManager
                     string path = args[0];
                     if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
                     {
-                        folderModeForm.Open(path, false);
+                        folderModeForm.Open(path);
                         Application.Run(folderModeForm);
                     }
                     else
                     {
-                        fileModeForm.Open(path, false);
+                        fileModeForm.Open(path);
                         Application.Run(fileModeForm);
                     }
                 }

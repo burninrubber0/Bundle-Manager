@@ -137,22 +137,34 @@ namespace ModelViewer.SceneData
 
         public void ExportWavefrontObj(string path)
         {
+            List<Material> materials = GetAllMaterials();
             string fullPath = Path.GetFullPath(path).Replace(Path.GetFileName(path), "");
             string mtlPath = fullPath + Path.GetFileNameWithoutExtension(path) + ".mtl";
             string materialDir = Path.GetFileNameWithoutExtension(path) + "_materials\\";
             string materialDirPath = fullPath + "/" + materialDir;
-            if (!Directory.Exists(materialDirPath))
-                Directory.CreateDirectory(materialDirPath);
 
-            List<Material> materials = GetAllMaterials();
-            ExportMTL(mtlPath, materialDir, materialDirPath, materials);
+            if (materials.Count > 0)
+            {
+                bool hasMaterials = false;
+                foreach (Material mat in materials)
+                    if (mat != null)
+                        hasMaterials = true;
+                if (hasMaterials)
+                {
+                    if (!Directory.Exists(materialDirPath))
+                        Directory.CreateDirectory(materialDirPath);
+
+                    ExportMTL(mtlPath, materialDir, materialDirPath, materials);
+                }
+            }
 
             try
             {
                 Stream s = File.Open(path, FileMode.Create);
                 StreamWriter sw = new StreamWriter(s);
 
-                sw.WriteLine("mtllib " + mtlPath);
+                if (materials.Count > 0)
+                    sw.WriteLine("mtllib " + mtlPath);
 
                 int meshIndex = 0;
 

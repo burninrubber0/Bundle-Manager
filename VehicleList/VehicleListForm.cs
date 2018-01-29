@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BundleFormat;
+using BundleUtilities;
 using Util = BundleFormat.Util;
 
 namespace VehicleList
@@ -75,13 +76,14 @@ namespace VehicleList
             lstVehicles.Sort();
         }
 
-        public void Open(BundleEntry entry, bool console = false)
+        public void Open(BundleEntry entry)
         {
             Entry = entry;
             byte[] data = entry.Header;
             MemoryStream ms = new MemoryStream(data);
-            BinaryReader mbr = new BinaryReader(ms);
-            currentList = mbr.ReadVehicleList(console);
+            BinaryReader2 mbr = new BinaryReader2(ms);
+            mbr.BigEndian = entry.Console;
+            currentList = mbr.ReadVehicleList();
             mbr.Close();
 
             UpdateDisplay();

@@ -47,9 +47,6 @@
             this.imageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.modelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.infoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportObjToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stsMain = new System.Windows.Forms.StatusStrip();
             this.pbMain = new System.Windows.Forms.ProgressBar();
             this.pboImage = new System.Windows.Forms.PictureBox();
@@ -163,8 +160,7 @@
             // 
             this.mnuBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.binaryToolStripMenuItem,
-            this.imageToolStripMenuItem,
-            this.modelToolStripMenuItem});
+            this.imageToolStripMenuItem});
             this.mnuBar.Location = new System.Drawing.Point(0, 0);
             this.mnuBar.Name = "mnuBar";
             this.mnuBar.Size = new System.Drawing.Size(624, 24);
@@ -238,29 +234,6 @@
             this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.importToolStripMenuItem.Text = "Import";
             this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
-            // 
-            // modelToolStripMenuItem
-            // 
-            this.modelToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.infoToolStripMenuItem,
-            this.exportObjToolStripMenuItem});
-            this.modelToolStripMenuItem.Name = "modelToolStripMenuItem";
-            this.modelToolStripMenuItem.Size = new System.Drawing.Size(53, 20);
-            this.modelToolStripMenuItem.Text = "Model";
-            // 
-            // infoToolStripMenuItem
-            // 
-            this.infoToolStripMenuItem.Name = "infoToolStripMenuItem";
-            this.infoToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
-            this.infoToolStripMenuItem.Text = "Info";
-            this.infoToolStripMenuItem.Click += new System.EventHandler(this.infoToolStripMenuItem_Click);
-            // 
-            // exportObjToolStripMenuItem
-            // 
-            this.exportObjToolStripMenuItem.Name = "exportObjToolStripMenuItem";
-            this.exportObjToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
-            this.exportObjToolStripMenuItem.Text = "Export Obj";
-            this.exportObjToolStripMenuItem.Click += new System.EventHandler(this.exportObjToolStripMenuItem_Click);
             // 
             // stsMain
             // 
@@ -344,9 +317,6 @@
         private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
         private System.Windows.Forms.PictureBox pboImage;
-        private System.Windows.Forms.ToolStripMenuItem modelToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem infoToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem exportObjToolStripMenuItem;
         private System.Windows.Forms.TabPage tabInfo;
         private System.Windows.Forms.TextBox txtInfo;
     }

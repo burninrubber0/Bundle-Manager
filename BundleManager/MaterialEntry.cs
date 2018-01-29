@@ -27,10 +27,10 @@ namespace BundleManager
         {
             MaterialEntry result = new MaterialEntry();
             
-            List<Dependency> dependencies = entry.GetDependencies();
-            foreach (Dependency dependency in dependencies)
+            List<BundleDependency> dependencies = entry.GetDependencies();
+            foreach (BundleDependency dependency in dependencies)
             {
-                uint id = dependency.EntryID;
+                ulong id = dependency.EntryID;
 
                 //DebugTimer t = DebugTimer.Start("LoadDep");
                 BundleEntry descEntry1 = entry.Archive.GetEntryByID(id);
@@ -39,7 +39,7 @@ namespace BundleManager
                     string file = BundleCache.GetFileByEntryID(id);
                     if (!string.IsNullOrEmpty(file))
                     {
-                        BundleArchive archive = BundleArchive.Read(file, entry.Console);
+                        BundleArchive archive = BundleArchive.Read(file);
                         descEntry1 = archive.GetEntryByID(id);
                     }
                 }
@@ -56,7 +56,8 @@ namespace BundleManager
             }
 
             MemoryStream ms = entry.MakeStream();
-            BinaryReader br = new BinaryReader(ms);
+            BinaryReader2 br = new BinaryReader2(ms);
+            br.BigEndian = entry.Console;
 
             // TODO: Read Material
 

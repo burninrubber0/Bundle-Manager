@@ -20,12 +20,13 @@ namespace BundleManager
         public ushort UnknownProperty1;
         public ushort UnknownProperty2;
         public byte[] Indices;
-        public uint Unknown1;
+		public byte[] IndicesIndices;
 
-        public PolygonSoupProperty()
+		public PolygonSoupProperty()
         {
             Indices = new byte[4];
-        }
+			IndicesIndices = new byte[4];
+		}
 
         public static PolygonSoupProperty Read(BinaryReader br)
         {
@@ -37,9 +38,12 @@ namespace BundleManager
             for (int i = 0; i < result.Indices.Length; i++)
             {
                 result.Indices[i] = br.ReadByte();
-            }
+			}
 
-            result.Unknown1 = br.ReadUInt32();
+			for (int i = 0; i < result.IndicesIndices.Length; i++)
+			{
+				result.IndicesIndices[i] = br.ReadByte();
+			}
 
             return result;
         }
@@ -123,10 +127,12 @@ namespace BundleManager
         public Mesh BuildMesh(Vector3I pos, float scale)
         {
             Mesh mesh = new Mesh();
+			// UNCOMMENT ME FOR EXPERIMENTAL GAP FILLING
+			//List<uint>[] tempFaces = new List<uint>[255];
 
-            // TODO: Build Mesh
-            
-            for (int i = 0; i < PropertyList.Count; i++)
+			// TODO: Build Mesh
+
+			for (int i = 0; i < PropertyList.Count; i++)
             {
                 PolygonSoupProperty property = PropertyList[i];
                 mesh.Indices.Add(property.Indices[0]);
@@ -137,12 +143,56 @@ namespace BundleManager
                     mesh.Indices.Add(property.Indices[3]);
                     mesh.Indices.Add(property.Indices[2]);
                     mesh.Indices.Add(property.Indices[1]);
-                }
-                
-                //DebugUtil.ShowDebug(mesh);
-            }
+				}
 
-            List<Vector3S> points = PointList;
+				// UNCOMMENT ME FOR EXPERIMENTAL GAP FILLING
+				/*
+				for (int j = 0; j < Math.Min(property.Indices.Length, property.IndicesIndices.Length); j++)
+				{
+					if (property.Indices[j] != 0xFF && property.IndicesIndices[j] != 0xFF)
+					{
+						try
+						{
+							tempFaces[property.IndicesIndices[j]].Add(property.Indices[j]);
+						}
+						catch (NullReferenceException)
+						{
+							tempFaces[property.IndicesIndices[j]] = new List<uint>();
+							tempFaces[property.IndicesIndices[j]].Add(property.Indices[j]);
+						}
+					}
+				}
+				*/
+
+				//DebugUtil.ShowDebug(mesh);
+			}
+			// UNCOMMENT ME FOR EXPERIMENTAL GAP FILLING
+			/*
+			for (int i = 0; i < tempFaces.Length; i++)
+			{
+				try
+				{
+					if (tempFaces[i].Count > 2)
+					{
+						mesh.Indices.Add(tempFaces[i][0]);
+						mesh.Indices.Add(tempFaces[i][1]);
+						mesh.Indices.Add(tempFaces[i][2]);
+						if (tempFaces[i].Count > 3 && tempFaces[i][3] != 0xFF)
+						{
+							mesh.Indices.Add(tempFaces[i][3]);
+							mesh.Indices.Add(tempFaces[i][2]);
+							mesh.Indices.Add(tempFaces[i][1]);
+						}
+					}
+				}
+				catch (NullReferenceException)
+				{
+					// Fail silently.
+				}
+			}
+			*/
+
+			List<Vector3S> points = PointList;
             //points.Reverse();
 
             for (int i = 0; i < points.Count; i++)

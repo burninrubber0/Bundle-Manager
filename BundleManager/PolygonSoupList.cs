@@ -74,7 +74,9 @@ namespace BundleManager
         public short Unknown7;
         public byte Unknown8;
         public byte Unknown9;
-        public int PointCount;
+        public byte PointCount;
+        public byte Unknown10;
+        public short Unknown11;
 
         public List<Vector3S> PointList;
         public List<PolygonSoupProperty> PropertyList;
@@ -96,7 +98,9 @@ namespace BundleManager
             result.Unknown7 = br.ReadInt16();
             result.Unknown8 = br.ReadByte();
             result.Unknown9 = br.ReadByte();
-            result.PointCount = br.ReadInt32();
+            result.PointCount = br.ReadByte();
+            result.Unknown10 = br.ReadByte();
+            result.Unknown11 = br.ReadInt16();
 
             br.BaseStream.Position = result.PointListStart;
             for (int i = 0; i < result.PointCount; i++)

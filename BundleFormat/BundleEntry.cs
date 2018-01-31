@@ -224,7 +224,7 @@ namespace BundleFormat
                     return name;
             }
 
-            return "N/A";
+            return "";
         }
 
         public Color GetColor()

@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AptData.cs" />
+    <Compile Include="AttribSys.cs" />
     <Compile Include="EntryEditor.cs">
       <SubType>Form</SubType>
     </Compile>

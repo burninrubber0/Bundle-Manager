@@ -43,6 +43,8 @@
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.searchForEntryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.debugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dumpAllCollisionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.tsbNew = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -61,8 +63,7 @@
             this.previewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.viewDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.debugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dumpAllCollisionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.mnuMain.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.mnuLst.SuspendLayout();
@@ -179,6 +180,21 @@
             this.searchForEntryToolStripMenuItem.Text = "Search for entry";
             this.searchForEntryToolStripMenuItem.Click += new System.EventHandler(this.searchForEntryToolStripMenuItem_Click);
             // 
+            // debugToolStripMenuItem
+            // 
+            this.debugToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.dumpAllCollisionsToolStripMenuItem});
+            this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
+            this.debugToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
+            this.debugToolStripMenuItem.Text = "Debug";
+            // 
+            // dumpAllCollisionsToolStripMenuItem
+            // 
+            this.dumpAllCollisionsToolStripMenuItem.Name = "dumpAllCollisionsToolStripMenuItem";
+            this.dumpAllCollisionsToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+            this.dumpAllCollisionsToolStripMenuItem.Text = "Dump All Collisions";
+            this.dumpAllCollisionsToolStripMenuItem.Click += new System.EventHandler(this.dumpAllCollisionsToolStripMenuItem_Click);
+            // 
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -253,6 +269,7 @@
             // 
             this.lstEntries.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colIndex,
+            this.colName,
             this.colID,
             this.colType,
             this.colSize,
@@ -323,20 +340,10 @@
             this.viewDataToolStripMenuItem.Text = "View Header";
             this.viewDataToolStripMenuItem.Click += new System.EventHandler(this.viewDataToolStripMenuItem_Click);
             // 
-            // debugToolStripMenuItem
+            // colName
             // 
-            this.debugToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.dumpAllCollisionsToolStripMenuItem});
-            this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
-            this.debugToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
-            this.debugToolStripMenuItem.Text = "Debug";
-            // 
-            // dumpAllCollisionsToolStripMenuItem
-            // 
-            this.dumpAllCollisionsToolStripMenuItem.Name = "dumpAllCollisionsToolStripMenuItem";
-            this.dumpAllCollisionsToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
-            this.dumpAllCollisionsToolStripMenuItem.Text = "Dump All Collisions";
-            this.dumpAllCollisionsToolStripMenuItem.Click += new System.EventHandler(this.dumpAllCollisionsToolStripMenuItem_Click);
+            this.colName.Text = "Name";
+            this.colName.Width = 120;
             // 
             // MainForm
             // 
@@ -396,6 +403,7 @@
         private System.Windows.Forms.ToolStripMenuItem searchForEntryToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem debugToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem dumpAllCollisionsToolStripMenuItem;
+        private System.Windows.Forms.ColumnHeader colName;
     }
 }
 

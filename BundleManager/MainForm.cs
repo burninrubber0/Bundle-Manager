@@ -202,6 +202,7 @@ namespace BundleManager
                 string[] values = new string[]
                 {
                     i.ToString("d3"),
+                    entry.DetectName(),
                     "0x" + entry.ID.ToString("X8"),
                     entry.Type.ToString(),
                     entry.Header.Length.ToString(),
@@ -320,7 +321,7 @@ namespace BundleManager
         
         public void DoOpenBundle(LoadingDialog loader, string path)
         {
-            Stream s = null;
+            /*Stream s = null;
             try
             {
                 s = File.Open(path, FileMode.Open, FileAccess.Read);
@@ -339,7 +340,11 @@ namespace BundleManager
             loader.Value = new object[] { archive, path };
 
             br.Close();
+            */
 
+            BundleArchive archive = BundleArchive.Read(path);
+
+            loader.Value = new object[] { archive, path };
             loader.IsDone = true;
         }
 
@@ -684,6 +689,18 @@ namespace BundleManager
             {
                 IDList list = IDList.Read(entry);
                 DebugUtil.ShowDebug(this, list);
+            }
+            else if (entry.Type == EntryType.AttribSysVaultResourceType && !forceHex)
+            {
+                try
+                {
+                    AttribSys at = AttribSys.Read(entry);
+                    DebugUtil.ShowDebug(this, at);
+                }
+                catch (ReadFailedError ex)
+                {
+                    MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             /* else if (entry.Type == EntryType.ModelResourceType && !forceHex)
             {

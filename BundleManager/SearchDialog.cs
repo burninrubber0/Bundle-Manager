@@ -14,12 +14,16 @@ namespace BundleManager
 {
     public partial class SearchDialog : Form
     {
+        public static string LastSearch = "";
+
         public delegate void OnSearch(ulong id);
         public event OnSearch Search;
 
         public SearchDialog()
         {
             InitializeComponent();
+
+            txtSearch.Text = LastSearch;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -36,6 +40,8 @@ namespace BundleManager
                     MessageBoxIcon.Warning);
                 return;
             }
+
+            LastSearch = txtSearch.Text;
 
             string numInput = input;
 

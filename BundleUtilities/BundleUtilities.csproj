@@ -44,6 +44,7 @@
     <Compile Include="BinaryReader2.cs" />
     <Compile Include="Crc32.cs" />
     <Compile Include="DebugTimer.cs" />
+    <Compile Include="ReadFailedError.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

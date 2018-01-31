@@ -189,7 +189,7 @@ namespace BundleFormat
                 entry.CompressedHeader = data;
 
                 entry.Header = data.Decompress(entry.UncompressedHeaderSize);
-                if (entry.Header == null)
+                if (entry.Header == null || entry.Header.NoData())
                 {
                     entry.DataCompressed = false;
                     entry.Header = data;

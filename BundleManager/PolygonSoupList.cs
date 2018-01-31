@@ -128,7 +128,8 @@ namespace BundleManager
         {
             Mesh mesh = new Mesh();
 			// UNCOMMENT ME FOR EXPERIMENTAL GAP FILLING
-			//List<uint>[] tempFaces = new List<uint>[255];
+			//Dictionary<byte, byte> tempFaces = new Dictionary<byte, byte>();
+            //byte[] lastIndices = null;
 
 			// TODO: Build Mesh
 
@@ -143,54 +144,63 @@ namespace BundleManager
                     mesh.Indices.Add(property.Indices[3]);
                     mesh.Indices.Add(property.Indices[2]);
                     mesh.Indices.Add(property.Indices[1]);
-				}
+                }
+                //lastIndices = property.Indices;
 
-				// UNCOMMENT ME FOR EXPERIMENTAL GAP FILLING
-				/*
-				for (int j = 0; j < Math.Min(property.Indices.Length, property.IndicesIndices.Length); j++)
+                /*tempFaces[property.IndicesIndices[0]] = property.Indices[0];
+                tempFaces[property.IndicesIndices[1]] = property.Indices[1];
+                tempFaces[property.IndicesIndices[2]] = property.Indices[2];
+                if (property.Indices[3] != 0xFF)
+                    tempFaces[property.IndicesIndices[3]] = property.Indices[3];*/
+
+                /*mesh.Indices.Add((uint)(property.IndicesIndices[0] - 32));
+                mesh.Indices.Add((uint)(property.IndicesIndices[1] - 32));
+                mesh.Indices.Add((uint)(property.IndicesIndices[2] - 32));
+                if (property.IndicesIndices[3] > 127)
+                {
+                    mesh.Indices.Add((uint)(property.IndicesIndices[3] - 32));
+                    mesh.Indices.Add((uint)(property.IndicesIndices[2] - 32));
+                    mesh.Indices.Add((uint)(property.IndicesIndices[1] - 32));
+                }*/
+
+                // UNCOMMENT ME FOR EXPERIMENTAL GAP FILLING
+
+                /*byte[] b = property.IndicesIndices;
+                //b.Reverse();
+
+                for (int j = 0; j < property.Indices.Length; j++)
 				{
-					if (property.Indices[j] != 0xFF && property.IndicesIndices[j] != 0xFF)
+					if (property.Indices[j] != 0xFF)// && property.IndicesIndices[j] != 0xFF)
 					{
-						try
-						{
-							tempFaces[property.IndicesIndices[j]].Add(property.Indices[j]);
-						}
-						catch (NullReferenceException)
-						{
-							tempFaces[property.IndicesIndices[j]] = new List<uint>();
-							tempFaces[property.IndicesIndices[j]].Add(property.Indices[j]);
-						}
+                        if (!tempFaces.ContainsKey(b[j]))
+						    tempFaces.Add(b[j], new List<byte>());
+                        tempFaces[b[j]].Add(property.Indices[j]);
 					}
-				}
-				*/
+				}*/
 
-				//DebugUtil.ShowDebug(mesh);
-			}
+
+                //DebugUtil.ShowDebug(mesh);
+            }
 			// UNCOMMENT ME FOR EXPERIMENTAL GAP FILLING
-			/*
-			for (int i = 0; i < tempFaces.Length; i++)
-			{
-				try
-				{
-					if (tempFaces[i].Count > 2)
-					{
-						mesh.Indices.Add(tempFaces[i][0]);
-						mesh.Indices.Add(tempFaces[i][1]);
-						mesh.Indices.Add(tempFaces[i][2]);
-						if (tempFaces[i].Count > 3 && tempFaces[i][3] != 0xFF)
-						{
-							mesh.Indices.Add(tempFaces[i][3]);
-							mesh.Indices.Add(tempFaces[i][2]);
-							mesh.Indices.Add(tempFaces[i][1]);
-						}
-					}
-				}
-				catch (NullReferenceException)
-				{
-					// Fail silently.
-				}
-			}
-			*/
+			
+			//foreach (byte key in tempFaces.Keys)
+			//{
+			//    byte value = tempFaces[key];
+			//    mesh.Indices.Add(value);
+			//    /*if (value.Count > 2)
+   //             {
+   //                 mesh.Indices.Add(value[0]);
+   //                 mesh.Indices.Add(value[1]);
+   //                 mesh.Indices.Add(value[2]);
+   //                 if (value.Count > 3 && value[3] != 0xFF)
+   //                 {
+   //                     mesh.Indices.Add(value[3]);
+   //                     mesh.Indices.Add(value[2]);
+   //                     mesh.Indices.Add(value[1]);
+   //                 }
+   //             }*/
+			//}
+			
 
 			List<Vector3S> points = PointList;
             //points.Reverse();

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using BundleUtilities;
+using Microsoft.SqlServer.Server;
 
 namespace BundleFormat
 {
@@ -115,6 +117,114 @@ namespace BundleFormat
             ms.Close();
 
             return result;
+        }
+
+        public string DetectName()
+        {
+            string theName = "worldvault";
+            ulong theID = Crc32.HashCrc32B(theName);
+            if (theID == ID)
+                return theName;
+            theName = "postfxvault";
+            theID = Crc32.HashCrc32B(theName);
+            if (theID == ID)
+                return theName;
+            theName = "cameravault";
+            theID = Crc32.HashCrc32B(theName);
+            if (theID == ID)
+                return theName;
+
+            string path = Path.GetFileNameWithoutExtension(Archive.Path);
+            string file = null;
+            if (path != null)
+                file = path.ToUpper();
+
+            if (file != null && file.StartsWith("TRK_UNIT") && file.EndsWith("_GR"))
+            {
+                string trackID = file.Substring(8).Replace("_GR", "").ToLower();
+                string name = "trk_unit" + trackID + "_list";
+                ulong newID = Crc32.HashCrc32B(name);
+                if (newID == ID)
+                    return name;
+            }
+
+            if (file != null)
+            {
+                string aptName = file.ToLower() + ".swf";
+                ulong aptID = Crc32.HashCrc32B(aptName);
+                if (aptID == ID)
+                    return aptName;
+            }
+
+            if (file != null && file.StartsWith("WHE_") && file.EndsWith("_GR"))
+            {
+                string wheelID = file.Substring(4).Replace("_GR", "").ToLower();
+                string name = wheelID + "_graphics";
+                ulong newID = Crc32.HashCrc32B(name);
+                if (newID == ID)
+                    return name;
+            }
+
+            if (file != null && file.StartsWith("VEH_"))
+            {
+                if (file.EndsWith("_AT"))
+                {
+                    string vehicleID = file.Substring(4).Replace("_AT", "").ToLower();
+                    string name = vehicleID + "_attribsys";
+                    ulong newID = Crc32.HashCrc32B(name);
+                    if (newID == ID)
+                        return name;
+                    name = vehicleID + "deformationmodel";
+                    newID = Crc32.HashCrc32B(name);
+                    if (newID == ID)
+                        return name;
+                    name = vehicleID + "_bpr";
+                    newID = Crc32.HashCrc32B(name);
+                    if (newID == ID)
+                        return name;
+                    name = vehicleID + "_anim";
+                    newID = Crc32.HashCrc32B(name);
+                    if (newID == ID)
+                        return name;
+                    name = vehicleID + "_trafficstub";
+                    newID = Crc32.HashCrc32B(name);
+                    if (newID == ID)
+                        return name;
+                    name = vehicleID + "_vanm";
+                    newID = Crc32.HashCrc32B(name);
+                    if (newID == ID)
+                        return name;
+                } else if (file.EndsWith("_CD"))
+                {
+                    string vehicleID = file.Substring(4).Replace("_CD", "").ToLower();
+                    string name = vehicleID;
+                    ulong newID = Crc32.HashCrc32B(name);
+                    if (newID == ID)
+                        return name;
+                } else if (file.EndsWith("_GR"))
+                {
+                    string vehicleID = file.Substring(4).Replace("_GR", "").ToLower();
+                    string name = vehicleID + "_graphics";
+                    ulong newID = Crc32.HashCrc32B(name);
+                    if (newID == ID)
+                        return name;
+                }
+            }
+
+            // WorldCol Names
+            for (int i = 0; i < Archive.Entries.Count; i++)
+            {
+                string name = "trk_col_" + i;
+                ulong newID = Crc32.HashCrc32B(name);
+                if (newID == ID)
+                    return name;
+                name = "trk_clil" + i;
+                newID = Crc32.HashCrc32B(name);
+                if (newID == ID)
+                    return name;
+            }
+
+            return "N/A";
         }
 
         public Color GetColor()

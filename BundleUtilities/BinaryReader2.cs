@@ -34,7 +34,7 @@ namespace BundleUtilities
         public override short ReadInt16()
         {
             var data = base.ReadBytes(2);
-            if (data.Length == 0)
+            if (data.Length < 2)
                 throw new EndOfStreamException();
             if (ShouldFlip())
                 Array.Reverse(data);
@@ -44,7 +44,7 @@ namespace BundleUtilities
         public override int ReadInt32()
         {
             var data = base.ReadBytes(4);
-            if (data.Length == 0)
+            if (data.Length < 4)
                 throw new EndOfStreamException();
             if (ShouldFlip())
                 Array.Reverse(data);
@@ -54,7 +54,7 @@ namespace BundleUtilities
         public override long ReadInt64()
         {
             var data = base.ReadBytes(8);
-            if (data.Length == 0)
+            if (data.Length < 8)
                 throw new EndOfStreamException();
             if (ShouldFlip())
                 Array.Reverse(data);
@@ -64,7 +64,7 @@ namespace BundleUtilities
         public override ushort ReadUInt16()
         {
             var data = base.ReadBytes(2);
-            if (data.Length == 0)
+            if (data.Length < 2)
                 throw new EndOfStreamException();
             if (ShouldFlip())
                 Array.Reverse(data);
@@ -74,7 +74,7 @@ namespace BundleUtilities
         public override uint ReadUInt32()
         {
             var data = base.ReadBytes(4);
-            if (data.Length == 0)
+            if (data.Length < 4)
                 throw new EndOfStreamException();
             if (ShouldFlip())
                 Array.Reverse(data);
@@ -84,7 +84,7 @@ namespace BundleUtilities
         public override ulong ReadUInt64()
         {
             var data = base.ReadBytes(8);
-            if (data.Length == 0)
+            if (data.Length < 8)
                 throw new EndOfStreamException();
             if (ShouldFlip())
                 Array.Reverse(data);
@@ -94,7 +94,7 @@ namespace BundleUtilities
         public override float ReadSingle()
         {
             var data = base.ReadBytes(4);
-            if (data.Length == 0)
+            if (data.Length < 4)
                 throw new EndOfStreamException();
             if (ShouldFlip())
                 Array.Reverse(data);
@@ -104,7 +104,7 @@ namespace BundleUtilities
         public override double ReadDouble()
         {
             var data = base.ReadBytes(8);
-            if (data.Length == 0)
+            if (data.Length < 8)
                 throw new EndOfStreamException();
             if (ShouldFlip())
                 Array.Reverse(data);

@@ -56,5 +56,49 @@ namespace BundleUtilities
 
             return sb.ToString();
         }
+
+        public static byte[] Flip(this byte[] self)
+        {
+            byte[] result = new byte[self.Length];
+
+            int j = 0;
+            for (int i = self.Length - 1; i >= 0; i--)
+            {
+                result[j] = self[i];
+                j++;
+            }
+
+            return result;
+        }
+
+        public static bool NoData(this byte[] self)
+        {
+            for (int i = 0; i < self.Length; i++)
+            {
+                if (self[i] != 0x00)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static string ReadLenString(this BinaryReader self, int size)
+        {
+            string result = "";
+
+            for (int i = 0; i < size; i++)
+            {
+                result += (char)self.ReadByte();
+            }
+
+            return result;
+        }
+
+        public static string ReadLenString(this BinaryReader self)
+        {
+            int len = self.ReadInt32();
+
+            return self.ReadLenString(len);
+        }
     }
 }

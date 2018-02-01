@@ -840,31 +840,33 @@ namespace BundleManager
         private void lstEntries_ColumnClick(object sender, ColumnClickEventArgs e)
         {
             int column = e.Column;
-            
-            bool direction = false;
+			EntrySorter sorter;
 
-            if (lstEntries.ListViewItemSorter is EntrySorter sorter)
-            {
-                if (sorter.Column == column)
-                {
-                    sorter.Swap();
-                    lstEntries.Sort();
-                    return;
-                }
-                direction = sorter.Direction;
-            }
-
-            EntrySorter newSorter = new EntrySorter(column)
-            {
-                Direction = !direction
-            };
-            lstEntries.ListViewItemSorter = newSorter;
-            lstEntries.Sort();
-        }
+			if (lstEntries.ListViewItemSorter is EntrySorter)
+			{
+				// every other time
+				sorter = lstEntries.ListViewItemSorter as EntrySorter;
+				sorter.Column = column;
+			}
+			else
+			{
+				// first time
+				sorter = new EntrySorter(column);
+				lstEntries.ListViewItemSorter = sorter;
+			}
+			// if you're clicking the same column already being sorted
+            //if (sorter.Column == column)
+            //{
+				// change the direction state from true to false or vice-versa
+                sorter.Swap();
+				// bop-it
+				lstEntries.Sort();
+			//}
+		}
 
         private class EntrySorter : IComparer
         {
-            public readonly int Column;
+            public int Column;
             public bool Direction;
 
             public EntrySorter(int column)
@@ -888,6 +890,7 @@ namespace BundleManager
                 string iX = itemX?.SubItems[Column].Text;
                 string iY = itemY?.SubItems[Column].Text;
 
+				/*
                 if (int.TryParse(iX, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var iXint))
                 {
                     if (int.TryParse(iY, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var iYint))
@@ -898,8 +901,9 @@ namespace BundleManager
                         return val2;
                     }
                 }
+				*/
 
-                int val = string.CompareOrdinal(iX, iY);
+                int val = Math.Sign(string.Compare(iX, iY, StringComparison.CurrentCultureIgnoreCase));
                 if (this.Direction)
                     return val * -1;
                 return val;

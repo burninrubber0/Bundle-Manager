@@ -412,6 +412,8 @@ namespace BundleManager
 
         public void DoSaveBundle(LoadingDialog loader, string path)
         {
+            if (CurrentArchive.Console)
+                ConvertToPC();
             Stream s = File.Open(path, FileMode.Create);
             BinaryWriter bw = new BinaryWriter(s);
 
@@ -961,6 +963,29 @@ namespace BundleManager
 
                 MessageBox.Show(this, "Done!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+        }
+
+        public void ConvertToPC()
+        {
+            // TODO: Support everything
+
+            for (int i = 0; i < CurrentArchive.Entries.Count; i++)
+            {
+                BundleEntry entry = CurrentArchive.Entries[i];
+
+                if (entry.Type == EntryType.IDList)
+                {
+                    IDList list = IDList.Read(entry);
+                    list.Write(entry);
+                }
+                else if (entry.Type == EntryType.PolygonSoupListResourceType)
+                {
+                    PolygonSoupList list = PolygonSoupList.Read(entry);
+                    list.Write(entry);
+                }
+            }
+            
+            CurrentArchive.Platform = BundlePlatform.PC;
         }
     }
 }

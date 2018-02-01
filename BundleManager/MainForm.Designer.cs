@@ -55,6 +55,7 @@
             this.tsbSwitchMode = new System.Windows.Forms.ToolStripButton();
             this.lstEntries = new System.Windows.Forms.ListView();
             this.colIndex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -63,7 +64,6 @@
             this.previewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.viewDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.mnuMain.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.mnuLst.SuspendLayout();
@@ -292,6 +292,11 @@
             // 
             this.colIndex.Text = "Index";
             // 
+            // colName
+            // 
+            this.colName.Text = "Name";
+            this.colName.Width = 120;
+            // 
             // colID
             // 
             this.colID.Text = "ID";
@@ -339,11 +344,6 @@
             this.viewDataToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.viewDataToolStripMenuItem.Text = "View Header";
             this.viewDataToolStripMenuItem.Click += new System.EventHandler(this.viewDataToolStripMenuItem_Click);
-            // 
-            // colName
-            // 
-            this.colName.Text = "Name";
-            this.colName.Width = 120;
             // 
             // MainForm
             // 

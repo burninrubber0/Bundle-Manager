@@ -146,6 +146,22 @@ namespace BundleFormat
                 ulong newID = Crc32.HashCrc32B(name);
                 if (newID == ID)
                     return name;
+                name = "prp_inst_" + trackID;
+                newID = Crc32.HashCrc32B(name);
+                if (newID == ID)
+                    return name;
+                name = "prp_gl__" + trackID;
+                newID = Crc32.HashCrc32B(name);
+                if (newID == ID)
+                    return name;
+                name = "trk_unit" + trackID + "_passby";
+                newID = Crc32.HashCrc32B(name);
+                if (newID == ID)
+                    return name;
+                name = "trk_unit" + trackID + "_emitter";
+                newID = Crc32.HashCrc32B(name);
+                if (newID == ID)
+                    return name;
             }
 
             if (file != null)

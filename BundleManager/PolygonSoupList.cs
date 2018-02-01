@@ -17,8 +17,7 @@ namespace BundleManager
 {
     public class PolygonSoupProperty
     {
-        public ushort UnknownProperty1;
-        public ushort UnknownProperty2;
+        public uint UnknownProperty;
         public byte[] Indices;
 		public byte[] IndicesIndices;
 
@@ -32,8 +31,7 @@ namespace BundleManager
         {
             PolygonSoupProperty result = new PolygonSoupProperty();
 
-            result.UnknownProperty1 = br.ReadUInt16();
-            result.UnknownProperty2 = br.ReadUInt16();
+            result.UnknownProperty = br.ReadUInt32();
 
             for (int i = 0; i < result.Indices.Length; i++)
             {
@@ -48,9 +46,24 @@ namespace BundleManager
             return result;
         }
 
+        public void Write(BinaryWriter bw)
+        {
+            bw.Write(UnknownProperty);
+
+            for (int i = 0; i < Indices.Length; i++)
+            {
+                bw.Write(Indices[i]);
+            }
+
+            for (int i = 0; i < IndicesIndices.Length; i++)
+            {
+                bw.Write(IndicesIndices[i]);
+            }
+        }
+
         public override string ToString()
         {
-            return "Prop1: " + UnknownProperty1.ToString("X2") + ", Prop2: " + UnknownProperty2.ToString("X2");
+            return "Prop: " + UnknownProperty.ToString("X8");
         }
     }
 
@@ -112,7 +125,7 @@ namespace BundleManager
 
             int count = (result.Unknown9 >> 1) * 2 +
                         (result.Unknown9 - (result.Unknown9 >> 1) * 2) +
-                        ((result.Unknown8 - result.Unknown9) >> 2) +
+                        (((result.Unknown8 - result.Unknown9) >> 2) * 4) +
                         ((result.Unknown8 - result.Unknown9) - ((result.Unknown8 - result.Unknown9) >> 2) * 4);
 
             for (int i = 0; i < count; i++)
@@ -125,17 +138,39 @@ namespace BundleManager
 
         public void Write(BinaryWriter bw)
         {
-            // TODO: Write PolygonSoupChunk
+            bw.Write(Position);
+            bw.Write(Scale);
+            bw.Write(PropertyListStart);
+            bw.Write(PointListStart);
+            bw.Write(Unknown7);
+            bw.Write(Unknown8);
+            bw.Write(Unknown9);
+            bw.Write(PointCount);
+            bw.Write(Unknown10);
+            bw.Write(Unknown11);
+
+            bw.BaseStream.Position = PointListStart;
+            for (int i = 0; i < PointCount; i++)
+            {
+                bw.Write(PointList[i]);
+            }
+
+            bw.BaseStream.Position = PropertyListStart;
+
+            int count = (Unknown9 >> 1) * 2 +
+                        (Unknown9 - (Unknown9 >> 1) * 2) +
+                        (((Unknown8 - Unknown9) >> 2) * 4) +
+                        ((Unknown8 - Unknown9) - ((Unknown8 - Unknown9) >> 2) * 4);
+
+            for (int i = 0; i < count; i++)
+            {
+                PropertyList[i].Write(bw);
+            }
         }
 
         public Mesh BuildMesh(Vector3I pos, float scale)
         {
             Mesh mesh = new Mesh();
-			// UNCOMMENT ME FOR EXPERIMENTAL GAP FILLING
-			//Dictionary<byte, byte> tempFaces = new Dictionary<byte, byte>();
-            //byte[] lastIndices = null;
-
-			// TODO: Build Mesh
 
 			for (int i = 0; i < PropertyList.Count; i++)
             {
@@ -149,74 +184,15 @@ namespace BundleManager
                     mesh.Indices.Add(property.Indices[2]);
                     mesh.Indices.Add(property.Indices[1]);
                 }
-                //lastIndices = property.Indices;
-
-                /*tempFaces[property.IndicesIndices[0]] = property.Indices[0];
-                tempFaces[property.IndicesIndices[1]] = property.Indices[1];
-                tempFaces[property.IndicesIndices[2]] = property.Indices[2];
-                if (property.Indices[3] != 0xFF)
-                    tempFaces[property.IndicesIndices[3]] = property.Indices[3];*/
-
-                /*mesh.Indices.Add((uint)(property.IndicesIndices[0] - 32));
-                mesh.Indices.Add((uint)(property.IndicesIndices[1] - 32));
-                mesh.Indices.Add((uint)(property.IndicesIndices[2] - 32));
-                if (property.IndicesIndices[3] > 127)
-                {
-                    mesh.Indices.Add((uint)(property.IndicesIndices[3] - 32));
-                    mesh.Indices.Add((uint)(property.IndicesIndices[2] - 32));
-                    mesh.Indices.Add((uint)(property.IndicesIndices[1] - 32));
-                }*/
-
-                // UNCOMMENT ME FOR EXPERIMENTAL GAP FILLING
-
-                /*byte[] b = property.IndicesIndices;
-                //b.Reverse();
-
-                for (int j = 0; j < property.Indices.Length; j++)
-				{
-					if (property.Indices[j] != 0xFF)// && property.IndicesIndices[j] != 0xFF)
-					{
-                        if (!tempFaces.ContainsKey(b[j]))
-						    tempFaces.Add(b[j], new List<byte>());
-                        tempFaces[b[j]].Add(property.Indices[j]);
-					}
-				}*/
-
-
-                //DebugUtil.ShowDebug(mesh);
             }
-			// UNCOMMENT ME FOR EXPERIMENTAL GAP FILLING
-			
-			//foreach (byte key in tempFaces.Keys)
-			//{
-			//    byte value = tempFaces[key];
-			//    mesh.Indices.Add(value);
-			//    /*if (value.Count > 2)
-   //             {
-   //                 mesh.Indices.Add(value[0]);
-   //                 mesh.Indices.Add(value[1]);
-   //                 mesh.Indices.Add(value[2]);
-   //                 if (value.Count > 3 && value[3] != 0xFF)
-   //                 {
-   //                     mesh.Indices.Add(value[3]);
-   //                     mesh.Indices.Add(value[2]);
-   //                     mesh.Indices.Add(value[1]);
-   //                 }
-   //             }*/
-			//}
 			
 
 			List<Vector3S> points = PointList;
-            //points.Reverse();
 
             for (int i = 0; i < points.Count; i++)
             {
                 Vector3S vert = points[i];
-                //mesh.Vertices.Add(new Vector3(vert.X * scale + pos.X, vert.Y * scale + pos.Y, vert.Z * scale + pos.Z));
                 mesh.Vertices.Add(new Vector3((vert.X + pos.X) * scale, (vert.Y + pos.Y) * scale, (vert.Z + pos.Z) * scale));
-                //mesh.Vertices.Add(new Vector3((vert.X) * scale, (vert.Y) * scale, (vert.Z) * scale));
-                //mesh.Vertices.Add(new Vector3((vert.X) * scale, (vert.Z) * scale, (vert.Y) * scale));
-                //mesh.Vertices.Add(new Vector3((vert.X + pos.X) * scale, (vert.Z + pos.Z) * scale, (vert.Y + pos.Y) * scale));
             }
 
             return mesh;
@@ -335,7 +311,81 @@ namespace BundleManager
 
         public void Write(BundleEntry entry)
         {
-            // TODO: Write PolygonSoupList
+            MemoryStream ms = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(ms);
+
+            bw.Write(Min);
+            bw.Write(Unknown4);
+            bw.Write(Max);
+            bw.Write(Unknown8);
+            bw.Write(ChunkPointerStart);
+            bw.Write(BoxListStart);
+            bw.Write(ChunkCount);
+            bw.Write(FileSize);
+
+            // No Data
+            if (ChunkCount == 0)
+            {
+                bw.Flush();
+                byte[] data2 = ms.ToArray();
+                bw.Close();
+                ms.Close();
+
+                entry.Header = data2;
+                entry.Dirty = true;
+                return;
+            }
+
+            bw.BaseStream.Position = ChunkPointerStart;
+
+            for (int i = 0; i < ChunkCount; i++)
+            {
+                bw.Write(ChunkPointers[i]);
+            }
+
+            //br.BaseStream.Position += (16 - br.BaseStream.Position % 16);
+            //br.BaseStream.Position = BoxListStart;
+
+            for (int i = 0; i < ChunkCount; i++)
+            {
+                // Write Vertically
+
+                long pos = BoxListStart + 0x70 * (i / 4) + 4 * (i % 4);
+
+                PolygonSoupBoundingBox box = BoundingBoxes[i];
+
+                bw.BaseStream.Position = pos;
+                bw.Write(box.Box.Min.X);
+                bw.BaseStream.Position += 12;
+                bw.Write(box.Box.Min.Y);
+                bw.BaseStream.Position += 12;
+                bw.Write(box.Box.Min.Z);
+
+                bw.BaseStream.Position += 12;
+                bw.Write(box.Box.Max.X);
+                bw.BaseStream.Position += 12;
+                bw.Write(box.Box.Max.Y);
+                bw.BaseStream.Position += 12;
+                bw.Write(box.Box.Max.Z);
+
+                bw.BaseStream.Position += 12;
+                bw.Write(box.Unknown);
+            }
+
+            for (int i = 0; i < ChunkPointers.Count; i++)
+            {
+                bw.BaseStream.Position = ChunkPointers[i];
+
+                Chunks[i].Write(bw);
+            }
+
+            bw.Flush();
+            byte[] data = ms.ToArray();
+            bw.Close();
+            ms.Close();
+
+            entry.Header = data;
+            entry.Dirty = true;
         }
 
         public Scene MakeScene(ILoader loader = null)

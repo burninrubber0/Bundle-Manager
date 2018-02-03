@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -48,7 +50,31 @@ namespace BundleManager
 
         public void Write(BinaryWriter bw)
         {
-            bw.Write(UnknownProperty);
+            // Cap to 0x9D64 for PC
+            ushort unknownProperty1 = (ushort)(UnknownProperty & 0xFFFF);
+            /*byte unk1 = (byte) (unknownProperty1 & 0xFF);
+            byte unk2 = (byte) (unknownProperty1 >> 8);
+
+            if (unk2 > 0x9D && unk2 != 0xFF)
+                unk2 = 0x9D;
+
+            if (unk1 > 0x64 && unk1 != 0xFF)
+                unk1 = 0x64;*/
+
+            //unknownProperty1 = (ushort)((unk2 << 8) | unk1);
+
+            if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
+            {
+                unknownProperty1 = 0x8316; //0x9531; // 0x9007 //0x8511 //0x8316;
+            }
+
+
+            //if (unknownProperty1 > 0x9D64)
+            //    unknownProperty1 = 0xFFFF;
+            ushort unknownProperty2 = (ushort) ((UnknownProperty >> 16) & 0xFFFF);
+            uint unknownProperty = (uint)((unknownProperty2 << 16) | unknownProperty1);
+
+            bw.Write(unknownProperty);
 
             for (int i = 0; i < Indices.Length; i++)
             {
@@ -168,9 +194,12 @@ namespace BundleManager
             }
         }
 
+        //public static uint Upper = 0;
+
         public Mesh BuildMesh(Vector3I pos, float scale)
         {
             Mesh mesh = new Mesh();
+            mesh.Materials = new Dictionary<uint, Material>();
 
 			for (int i = 0; i < PropertyList.Count; i++)
             {
@@ -183,6 +212,89 @@ namespace BundleManager
                     mesh.Indices.Add(property.Indices[3]);
                     mesh.Indices.Add(property.Indices[2]);
                     mesh.Indices.Add(property.Indices[1]);
+                }
+
+                ushort unknownProperty1 = (ushort)(property.UnknownProperty & 0xFFFF);
+                ushort unknownProperty2 = (ushort)((property.UnknownProperty >> 16));// & 0xFFFF);
+
+                //ushort banana = (ushort)(unknownProperty1 & 0xFF);
+                //ushort id = (ushort) (unknownProperty1 & 0x7FFF);
+
+                //if (unknownProperty1 != 0xFFFF)
+                // Upper = Math.Max(unknownProperty1, Upper);
+
+                // To Reverse
+                //uint unknownProperty = (uint)((unknownProperty2 << 16) | unknownProperty1);
+
+                /*if (unknownProperty1 == 0x9DA2)
+                {
+                    Material mat = new Material(unknownProperty1.ToString("X4"), Color.Orange);
+                    mesh.Materials[property.Indices[0]] = mat;
+                    mesh.Materials[property.Indices[1]] = mat;
+                    mesh.Materials[property.Indices[2]] = mat;
+                    if (property.Indices[3] != 0xFF)
+                        mesh.Materials[property.Indices[3]] = mat;
+                } else if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
+                {
+                    Material mat = new Material(unknownProperty1.ToString("X4"), Color.Red);
+                    mesh.Materials[property.Indices[0]] = mat;
+                    mesh.Materials[property.Indices[1]] = mat;
+                    mesh.Materials[property.Indices[2]] = mat;
+                    if (property.Indices[3] != 0xFF)
+                        mesh.Materials[property.Indices[3]] = mat;
+                }
+                else
+                {
+                    Material mat = new Material(unknownProperty1.ToString("X4"), Color.White);
+                    mesh.Materials[property.Indices[0]] = mat;
+                    mesh.Materials[property.Indices[1]] = mat;
+                    mesh.Materials[property.Indices[2]] = mat;
+                    if (property.Indices[3] != 0xFF)
+                        mesh.Materials[property.Indices[3]] = mat;
+                }*/
+
+                /*int red = banana * 10 % 255;
+                int green = banana * 5 % 255;
+                int blue = banana * 12 % 255;
+
+                Color color = Color.FromArgb(red, green, blue);
+                Material mat = new Material(banana.ToString("X2"), color);
+                    //Color.FromArgb(banana & 0xFF, 0, (banana >> 8) & 0xFF));
+                mesh.Materials[property.Indices[0]] = mat;
+                mesh.Materials[property.Indices[1]] = mat;
+                mesh.Materials[property.Indices[2]] = mat;
+                if (property.Indices[3] != 0xFF)
+                    mesh.Materials[property.Indices[3]] = mat;*/
+
+                //if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
+                if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
+                {
+                    string bla = property.IndicesIndices[0].ToString("X2") + "_" +
+                                 property.IndicesIndices[1].ToString("X2") + "_" +
+                                 property.IndicesIndices[2].ToString("X2") + "_" +
+                                 property.IndicesIndices[3].ToString("X2");
+                    //Material mat = new Material(unknownProperty1.ToString("X4"),
+                    Material mat = new Material(unknownProperty1.ToString("X4") + "_" + unknownProperty2.ToString("X4") + "_" + bla,
+                        Color.FromArgb(unknownProperty1 & 0xFF, 0, (unknownProperty1 >> 8) & 0xFF));
+                    mesh.Materials[property.Indices[0]] = mat;
+                    mesh.Materials[property.Indices[1]] = mat;
+                    mesh.Materials[property.Indices[2]] = mat;
+                    if (property.Indices[3] != 0xFF)
+                        mesh.Materials[property.Indices[3]] = mat;
+                }
+                else
+                {
+                    string bla = property.IndicesIndices[0].ToString("X2") + "_" +
+                                 property.IndicesIndices[1].ToString("X2") + "_" +
+                                 property.IndicesIndices[2].ToString("X2") + "_" +
+                                 property.IndicesIndices[3].ToString("X2");
+                    //Material mat = new Material(unknownProperty1.ToString("X4"),
+                    Material mat = new Material(unknownProperty1.ToString("X4") + "_" + unknownProperty2.ToString("X4") + "_" + bla, Color.White);
+                    mesh.Materials[property.Indices[0]] = mat;
+                    mesh.Materials[property.Indices[1]] = mat;
+                    mesh.Materials[property.Indices[2]] = mat;
+                    if (property.Indices[3] != 0xFF)
+                        mesh.Materials[property.Indices[3]] = mat;
                 }
             }
 			
@@ -399,9 +511,20 @@ namespace BundleManager
 
                 Vector3I pos = chunk.Position;
                 float scale = chunk.Scale;
+                /*List<Mesh> meshes = chunk.BuildMesh(pos, scale);
+                for (int i = 0; i < meshes.Count; i++)
+                {
+                    Mesh mesh = meshes[i];
+                    Model model = new Model(mesh);
+                    SceneObject sceneObject = new SceneObject(id + "_" + i, model);
+                    //sceneObject.ID = id;
+                    //sceneObject.Transform = Matrix4.CreateScale(scale) *
+                    //                        Matrix4.CreateTranslation(new Vector3(pos.X, pos.Y, pos.Z));
+                    scene.AddObject(sceneObject);
+                }*/
                 Model model = new Model(chunk.BuildMesh(pos, scale));
                 SceneObject sceneObject = new SceneObject(id, model);
-                sceneObject.ID = id;
+                //sceneObject.ID = id;
                 //sceneObject.Transform = Matrix4.CreateScale(scale) *
                 //                        Matrix4.CreateTranslation(new Vector3(pos.X, pos.Y, pos.Z));
                 scene.AddObject(sceneObject);
@@ -412,6 +535,148 @@ namespace BundleManager
             }
 
             return scene;
+        }
+
+        public void ImportObj(string path)
+        {
+            Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
+            StreamReader sr = new StreamReader(s);
+
+            string currentMesh = "";
+            PolygonSoupProperty currentProperty;
+
+            while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+                if (line == null || line.Trim().StartsWith("#"))
+                    continue;
+
+                line = line.Trim();
+
+                if (line.StartsWith("v"))
+                {
+                    string[] options = line.Split(' ');
+                    if (options.Length < 4)
+                        throw new ReadFailedError("Invalid Vertex Line: " + line);
+
+                    if (!float.TryParse(options[1], NumberStyles.None, CultureInfo.CurrentCulture,
+                        out var v1))
+                    {
+                        throw new ReadFailedError("Invalid Coord: " + options[1]);
+                    }
+
+                    if (!float.TryParse(options[1], NumberStyles.None, CultureInfo.CurrentCulture,
+                        out var v2))
+                    {
+                        throw new ReadFailedError("Invalid Coord: " + options[2]);
+                    }
+
+                    if (!float.TryParse(options[1], NumberStyles.None, CultureInfo.CurrentCulture,
+                        out var v3))
+                    {
+                        throw new ReadFailedError("Invalid Coord: " + options[3]);
+                    }
+
+                    // TODO: Use Vertices
+
+                } else if (line.StartsWith("f"))
+                {
+                    string[] options = line.Split(' ');
+                    if (options.Length < 4)
+                        throw new ReadFailedError("Invalid Face Line: " + line);
+
+                    if (!byte.TryParse(options[1], NumberStyles.None, CultureInfo.CurrentCulture,
+                        out var f1))
+                    {
+                        throw new ReadFailedError("Invalid Index: " + options[1]);
+                    }
+
+                    if (!byte.TryParse(options[2], NumberStyles.None, CultureInfo.CurrentCulture,
+                        out var f2))
+                    {
+                        throw new ReadFailedError("Invalid Index: " + options[2]);
+                    }
+
+                    if (!byte.TryParse(options[3], NumberStyles.None, CultureInfo.CurrentCulture,
+                        out var f3))
+                    {
+                        throw new ReadFailedError("Invalid Index: " + options[3]);
+                    }
+                    
+                    // TODO: Use Indices and make quads maybe?
+                } else if (line.StartsWith("usemtl"))
+                {
+                    string[] options = line.Split(' ');
+                    if (options.Length < 2)
+                        throw new ReadFailedError("Invalid Material Line: " + line);
+                    string material = options[1];
+                    string[] matStrings = material.Split('_');
+                    if (matStrings.Length < 7)
+                        throw new ReadFailedError("Invalid Material: " + material);
+                    string property1 = matStrings[1];
+                    string property2 = matStrings[2];
+                    string newByte1 = matStrings[3];
+                    string newByte2 = matStrings[4];
+                    string newByte3 = matStrings[5];
+                    string newByte4 = matStrings[6];
+
+                    if (!ushort.TryParse(property1, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
+                        out var prop1))
+                    {
+                        throw new ReadFailedError("Invalid Property1: " + property1);
+                    }
+
+                    if (!ushort.TryParse(property2, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
+                        out var prop2))
+                    {
+                        throw new ReadFailedError("Invalid Property2: " + property1);
+                    }
+
+                    if (!byte.TryParse(newByte1, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
+                        out var nByte1))
+                    {
+                        throw new ReadFailedError("Invalid NByte1: " + property1);
+                    }
+
+                    if (!byte.TryParse(newByte2, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
+                        out var nByte2))
+                    {
+                        throw new ReadFailedError("Invalid NByte2: " + property1);
+                    }
+
+                    if (!byte.TryParse(newByte3, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
+                        out var nByte3))
+                    {
+                        throw new ReadFailedError("Invalid NByte3: " + property1);
+                    }
+
+                    if (!byte.TryParse(newByte4, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
+                        out var nByte4))
+                    {
+                        throw new ReadFailedError("Invalid NByte4: " + property1);
+                    }
+
+                    currentProperty = new PolygonSoupProperty();
+                    currentProperty.UnknownProperty = (uint) ((prop2 << 16) | prop1);
+                    //currentProperty.Indices = ???; // TODO
+                    currentProperty.IndicesIndices[0] = nByte1;
+                    currentProperty.IndicesIndices[1] = nByte2;
+                    currentProperty.IndicesIndices[2] = nByte3;
+                    currentProperty.IndicesIndices[3] = nByte4;
+
+                } else if (line.StartsWith("g"))
+                {
+                    string[] options = line.Split(' ');
+                    if (options.Length < 2)
+                        throw new ReadFailedError("Invalid Group: <none>");
+                    currentMesh = options[1];
+                }
+            }
+
+            sr.Close();
+            s.Close();
+
+            // TODO: Replace PolygonSoupList contents with parsed obj data
         }
     }
 }

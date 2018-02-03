@@ -85,9 +85,20 @@ namespace ModelViewer.SceneData
                 foreach (Mesh mesh in obj.Model.Meshes)
                 {
                     Material material = mesh.Material;
-
-                    if (!result.Contains(material))
+                    
+                    if (material != null && !result.Contains(material))
                         result.Add(material);
+
+                    if (material == null && mesh.Materials != null)
+                    {
+                        foreach (uint index in mesh.Materials.Keys)
+                        {
+                            Material mat = mesh.Materials[index];
+
+                            if (mat != null && !result.Contains(mat))
+                                result.Add(mat);
+                        }
+                    }
                 }
             }
 
@@ -113,20 +124,29 @@ namespace ModelViewer.SceneData
                 string materialRelativePathName = materialDir + materialFileName;
                 string materialPathName = materialDirPath + materialFileName;
 
+                Image image = material.DiffuseMap;
+
+                float r = material.Color.R / 255.0f;
+                float g = material.Color.G / 255.0f;
+                float b = material.Color.B / 255.0f;
+
                 sw1.WriteLine("newmtl material_" + material.Name);
-                sw1.WriteLine("map_Kd " + materialRelativePathName);
+                sw1.WriteLine("Kd " + r + " " + g + " " + b);
+                if (image != null)
+                    sw1.WriteLine("map_Kd " + materialRelativePathName);
 
                 sw1.WriteLine();
 
-                Image image = material.DiffuseMap;
-                //Bitmap bitmap = new Bitmap(image);
-                try
+                if (image != null)
                 {
-                    image?.Save(materialPathName, ImageFormat.Png);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message + "\n" + ex.StackTrace);
+                    try
+                    {
+                        image?.Save(materialPathName, ImageFormat.Png);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message + "\n" + ex.StackTrace);
+                    }
                 }
             }
 
@@ -146,12 +166,19 @@ namespace ModelViewer.SceneData
             if (materials.Count > 0)
             {
                 bool hasMaterials = false;
+                bool hasTextures = false;
                 foreach (Material mat in materials)
+                {
                     if (mat != null)
+                    {
                         hasMaterials = true;
+                        if (mat.DiffuseMap != null || mat.NormalMap != null || mat.SpecularMap != null)
+                            hasTextures = true;
+                    }
+                }
                 if (hasMaterials)
                 {
-                    if (!Directory.Exists(materialDirPath))
+                    if (hasTextures && !Directory.Exists(materialDirPath))
                         Directory.CreateDirectory(materialDirPath);
 
                     ExportMTL(mtlPath, materialDir, materialDirPath, materials);
@@ -219,6 +246,12 @@ namespace ModelViewer.SceneData
                             if (j + 2 >= inds.Count)
                                 break;
 
+                            if (mesh.Materials != null && mesh.Materials.ContainsKey(inds[j]))
+                            {
+                                Material mat = mesh.Materials[inds[j]];
+                                if (mat != null)
+                                    sw.WriteLine("usemtl material_" + mat.Name);
+                            }
 
                             uint v0 = inds[j + 0] + 1 + usedIndices;
                             uint v1 = inds[j + 1] + 1 + usedIndices;

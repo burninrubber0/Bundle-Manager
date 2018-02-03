@@ -43,6 +43,8 @@ namespace ModelViewer.SceneData
         public int ID1 { get; set; }
         public int ID2 { get; set; }
 
+        public Dictionary<uint, Material> Materials { get; set; }
+
         public Mesh()
         {
             Vertices = new List<Vector3>();
@@ -53,6 +55,8 @@ namespace ModelViewer.SceneData
             UV2 = new List<Vector2>();
             ID1 = 0;
             ID2 = 0;
+
+            //Materials = new Dictionary<uint, Material>();
         }
 
         public Mesh Copy()
@@ -69,6 +73,9 @@ namespace ModelViewer.SceneData
             result.UV2 = new List<Vector2>(UV2);
             result.ID1 = ID1;
             result.ID2 = ID2;
+
+            if (Materials != null)
+                result.Materials = new Dictionary<uint, Material>(Materials);
 
             return result;
         }

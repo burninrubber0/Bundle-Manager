@@ -104,11 +104,12 @@ namespace BundleManager
 
                 if (rMesh.Material != null)
                 {
+                    Color color = rMesh.Material.Color;
                     Image diffuse = rMesh.Material.DiffuseMap;
                     Image normal = rMesh.Material.NormalMap;
                     Image specular = rMesh.Material.SpecularMap;
 
-                    mesh.Material = new Material(rMesh.MaterialID.ToString("X8"), diffuse, normal, specular);
+                    mesh.Material = new Material(rMesh.MaterialID.ToString("X8"), color, diffuse, normal, specular);
                 }
 
                 mesh.Indices = rMesh.Indices;

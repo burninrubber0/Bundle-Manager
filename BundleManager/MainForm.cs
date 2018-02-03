@@ -926,6 +926,7 @@ namespace BundleManager
             DialogResult result = fbd.ShowDialog(this);
             if (result == DialogResult.OK)
             {
+                //PolygonSoupChunk.Upper = 0;
                 string path = fbd.SelectedPath;
 
                 for (int i = 0; ; i++)
@@ -960,6 +961,8 @@ namespace BundleManager
                     Scene scene = poly.MakeScene();
                     scene.ExportWavefrontObj(path + "/" + polyName + ".obj");
                 }
+
+                //MessageBox.Show(this, PolygonSoupChunk.Upper.ToString("X4"), "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 MessageBox.Show(this, "Done!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }

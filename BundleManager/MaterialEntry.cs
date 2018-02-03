@@ -17,6 +17,7 @@ namespace BundleManager
         public Image DiffuseMap { get; set; }
         public Image NormalMap { get; set; }
         public Image SpecularMap { get; set; }
+        public Color Color { get; set; }
 
         public MaterialEntry()
         {
@@ -63,6 +64,8 @@ namespace BundleManager
 
             br.Close();
             ms.Close();
+
+            result.Color = Color.White;
 
             if (result.TextureStates.Count > 0)
                 result.DiffuseMap = result.TextureStates[0].Texture;

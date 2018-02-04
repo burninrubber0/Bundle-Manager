@@ -412,7 +412,7 @@ namespace BundleManager
 
         public void DoSaveBundle(LoadingDialog loader, string path)
         {
-            if (CurrentArchive.Console)
+            //if (CurrentArchive.Console)
                 ConvertToPC();
             Stream s = File.Open(path, FileMode.Create);
             BinaryWriter bw = new BinaryWriter(s);
@@ -683,6 +683,7 @@ namespace BundleManager
             } else if (entry.Type == EntryType.PolygonSoupListResourceType && !forceHex)
             {
                 PolygonSoupList list = PolygonSoupList.Read(entry);
+				// UNCOMMENT ME TO DEBUG MODEL VIEWER!!
                 Scene scene = list.MakeScene();
                 ModelViewerForm.ShowModelViewer(this, scene);
                 //DebugUtil.ShowDebug(this, list);

@@ -454,8 +454,8 @@ namespace BundleManager
 
         public void Write(BundleEntry entry)
         {
-            if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
-                ImportObj("E:\\notrains.obj");
+            if (entry.ID == Crc32.HashCrc32B("trk_col_49"))
+                ImportObj("C:\\Users\\Anthony\\Games\\Burnout Tools\\banana\\trk_col_49.obj");
 
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -584,7 +584,7 @@ namespace BundleManager
         {
             public int ID;
             public string Name;
-            public List<Vector3S> Points;
+            public Dictionary<byte, Vector3S> Points;
             public List<PolygonSoupProperty> Properties;
             //public List<uint> Indices;
         }
@@ -605,8 +605,9 @@ namespace BundleManager
             PolygonSoupProperty lastUsedProperty = null;
             bool usedCurrentProperty = false;
             uint globalVertCount = 0;
-            int startVertex = 0;
-            int currentProperty = -1;
+			int curStartVertex = 0;
+			int nextStartVertex = 0;
+			int currentProperty = -1;
             string currentMesh = "";
             //PolygonSoupProperty currentProperty;
 
@@ -620,6 +621,7 @@ namespace BundleManager
 
                 if (line.StartsWith("v"))
                 {
+					// read in this vertex and add it to the points (this happens first)
                     string[] options = line.Split(' ');
                     if (options.Length < 4)
                         throw new ReadFailedError("Invalid Vertex Line: " + line);
@@ -647,23 +649,24 @@ namespace BundleManager
 
                 } else if (line.StartsWith("f"))
                 {
+					// add the faces to the list of faces (this happens after)
                     string[] options = line.Split(' ');
                     if (options.Length < 4)
                         throw new ReadFailedError("Invalid Face Line: " + line);
 
-                    if (!uint.TryParse(options[1], NumberStyles.None, CultureInfo.CurrentCulture,
+					if (!uint.TryParse(options[1].Split('/')[0], NumberStyles.None, CultureInfo.CurrentCulture,
                         out var f1))
                     {
                         throw new ReadFailedError("Invalid Index: " + options[1]);
                     }
 
-                    if (!uint.TryParse(options[2], NumberStyles.None, CultureInfo.CurrentCulture,
+                    if (!uint.TryParse(options[2].Split('/')[0], NumberStyles.None, CultureInfo.CurrentCulture,
                         out var f2))
                     {
                         throw new ReadFailedError("Invalid Index: " + options[2]);
                     }
 
-                    if (!uint.TryParse(options[3], NumberStyles.None, CultureInfo.CurrentCulture,
+                    if (!uint.TryParse(options[3].Split('/')[0], NumberStyles.None, CultureInfo.CurrentCulture,
                         out var f3))
                     {
                         throw new ReadFailedError("Invalid Index: " + options[3]);
@@ -675,25 +678,47 @@ namespace BundleManager
                         meshes[currentMesh].Properties.Add(lastUsedProperty.Copy());
                     }
 
+					// find the face's points
                     Vector3 v1 = points[(int)f1 - 1];
                     Vector3 v2 = points[(int)f2 - 1];
                     Vector3 v3 = points[(int)f3 - 1];
 
+					// make vectors out of the three points we just read in with their X, Y and Z and take into account the scale/base
                     Vector3S v1S = new Vector3S((short)((v1.X / scale) - pos.X), (short)((v1.Y / scale) - pos.Y), (short)((v1.Z / scale) - pos.Z));
                     Vector3S v2S = new Vector3S((short)((v2.X / scale) - pos.X), (short)((v2.Y / scale) - pos.Y), (short)((v2.Z / scale) - pos.Z));
                     Vector3S v3S = new Vector3S((short)((v3.X / scale) - pos.X), (short)((v3.Y / scale) - pos.Y), (short)((v3.Z / scale) - pos.Z));
 
-
-                    meshes[currentMesh].Properties[currentProperty].Indices[0] = (byte)(meshes[currentMesh].Points.Count + 0);//(byte)(f1 - 1 - startVertex);
+					byte localIndex1 = (byte)(f1 - 1 - curStartVertex);
+					byte localIndex2 = (byte)(f2 - 1 - curStartVertex);
+					byte localIndex3 = (byte)(f3 - 1 - curStartVertex);
+					// add the three points we just read in for this mesh to the current property (polygon)
+					meshes[currentMesh].Properties[currentProperty].Indices[0] = localIndex1;//(byte)(f1 - 1 - startVertex);
                     meshes[currentMesh].Properties[currentProperty].Indices[1] =
-                        (byte) (meshes[currentMesh].Points.Count + 1);//1;//(byte)(f2 - 1 - startVertex);
+						localIndex2;//1;//(byte)(f2 - 1 - startVertex);
                     meshes[currentMesh].Properties[currentProperty].Indices[2] =
-                        (byte) (meshes[currentMesh].Points.Count + 2);//2;//(byte)(f3 - 1 - startVertex);
-                    
-                    meshes[currentMesh].Points.Add(v1S);
-                    meshes[currentMesh].Points.Add(v2S);
-                    meshes[currentMesh].Points.Add(v3S);
+						localIndex3;//2;//(byte)(f3 - 1 - startVertex);
 
+					// then add them to the mesh
+					/*
+                    meshes[currentMesh][f1] = v1S;
+                    meshes[currentMesh][f2] = v2S;
+                    meshes[currentMesh][f3] = v3S;
+					*/
+					if (!meshes[currentMesh].Points.ContainsKey(localIndex1))
+					{
+						meshes[currentMesh].Points.Add(localIndex1, v1S);
+					}
+					if (!meshes[currentMesh].Points.ContainsKey(localIndex2))
+					{
+						meshes[currentMesh].Points.Add(localIndex2, v2S);
+					}
+					if (!meshes[currentMesh].Points.ContainsKey(localIndex3))
+					{
+						meshes[currentMesh].Points.Add(localIndex3, v3S);
+					}
+
+					// dealing with... quads? in an OBJ file!?
+					/*
                     if (options.Length > 4)
                     {
                         if (!uint.TryParse(options[4], NumberStyles.None, CultureInfo.CurrentCulture,
@@ -711,9 +736,9 @@ namespace BundleManager
                         meshes[currentMesh].Points.Add(v4S);
                     }
                     else
-                    {
+                    {*/
                         meshes[currentMesh].Properties[currentProperty].Indices[3] = 0xFF;
-                    }
+                    //}
 
                     usedCurrentProperty = true;
 
@@ -790,10 +815,11 @@ namespace BundleManager
                     if (options.Length < 2)
                         throw new ReadFailedError("Invalid Group: <none>");
                     currentMesh = options[1];
-                    //if (currentMesh == "mesh0")
-                    //    Debugger.Break();
+					//if (currentMesh == "mesh0")
+					//    Debugger.Break();
 
-                    startVertex = (int)(globalVertCount - 1);
+					curStartVertex = nextStartVertex;
+                    nextStartVertex = (int)(globalVertCount - 1);
                     currentProperty = -1;
 
                     ColMesh colMesh = new ColMesh();
@@ -813,7 +839,7 @@ namespace BundleManager
                     }
 
                     colMesh.Name = currentMesh;
-                    colMesh.Points = new List<Vector3S>();
+                    colMesh.Points = new Dictionary<byte, Vector3S>();
                     colMesh.Properties = new List<PolygonSoupProperty>();
                     //colMesh.Indices = new List<uint>();
                     meshes.Add(currentMesh, colMesh);
@@ -829,8 +855,21 @@ namespace BundleManager
 
                 PolygonSoupChunk chunk = Chunks[mesh.ID];
                 chunk.PropertyList = mesh.Properties;
-                chunk.PointList = mesh.Points;
-                chunk.PointCount = (byte)mesh.Points.Count;
+				byte meshPointMax = 0;
+				foreach (byte key in mesh.Points.Keys)
+				{
+					if (meshPointMax < key)
+					{
+						meshPointMax = key;
+					}
+				}
+				Vector3S[] verts = new Vector3S[meshPointMax + 1];
+				foreach (byte key in mesh.Points.Keys)
+				{
+					verts[key] = mesh.Points[key];
+				}
+				chunk.PointList = verts.ToList();
+				chunk.PointCount = (byte)meshPointMax;
 
                 //int count = (Unknown9 >> 1) * 2 +
                 //            (Unknown9 - (Unknown9 >> 1) * 2) +

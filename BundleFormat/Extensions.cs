@@ -136,6 +136,10 @@ namespace BundleFormat
                 {
                     byte[] compressedData = entry.Header;
                     byte[] compressedExtraData = entry.Body;
+                    if (compressedData != null)
+                        entry.UncompressedHeaderSize = compressedData.Length;
+                    if (compressedExtraData != null)
+                        entry.UncompressedBodySize = compressedExtraData.Length;
                     if (entry.DataCompressed)
                         compressedData = compressedData.Compress();
                     if (entry.ExtraDataCompressed)

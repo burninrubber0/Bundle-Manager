@@ -27,7 +27,24 @@ namespace BundleManager
         {
             Indices = new byte[4];
 			IndicesIndices = new byte[4];
-		}
+        }
+
+        public PolygonSoupProperty Copy()
+        {
+            PolygonSoupProperty result = new PolygonSoupProperty();
+
+            result.UnknownProperty = UnknownProperty;
+            for (int i = 0; i < Indices.Length; i++)
+            {
+                result.Indices[i] = Indices[i];
+            }
+            for (int i = 0; i < IndicesIndices.Length; i++)
+            {
+                result.IndicesIndices[i] = IndicesIndices[i];
+            }
+
+            return result;
+        }
 
         public static PolygonSoupProperty Read(BinaryReader br)
         {
@@ -111,7 +128,7 @@ namespace BundleManager
         public uint PropertyListStart;
         public uint PointListStart;
         public short Unknown7;
-        public byte Unknown8;
+        public byte PropertyListCount;
         public byte Unknown9;
         public byte PointCount;
         public byte Unknown10;
@@ -135,7 +152,7 @@ namespace BundleManager
             result.PropertyListStart = br.ReadUInt32();
             result.PointListStart = br.ReadUInt32();
             result.Unknown7 = br.ReadInt16();
-            result.Unknown8 = br.ReadByte();
+            result.PropertyListCount = br.ReadByte();
             result.Unknown9 = br.ReadByte();
             result.PointCount = br.ReadByte();
             result.Unknown10 = br.ReadByte();
@@ -149,12 +166,12 @@ namespace BundleManager
 
             br.BaseStream.Position = result.PropertyListStart;
 
-            int count = (result.Unknown9 >> 1) * 2 +
+            /*int count = (result.Unknown9 >> 1) * 2 +
                         (result.Unknown9 - (result.Unknown9 >> 1) * 2) +
-                        (((result.Unknown8 - result.Unknown9) >> 2) * 4) +
-                        ((result.Unknown8 - result.Unknown9) - ((result.Unknown8 - result.Unknown9) >> 2) * 4);
+                        (((result.PropertyListCount - result.Unknown9) >> 2) * 4) +
+                        ((result.PropertyListCount - result.Unknown9) - ((result.PropertyListCount - result.Unknown9) >> 2) * 4);*/
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < result.PropertyListCount; i++)
             {
                 result.PropertyList.Add(PolygonSoupProperty.Read(br));
             }
@@ -166,29 +183,43 @@ namespace BundleManager
         {
             bw.Write(Position);
             bw.Write(Scale);
-            bw.Write(PropertyListStart);
-            bw.Write(PointListStart);
+            long propListStartPtr = bw.BaseStream.Position;
+            bw.Write((uint) 0);//PropertyListStart);
+            long pointListStartPtr = bw.BaseStream.Position;
+            bw.Write((uint) 0);//PointListStart);
             bw.Write(Unknown7);
-            bw.Write(Unknown8);
+            bw.Write(PropertyListCount);
             bw.Write(Unknown9);
             bw.Write(PointCount);
             bw.Write(Unknown10);
             bw.Write(Unknown11);
 
-            bw.BaseStream.Position = PointListStart;
+            //bw.BaseStream.Position = PointListStart;
+            bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
+            long cPos = bw.BaseStream.Position;
+            bw.BaseStream.Position = pointListStartPtr;
+            bw.Write((uint)cPos);
+            bw.BaseStream.Position = cPos;
+
             for (int i = 0; i < PointCount; i++)
             {
                 bw.Write(PointList[i]);
             }
 
-            bw.BaseStream.Position = PropertyListStart;
+            //bw.BaseStream.Position = PropertyListStart;
+            
+            bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
+            cPos = bw.BaseStream.Position;
+            bw.BaseStream.Position = propListStartPtr;
+            bw.Write((uint)cPos);
+            bw.BaseStream.Position = cPos;
 
-            int count = (Unknown9 >> 1) * 2 +
+            /*int count = (Unknown9 >> 1) * 2 +
                         (Unknown9 - (Unknown9 >> 1) * 2) +
-                        (((Unknown8 - Unknown9) >> 2) * 4) +
-                        ((Unknown8 - Unknown9) - ((Unknown8 - Unknown9) >> 2) * 4);
+                        (((PropertyListCount - Unknown9) >> 2) * 4) +
+                        ((PropertyListCount - Unknown9) - ((PropertyListCount - Unknown9) >> 2) * 4);*/
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < PropertyListCount; i++)
             {
                 PropertyList[i].Write(bw);
             }
@@ -423,6 +454,9 @@ namespace BundleManager
 
         public void Write(BundleEntry entry)
         {
+            if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
+                ImportObj("E:\\notrains.obj");
+
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
@@ -449,10 +483,10 @@ namespace BundleManager
             }
 
             bw.BaseStream.Position = ChunkPointerStart;
-
+            
             for (int i = 0; i < ChunkCount; i++)
             {
-                bw.Write(ChunkPointers[i]);
+                bw.Write((uint)0); //ChunkPointers[i]);
             }
 
             //br.BaseStream.Position += (16 - br.BaseStream.Position % 16);
@@ -483,12 +517,21 @@ namespace BundleManager
                 bw.BaseStream.Position += 12;
                 bw.Write(box.Unknown);
             }
-
+            
             for (int i = 0; i < ChunkPointers.Count; i++)
             {
-                bw.BaseStream.Position = ChunkPointers[i];
+                bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
+
+                //bw.BaseStream.Position = ChunkPointers[i];
+                ChunkPointers[i] = (uint)bw.BaseStream.Position;
 
                 Chunks[i].Write(bw);
+            }
+
+            bw.BaseStream.Position = ChunkPointerStart;
+            for (int i = 0; i < ChunkCount; i++)
+            {
+                bw.Write(ChunkPointers[i]);
             }
 
             bw.Flush();
@@ -537,13 +580,35 @@ namespace BundleManager
             return scene;
         }
 
+        private class ColMesh
+        {
+            public int ID;
+            public string Name;
+            public List<Vector3S> Points;
+            public List<PolygonSoupProperty> Properties;
+            //public List<uint> Indices;
+        }
+
         public void ImportObj(string path)
         {
             Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
             StreamReader sr = new StreamReader(s);
 
+            List<Vector3> points = new List<Vector3>();
+            //List<uint> indices = new List<uint>();
+
+            Dictionary<string, ColMesh> meshes = new Dictionary<string, ColMesh>();
+
+            float scale = 1.0f;
+            Vector3I pos = new Vector3I();
+
+            PolygonSoupProperty lastUsedProperty = null;
+            bool usedCurrentProperty = false;
+            uint globalVertCount = 0;
+            int startVertex = 0;
+            int currentProperty = -1;
             string currentMesh = "";
-            PolygonSoupProperty currentProperty;
+            //PolygonSoupProperty currentProperty;
 
             while (!sr.EndOfStream)
             {
@@ -559,25 +624,26 @@ namespace BundleManager
                     if (options.Length < 4)
                         throw new ReadFailedError("Invalid Vertex Line: " + line);
 
-                    if (!float.TryParse(options[1], NumberStyles.None, CultureInfo.CurrentCulture,
-                        out var v1))
+                    if (!float.TryParse(options[1], NumberStyles.Any, CultureInfo.CurrentCulture,
+                        out var x))
                     {
                         throw new ReadFailedError("Invalid Coord: " + options[1]);
                     }
 
-                    if (!float.TryParse(options[1], NumberStyles.None, CultureInfo.CurrentCulture,
-                        out var v2))
+                    if (!float.TryParse(options[2], NumberStyles.Any, CultureInfo.CurrentCulture,
+                        out var y))
                     {
                         throw new ReadFailedError("Invalid Coord: " + options[2]);
                     }
 
-                    if (!float.TryParse(options[1], NumberStyles.None, CultureInfo.CurrentCulture,
-                        out var v3))
+                    if (!float.TryParse(options[3], NumberStyles.Any, CultureInfo.CurrentCulture,
+                        out var z))
                     {
                         throw new ReadFailedError("Invalid Coord: " + options[3]);
                     }
 
-                    // TODO: Use Vertices
+                    globalVertCount++;
+                    points.Add(new Vector3(x, y, z));
 
                 } else if (line.StartsWith("f"))
                 {
@@ -585,25 +651,72 @@ namespace BundleManager
                     if (options.Length < 4)
                         throw new ReadFailedError("Invalid Face Line: " + line);
 
-                    if (!byte.TryParse(options[1], NumberStyles.None, CultureInfo.CurrentCulture,
+                    if (!uint.TryParse(options[1], NumberStyles.None, CultureInfo.CurrentCulture,
                         out var f1))
                     {
                         throw new ReadFailedError("Invalid Index: " + options[1]);
                     }
 
-                    if (!byte.TryParse(options[2], NumberStyles.None, CultureInfo.CurrentCulture,
+                    if (!uint.TryParse(options[2], NumberStyles.None, CultureInfo.CurrentCulture,
                         out var f2))
                     {
                         throw new ReadFailedError("Invalid Index: " + options[2]);
                     }
 
-                    if (!byte.TryParse(options[3], NumberStyles.None, CultureInfo.CurrentCulture,
+                    if (!uint.TryParse(options[3], NumberStyles.None, CultureInfo.CurrentCulture,
                         out var f3))
                     {
                         throw new ReadFailedError("Invalid Index: " + options[3]);
                     }
+
+                    if (usedCurrentProperty)
+                    {
+                        currentProperty++;
+                        meshes[currentMesh].Properties.Add(lastUsedProperty.Copy());
+                    }
+
+                    Vector3 v1 = points[(int)f1 - 1];
+                    Vector3 v2 = points[(int)f2 - 1];
+                    Vector3 v3 = points[(int)f3 - 1];
+
+                    Vector3S v1S = new Vector3S((short)((v1.X / scale) - pos.X), (short)((v1.Y / scale) - pos.Y), (short)((v1.Z / scale) - pos.Z));
+                    Vector3S v2S = new Vector3S((short)((v2.X / scale) - pos.X), (short)((v2.Y / scale) - pos.Y), (short)((v2.Z / scale) - pos.Z));
+                    Vector3S v3S = new Vector3S((short)((v3.X / scale) - pos.X), (short)((v3.Y / scale) - pos.Y), (short)((v3.Z / scale) - pos.Z));
+
+
+                    meshes[currentMesh].Properties[currentProperty].Indices[0] = (byte)(meshes[currentMesh].Points.Count + 0);//(byte)(f1 - 1 - startVertex);
+                    meshes[currentMesh].Properties[currentProperty].Indices[1] =
+                        (byte) (meshes[currentMesh].Points.Count + 1);//1;//(byte)(f2 - 1 - startVertex);
+                    meshes[currentMesh].Properties[currentProperty].Indices[2] =
+                        (byte) (meshes[currentMesh].Points.Count + 2);//2;//(byte)(f3 - 1 - startVertex);
                     
-                    // TODO: Use Indices and make quads maybe?
+                    meshes[currentMesh].Points.Add(v1S);
+                    meshes[currentMesh].Points.Add(v2S);
+                    meshes[currentMesh].Points.Add(v3S);
+
+                    if (options.Length > 4)
+                    {
+                        if (!uint.TryParse(options[4], NumberStyles.None, CultureInfo.CurrentCulture,
+                            out var f4))
+                        {
+                            throw new ReadFailedError("Invalid Index: " + options[4]);
+                        }
+
+                        Vector3 v4 = points[(int)f4 - 1];
+                        Vector3S v4S = new Vector3S((short)((v4.X / scale) - pos.X), (short)((v4.Y / scale) - pos.Y), (short)((v4.Z / scale) - pos.Z));
+
+                        meshes[currentMesh].Properties[currentProperty].Indices[3] =
+                            (byte) (meshes[currentMesh].Points.Count + 0); //3;//(byte)(f4 - 1 - startVertex);
+
+                        meshes[currentMesh].Points.Add(v4S);
+                    }
+                    else
+                    {
+                        meshes[currentMesh].Properties[currentProperty].Indices[3] = 0xFF;
+                    }
+
+                    usedCurrentProperty = true;
+
                 } else if (line.StartsWith("usemtl"))
                 {
                     string[] options = line.Split(' ');
@@ -656,13 +769,20 @@ namespace BundleManager
                         throw new ReadFailedError("Invalid NByte4: " + property1);
                     }
 
-                    currentProperty = new PolygonSoupProperty();
-                    currentProperty.UnknownProperty = (uint) ((prop2 << 16) | prop1);
-                    //currentProperty.Indices = ???; // TODO
-                    currentProperty.IndicesIndices[0] = nByte1;
-                    currentProperty.IndicesIndices[1] = nByte2;
-                    currentProperty.IndicesIndices[2] = nByte3;
-                    currentProperty.IndicesIndices[3] = nByte4;
+                    usedCurrentProperty = false;
+
+                    PolygonSoupProperty property = new PolygonSoupProperty();
+                    property.UnknownProperty = (uint) ((prop2 << 16) | prop1);
+                    //property.Indices is done above
+                    property.IndicesIndices[0] = nByte1;
+                    property.IndicesIndices[1] = nByte2;
+                    property.IndicesIndices[2] = nByte3;
+                    property.IndicesIndices[3] = nByte4;
+
+                    lastUsedProperty = property;
+
+                    currentProperty++;
+                    meshes[currentMesh].Properties.Add(property);
 
                 } else if (line.StartsWith("g"))
                 {
@@ -670,13 +790,57 @@ namespace BundleManager
                     if (options.Length < 2)
                         throw new ReadFailedError("Invalid Group: <none>");
                     currentMesh = options[1];
+                    //if (currentMesh == "mesh0")
+                    //    Debugger.Break();
+
+                    startVertex = (int)(globalVertCount - 1);
+                    currentProperty = -1;
+
+                    ColMesh colMesh = new ColMesh();
+
+                    // TODO: Only works if mesh already exists in this PolygonSoupList
+                    {
+                        string meshId = currentMesh.Substring("mesh".Length);
+                        if (!int.TryParse(meshId, NumberStyles.None, CultureInfo.CurrentCulture, out var meshIndex))
+                        {
+                            throw new ReadFailedError("Invalid Group: " + meshId);
+                        }
+
+                        scale = Chunks[meshIndex].Scale;
+                        pos = Chunks[meshIndex].Position;
+
+                        colMesh.ID = meshIndex;
+                    }
+
+                    colMesh.Name = currentMesh;
+                    colMesh.Points = new List<Vector3S>();
+                    colMesh.Properties = new List<PolygonSoupProperty>();
+                    //colMesh.Indices = new List<uint>();
+                    meshes.Add(currentMesh, colMesh);
                 }
             }
 
             sr.Close();
             s.Close();
 
-            // TODO: Replace PolygonSoupList contents with parsed obj data
+            foreach (string meshName in meshes.Keys)
+            {
+                ColMesh mesh = meshes[meshName];
+
+                PolygonSoupChunk chunk = Chunks[mesh.ID];
+                chunk.PropertyList = mesh.Properties;
+                chunk.PointList = mesh.Points;
+                chunk.PointCount = (byte)mesh.Points.Count;
+
+                //int count = (Unknown9 >> 1) * 2 +
+                //            (Unknown9 - (Unknown9 >> 1) * 2) +
+                //            (((PropertyListCount - Unknown9) >> 2) * 4) +
+                //            ((PropertyListCount - Unknown9) - ((PropertyListCount - Unknown9) >> 2) * 4);
+
+                //int count = chunk.PropertyList.Count;
+
+                chunk.PropertyListCount = (byte)mesh.Properties.Count; //0;
+            }
         }
     }
 }

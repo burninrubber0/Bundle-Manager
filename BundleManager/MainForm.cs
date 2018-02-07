@@ -703,6 +703,17 @@ namespace BundleManager
                 {
                     MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            } else if (entry.Type == EntryType.LanguageResourceType && !forceHex)
+            {
+                Language language = Language.Read(entry);
+                //DebugUtil.ShowDebug(this, language);
+                LangEdit edit = new LangEdit();
+                edit.Lang = language;
+                edit.Changed += () =>
+                {
+                    edit.Lang.Write(entry);
+                };
+                edit.ShowDialog(this);
             }
             /* else if (entry.Type == EntryType.ModelResourceType && !forceHex)
             {
@@ -991,6 +1002,8 @@ namespace BundleManager
                     list.Write(entry);
                 }
             }
+
+            PatchImages();
             
             CurrentArchive.Platform = BundlePlatform.PC;
         }

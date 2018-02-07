@@ -100,5 +100,25 @@ namespace BundleUtilities
 
             return self.ReadLenString(len);
         }
+
+        public static string ReadCStringPtr(this BinaryReader self)
+        {
+            uint ptr = self.ReadUInt32();
+            long pos = self.BaseStream.Position;
+            self.BaseStream.Position = ptr;
+            string result = self.ReadCStr();
+            self.BaseStream.Position = pos;
+
+            return result;
+        }
+
+        public static void WriteCStr(this BinaryWriter self, string value)
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                self.Write((byte)value[i]);
+            }
+            self.Write((byte) 0);
+        }
     }
 }

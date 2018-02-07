@@ -43,7 +43,7 @@ namespace BundleUtilities
             0xAFB010B1, 0xAB710D06, 0xA6322BDF, 0xA2F33668, 0xBCB4666D, 0xB8757BDA, 0xB5365D03, 0xB1F740B4
         };
 
-        private static readonly UInt32[] Crc32BTable =
+        public static readonly UInt32[] Crc32BTable =
         {
             0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
             0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988, 0x09B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91,
@@ -119,6 +119,25 @@ namespace BundleUtilities
             }
 
             return (~hash);
+        }
+        
+        public static uint HashEntryID(string id)
+        {
+            uint result = 0xFFFFFFFF;
+            for (int i = 0; i < id.Length; i++)
+            {
+                byte b = (byte)id[i];
+                byte newByte = (byte)((b - 0x41) & 0xFF);
+                if (newByte <= 0x19)
+                    b += 0x20;
+                byte lowByte = (byte)(result & 0xFF);
+                lowByte = (byte)((lowByte ^ b) & 0xFF);
+                result = (result >> 8) & 0x00FFFFFF;
+                result = (result ^ Crc32BTable[lowByte]) & 0xFFFFFFFF;
+            }
+            result = (~result) & 0xFFFFFFFF;
+
+            return result;
         }
 
         static UInt32 ReverseEndian(UInt32 hash)

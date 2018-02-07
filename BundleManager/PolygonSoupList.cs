@@ -85,6 +85,12 @@ namespace BundleManager
                 unknownProperty1 = 0x8316; //0x9531; // 0x9007 //0x8511 //0x8316;
             }
 
+            // TODO: Test
+            /*if (unknownProperty1 == 0x8D35)
+            {
+                unknownProperty1 = 0x807B;
+            }*/
+
 
             //if (unknownProperty1 > 0x9D64)
             //    unknownProperty1 = 0xFFFF;
@@ -183,10 +189,12 @@ namespace BundleManager
         {
             bw.Write(Position);
             bw.Write(Scale);
-            long propListStartPtr = bw.BaseStream.Position;
-            bw.Write((uint) 0);//PropertyListStart);
-            long pointListStartPtr = bw.BaseStream.Position;
-            bw.Write((uint) 0);//PointListStart);
+            //long propListStartPtr = bw.BaseStream.Position;
+            //bw.Write((uint) 0);//PropertyListStart);
+            bw.Write(PropertyListStart);
+            //long pointListStartPtr = bw.BaseStream.Position;
+            //bw.Write((uint) 0);//PointListStart);
+            bw.Write(PointListStart);
             bw.Write(Unknown7);
             bw.Write(PropertyListCount);
             bw.Write(Unknown9);
@@ -194,32 +202,33 @@ namespace BundleManager
             bw.Write(Unknown10);
             bw.Write(Unknown11);
 
-            //bw.BaseStream.Position = PointListStart;
-            bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
+            bw.BaseStream.Position = PointListStart;
+            /*bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
             long cPos = bw.BaseStream.Position;
             bw.BaseStream.Position = pointListStartPtr;
             bw.Write((uint)cPos);
-            bw.BaseStream.Position = cPos;
+            bw.BaseStream.Position = cPos;*/
 
             for (int i = 0; i < PointCount; i++)
             {
                 bw.Write(PointList[i]);
             }
 
-            //bw.BaseStream.Position = PropertyListStart;
+            bw.BaseStream.Position = PropertyListStart;
             
-            bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
+            /*bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
             cPos = bw.BaseStream.Position;
             bw.BaseStream.Position = propListStartPtr;
             bw.Write((uint)cPos);
-            bw.BaseStream.Position = cPos;
+            bw.BaseStream.Position = cPos;*/
 
-            /*int count = (Unknown9 >> 1) * 2 +
+            int count = (Unknown9 >> 1) * 2 +
                         (Unknown9 - (Unknown9 >> 1) * 2) +
                         (((PropertyListCount - Unknown9) >> 2) * 4) +
-                        ((PropertyListCount - Unknown9) - ((PropertyListCount - Unknown9) >> 2) * 4);*/
+                        ((PropertyListCount - Unknown9) - ((PropertyListCount - Unknown9) >> 2) * 4);
 
-            for (int i = 0; i < PropertyListCount; i++)
+            //for (int i = 0; i < PropertyListCount; i++)
+            for (int i = 0; i < count; i++)
             {
                 PropertyList[i].Write(bw);
             }
@@ -454,8 +463,8 @@ namespace BundleManager
 
         public void Write(BundleEntry entry)
         {
-            if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
-                ImportObj("E:\\notrains.obj");
+            //if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
+            //    ImportObj("E:\\notrains.obj");
 
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -486,7 +495,8 @@ namespace BundleManager
             
             for (int i = 0; i < ChunkCount; i++)
             {
-                bw.Write((uint)0); //ChunkPointers[i]);
+                //bw.Write((uint)0); //ChunkPointers[i]);
+                bw.Write(ChunkPointers[i]);
             }
 
             //br.BaseStream.Position += (16 - br.BaseStream.Position % 16);
@@ -520,19 +530,19 @@ namespace BundleManager
             
             for (int i = 0; i < ChunkPointers.Count; i++)
             {
-                bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
+                //bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
 
-                //bw.BaseStream.Position = ChunkPointers[i];
-                ChunkPointers[i] = (uint)bw.BaseStream.Position;
+                bw.BaseStream.Position = ChunkPointers[i];
+                //ChunkPointers[i] = (uint)bw.BaseStream.Position;
 
                 Chunks[i].Write(bw);
             }
 
-            bw.BaseStream.Position = ChunkPointerStart;
+            /*bw.BaseStream.Position = ChunkPointerStart;
             for (int i = 0; i < ChunkCount; i++)
             {
                 bw.Write(ChunkPointers[i]);
-            }
+            }*/
 
             bw.Flush();
             byte[] data = ms.ToArray();

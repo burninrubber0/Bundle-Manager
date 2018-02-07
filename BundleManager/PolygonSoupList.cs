@@ -89,6 +89,10 @@ namespace BundleManager
             //if (unknownProperty1 > 0x9D64)
             //    unknownProperty1 = 0xFFFF;
             ushort unknownProperty2 = (ushort) ((UnknownProperty >> 16) & 0xFFFF);
+
+            // Remove wreck surfaces - TODO: tmp
+            unknownProperty2 &= unchecked((ushort)~0x4000);
+
             uint unknownProperty = (uint)((unknownProperty2 << 16) | unknownProperty1);
 
             bw.Write(unknownProperty);
@@ -129,7 +133,7 @@ namespace BundleManager
         public uint PointListStart;
         public short Unknown7;
         public byte PropertyListCount;
-        public byte Unknown9;
+        public byte QuadCount;
         public byte PointCount;
         public byte Unknown10;
         public short Unknown11;
@@ -153,7 +157,7 @@ namespace BundleManager
             result.PointListStart = br.ReadUInt32();
             result.Unknown7 = br.ReadInt16();
             result.PropertyListCount = br.ReadByte();
-            result.Unknown9 = br.ReadByte();
+            result.QuadCount = br.ReadByte();
             result.PointCount = br.ReadByte();
             result.Unknown10 = br.ReadByte();
             result.Unknown11 = br.ReadInt16();
@@ -165,11 +169,6 @@ namespace BundleManager
             }
 
             br.BaseStream.Position = result.PropertyListStart;
-
-            /*int count = (result.Unknown9 >> 1) * 2 +
-                        (result.Unknown9 - (result.Unknown9 >> 1) * 2) +
-                        (((result.PropertyListCount - result.Unknown9) >> 2) * 4) +
-                        ((result.PropertyListCount - result.Unknown9) - ((result.PropertyListCount - result.Unknown9) >> 2) * 4);*/
 
             for (int i = 0; i < result.PropertyListCount; i++)
             {
@@ -189,13 +188,13 @@ namespace BundleManager
             bw.Write((uint) 0);//PointListStart);
             bw.Write(Unknown7);
             bw.Write(PropertyListCount);
-            bw.Write(Unknown9);
+            bw.Write(QuadCount);
             bw.Write(PointCount);
             bw.Write(Unknown10);
             bw.Write(Unknown11);
 
             //bw.BaseStream.Position = PointListStart;
-            bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
+            //bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
             long cPos = bw.BaseStream.Position;
             bw.BaseStream.Position = pointListStartPtr;
             bw.Write((uint)cPos);
@@ -207,17 +206,12 @@ namespace BundleManager
             }
 
             //bw.BaseStream.Position = PropertyListStart;
-            
-            bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
+
+            bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
             cPos = bw.BaseStream.Position;
             bw.BaseStream.Position = propListStartPtr;
             bw.Write((uint)cPos);
             bw.BaseStream.Position = cPos;
-
-            /*int count = (Unknown9 >> 1) * 2 +
-                        (Unknown9 - (Unknown9 >> 1) * 2) +
-                        (((PropertyListCount - Unknown9) >> 2) * 4) +
-                        ((PropertyListCount - Unknown9) - ((PropertyListCount - Unknown9) >> 2) * 4);*/
 
             for (int i = 0; i < PropertyListCount; i++)
             {
@@ -706,9 +700,9 @@ namespace BundleManager
                     Vector3 v3 = points[(int)f3 - 1];
 
 					// make vectors out of the three points we just read in with their X, Y and Z and take into account the scale/base
-                    Vector3S v1S = new Vector3S((short)((v1.X / scale) - pos.X), (short)((v1.Y / scale) - pos.Y), (short)((v1.Z / scale) - pos.Z));
-                    Vector3S v2S = new Vector3S((short)((v2.X / scale) - pos.X), (short)((v2.Y / scale) - pos.Y), (short)((v2.Z / scale) - pos.Z));
-                    Vector3S v3S = new Vector3S((short)((v3.X / scale) - pos.X), (short)((v3.Y / scale) - pos.Y), (short)((v3.Z / scale) - pos.Z));
+                    Vector3S v1S = new Vector3S((short)(Math.Round(v1.X / scale) - pos.X), (short)(Math.Round(v1.Y / scale) - pos.Y), (short)(Math.Round(v1.Z / scale) - pos.Z));
+                    Vector3S v2S = new Vector3S((short)(Math.Round(v2.X / scale) - pos.X), (short)(Math.Round(v2.Y / scale) - pos.Y), (short)(Math.Round(v2.Z / scale) - pos.Z));
+                    Vector3S v3S = new Vector3S((short)(Math.Round(v3.X / scale) - pos.X), (short)(Math.Round(v3.Y / scale) - pos.Y), (short)(Math.Round(v3.Z / scale) - pos.Z));
 
 					byte localIndex1 = (byte)(f1 - 1 - curStartVertex);
 					byte localIndex2 = (byte)(f2 - 1 - curStartVertex);
@@ -893,15 +887,10 @@ namespace BundleManager
 				chunk.PointList = verts.ToList();
 				chunk.PointCount = (byte)(meshPointMax + 1);
 
-                chunk.Unknown9 = (byte)mesh.Properties.Count; // TODO: when quads are supported.
-                //int count = (Unknown9 >> 1) * 2 +
-                //            (Unknown9 - (Unknown9 >> 1) * 2) +
-                //            (((PropertyListCount - Unknown9) >> 2) * 4) +
-                //            ((PropertyListCount - Unknown9) - ((PropertyListCount - Unknown9) >> 2) * 4);
-
                 //int count = chunk.PropertyList.Count;
 
                 chunk.PropertyListCount = (byte)mesh.Properties.Count; //0;
+                chunk.QuadCount = 0; // TODO: when quads are supported.
             }
         }
     }

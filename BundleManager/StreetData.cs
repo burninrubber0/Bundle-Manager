@@ -51,17 +51,17 @@ namespace BundleManager
     {
         public Vector3 Coords;
         public int Unknown4;
-        public long Unknown5;
+        public long StreetID;
         public long Unknown6;
         public long Unknown7;
-        public string StreetID;
+        public string StreetNameID;
         public int Unknown8;
         public int Unknown9; // PC Only, always 1
         public int Unknown10;
 
         public override string ToString()
         {
-            return "{Coords: " + Coords + ", Unk4: " + Unknown4 + ", Unk5: " + Unknown5 + ", Unk6: " + Unknown6 + ", Unk7: " + Unknown7 + ", StreetID: " + StreetID + ", Unk8: " + Unknown8 + ", Unk9: " + Unknown9 + ", Unk10: " + Unknown10 + "}";
+            return "{Coords: " + Coords + ", Unk4: " + Unknown4 + ", Unk5: " + StreetID + ", Unk6: " + Unknown6 + ", Unk7: " + Unknown7 + ", StreetNameID: " + StreetNameID + ", Unk8: " + Unknown8 + ", Unk9: " + Unknown9 + ", Unk10: " + Unknown10 + "}";
         }
     }
 
@@ -187,10 +187,10 @@ namespace BundleManager
 
                 section3.Coords = br.ReadVector3F();
                 section3.Unknown4 = br.ReadInt32();
-                section3.Unknown5 = br.ReadInt64();
+                section3.StreetID = br.ReadInt64();
                 section3.Unknown6 = br.ReadInt64();
                 section3.Unknown7 = br.ReadInt64();
-                section3.StreetID = Encoding.ASCII.GetString(br.ReadBytes(20));
+                section3.StreetNameID = Encoding.ASCII.GetString(br.ReadBytes(20));
                 section3.Unknown8 = br.ReadInt32();
 
                 //if (entry.Console)
@@ -313,10 +313,15 @@ namespace BundleManager
 
                 bw.Write(section3.Coords);
                 bw.Write(section3.Unknown4);
-                bw.Write(section3.Unknown5);
+
+                // TODO: TEMP
+                //if (section3.StreetID == 808305)
+                //    section3.StreetID = 383595;
+                
+                bw.Write(section3.StreetID);
                 bw.Write(section3.Unknown6);
                 bw.Write(section3.Unknown7);
-                bw.Write(Encoding.ASCII.GetBytes(section3.StreetID).Pad(20));
+                bw.Write(Encoding.ASCII.GetBytes(section3.StreetNameID).Pad(20));
                 bw.Write(section3.Unknown8);
                 bw.Write(section3.Unknown9); // PC Only
                 bw.Write(section3.Unknown10); // PC Only

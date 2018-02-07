@@ -517,16 +517,38 @@ namespace BundleManager
                 bw.BaseStream.Position += 12;
                 bw.Write(box.Unknown);
             }
-            
+
+            bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
+
+            if (ChunkCount > 0)
+            {
+                bw.BaseStream.Position = (128 * ((bw.BaseStream.Position + 127) / 128));
+
+                for (int i = 0; i < ChunkCount / 4; i++)
+                {
+                    if ((i % 8) % 3 == 0)
+                    {
+                        bw.BaseStream.Position += 256;
+                    }
+                    else
+                    {
+                        bw.BaseStream.Position += 384;
+                    }
+                }
+            }
+
             for (int i = 0; i < ChunkPointers.Count; i++)
             {
-                bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
+                bw.BaseStream.Position = (128 * ((bw.BaseStream.Position + 127) / 128));
 
                 //bw.BaseStream.Position = ChunkPointers[i];
                 ChunkPointers[i] = (uint)bw.BaseStream.Position;
 
                 Chunks[i].Write(bw);
             }
+
+            bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16)) + 0x5F;
+            bw.Write((byte)0);
 
             bw.BaseStream.Position = ChunkPointerStart;
             for (int i = 0; i < ChunkCount; i++)
@@ -869,8 +891,9 @@ namespace BundleManager
 					verts[key] = mesh.Points[key];
 				}
 				chunk.PointList = verts.ToList();
-				chunk.PointCount = (byte)meshPointMax;
+				chunk.PointCount = (byte)(meshPointMax + 1);
 
+                chunk.Unknown9 = (byte)mesh.Properties.Count; // TODO: when quads are supported.
                 //int count = (Unknown9 >> 1) * 2 +
                 //            (Unknown9 - (Unknown9 >> 1) * 2) +
                 //            (((PropertyListCount - Unknown9) >> 2) * 4) +

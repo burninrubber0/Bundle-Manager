@@ -454,8 +454,8 @@ namespace BundleManager
 
         public void Write(BundleEntry entry)
         {
-            if (entry.ID == Crc32.HashCrc32B("trk_col_49"))
-                ImportObj("C:\\Users\\Anthony\\Games\\Burnout Tools\\banana\\trk_col_49.obj");
+            if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
+                ImportObj("E:\\trk_col_221.obj");
 
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);

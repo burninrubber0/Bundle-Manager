@@ -94,7 +94,20 @@
     <Compile Include="IDList.cs" />
     <Compile Include="ILoader.cs" />
     <Compile Include="GraphicsSpec.cs" />
+    <Compile Include="InputDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InputDialog.designer.cs">
+      <DependentUpon>InputDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="InstanceList.cs" />
+    <Compile Include="LangEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LangEdit.designer.cs">
+      <DependentUpon>LangEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Language.cs" />
     <Compile Include="LoadingDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -134,6 +147,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FileView.resx">
       <DependentUpon>FileView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InputDialog.resx">
+      <DependentUpon>InputDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LangEdit.resx">
+      <DependentUpon>LangEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoadingDialog.resx">
       <DependentUpon>LoadingDialog.cs</DependentUpon>

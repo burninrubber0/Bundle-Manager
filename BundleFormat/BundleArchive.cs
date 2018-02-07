@@ -145,6 +145,8 @@ namespace BundleFormat
 
             //long dataOffset = result.HeadStart;
 
+            br.BaseStream.Position = result.MetadataStart;
+
             for (int i = 0; i < result.FileCount; i++)
             {
                 BundleEntry entry = new BundleEntry(result);

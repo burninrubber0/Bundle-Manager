@@ -12,7 +12,6 @@ in vec3 vPosition;
 
 void main(void)
 {
-	//color = texelFetch(textureObject, ivec2(vs_textureCoordinate.x, vs_textureCoordinate.y), 0);
 	//color = texture(textureObject, vs_textureCoordinate);
 	vec3 nor = -normalize(vec3(dFdx(vPosition.z), dFdy(vPosition.z), 1.0));
 	float brightness = dot(nor, normalize(vec3(0.5, -0.5, -1.0)));

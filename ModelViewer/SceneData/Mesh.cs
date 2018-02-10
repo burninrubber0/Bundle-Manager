@@ -159,9 +159,9 @@ namespace ModelViewer.SceneData
             for (int i = 0; i < indices.Count; i++)
             {
                 // TODO: >=
-                if (indices[i] > Vertices.Count)
+                if (indices[i] >= Vertices.Count)
                 {
-                    //MessageBox.Show("Index too large: " + indices[i].ToString("X2") + " > " + Vertices.Count.ToString("X8"));
+                    //MessageBox.Show("Index too large: " + indices[i].ToString("X2") + " >= " + Vertices.Count.ToString("X8"));
                     continue;
                 }
                 Vector3 pos = Vertices[(int) indices[i]];

@@ -198,7 +198,6 @@ namespace BundleManager
 
         public void ReadBody(BinaryReader br)
         {
-
             for (int i = 0; i < NumIndices; i++)
             {
                 Indices.Add(br.ReadInt16());

@@ -288,7 +288,7 @@ namespace ModelViewer.SceneData
 
             //Vector3 closestToCenter = new Vector3(float.NaN);
 
-            int numVerts = 0;
+            //int numVerts = 0;
 
             foreach (SceneObject obj in SceneObjects.Values)
             {
@@ -305,7 +305,7 @@ namespace ModelViewer.SceneData
                         maxZ = Math.Max(vert.Z, maxZ);
                         minZ = Math.Min(vert.Z, minZ);
 
-                        numVerts++;
+                        //numVerts++;
                     }
                 }
             }

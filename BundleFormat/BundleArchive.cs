@@ -217,7 +217,7 @@ namespace BundleFormat
                     entry.CompressedBody = extra;
 
                     entry.Body = extra.Decompress(entry.UncompressedBodySize);
-                    if (entry.Body == null)
+                    if (entry.Body == null || entry.Body.NoData())
                     {
                         entry.ExtraDataCompressed = false;
                         entry.Body = extra;

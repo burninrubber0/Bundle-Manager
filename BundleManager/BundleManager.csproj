@@ -135,6 +135,7 @@
     </Compile>
     <Compile Include="StreetData.cs" />
     <Compile Include="TextureState.cs" />
+    <Compile Include="Traffic.cs" />
     <Compile Include="TriggerData.cs" />
     <Compile Include="VertexSizePicker.cs">
       <SubType>Form</SubType>

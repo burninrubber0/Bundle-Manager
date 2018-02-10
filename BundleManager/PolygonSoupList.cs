@@ -21,12 +21,12 @@ namespace BundleManager
     {
         public uint UnknownProperty;
         public byte[] Indices;
-		public byte[] IndicesIndices;
+		public byte[] UnknownBytes;
 
 		public PolygonSoupProperty()
         {
             Indices = new byte[4];
-			IndicesIndices = new byte[4];
+			UnknownBytes = new byte[4];
         }
 
         public PolygonSoupProperty Copy()
@@ -38,9 +38,9 @@ namespace BundleManager
             {
                 result.Indices[i] = Indices[i];
             }
-            for (int i = 0; i < IndicesIndices.Length; i++)
+            for (int i = 0; i < UnknownBytes.Length; i++)
             {
-                result.IndicesIndices[i] = IndicesIndices[i];
+                result.UnknownBytes[i] = UnknownBytes[i];
             }
 
             return result;
@@ -57,9 +57,9 @@ namespace BundleManager
                 result.Indices[i] = br.ReadByte();
 			}
 
-			for (int i = 0; i < result.IndicesIndices.Length; i++)
+			for (int i = 0; i < result.UnknownBytes.Length; i++)
 			{
-				result.IndicesIndices[i] = br.ReadByte();
+				result.UnknownBytes[i] = br.ReadByte();
 			}
 
             return result;
@@ -91,7 +91,7 @@ namespace BundleManager
             ushort unknownProperty2 = (ushort) ((UnknownProperty >> 16) & 0xFFFF);
 
             // Remove wreck surfaces - TODO: tmp
-            unknownProperty2 &= unchecked((ushort)~0x4000);
+            //unknownProperty2 &= unchecked((ushort)~0x4000);
 
             uint unknownProperty = (uint)((unknownProperty2 << 16) | unknownProperty1);
 
@@ -102,9 +102,9 @@ namespace BundleManager
                 bw.Write(Indices[i]);
             }
 
-            for (int i = 0; i < IndicesIndices.Length; i++)
+            for (int i = 0; i < UnknownBytes.Length; i++)
             {
-                bw.Write(IndicesIndices[i]);
+                bw.Write(UnknownBytes[i]);
             }
         }
 
@@ -294,10 +294,10 @@ namespace BundleManager
                 //if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
                 if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
                 {
-                    string bla = property.IndicesIndices[0].ToString("X2") + "_" +
-                                 property.IndicesIndices[1].ToString("X2") + "_" +
-                                 property.IndicesIndices[2].ToString("X2") + "_" +
-                                 property.IndicesIndices[3].ToString("X2");
+                    string bla = property.UnknownBytes[0].ToString("X2") + "_" +
+                                 property.UnknownBytes[1].ToString("X2") + "_" +
+                                 property.UnknownBytes[2].ToString("X2") + "_" +
+                                 property.UnknownBytes[3].ToString("X2");
                     //Material mat = new Material(unknownProperty1.ToString("X4"),
                     Material mat = new Material(unknownProperty1.ToString("X4") + "_" + unknownProperty2.ToString("X4") + "_" + bla,
                         Color.FromArgb(unknownProperty1 & 0xFF, 0, (unknownProperty1 >> 8) & 0xFF));
@@ -309,10 +309,10 @@ namespace BundleManager
                 }
                 else
                 {
-                    string bla = property.IndicesIndices[0].ToString("X2") + "_" +
-                                 property.IndicesIndices[1].ToString("X2") + "_" +
-                                 property.IndicesIndices[2].ToString("X2") + "_" +
-                                 property.IndicesIndices[3].ToString("X2");
+                    string bla = property.UnknownBytes[0].ToString("X2") + "_" +
+                                 property.UnknownBytes[1].ToString("X2") + "_" +
+                                 property.UnknownBytes[2].ToString("X2") + "_" +
+                                 property.UnknownBytes[3].ToString("X2");
                     //Material mat = new Material(unknownProperty1.ToString("X4"),
                     Material mat = new Material(unknownProperty1.ToString("X4") + "_" + unknownProperty2.ToString("X4") + "_" + bla, Color.White);
                     mesh.Materials[property.Indices[0]] = mat;
@@ -449,7 +449,7 @@ namespace BundleManager
         public void Write(BundleEntry entry)
         {
             if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
-                ImportObj("E:\\trk_col_221.obj");
+                ImportObj("E:\\notrains4.obj");
 
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -815,10 +815,10 @@ namespace BundleManager
                     PolygonSoupProperty property = new PolygonSoupProperty();
                     property.UnknownProperty = (uint) ((prop2 << 16) | prop1);
                     //property.Indices is done above
-                    property.IndicesIndices[0] = nByte1;
-                    property.IndicesIndices[1] = nByte2;
-                    property.IndicesIndices[2] = nByte3;
-                    property.IndicesIndices[3] = nByte4;
+                    property.UnknownBytes[0] = nByte1;
+                    property.UnknownBytes[1] = nByte2;
+                    property.UnknownBytes[2] = nByte3;
+                    property.UnknownBytes[3] = nByte4;
 
                     lastUsedProperty = property;
 
@@ -848,8 +848,8 @@ namespace BundleManager
                             throw new ReadFailedError("Invalid Group: " + meshId);
                         }
 
-                        scale = Chunks[meshIndex].Scale;
-                        pos = Chunks[meshIndex].Position;
+                        scale = Chunks[meshIndex].Scale; // 0.02f
+                        pos = Chunks[meshIndex].Position; // get center and use that
 
                         colMesh.ID = meshIndex;
                     }

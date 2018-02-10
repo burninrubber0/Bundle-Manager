@@ -279,17 +279,16 @@ namespace ModelViewer.SceneData
 
         public void UpdateSizing()
         {
-            float highestAbsHorizSize = 0.0f;
-            float highestVertSize = 0.0f;
-
-            float maxX = 0.0f;
+            float maxX = float.MinValue;
             float minX = float.MaxValue;
-            float maxY = 0.0f;
+            float maxY = float.MinValue;
             float minY = float.MaxValue;
-            float maxZ = 0.0f;
+            float maxZ = float.MinValue;
             float minZ = float.MaxValue;
 
-            Vector3 closestToCenter = new Vector3(float.NaN);
+            //Vector3 closestToCenter = new Vector3(float.NaN);
+
+            int numVerts = 0;
 
             foreach (SceneObject obj in SceneObjects.Values)
             {
@@ -299,20 +298,14 @@ namespace ModelViewer.SceneData
                     {
                         Vector3 vert = mesh.Vertices[i];
 
-                        float absX = Math.Abs(vert.X);
-                        float absZ = Math.Abs(vert.Z);
-
-                        float maxHoriz = Math.Max(absX, absZ);
-
-                        highestAbsHorizSize = Math.Max(maxHoriz, highestAbsHorizSize);
-                        highestVertSize = Math.Max(vert.Y, highestVertSize);
-
                         maxX = Math.Max(vert.X, maxX);
                         minX = Math.Min(vert.X, minX);
                         maxY = Math.Max(vert.Y, maxY);
                         minY = Math.Min(vert.Y, minY);
                         maxZ = Math.Max(vert.Z, maxZ);
                         minZ = Math.Min(vert.Z, minZ);
+
+                        numVerts++;
                     }
                 }
             }
@@ -321,8 +314,8 @@ namespace ModelViewer.SceneData
             float midY = (minY + maxY) / 2;
             float midZ = (minZ + maxZ) / 2;
 
-            HorizSize = highestAbsHorizSize + 1;
-            VertSize = highestVertSize + 1;
+            HorizSize = Math.Max(maxX - minX, maxZ - minZ) / 2 * 1.5f;
+            VertSize = (maxY - minY) / 2 * 1.5f;
 
             Center = new Vector3(midX, midY, midZ);
         }

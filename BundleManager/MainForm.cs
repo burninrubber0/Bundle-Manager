@@ -716,6 +716,10 @@ namespace BundleManager
                     edit.Lang.Write(entry);
                 };
                 edit.ShowDialog(this);
+            } else if (entry.Type == EntryType.TrafficDataResourceType && !forceHex)
+            {
+                Traffic traffic = Traffic.Read(entry);
+                DebugUtil.ShowDebug(this, traffic);
             }
             /* else if (entry.Type == EntryType.ModelResourceType && !forceHex)
             {

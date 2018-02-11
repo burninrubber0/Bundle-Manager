@@ -458,7 +458,7 @@ namespace BundleManager
         public void Write(BundleEntry entry)
         {
             if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
-                ImportObj("C:\\Users\\Anthony\\Games\\Burnout Tools\\banana\\collisions\\trk_col_221.obj");
+                ImportObj(@"E:\trk_col_221_untouched.obj");
 
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -579,27 +579,10 @@ namespace BundleManager
 
                 Vector3I pos = chunk.Position;
                 float scale = chunk.Scale;
-                /*List<Mesh> meshes = chunk.BuildMesh(pos, scale);
-                for (int i = 0; i < meshes.Count; i++)
-                {
-                    Mesh mesh = meshes[i];
-                    Model model = new Model(mesh);
-                    SceneObject sceneObject = new SceneObject(id + "_" + i, model);
-                    //sceneObject.ID = id;
-                    //sceneObject.Transform = Matrix4.CreateScale(scale) *
-                    //                        Matrix4.CreateTranslation(new Vector3(pos.X, pos.Y, pos.Z));
-                    scene.AddObject(sceneObject);
-                }*/
                 Model model = new Model(chunk.BuildMesh(pos, scale));
                 SceneObject sceneObject = new SceneObject(id, model);
-                //sceneObject.ID = id;
-                //sceneObject.Transform = Matrix4.CreateScale(scale) *
-                //                        Matrix4.CreateTranslation(new Vector3(pos.X, pos.Y, pos.Z));
                 scene.AddObject(sceneObject);
                 index++;
-
-                // TODO: TEMP
-                //break;
             }
 
             return scene;
@@ -607,15 +590,12 @@ namespace BundleManager
 
         private class ColMesh
         {
-            public int ID;
-            public string Name;
-			public Dictionary<byte, Vector3> PointsUnprocessed;
-			public Dictionary<byte, Vector3S> Points;
+			public Dictionary<byte, Vector3> Points;
 			public float Scale;
 			public Vector3 Position;
+            public Vector3 Min;
 			public Vector3 Max;
 			public List<PolygonSoupProperty> Properties;
-            //public List<uint> Indices;
         }
 
         public void ImportObj(string path)
@@ -624,7 +604,6 @@ namespace BundleManager
             StreamReader sr = new StreamReader(s);
 
             List<Vector3> points = new List<Vector3>();
-            //List<uint> indices = new List<uint>();
 
             Dictionary<string, ColMesh> meshes = new Dictionary<string, ColMesh>();
 
@@ -635,8 +614,6 @@ namespace BundleManager
 			int nextStartVertex = 0;
 			int currentProperty = -1;
             string currentMesh = "";
-			int meshIndex = 0;
-            //PolygonSoupProperty currentProperty;
 
             while (!sr.EndOfStream)
             {
@@ -652,24 +629,10 @@ namespace BundleManager
                     string[] options = line.Split(' ');
                     if (options.Length < 4)
                         throw new ReadFailedError("Invalid Vertex Line: " + line);
-
-                    if (!float.TryParse(options[1], NumberStyles.Any, CultureInfo.CurrentCulture,
-                        out var x))
-                    {
-                        throw new ReadFailedError("Invalid Coord: " + options[1]);
-                    }
-
-                    if (!float.TryParse(options[2], NumberStyles.Any, CultureInfo.CurrentCulture,
-                        out var y))
-                    {
-                        throw new ReadFailedError("Invalid Coord: " + options[2]);
-                    }
-
-                    if (!float.TryParse(options[3], NumberStyles.Any, CultureInfo.CurrentCulture,
-                        out var z))
-                    {
-                        throw new ReadFailedError("Invalid Coord: " + options[3]);
-                    }
+                    
+                    Utilities.Parse(options[1], false, out float x);
+                    Utilities.Parse(options[2], false, out float y);
+                    Utilities.Parse(options[3], false, out float z);
 
                     globalVertCount++;
                     points.Add(new Vector3(x, y, z));
@@ -681,113 +644,56 @@ namespace BundleManager
                     if (options.Length < 4)
                         throw new ReadFailedError("Invalid Face Line: " + line);
 
-					if (!uint.TryParse(options[1].Split('/')[0], NumberStyles.None, CultureInfo.CurrentCulture,
-                        out var f1))
+                    try
                     {
-                        throw new ReadFailedError("Invalid Index: " + options[1]);
-                    }
+                        Utilities.Parse(options[1].Split('/')[0], false, out uint f1);
+                        Utilities.Parse(options[2].Split('/')[0], false, out uint f2);
+                        Utilities.Parse(options[3].Split('/')[0], false, out uint f3);
 
-                    if (!uint.TryParse(options[2].Split('/')[0], NumberStyles.None, CultureInfo.CurrentCulture,
-                        out var f2))
-                    {
-                        throw new ReadFailedError("Invalid Index: " + options[2]);
-                    }
-
-                    if (!uint.TryParse(options[3].Split('/')[0], NumberStyles.None, CultureInfo.CurrentCulture,
-                        out var f3))
-                    {
-                        throw new ReadFailedError("Invalid Index: " + options[3]);
-                    }
-
-                    if (usedCurrentProperty)
-                    {
-                        currentProperty++;
-                        meshes[currentMesh].Properties.Add(lastUsedProperty.Copy());
-                    }
-
-					// find the face's points
-                    Vector3 v1 = points[(int)f1 - 1];
-                    Vector3 v2 = points[(int)f2 - 1];
-                    Vector3 v3 = points[(int)f3 - 1];
-					meshes[currentMesh].Position = MathUtils.MinBounds(v1, v2, v3, meshes[currentMesh].Position);
-					meshes[currentMesh].Max = MathUtils.MaxBounds(v1, v2, v3, meshes[currentMesh].Max);
-
-					// processing the points - this needs to happen, but later!
-					/*
-					// make vectors out of the three points we just read in with their X, Y and Z and take into account the scale/base
-                    Vector3S v1S = new Vector3S((short)(Math.Round(v1.X / scale) - pos.X), (short)(Math.Round(v1.Y / scale) - pos.Y), (short)(Math.Round(v1.Z / scale) - pos.Z));
-                    Vector3S v2S = new Vector3S((short)(Math.Round(v2.X / scale) - pos.X), (short)(Math.Round(v2.Y / scale) - pos.Y), (short)(Math.Round(v2.Z / scale) - pos.Z));
-                    Vector3S v3S = new Vector3S((short)(Math.Round(v3.X / scale) - pos.X), (short)(Math.Round(v3.Y / scale) - pos.Y), (short)(Math.Round(v3.Z / scale) - pos.Z));
-					*/
-
-					byte localIndex1 = (byte)(f1 - 1 - curStartVertex);
-					byte localIndex2 = (byte)(f2 - 1 - curStartVertex);
-					byte localIndex3 = (byte)(f3 - 1 - curStartVertex);
-					// add the three points we just read in for this mesh to the current property (polygon)
-					meshes[currentMesh].Properties[currentProperty].Indices[0] = localIndex1;//(byte)(f1 - 1 - startVertex);
-                    meshes[currentMesh].Properties[currentProperty].Indices[1] =
-						localIndex2;//1;//(byte)(f2 - 1 - startVertex);
-                    meshes[currentMesh].Properties[currentProperty].Indices[2] =
-						localIndex3;//2;//(byte)(f3 - 1 - startVertex);
-
-					// then add them to the mesh
-					/*
-                    meshes[currentMesh][f1] = v1S;
-                    meshes[currentMesh][f2] = v2S;
-                    meshes[currentMesh][f3] = v3S;
-					*/
-					if (!meshes[currentMesh].PointsUnprocessed.ContainsKey(localIndex1))
-					{
-						meshes[currentMesh].PointsUnprocessed.Add(localIndex1, v1);
-					}
-					if (!meshes[currentMesh].PointsUnprocessed.ContainsKey(localIndex2))
-					{
-						meshes[currentMesh].PointsUnprocessed.Add(localIndex2, v2);
-					}
-					if (!meshes[currentMesh].PointsUnprocessed.ContainsKey(localIndex3))
-					{
-						meshes[currentMesh].PointsUnprocessed.Add(localIndex3, v3);
-					}
-					// this also needs to happen later
-					/*
-					if (!meshes[currentMesh].Points.ContainsKey(localIndex1))
-					{
-						meshes[currentMesh].Points.Add(localIndex1, v1S);
-					}
-					if (!meshes[currentMesh].Points.ContainsKey(localIndex2))
-					{
-						meshes[currentMesh].Points.Add(localIndex2, v2S);
-					}
-					if (!meshes[currentMesh].Points.ContainsKey(localIndex3))
-					{
-						meshes[currentMesh].Points.Add(localIndex3, v3S);
-					}
-					*/
-
-					// dealing with... quads? in an OBJ file!?
-					/*
-                    if (options.Length > 4)
-                    {
-                        if (!uint.TryParse(options[4], NumberStyles.None, CultureInfo.CurrentCulture,
-                            out var f4))
+                        if (usedCurrentProperty)
                         {
-                            throw new ReadFailedError("Invalid Index: " + options[4]);
+                            currentProperty++;
+                            meshes[currentMesh].Properties.Add(lastUsedProperty?.Copy());
                         }
 
-                        Vector3 v4 = points[(int)f4 - 1];
-                        Vector3S v4S = new Vector3S((short)((v4.X / scale) - pos.X), (short)((v4.Y / scale) - pos.Y), (short)((v4.Z / scale) - pos.Z));
+                        // find the face's points
+                        Vector3 v1 = points[(int) f1 - 1];
+                        Vector3 v2 = points[(int) f2 - 1];
+                        Vector3 v3 = points[(int) f3 - 1];
+                        meshes[currentMesh].Min = MathUtils.MinBounds(v1, v2, v3, meshes[currentMesh].Min);
+                        meshes[currentMesh].Max = MathUtils.MaxBounds(v1, v2, v3, meshes[currentMesh].Max);
+                        //meshes[currentMesh].Position = new Vector3(-3293.355f, 135.285f, -1364.13f);
+                        meshes[currentMesh].Position = meshes[currentMesh].Min;
 
-                        meshes[currentMesh].Properties[currentProperty].Indices[3] =
-                            (byte) (meshes[currentMesh].Points.Count + 0); //3;//(byte)(f4 - 1 - startVertex);
+                        byte localIndex1 = (byte) (f1 - 1 - curStartVertex);
+                        byte localIndex2 = (byte) (f2 - 1 - curStartVertex);
+                        byte localIndex3 = (byte) (f3 - 1 - curStartVertex);
 
-                        meshes[currentMesh].Points.Add(v4S);
+                        // add the three points we just read in for this mesh to the current property (polygon)
+                        meshes[currentMesh].Properties[currentProperty].Indices[0] = localIndex1;
+                        meshes[currentMesh].Properties[currentProperty].Indices[1] = localIndex2;
+                        meshes[currentMesh].Properties[currentProperty].Indices[2] = localIndex3;
+
+                        if (!meshes[currentMesh].Points.ContainsKey(localIndex1))
+                        {
+                            meshes[currentMesh].Points.Add(localIndex1, v1);
+                        }
+                        if (!meshes[currentMesh].Points.ContainsKey(localIndex2))
+                        {
+                            meshes[currentMesh].Points.Add(localIndex2, v2);
+                        }
+                        if (!meshes[currentMesh].Points.ContainsKey(localIndex3))
+                        {
+                            meshes[currentMesh].Points.Add(localIndex3, v3);
+                        }
+                        meshes[currentMesh].Properties[currentProperty].Indices[3] = 0xFF;
+
+                        usedCurrentProperty = true;
                     }
-                    else
-                    {*/
-					meshes[currentMesh].Properties[currentProperty].Indices[3] = 0xFF;
-                    //}
-
-                    usedCurrentProperty = true;
+                    catch (NotSupportedException)
+                    {
+                        throw new ReadFailedError("Invalid Face Line: " + line);
+                    }
 
                 } else if (line.StartsWith("usemtl"))
                 {
@@ -805,56 +711,34 @@ namespace BundleManager
                     string newByte3 = matStrings[5];
                     string newByte4 = matStrings[6];
 
-                    if (!ushort.TryParse(property1, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
-                        out var prop1))
+                    try
                     {
-                        throw new ReadFailedError("Invalid Property1: " + property1);
-                    }
+                        Utilities.Parse(property1, true, out ushort prop1);
+                        Utilities.Parse(property2, true, out ushort prop2);
+                        Utilities.Parse(newByte1, true, out byte nByte1);
+                        Utilities.Parse(newByte2, true, out byte nByte2);
+                        Utilities.Parse(newByte3, true, out byte nByte3);
+                        Utilities.Parse(newByte4, true, out byte nByte4);
 
-                    if (!ushort.TryParse(property2, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
-                        out var prop2))
+                        usedCurrentProperty = false;
+
+                        PolygonSoupProperty property = new PolygonSoupProperty();
+                        property.UnknownProperty = (uint) ((prop2 << 16) | prop1);
+                        //property.Indices is done above
+                        property.UnknownBytes[0] = nByte1;
+                        property.UnknownBytes[1] = nByte2;
+                        property.UnknownBytes[2] = nByte3;
+                        property.UnknownBytes[3] = nByte4;
+
+                        lastUsedProperty = property;
+
+                        currentProperty++;
+                        meshes[currentMesh].Properties.Add(property);
+                    }
+                    catch (NotSupportedException)
                     {
-                        throw new ReadFailedError("Invalid Property2: " + property1);
+                        throw new ReadFailedError("Invalid Material: " + material);
                     }
-
-                    if (!byte.TryParse(newByte1, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
-                        out var nByte1))
-                    {
-                        throw new ReadFailedError("Invalid NByte1: " + property1);
-                    }
-
-                    if (!byte.TryParse(newByte2, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
-                        out var nByte2))
-                    {
-                        throw new ReadFailedError("Invalid NByte2: " + property1);
-                    }
-
-                    if (!byte.TryParse(newByte3, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
-                        out var nByte3))
-                    {
-                        throw new ReadFailedError("Invalid NByte3: " + property1);
-                    }
-
-                    if (!byte.TryParse(newByte4, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
-                        out var nByte4))
-                    {
-                        throw new ReadFailedError("Invalid NByte4: " + property1);
-                    }
-
-                    usedCurrentProperty = false;
-
-                    PolygonSoupProperty property = new PolygonSoupProperty();
-                    property.UnknownProperty = (uint) ((prop2 << 16) | prop1);
-                    //property.Indices is done above
-                    property.UnknownBytes[0] = nByte1;
-                    property.UnknownBytes[1] = nByte2;
-                    property.UnknownBytes[2] = nByte3;
-                    property.UnknownBytes[3] = nByte4;
-
-                    lastUsedProperty = property;
-
-                    currentProperty++;
-                    meshes[currentMesh].Properties.Add(property);
 
                 } else if (line.StartsWith("g"))
                 {
@@ -862,24 +746,20 @@ namespace BundleManager
                     if (options.Length < 2)
                         throw new ReadFailedError("Invalid Group: <none>");
                     currentMesh = options[1];
-					//if (currentMesh == "mesh0")
-					//    Debugger.Break();
 
 					curStartVertex = nextStartVertex;
                     nextStartVertex = (int)(globalVertCount - 1);
                     currentProperty = -1;
 
-                    ColMesh colMesh = new ColMesh();
-					
-                    colMesh.ID = meshIndex++;
-
-                    colMesh.Name = currentMesh;
-					colMesh.PointsUnprocessed = new Dictionary<byte, Vector3>();
-					colMesh.Points = new Dictionary<byte, Vector3S>();
-					colMesh.Properties = new List<PolygonSoupProperty>();
-					//colMesh.Indices = new List<uint>();
-					colMesh.Scale = 0.02f;
-					colMesh.Position = new Vector3(float.MaxValue);
+                    ColMesh colMesh = new ColMesh
+                    {
+                        Points = new Dictionary<byte, Vector3>(),
+                        Properties = new List<PolygonSoupProperty>(),
+                        Scale = 0.015f,
+                        Position = new Vector3(float.MaxValue),
+                        Min = new Vector3(float.MaxValue),
+                        Max = new Vector3(float.MinValue)
+                    };
                     meshes.Add(currentMesh, colMesh);
                 }
             }
@@ -901,7 +781,7 @@ namespace BundleManager
 				PolygonSoupChunk chunk = new PolygonSoupChunk();
                 chunk.PropertyList = mesh.Properties;
 				byte meshPointMax = 0;
-				foreach (byte key in mesh.PointsUnprocessed.Keys)
+				foreach (byte key in mesh.Points.Keys)
 				{
 					if (meshPointMax < key)
 					{
@@ -909,22 +789,21 @@ namespace BundleManager
 					}
 				}
 				Vector3S[] verts = new Vector3S[meshPointMax + 1];
-				foreach (byte key in mesh.PointsUnprocessed.Keys)
+				foreach (byte key in mesh.Points.Keys)
 				{
-					Vector3S pointProcessed = new Vector3S((short)(Math.Round(mesh.PointsUnprocessed[key].X / mesh.Scale) - mesh.Position.X), (short)(Math.Round(mesh.PointsUnprocessed[key].Y / mesh.Scale) - mesh.Position.Y), (short)(Math.Round(mesh.PointsUnprocessed[key].Z / mesh.Scale) - mesh.Position.Z));
-					verts[key] = pointProcessed;
+                    Vector3S pointProcessed = new Vector3S((short)Math.Round((mesh.Points[key].X - mesh.Position.X) / mesh.Scale), (short)Math.Round((mesh.Points[key].Y - mesh.Position.Y) / mesh.Scale), (short)Math.Round((mesh.Points[key].Z - mesh.Position.Z) / mesh.Scale));
+				    //Vector3S pointProcessed = new Vector3S((short)Math.Round(mesh.Points[key].X - mesh.Position.X), (short)Math.Round(mesh.Points[key].Y - mesh.Position.Y), (short)Math.Round(mesh.Points[key].Z - mesh.Position.Z));
+                    verts[key] = pointProcessed;
 				}
 				chunk.PointList = verts.ToList();
 				chunk.PointCount = (byte)(meshPointMax + 1);
 
-                //int count = chunk.PropertyList.Count;
-
-                chunk.PropertyListCount = (byte)mesh.Properties.Count; //0;
+                chunk.PropertyListCount = (byte)mesh.Properties.Count;
                 chunk.QuadCount = 0; // TODO: when quads are supported.
 				chunk.Scale = mesh.Scale;
 				chunk.Position = new Vector3I((int)Math.Round(mesh.Position.X / mesh.Scale), (int)Math.Round(mesh.Position.Y / mesh.Scale), (int)Math.Round(mesh.Position.Z / mesh.Scale));
 				int polygonSoupBoundingBoxUnknown = -1;
-				BoundingBoxes.Add(new PolygonSoupBoundingBox(new BoxF(mesh.Position, mesh.Max), polygonSoupBoundingBoxUnknown)); //addAndThenCalculateTheBoundingBoxButThenAlsoWeHaveToClearItAnthonyIWantToBeSeriousRightNowPleaseYoureGettingOnMyNervesSighAnthonyPleaseYoureReallyBuggingMeAnthonyIWantYouToStopIllLeave
+				BoundingBoxes.Add(new PolygonSoupBoundingBox(new BoxF(mesh.Min, mesh.Max), polygonSoupBoundingBoxUnknown)); //addAndThenCalculateTheBoundingBoxButThenAlsoWeHaveToClearItAnthonyIWantToBeSeriousRightNowPleaseYoureGettingOnMyNervesSighAnthonyPleaseYoureReallyBuggingMeAnthonyIWantYouToStopIllLeave
 				Chunks.Add(chunk);
             }
         }

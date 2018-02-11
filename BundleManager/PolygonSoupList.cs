@@ -448,8 +448,8 @@ namespace BundleManager
 
         public void Write(BundleEntry entry)
         {
-            if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
-                ImportObj("E:\\notrains4.obj");
+            if (entry.ID == Crc32.HashCrc32B("trk_col_303"))
+                ImportObj("E:\\trk_col_303_edit.obj");
 
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);

@@ -80,14 +80,17 @@ namespace BundleManager
 
             //unknownProperty1 = (ushort)((unk2 << 8) | unk1);
 
+            // Patch values that are too high (from console) with Schembri Pass
             if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
             {
-                unknownProperty1 = 0x8316; //0x9531; // 0x9007 //0x8511 //0x8316;
+                // 0x8316, 0x9531,  0x9007, 0x8511, 0x8316, 0xFFFF
+                unknownProperty1 = 0x8316;
             }
 
-
+            // Patch values that are too high(from console) with 0xFFFF
             //if (unknownProperty1 > 0x9D64)
             //    unknownProperty1 = 0xFFFF;
+
             ushort unknownProperty2 = (ushort) ((UnknownProperty >> 16) & 0xFFFF);
 
             // Remove wreck surfaces - TODO: tmp
@@ -137,7 +140,6 @@ namespace BundleManager
         public float Scale;
         public uint PropertyListStart;
         public uint PointListStart;
-        public short Length;
         public byte PropertyListCount;
         public byte QuadCount;
         public byte PointCount;
@@ -161,7 +163,7 @@ namespace BundleManager
             result.Scale = br.ReadSingle();
             result.PropertyListStart = br.ReadUInt32();
             result.PointListStart = br.ReadUInt32();
-            result.Length = br.ReadInt16();
+            br.ReadInt16(); // Length
             result.PropertyListCount = br.ReadByte();
             result.QuadCount = br.ReadByte();
             result.PointCount = br.ReadByte();
@@ -190,9 +192,9 @@ namespace BundleManager
 			bw.Write(Position);
             bw.Write(Scale);
             long propListStartPtr = bw.BaseStream.Position;
-            bw.Write((uint) 0);//PropertyListStart);
+            bw.Write((uint) 0);
             long pointListStartPtr = bw.BaseStream.Position;
-            bw.Write((uint) 0);//PointListStart);
+            bw.Write((uint) 0);
 			long lengthPtr = bw.BaseStream.Position;
             bw.Write((ushort) 0);
             bw.Write(PropertyListCount);
@@ -200,9 +202,7 @@ namespace BundleManager
             bw.Write(PointCount);
             bw.Write(Unknown10);
             bw.Write(Unknown11);
-
-            //bw.BaseStream.Position = PointListStart;
-            //bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
+            
             long cPos = bw.BaseStream.Position;
             bw.BaseStream.Position = pointListStartPtr;
             bw.Write((uint)cPos);
@@ -212,8 +212,6 @@ namespace BundleManager
             {
                 bw.Write(PointList[i]);
             }
-
-            //bw.BaseStream.Position = PropertyListStart;
 
             bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
             cPos = bw.BaseStream.Position;
@@ -231,8 +229,6 @@ namespace BundleManager
 			bw.BaseStream.Position = cPos;
 
 		}
-
-        //public static uint Upper = 0;
 
         public Mesh BuildMesh(Vector3I pos, float scale)
         {
@@ -305,7 +301,7 @@ namespace BundleManager
                     mesh.Materials[property.Indices[3]] = mat;*/
 
                 //if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
-                if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
+                /*if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
                 {
                     string bla = property.UnknownBytes[0].ToString("X2") + "_" +
                                  property.UnknownBytes[1].ToString("X2") + "_" +
@@ -321,7 +317,7 @@ namespace BundleManager
                         mesh.Materials[property.Indices[3]] = mat;
                 }
                 else
-                {
+                {*/
                     string bla = property.UnknownBytes[0].ToString("X2") + "_" +
                                  property.UnknownBytes[1].ToString("X2") + "_" +
                                  property.UnknownBytes[2].ToString("X2") + "_" +
@@ -333,7 +329,7 @@ namespace BundleManager
                     mesh.Materials[property.Indices[2]] = mat;
                     if (property.Indices[3] != 0xFF)
                         mesh.Materials[property.Indices[3]] = mat;
-                }
+                //}
             }
 			
 
@@ -350,7 +346,7 @@ namespace BundleManager
 
         public override string ToString()
         {
-            return "Pos: " + Position + ", Scale: " + Scale + ", Unk7: " + Length + ", PointCount: " + PointCount;
+            return "Pos: " + Position + ", Scale: " + Scale + ", PointCount: " + PointCount;
         }
     }
 
@@ -408,9 +404,6 @@ namespace BundleManager
                 result.ChunkPointers.Add(br.ReadUInt32());
             }
 
-            //br.BaseStream.Position += (16 - br.BaseStream.Position % 16);
-            //br.BaseStream.Position = result.BoxListStart;
-
             for (int i = 0; i < result.ChunkCount; i++)
             {
                 // Read Vertically
@@ -457,8 +450,8 @@ namespace BundleManager
 
         public void Write(BundleEntry entry)
         {
-            if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
-                ImportObj(@"E:\trk_col_221_untouched.obj");
+            //if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
+            //    ImportObj(@"E:\trk_col_221_untouched.obj");
 
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -489,11 +482,8 @@ namespace BundleManager
             
             for (int i = 0; i < ChunkCount; i++)
             {
-                bw.Write((uint)0); //ChunkPointers[i]);
+                bw.Write((uint)0);
             }
-
-            //br.BaseStream.Position += (16 - br.BaseStream.Position % 16);
-            //br.BaseStream.Position = BoxListStart;
 
             for (int i = 0; i < ChunkCount; i++)
             {
@@ -543,8 +533,7 @@ namespace BundleManager
             for (int i = 0; i < ChunkPointers.Count; i++)
             {
                 bw.BaseStream.Position = (128 * ((bw.BaseStream.Position + 127) / 128));
-
-                //bw.BaseStream.Position = ChunkPointers[i];
+                
                 ChunkPointers[i] = (uint)bw.BaseStream.Position;
 
                 Chunks[i].Write(bw);
@@ -662,7 +651,6 @@ namespace BundleManager
                         Vector3 v3 = points[(int) f3 - 1];
                         meshes[currentMesh].Min = MathUtils.MinBounds(v1, v2, v3, meshes[currentMesh].Min);
                         meshes[currentMesh].Max = MathUtils.MaxBounds(v1, v2, v3, meshes[currentMesh].Max);
-                        //meshes[currentMesh].Position = new Vector3(-3293.355f, 135.285f, -1364.13f);
                         meshes[currentMesh].Position = meshes[currentMesh].Min;
 
                         byte localIndex1 = (byte) (f1 - 1 - curStartVertex);
@@ -792,7 +780,6 @@ namespace BundleManager
 				foreach (byte key in mesh.Points.Keys)
 				{
                     Vector3S pointProcessed = new Vector3S((short)Math.Round((mesh.Points[key].X - mesh.Position.X) / mesh.Scale), (short)Math.Round((mesh.Points[key].Y - mesh.Position.Y) / mesh.Scale), (short)Math.Round((mesh.Points[key].Z - mesh.Position.Z) / mesh.Scale));
-				    //Vector3S pointProcessed = new Vector3S((short)Math.Round(mesh.Points[key].X - mesh.Position.X), (short)Math.Round(mesh.Points[key].Y - mesh.Position.Y), (short)Math.Round(mesh.Points[key].Z - mesh.Position.Z));
                     verts[key] = pointProcessed;
 				}
 				chunk.PointList = verts.ToList();
@@ -803,7 +790,7 @@ namespace BundleManager
 				chunk.Scale = mesh.Scale;
 				chunk.Position = new Vector3I((int)Math.Round(mesh.Position.X / mesh.Scale), (int)Math.Round(mesh.Position.Y / mesh.Scale), (int)Math.Round(mesh.Position.Z / mesh.Scale));
 				int polygonSoupBoundingBoxUnknown = -1;
-				BoundingBoxes.Add(new PolygonSoupBoundingBox(new BoxF(mesh.Min, mesh.Max), polygonSoupBoundingBoxUnknown)); //addAndThenCalculateTheBoundingBoxButThenAlsoWeHaveToClearItAnthonyIWantToBeSeriousRightNowPleaseYoureGettingOnMyNervesSighAnthonyPleaseYoureReallyBuggingMeAnthonyIWantYouToStopIllLeave
+				BoundingBoxes.Add(new PolygonSoupBoundingBox(new BoxF(mesh.Min, mesh.Max), polygonSoupBoundingBoxUnknown));
 				Chunks.Add(chunk);
             }
         }

@@ -684,9 +684,9 @@ namespace BundleManager
             {
                 PolygonSoupList list = PolygonSoupList.Read(entry);
 				// UNCOMMENT ME TO DEBUG MODEL VIEWER!!
-                Scene scene = list.MakeScene();
-                ModelViewerForm.ShowModelViewer(this, scene);
-                //DebugUtil.ShowDebug(this, list);
+                //Scene scene = list.MakeScene();
+                //ModelViewerForm.ShowModelViewer(this, scene);
+                DebugUtil.ShowDebug(this, list);
             }
             else if (entry.Type == EntryType.IDList && !forceHex)
             {

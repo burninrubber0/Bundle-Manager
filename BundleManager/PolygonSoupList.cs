@@ -119,6 +119,12 @@ namespace BundleManager
         public BoxF Box;
         public int Unknown;
 
+		public PolygonSoupBoundingBox(BoxF box, int unknown)
+		{
+			Box = box;
+			Unknown = unknown;
+		}
+
         public override string ToString()
         {
             return Box.ToString() + ", " + Unknown;
@@ -131,7 +137,7 @@ namespace BundleManager
         public float Scale;
         public uint PropertyListStart;
         public uint PointListStart;
-        public short Unknown7;
+        public short Length;
         public byte PropertyListCount;
         public byte QuadCount;
         public byte PointCount;
@@ -155,7 +161,7 @@ namespace BundleManager
             result.Scale = br.ReadSingle();
             result.PropertyListStart = br.ReadUInt32();
             result.PointListStart = br.ReadUInt32();
-            result.Unknown7 = br.ReadInt16();
+            result.Length = br.ReadInt16();
             result.PropertyListCount = br.ReadByte();
             result.QuadCount = br.ReadByte();
             result.PointCount = br.ReadByte();
@@ -179,14 +185,16 @@ namespace BundleManager
         }
 
         public void Write(BinaryWriter bw)
-        {
-            bw.Write(Position);
+		{
+			long chunkStartPtr = bw.BaseStream.Position;
+			bw.Write(Position);
             bw.Write(Scale);
             long propListStartPtr = bw.BaseStream.Position;
             bw.Write((uint) 0);//PropertyListStart);
             long pointListStartPtr = bw.BaseStream.Position;
             bw.Write((uint) 0);//PointListStart);
-            bw.Write(Unknown7);
+			long lengthPtr = bw.BaseStream.Position;
+            bw.Write((ushort) 0);
             bw.Write(PropertyListCount);
             bw.Write(QuadCount);
             bw.Write(PointCount);
@@ -217,7 +225,12 @@ namespace BundleManager
             {
                 PropertyList[i].Write(bw);
             }
-        }
+			cPos = bw.BaseStream.Position;
+			bw.BaseStream.Position = lengthPtr;
+			bw.Write((short)(bw.BaseStream.Length - chunkStartPtr));
+			bw.BaseStream.Position = cPos;
+
+		}
 
         //public static uint Upper = 0;
 
@@ -337,7 +350,7 @@ namespace BundleManager
 
         public override string ToString()
         {
-            return "Pos: " + Position + ", Scale: " + Scale + ", Unk7: " + Unknown7 + ", PointCount: " + PointCount;
+            return "Pos: " + Position + ", Scale: " + Scale + ", Unk7: " + Length + ", PointCount: " + PointCount;
         }
     }
 
@@ -404,8 +417,6 @@ namespace BundleManager
 
                 long pos = result.BoxListStart + 0x70 * (i / 4) + 4 * (i % 4);
 
-                PolygonSoupBoundingBox box = new PolygonSoupBoundingBox();
-
                 BoxF boundingBox = new BoxF();
                 br.BaseStream.Position = pos;
                 float minX = br.ReadSingle();
@@ -414,7 +425,7 @@ namespace BundleManager
                 br.BaseStream.Position += 12;
                 float minZ = br.ReadSingle();
 
-                boundingBox.Min = new Vector3(minX, minY, minZ);
+				boundingBox.Min = new Vector3(minX, minY, minZ);
 
                 br.BaseStream.Position += 12;
                 float maxX = br.ReadSingle();
@@ -422,15 +433,13 @@ namespace BundleManager
                 float maxY = br.ReadSingle();
                 br.BaseStream.Position += 12;
                 float maxZ = br.ReadSingle();
+				br.BaseStream.Position += 12;
 
-                boundingBox.Max = new Vector3(maxX, maxY, maxZ);
+				boundingBox.Max = new Vector3(maxX, maxY, maxZ);
 
-                box.Box = boundingBox;
+				PolygonSoupBoundingBox box = new PolygonSoupBoundingBox(boundingBox, br.ReadInt32());
 
-                br.BaseStream.Position += 12;
-                box.Unknown = br.ReadInt32();
-
-                result.BoundingBoxes.Add(box);
+				result.BoundingBoxes.Add(box);
             }
 
             for (int i = 0; i < result.ChunkPointers.Count; i++)
@@ -448,8 +457,8 @@ namespace BundleManager
 
         public void Write(BundleEntry entry)
         {
-            if (entry.ID == Crc32.HashCrc32B("trk_col_303"))
-                ImportObj("E:\\trk_col_303_edit.obj");
+            if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
+                ImportObj("C:\\Users\\Anthony\\Games\\Burnout Tools\\banana\\collisions\\trk_col_221.obj");
 
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -600,8 +609,12 @@ namespace BundleManager
         {
             public int ID;
             public string Name;
-            public Dictionary<byte, Vector3S> Points;
-            public List<PolygonSoupProperty> Properties;
+			public Dictionary<byte, Vector3> PointsUnprocessed;
+			public Dictionary<byte, Vector3S> Points;
+			public float Scale;
+			public Vector3 Position;
+			public Vector3 Max;
+			public List<PolygonSoupProperty> Properties;
             //public List<uint> Indices;
         }
 
@@ -615,9 +628,6 @@ namespace BundleManager
 
             Dictionary<string, ColMesh> meshes = new Dictionary<string, ColMesh>();
 
-            float scale = 1.0f;
-            Vector3I pos = new Vector3I();
-
             PolygonSoupProperty lastUsedProperty = null;
             bool usedCurrentProperty = false;
             uint globalVertCount = 0;
@@ -625,6 +635,7 @@ namespace BundleManager
 			int nextStartVertex = 0;
 			int currentProperty = -1;
             string currentMesh = "";
+			int meshIndex = 0;
             //PolygonSoupProperty currentProperty;
 
             while (!sr.EndOfStream)
@@ -698,11 +709,16 @@ namespace BundleManager
                     Vector3 v1 = points[(int)f1 - 1];
                     Vector3 v2 = points[(int)f2 - 1];
                     Vector3 v3 = points[(int)f3 - 1];
+					meshes[currentMesh].Position = MathUtils.MinBounds(v1, v2, v3, meshes[currentMesh].Position);
+					meshes[currentMesh].Max = MathUtils.MaxBounds(v1, v2, v3, meshes[currentMesh].Max);
 
+					// processing the points - this needs to happen, but later!
+					/*
 					// make vectors out of the three points we just read in with their X, Y and Z and take into account the scale/base
                     Vector3S v1S = new Vector3S((short)(Math.Round(v1.X / scale) - pos.X), (short)(Math.Round(v1.Y / scale) - pos.Y), (short)(Math.Round(v1.Z / scale) - pos.Z));
                     Vector3S v2S = new Vector3S((short)(Math.Round(v2.X / scale) - pos.X), (short)(Math.Round(v2.Y / scale) - pos.Y), (short)(Math.Round(v2.Z / scale) - pos.Z));
                     Vector3S v3S = new Vector3S((short)(Math.Round(v3.X / scale) - pos.X), (short)(Math.Round(v3.Y / scale) - pos.Y), (short)(Math.Round(v3.Z / scale) - pos.Z));
+					*/
 
 					byte localIndex1 = (byte)(f1 - 1 - curStartVertex);
 					byte localIndex2 = (byte)(f2 - 1 - curStartVertex);
@@ -720,6 +736,20 @@ namespace BundleManager
                     meshes[currentMesh][f2] = v2S;
                     meshes[currentMesh][f3] = v3S;
 					*/
+					if (!meshes[currentMesh].PointsUnprocessed.ContainsKey(localIndex1))
+					{
+						meshes[currentMesh].PointsUnprocessed.Add(localIndex1, v1);
+					}
+					if (!meshes[currentMesh].PointsUnprocessed.ContainsKey(localIndex2))
+					{
+						meshes[currentMesh].PointsUnprocessed.Add(localIndex2, v2);
+					}
+					if (!meshes[currentMesh].PointsUnprocessed.ContainsKey(localIndex3))
+					{
+						meshes[currentMesh].PointsUnprocessed.Add(localIndex3, v3);
+					}
+					// this also needs to happen later
+					/*
 					if (!meshes[currentMesh].Points.ContainsKey(localIndex1))
 					{
 						meshes[currentMesh].Points.Add(localIndex1, v1S);
@@ -732,6 +762,7 @@ namespace BundleManager
 					{
 						meshes[currentMesh].Points.Add(localIndex3, v3S);
 					}
+					*/
 
 					// dealing with... quads? in an OBJ file!?
 					/*
@@ -753,7 +784,7 @@ namespace BundleManager
                     }
                     else
                     {*/
-                        meshes[currentMesh].Properties[currentProperty].Indices[3] = 0xFF;
+					meshes[currentMesh].Properties[currentProperty].Indices[3] = 0xFF;
                     //}
 
                     usedCurrentProperty = true;
@@ -839,25 +870,16 @@ namespace BundleManager
                     currentProperty = -1;
 
                     ColMesh colMesh = new ColMesh();
-
-                    // TODO: Only works if mesh already exists in this PolygonSoupList
-                    {
-                        string meshId = currentMesh.Substring("mesh".Length);
-                        if (!int.TryParse(meshId, NumberStyles.None, CultureInfo.CurrentCulture, out var meshIndex))
-                        {
-                            throw new ReadFailedError("Invalid Group: " + meshId);
-                        }
-
-                        scale = Chunks[meshIndex].Scale; // 0.02f
-                        pos = Chunks[meshIndex].Position; // get center and use that
-
-                        colMesh.ID = meshIndex;
-                    }
+					
+                    colMesh.ID = meshIndex++;
 
                     colMesh.Name = currentMesh;
-                    colMesh.Points = new Dictionary<byte, Vector3S>();
-                    colMesh.Properties = new List<PolygonSoupProperty>();
-                    //colMesh.Indices = new List<uint>();
+					colMesh.PointsUnprocessed = new Dictionary<byte, Vector3>();
+					colMesh.Points = new Dictionary<byte, Vector3S>();
+					colMesh.Properties = new List<PolygonSoupProperty>();
+					//colMesh.Indices = new List<uint>();
+					colMesh.Scale = 0.02f;
+					colMesh.Position = new Vector3(float.MaxValue);
                     meshes.Add(currentMesh, colMesh);
                 }
             }
@@ -865,14 +887,21 @@ namespace BundleManager
             sr.Close();
             s.Close();
 
+			Chunks.Clear();
+			BoundingBoxes.Clear();
+
             foreach (string meshName in meshes.Keys)
             {
                 ColMesh mesh = meshes[meshName];
 
-                PolygonSoupChunk chunk = Chunks[mesh.ID];
+				// at this point we have the mesh, we need to process its points
+				// and we need to subtract the position and take scale into account here!
+				// make vectors out of the three points we just read in with their X, Y and Z and take into account the scale/base
+
+				PolygonSoupChunk chunk = new PolygonSoupChunk();
                 chunk.PropertyList = mesh.Properties;
 				byte meshPointMax = 0;
-				foreach (byte key in mesh.Points.Keys)
+				foreach (byte key in mesh.PointsUnprocessed.Keys)
 				{
 					if (meshPointMax < key)
 					{
@@ -880,9 +909,10 @@ namespace BundleManager
 					}
 				}
 				Vector3S[] verts = new Vector3S[meshPointMax + 1];
-				foreach (byte key in mesh.Points.Keys)
+				foreach (byte key in mesh.PointsUnprocessed.Keys)
 				{
-					verts[key] = mesh.Points[key];
+					Vector3S pointProcessed = new Vector3S((short)(Math.Round(mesh.PointsUnprocessed[key].X / mesh.Scale) - mesh.Position.X), (short)(Math.Round(mesh.PointsUnprocessed[key].Y / mesh.Scale) - mesh.Position.Y), (short)(Math.Round(mesh.PointsUnprocessed[key].Z / mesh.Scale) - mesh.Position.Z));
+					verts[key] = pointProcessed;
 				}
 				chunk.PointList = verts.ToList();
 				chunk.PointCount = (byte)(meshPointMax + 1);
@@ -891,6 +921,11 @@ namespace BundleManager
 
                 chunk.PropertyListCount = (byte)mesh.Properties.Count; //0;
                 chunk.QuadCount = 0; // TODO: when quads are supported.
+				chunk.Scale = mesh.Scale;
+				chunk.Position = new Vector3I((int)Math.Round(mesh.Position.X / mesh.Scale), (int)Math.Round(mesh.Position.Y / mesh.Scale), (int)Math.Round(mesh.Position.Z / mesh.Scale));
+				int polygonSoupBoundingBoxUnknown = -1;
+				BoundingBoxes.Add(new PolygonSoupBoundingBox(new BoxF(mesh.Position, mesh.Max), polygonSoupBoundingBoxUnknown)); //addAndThenCalculateTheBoundingBoxButThenAlsoWeHaveToClearItAnthonyIWantToBeSeriousRightNowPleaseYoureGettingOnMyNervesSighAnthonyPleaseYoureReallyBuggingMeAnthonyIWantYouToStopIllLeave
+				Chunks.Add(chunk);
             }
         }
     }

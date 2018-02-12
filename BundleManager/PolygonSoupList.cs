@@ -361,13 +361,13 @@ namespace BundleManager
         public int ChunkCount;
         public uint FileSize;
 
-        public List<uint> ChunkPointers;
+        //public List<uint> ChunkPointers;
         public List<PolygonSoupBoundingBox> BoundingBoxes;
         public List<PolygonSoupChunk> Chunks;
 
         public PolygonSoupList()
         {
-            ChunkPointers = new List<uint>();
+            //ChunkPointers = new List<uint>();
             BoundingBoxes = new List<PolygonSoupBoundingBox>();
             Chunks = new List<PolygonSoupChunk>();
         }
@@ -389,6 +389,8 @@ namespace BundleManager
             result.ChunkCount = br.ReadInt32();
             result.FileSize = br.ReadUInt32();
 
+            List<uint> chunkPointers = new List<uint>();
+
             // No Data
             if (result.ChunkCount == 0)
             {
@@ -401,7 +403,7 @@ namespace BundleManager
 
             for (int i = 0; i < result.ChunkCount; i++)
             {
-                result.ChunkPointers.Add(br.ReadUInt32());
+                chunkPointers.Add(br.ReadUInt32());
             }
 
             for (int i = 0; i < result.ChunkCount; i++)
@@ -435,9 +437,9 @@ namespace BundleManager
 				result.BoundingBoxes.Add(box);
             }
 
-            for (int i = 0; i < result.ChunkPointers.Count; i++)
+            for (int i = 0; i < chunkPointers.Count; i++)
             {
-                br.BaseStream.Position = result.ChunkPointers[i];
+                br.BaseStream.Position = chunkPointers[i];
 
                 result.Chunks.Add(PolygonSoupChunk.Read(br));
             }
@@ -450,9 +452,6 @@ namespace BundleManager
 
         public void Write(BundleEntry entry)
         {
-            //if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
-            //    ImportObj(@"E:\trk_col_221_untouched.obj");
-
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
@@ -462,11 +461,13 @@ namespace BundleManager
             bw.Write(Unknown8);
             bw.Write(ChunkPointerStart);
             bw.Write(BoxListStart);
-            bw.Write(ChunkCount);
+            bw.Write(Chunks.Count);
             bw.Write(FileSize);
+            
+            uint[] chunkPointers = new uint[Chunks.Count];
 
             // No Data
-            if (ChunkCount == 0)
+            if (Chunks.Count == 0)
             {
                 bw.Flush();
                 byte[] data2 = ms.ToArray();
@@ -480,12 +481,12 @@ namespace BundleManager
 
             bw.BaseStream.Position = ChunkPointerStart;
             
-            for (int i = 0; i < ChunkCount; i++)
+            for (int i = 0; i < Chunks.Count; i++)
             {
                 bw.Write((uint)0);
             }
 
-            for (int i = 0; i < ChunkCount; i++)
+            for (int i = 0; i < Chunks.Count; i++)
             {
                 // Write Vertically
 
@@ -513,11 +514,11 @@ namespace BundleManager
 
             bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
 
-            if (ChunkCount > 0)
+            if (Chunks.Count > 0)
             {
                 bw.BaseStream.Position = (128 * ((bw.BaseStream.Position + 127) / 128));
 
-                for (int i = 0; i < ChunkCount / 4; i++)
+                for (int i = 0; i < Chunks.Count / 4; i++)
                 {
                     if ((i % 8) % 3 == 0)
                     {
@@ -530,11 +531,11 @@ namespace BundleManager
                 }
             }
 
-            for (int i = 0; i < ChunkPointers.Count; i++)
+            for (int i = 0; i < chunkPointers.Length; i++)
             {
                 bw.BaseStream.Position = (128 * ((bw.BaseStream.Position + 127) / 128));
-                
-                ChunkPointers[i] = (uint)bw.BaseStream.Position;
+
+                chunkPointers[i] = (uint)bw.BaseStream.Position;
 
                 Chunks[i].Write(bw);
             }
@@ -543,9 +544,9 @@ namespace BundleManager
             bw.Write((byte)0);
 
             bw.BaseStream.Position = ChunkPointerStart;
-            for (int i = 0; i < ChunkCount; i++)
+            for (int i = 0; i < Chunks.Count; i++)
             {
-                bw.Write(ChunkPointers[i]);
+                bw.Write(chunkPointers[i]);
             }
 
             bw.Flush();
@@ -653,9 +654,16 @@ namespace BundleManager
                         meshes[currentMesh].Max = MathUtils.MaxBounds(v1, v2, v3, meshes[currentMesh].Max);
                         meshes[currentMesh].Position = meshes[currentMesh].Min;
 
-                        byte localIndex1 = (byte) (f1 - 1 - curStartVertex);
-                        byte localIndex2 = (byte) (f2 - 1 - curStartVertex);
-                        byte localIndex3 = (byte) (f3 - 1 - curStartVertex);
+                        uint vert1 = (uint)(f1 - 1 - curStartVertex);
+                        uint vert2 = (uint)(f2 - 1 - curStartVertex);
+                        uint vert3 = (uint)(f3 - 1 - curStartVertex);
+
+                        if (vert1 >= 255 || vert2 >= 255 || vert3 >= 255)
+                            throw new ReadFailedError("PolygonSoupLists require that each mesh has less than 255 vertices.\nSplit up your mesh and try again.\n\nThis error occurred while importing: " + currentMesh);
+
+                        byte localIndex1 = (byte) vert1;
+                        byte localIndex2 = (byte) vert2;
+                        byte localIndex3 = (byte) vert3;
 
                         // add the three points we just read in for this mesh to the current property (polygon)
                         meshes[currentMesh].Properties[currentProperty].Indices[0] = localIndex1;
@@ -677,6 +685,38 @@ namespace BundleManager
                         meshes[currentMesh].Properties[currentProperty].Indices[3] = 0xFF;
 
                         usedCurrentProperty = true;
+                        
+                        /* Doesn't work - TODO: FIX
+                        
+                        // If there are more than 240 points then put them into another mesh
+                        // 255 is the limit but let's use 240 to be safe
+                        byte meshPointMax = 0;
+                        foreach (byte key in meshes[currentMesh].Points.Keys)
+                        {
+                            if (meshPointMax < key)
+                            {
+                                meshPointMax = key;
+                            }
+                        }
+                        if (meshPointMax >= 240)
+                        {
+                            currentMesh = currentMesh + "_";
+
+                            curStartVertex = nextStartVertex;
+                            nextStartVertex = (int)(globalVertCount - 1);
+                            currentProperty = -1;
+
+                            ColMesh colMesh = new ColMesh
+                            {
+                                Points = new Dictionary<byte, Vector3>(),
+                                Properties = new List<PolygonSoupProperty>(),
+                                Scale = 0.015f,
+                                Position = new Vector3(float.MaxValue),
+                                Min = new Vector3(float.MaxValue),
+                                Max = new Vector3(float.MinValue)
+                            };
+                            meshes.Add(currentMesh, colMesh);
+                        }*/
                     }
                     catch (NotSupportedException)
                     {
@@ -758,6 +798,7 @@ namespace BundleManager
 			Chunks.Clear();
 			BoundingBoxes.Clear();
 
+            // Convert ColMeshes to PolygonSoupChunks and generate bounding boxes
             foreach (string meshName in meshes.Keys)
             {
                 ColMesh mesh = meshes[meshName];

@@ -50,17 +50,21 @@ namespace BundleManager
                 if (string.IsNullOrEmpty(path) || path.Trim().Length == 0)
                     return;
 
+                bool success;
                 try
                 {
                     _poly.ImportObj(path);
+                    success = true;
                 }
                 catch (ReadFailedError ex)
                 {
                     MessageBox.Show(this, ex.Message, "Read Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    success = false;
                 }
                 UpdateDisplay();
 
-                Changed?.Invoke();
+                if (success)
+                    Changed?.Invoke();
             }
         }
 

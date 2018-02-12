@@ -47,14 +47,14 @@
             this.rndMain.Location = new System.Drawing.Point(0, 24);
             this.rndMain.Name = "rndMain";
             this.rndMain.Scene = null;
-            this.rndMain.Size = new System.Drawing.Size(492, 354);
+            this.rndMain.Size = new System.Drawing.Size(1008, 683);
             this.rndMain.TabIndex = 0;
             // 
             // stsMain
             // 
-            this.stsMain.Location = new System.Drawing.Point(0, 378);
+            this.stsMain.Location = new System.Drawing.Point(0, 707);
             this.stsMain.Name = "stsMain";
-            this.stsMain.Size = new System.Drawing.Size(492, 22);
+            this.stsMain.Size = new System.Drawing.Size(1008, 22);
             this.stsMain.TabIndex = 1;
             this.stsMain.Text = "statusStrip1";
             // 
@@ -65,7 +65,7 @@
             this.viewToolStripMenuItem});
             this.mnuMain.Location = new System.Drawing.Point(0, 0);
             this.mnuMain.Name = "mnuMain";
-            this.mnuMain.Size = new System.Drawing.Size(492, 24);
+            this.mnuMain.Size = new System.Drawing.Size(1008, 24);
             this.mnuMain.TabIndex = 2;
             this.mnuMain.Text = "menuStrip1";
             // 
@@ -83,26 +83,26 @@
             // importModelToolStripMenuItem
             // 
             this.importModelToolStripMenuItem.Name = "importModelToolStripMenuItem";
-            this.importModelToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.importModelToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.importModelToolStripMenuItem.Text = "Import Model";
             this.importModelToolStripMenuItem.Click += new System.EventHandler(this.importModelToolStripMenuItem_Click);
             // 
             // exportModelToolStripMenuItem
             // 
             this.exportModelToolStripMenuItem.Name = "exportModelToolStripMenuItem";
-            this.exportModelToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exportModelToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.exportModelToolStripMenuItem.Text = "Export Model";
             this.exportModelToolStripMenuItem.Click += new System.EventHandler(this.exportModelToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(144, 6);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.closeToolStripMenuItem.Text = "Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
@@ -117,7 +117,7 @@
             // debugInfoToolStripMenuItem
             // 
             this.debugInfoToolStripMenuItem.Name = "debugInfoToolStripMenuItem";
-            this.debugInfoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.debugInfoToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
             this.debugInfoToolStripMenuItem.Text = "Debug Info";
             this.debugInfoToolStripMenuItem.Click += new System.EventHandler(this.debugInfoToolStripMenuItem_Click);
             // 
@@ -125,7 +125,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(492, 400);
+            this.ClientSize = new System.Drawing.Size(1008, 729);
             this.Controls.Add(this.rndMain);
             this.Controls.Add(this.stsMain);
             this.Controls.Add(this.mnuMain);

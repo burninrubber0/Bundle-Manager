@@ -43,7 +43,6 @@
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.searchForEntryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.debugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dumpAllCollisionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.tsbNew = new System.Windows.Forms.ToolStripButton();
@@ -73,8 +72,7 @@
             // 
             this.mnuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.toolsToolStripMenuItem,
-            this.debugToolStripMenuItem});
+            this.toolsToolStripMenuItem});
             this.mnuMain.Location = new System.Drawing.Point(0, 0);
             this.mnuMain.Name = "mnuMain";
             this.mnuMain.Size = new System.Drawing.Size(784, 24);
@@ -167,7 +165,8 @@
             // toolsToolStripMenuItem
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.searchForEntryToolStripMenuItem});
+            this.searchForEntryToolStripMenuItem,
+            this.dumpAllCollisionsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -180,18 +179,11 @@
             this.searchForEntryToolStripMenuItem.Text = "Search for entry";
             this.searchForEntryToolStripMenuItem.Click += new System.EventHandler(this.searchForEntryToolStripMenuItem_Click);
             // 
-            // debugToolStripMenuItem
-            // 
-            this.debugToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.dumpAllCollisionsToolStripMenuItem});
-            this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
-            this.debugToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
-            this.debugToolStripMenuItem.Text = "Debug";
-            // 
             // dumpAllCollisionsToolStripMenuItem
             // 
+            this.dumpAllCollisionsToolStripMenuItem.Enabled = false;
             this.dumpAllCollisionsToolStripMenuItem.Name = "dumpAllCollisionsToolStripMenuItem";
-            this.dumpAllCollisionsToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+            this.dumpAllCollisionsToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
             this.dumpAllCollisionsToolStripMenuItem.Text = "Dump All Collisions";
             this.dumpAllCollisionsToolStripMenuItem.Click += new System.EventHandler(this.dumpAllCollisionsToolStripMenuItem_Click);
             // 
@@ -401,9 +393,8 @@
         private System.Windows.Forms.ColumnHeader colSize;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem searchForEntryToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem debugToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem dumpAllCollisionsToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader colName;
+        private System.Windows.Forms.ToolStripMenuItem dumpAllCollisionsToolStripMenuItem;
     }
 }
 

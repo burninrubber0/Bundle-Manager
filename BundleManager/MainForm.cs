@@ -185,6 +185,8 @@ namespace BundleManager
         {
             lstEntries.Items.Clear();
 
+            dumpAllCollisionsToolStripMenuItem.Enabled = false;
+
             if (CurrentArchive == null)
             {
                 lstEntries.Enabled = false;
@@ -198,6 +200,8 @@ namespace BundleManager
             for (int i = 0; i < CurrentArchive.Entries.Count; i++)
             {
                 BundleEntry entry = CurrentArchive.Entries[i];
+                if (entry.Type == EntryType.PolygonSoupListResourceType)
+                    dumpAllCollisionsToolStripMenuItem.Enabled = true;
                 Color color = entry.GetColor();
                 string[] values = new string[]
                 {
@@ -412,7 +416,7 @@ namespace BundleManager
 
         public void DoSaveBundle(LoadingDialog loader, string path)
         {
-            //if (CurrentArchive.Console)
+            if (CurrentArchive.Console)
                 ConvertToPC();
             Stream s = File.Open(path, FileMode.Create);
             BinaryWriter bw = new BinaryWriter(s);
@@ -429,8 +433,8 @@ namespace BundleManager
         {
             Application.Exit();
         }
-
-        public void PatchImages()
+        
+        public void ConvertImagesFromPS3ToPC_old()
         {
             if (CurrentArchive == null)
             {
@@ -817,11 +821,6 @@ namespace BundleManager
             EditSelectedEntry(true);
         }
 
-        private void patchImagesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            PatchImages();
-        }
-
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (!CheckSave())
@@ -849,18 +848,6 @@ namespace BundleManager
         {
             Close();
         }
-
-        /*private void modelCountToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            int modelCount = 0;
-            foreach (BundleEntry entry in CurrentArchive.Entries)
-            {
-                if (entry.Type == EntryType.Model)
-                    modelCount++;
-            }
-
-            MessageBox.Show(this, "Model Count: " + modelCount, "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }*/
 
         private void lstEntries_ColumnClick(object sender, ColumnClickEventArgs e)
         {
@@ -955,7 +942,6 @@ namespace BundleManager
             DialogResult result = fbd.ShowDialog(this);
             if (result == DialogResult.OK)
             {
-                //PolygonSoupChunk.Upper = 0;
                 string path = fbd.SelectedPath;
 
                 for (int i = 0; ; i++)
@@ -990,8 +976,6 @@ namespace BundleManager
                     Scene scene = poly.MakeScene();
                     scene.ExportWavefrontObj(path + "/" + polyName + ".obj");
                 }
-
-                //MessageBox.Show(this, PolygonSoupChunk.Upper.ToString("X4"), "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 MessageBox.Show(this, "Done!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }

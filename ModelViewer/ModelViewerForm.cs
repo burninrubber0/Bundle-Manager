@@ -14,41 +14,23 @@ namespace ModelViewer
 {
     public partial class ModelViewerForm : Form
     {
-        public GraphicsScene GraphicsScene;
-
-        public Scene Scene
-        {
-            get => GraphicsScene.Scene;
-            set => GraphicsScene.Scene = value;
-        }
-
         public ModelViewerForm()
         {
             InitializeComponent();
-
-            GraphicsScene = new GraphicsScene(glcMain.Width, glcMain.Height);
-            GraphicsScene.FrameRendered += GraphicsSceneOnFrameRendered;
-        }
-
-        private void GraphicsSceneOnFrameRendered()
-        {
-            glcMain.SwapBuffers();
         }
 
         public static void ShowModelViewer(Scene scene)
         {
             ModelViewerForm viewer = new ModelViewerForm();
-            viewer.Scene = scene;
+            viewer.rndMain.Scene = scene;
             viewer.ShowDialog();
-            viewer.Init();
         }
 
         public static void ShowModelViewer(IWin32Window owner, Scene scene)
         {
             ModelViewerForm viewer = new ModelViewerForm();
-            viewer.Scene = scene;
+            viewer.rndMain.Scene = scene;
             viewer.ShowDialog(owner);
-            viewer.Init();
         }
 
         public void ExportCollada14()
@@ -61,7 +43,7 @@ namespace ModelViewer
                 if (string.IsNullOrEmpty(sfd.FileName))
                     return;
 
-                Scene.ExportCollada14(sfd.FileName);
+                rndMain.Scene.ExportCollada14(sfd.FileName);
             }
         }
 
@@ -75,13 +57,8 @@ namespace ModelViewer
                 if (string.IsNullOrEmpty(sfd.FileName))
                     return;
 
-                Scene.ExportWavefrontObj(sfd.FileName);
+                rndMain.Scene.ExportWavefrontObj(sfd.FileName);
             }
-        }
-
-        private void Init()
-        {
-            GraphicsScene.Init();
         }
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -97,37 +74,6 @@ namespace ModelViewer
         private void wavefrontOBJToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ExportWavefrontObj();
-        }
-
-        private void glcMain_Load(object sender, EventArgs e)
-        {
-            GraphicsScene.Init();
-        }
-
-        private void glcMain_Paint(object sender, PaintEventArgs e)
-        {
-            GraphicsScene.Render();
-        }
-
-        private void ModelViewerForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            GraphicsScene.Cleanup();
-        }
-
-        private int _updateCount;
-        private void tmrUpdate_Tick(object sender, EventArgs e)
-        {
-            if (_updateCount < 2)
-                tmrUpdate.Interval = 17;
-            else
-            {
-                tmrUpdate.Interval = 16;
-                _updateCount = 0;
-            }
-            _updateCount++;
-
-            GraphicsScene?.Update();
-            glcMain.Refresh();
         }
     }
 }

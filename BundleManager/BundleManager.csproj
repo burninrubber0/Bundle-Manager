@@ -143,6 +143,12 @@
     <Compile Include="VertexSizePicker.Designer.cs">
       <DependentUpon>VertexSizePicker.cs</DependentUpon>
     </Compile>
+    <Compile Include="WorldColEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WorldColEditor.Designer.cs">
+      <DependentUpon>WorldColEditor.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="EntryEditor.resx">
       <DependentUpon>EntryEditor.cs</DependentUpon>
     </EmbeddedResource>
@@ -178,6 +184,9 @@
       <DependentUpon>VertexSizePicker.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="PolygonSoupList.cs" />
+    <EmbeddedResource Include="WorldColEditor.resx">
+      <DependentUpon>WorldColEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

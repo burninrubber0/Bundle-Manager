@@ -105,7 +105,7 @@ namespace VehicleList
         public float Unknown4; // float
         public int Flags;
         public short Unknown6;
-        public byte Unknown7;
+        public byte DisplayControl; // unused in released builds of burnout
         public byte DisplayStrength;
         public int Unknown8;
         public int Unknown9;
@@ -150,7 +150,7 @@ namespace VehicleList
             Unknown4 = copy.Unknown4;
             Flags = copy.Flags;
             Unknown6 = copy.Unknown6;
-            Unknown7 = copy.Unknown7;
+            DisplayControl = copy.DisplayControl;
             DisplayStrength = copy.DisplayStrength;
             Unknown8 = copy.Unknown8;
             Unknown9 = copy.Unknown9;

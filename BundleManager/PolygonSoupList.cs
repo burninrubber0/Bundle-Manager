@@ -658,7 +658,7 @@ namespace BundleManager
                         uint vert2 = (uint)(f2 - 1 - curStartVertex);
                         uint vert3 = (uint)(f3 - 1 - curStartVertex);
 
-                        if (vert1 >= 255 || vert2 >= 255 || vert3 >= 255)
+                        if (vert1 > 255 || vert2 > 255 || vert3 > 255)
                             throw new ReadFailedError("PolygonSoupLists require that each mesh has less than 255 vertices.\nSplit up your mesh and try again.\n\nThis error occurred while importing: " + currentMesh);
 
                         byte localIndex1 = (byte) vert1;
@@ -775,8 +775,9 @@ namespace BundleManager
                         throw new ReadFailedError("Invalid Group: <none>");
                     currentMesh = options[1];
 
-					curStartVertex = nextStartVertex;
+                    // the next 2 lines were flipped before. How did that even work?!
                     nextStartVertex = (int)(globalVertCount - 1);
+					curStartVertex = nextStartVertex;
                     currentProperty = -1;
 
                     ColMesh colMesh = new ColMesh

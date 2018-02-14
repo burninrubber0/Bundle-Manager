@@ -1,6 +1,6 @@
-#version 450 core
-//#extension GL_ARB_explicit_attrib_location: enable
-//#extension GL_ARB_explicit_uniform_location : enable
+#version 330 core
+#extension GL_ARB_explicit_attrib_location: enable
+#extension GL_ARB_explicit_uniform_location : enable
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec2 textureCoordinate;

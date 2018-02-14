@@ -1,6 +1,6 @@
-#version 450 core
-//#extension GL_ARB_explicit_attrib_location: enable
-//#extension GL_ARB_explicit_uniform_location : enable
+#version 330 core
+#extension GL_ARB_explicit_attrib_location: enable
+#extension GL_ARB_explicit_uniform_location : enable
 
 in vec2 vs_textureCoordinate;
 uniform sampler2D textureObject;

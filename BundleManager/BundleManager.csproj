@@ -91,6 +91,8 @@
     <Compile Include="FileView.Designer.cs">
       <DependentUpon>FileView.cs</DependentUpon>
     </Compile>
+    <Compile Include="GenericMesh.cs" />
+    <Compile Include="GenericModel.cs" />
     <Compile Include="IDList.cs" />
     <Compile Include="ILoader.cs" />
     <Compile Include="GraphicsSpec.cs" />
@@ -122,6 +124,7 @@
     </Compile>
     <Compile Include="MaterialEntry.cs" />
     <Compile Include="ModelResource.cs" />
+    <Compile Include="OBJImporter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProgressionData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

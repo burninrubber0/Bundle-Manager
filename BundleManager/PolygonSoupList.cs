@@ -13,6 +13,7 @@ using DebugHelper;
 using MathLib;
 using ModelViewer.SceneData;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using StandardExtension;
 
 namespace BundleManager
@@ -69,16 +70,6 @@ namespace BundleManager
         {
             // Cap to 0x9D64 for PC
             ushort unknownProperty1 = (ushort)(UnknownProperty & 0xFFFF);
-            /*byte unk1 = (byte) (unknownProperty1 & 0xFF);
-            byte unk2 = (byte) (unknownProperty1 >> 8);
-
-            if (unk2 > 0x9D && unk2 != 0xFF)
-                unk2 = 0x9D;
-
-            if (unk1 > 0x64 && unk1 != 0xFF)
-                unk1 = 0x64;*/
-
-            //unknownProperty1 = (ushort)((unk2 << 8) | unk1);
 
             // Patch values that are too high (from console) with Schembri Pass
             if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
@@ -120,17 +111,17 @@ namespace BundleManager
     public class PolygonSoupBoundingBox
     {
         public BoxF Box;
-        public int Unknown;
+        public int Terminator;
 
-		public PolygonSoupBoundingBox(BoxF box, int unknown)
+		public PolygonSoupBoundingBox(BoxF box, int terminator)
 		{
 			Box = box;
-			Unknown = unknown;
+			Terminator = terminator;
 		}
 
         public override string ToString()
         {
-            return Box.ToString() + ", " + Unknown;
+            return Box.ToString() + ", " + Terminator;
         }
     }
 
@@ -138,11 +129,7 @@ namespace BundleManager
     {
         public Vector3I Position;
         public float Scale;
-        public uint PropertyListStart;
-        public uint PointListStart;
-        public byte PropertyListCount;
         public byte QuadCount;
-        public byte PointCount;
         public byte Unknown10;
         public short Unknown11;
 
@@ -161,24 +148,24 @@ namespace BundleManager
 
             result.Position = br.ReadVector3I();
             result.Scale = br.ReadSingle();
-            result.PropertyListStart = br.ReadUInt32();
-            result.PointListStart = br.ReadUInt32();
+            uint propertyListStart = br.ReadUInt32();
+            uint pointListStart = br.ReadUInt32();
             br.ReadInt16(); // Length
-            result.PropertyListCount = br.ReadByte();
+            byte propertyListCount = br.ReadByte();
             result.QuadCount = br.ReadByte();
-            result.PointCount = br.ReadByte();
+            int pointCount = br.ReadByte();
             result.Unknown10 = br.ReadByte();
             result.Unknown11 = br.ReadInt16();
 
-            br.BaseStream.Position = result.PointListStart;
-            for (int i = 0; i < result.PointCount; i++)
+            br.BaseStream.Position = pointListStart;
+            for (int i = 0; i < pointCount; i++)
             {
                 result.PointList.Add(br.ReadVector3S());
             }
 
-            br.BaseStream.Position = result.PropertyListStart;
+            br.BaseStream.Position = propertyListStart;
 
-            for (int i = 0; i < result.PropertyListCount; i++)
+            for (int i = 0; i < propertyListCount; i++)
             {
                 result.PropertyList.Add(PolygonSoupProperty.Read(br));
             }
@@ -197,9 +184,9 @@ namespace BundleManager
             bw.Write((uint) 0);
 			long lengthPtr = bw.BaseStream.Position;
             bw.Write((ushort) 0);
-            bw.Write(PropertyListCount);
+            bw.Write((byte)PropertyList.Count);
             bw.Write(QuadCount);
-            bw.Write(PointCount);
+            bw.Write((byte)PointList.Count);
             bw.Write(Unknown10);
             bw.Write(Unknown11);
             
@@ -208,7 +195,7 @@ namespace BundleManager
             bw.Write((uint)cPos);
             bw.BaseStream.Position = cPos;
 
-            for (int i = 0; i < PointCount; i++)
+            for (int i = 0; i < PointList.Count; i++)
             {
                 bw.Write(PointList[i]);
             }
@@ -219,7 +206,7 @@ namespace BundleManager
             bw.Write((uint)cPos);
             bw.BaseStream.Position = cPos;
 
-            for (int i = 0; i < PropertyListCount; i++)
+            for (int i = 0; i < PropertyList.Count; i++)
             {
                 PropertyList[i].Write(bw);
             }
@@ -346,7 +333,7 @@ namespace BundleManager
 
         public override string ToString()
         {
-            return "Pos: " + Position + ", Scale: " + Scale + ", PointCount: " + PointCount;
+            return "Pos: " + Position + ", Scale: " + Scale + ", PointCount: " + PointList.Count;
         }
     }
 
@@ -356,10 +343,10 @@ namespace BundleManager
         public int Unknown4;
         public Vector3 Max;
         public int Unknown8;
-        public uint ChunkPointerStart;
-        public uint BoxListStart;
-        public int ChunkCount;
-        public uint FileSize;
+        //public uint ChunkPointerStart;
+        //public uint BoxListStart;
+        //public int ChunkCount;
+        //public uint FileSize;
 
         //public List<uint> ChunkPointers;
         public List<PolygonSoupBoundingBox> BoundingBoxes;
@@ -384,33 +371,33 @@ namespace BundleManager
             result.Unknown4 = br.ReadInt32();
             result.Max = br.ReadVector3F();
             result.Unknown8 = br.ReadInt32();
-            result.ChunkPointerStart = br.ReadUInt32();
-            result.BoxListStart = br.ReadUInt32();
-            result.ChunkCount = br.ReadInt32();
-            result.FileSize = br.ReadUInt32();
+            uint chunkPointerStart = br.ReadUInt32();
+            uint boxListStart = br.ReadUInt32();
+            int chunkCount = br.ReadInt32();
+            br.ReadUInt32(); // FileSize
 
             List<uint> chunkPointers = new List<uint>();
 
             // No Data
-            if (result.ChunkCount == 0)
+            if (chunkCount == 0)
             {
                 br.Close();
                 ms.Close();
                 return result;
             }
 
-            br.BaseStream.Position = result.ChunkPointerStart;
+            br.BaseStream.Position = chunkPointerStart;
 
-            for (int i = 0; i < result.ChunkCount; i++)
+            for (int i = 0; i < chunkCount; i++)
             {
                 chunkPointers.Add(br.ReadUInt32());
             }
 
-            for (int i = 0; i < result.ChunkCount; i++)
+            for (int i = 0; i < chunkCount; i++)
             {
                 // Read Vertically
 
-                long pos = result.BoxListStart + 0x70 * (i / 4) + 4 * (i % 4);
+                long pos = boxListStart + 0x70 * (i / 4) + 4 * (i % 4);
 
                 BoxF boundingBox = new BoxF();
                 br.BaseStream.Position = pos;
@@ -459,10 +446,13 @@ namespace BundleManager
             bw.Write(Unknown4);
             bw.Write(Max);
             bw.Write(Unknown8);
-            bw.Write(ChunkPointerStart);
-            bw.Write(BoxListStart);
+            long chunkPointerStartPos = bw.BaseStream.Position;
+            bw.Write((uint)0);
+            long boxListStartPos = bw.BaseStream.Position;
+            bw.Write((uint)0);
             bw.Write(Chunks.Count);
-            bw.Write(FileSize);
+            long fileSizePos = bw.BaseStream.Position;
+            bw.Write((uint)0);
             
             uint[] chunkPointers = new uint[Chunks.Count];
 
@@ -479,18 +469,28 @@ namespace BundleManager
                 return;
             }
 
-            bw.BaseStream.Position = ChunkPointerStart;
+            long cPos = bw.BaseStream.Position;
+            uint chunkPointerStart = (uint)bw.BaseStream.Position;
+            bw.BaseStream.Position = chunkPointerStartPos;
+            bw.Write((uint)cPos);
+            bw.BaseStream.Position = cPos;
             
             for (int i = 0; i < Chunks.Count; i++)
             {
                 bw.Write((uint)0);
             }
+            
+            bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
+            cPos = bw.BaseStream.Position;
+            uint boxListStart = (uint)bw.BaseStream.Position;
+            bw.BaseStream.Position = boxListStartPos;
+            bw.Write((uint) cPos);
 
             for (int i = 0; i < Chunks.Count; i++)
             {
                 // Write Vertically
 
-                long pos = BoxListStart + 0x70 * (i / 4) + 4 * (i % 4);
+                long pos = boxListStart + 0x70 * (i / 4) + 4 * (i % 4);
 
                 PolygonSoupBoundingBox box = BoundingBoxes[i];
 
@@ -509,7 +509,7 @@ namespace BundleManager
                 bw.Write(box.Box.Max.Z);
 
                 bw.BaseStream.Position += 12;
-                bw.Write(box.Unknown);
+                bw.Write(box.Terminator);
             }
 
             bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
@@ -543,7 +543,11 @@ namespace BundleManager
             bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16)) + 0x5F;
             bw.Write((byte)0);
 
-            bw.BaseStream.Position = ChunkPointerStart;
+            cPos = bw.BaseStream.Position;
+            bw.BaseStream.Position = fileSizePos;
+            bw.Write((uint)cPos);
+
+            bw.BaseStream.Position = chunkPointerStart;
             for (int i = 0; i < Chunks.Count; i++)
             {
                 bw.Write(chunkPointers[i]);
@@ -578,263 +582,150 @@ namespace BundleManager
             return scene;
         }
 
-        private class ColMesh
-        {
-			public Dictionary<byte, Vector3> Points;
-			public float Scale;
-			public Vector3 Position;
-            public Vector3 Min;
-			public Vector3 Max;
-			public List<PolygonSoupProperty> Properties;
-        }
-
         public void ImportObj(string path)
         {
-            Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
-            StreamReader sr = new StreamReader(s);
+            GenericModel model = OBJImporter.ImportOBJ(path);
+            model.SplitByPointCount(255);
 
-            List<Vector3> points = new List<Vector3>();
-
-            Dictionary<string, ColMesh> meshes = new Dictionary<string, ColMesh>();
-
-            PolygonSoupProperty lastUsedProperty = null;
-            bool usedCurrentProperty = false;
-            uint globalVertCount = 0;
-			int curStartVertex = 0;
-			int nextStartVertex = 0;
-			int currentProperty = -1;
-            string currentMesh = "";
-
-            while (!sr.EndOfStream)
+            // Verify data before applying
+            foreach (GenericMesh mesh in model.Meshes)
             {
-                string line = sr.ReadLine();
-                if (line == null || line.Trim().StartsWith("#"))
-                    continue;
-
-                line = line.Trim();
-
-                if (line.StartsWith("v"))
+                // Get highest point
+                uint pointCount = 0;
+                foreach (uint key in mesh.Vertices.Keys)
                 {
-					// read in this vertex and add it to the points (this happens first)
-                    string[] options = line.Split(' ');
-                    if (options.Length < 4)
-                        throw new ReadFailedError("Invalid Vertex Line: " + line);
-                    
-                    Utilities.Parse(options[1], false, out float x);
-                    Utilities.Parse(options[2], false, out float y);
-                    Utilities.Parse(options[3], false, out float z);
-
-                    globalVertCount++;
-                    points.Add(new Vector3(x, y, z));
-
-                } else if (line.StartsWith("f"))
+                    if (pointCount < key)
+                    {
+                        pointCount = key;
+                    }
+                }
+                pointCount++;
+                // Is it too big for a byte?
+                if (pointCount > 256)
+                    throw new ReadFailedError("Too many points for mesh: " + mesh.Name + ", " + pointCount + " > 256");
+                foreach (Face face in mesh.Faces)
                 {
-					// add the faces to the list of faces (this happens after)
-                    string[] options = line.Split(' ');
-                    if (options.Length < 4)
-                        throw new ReadFailedError("Invalid Face Line: " + line);
+                    // Material names are required
+                    if (string.IsNullOrEmpty(face.Material?.Name))
+                        throw new ReadFailedError("Invalid Material for mesh: " + mesh.Name);
 
+                    // Verify that all data is there
+                    string[] split = face.Material.Name.Split('_');
+                    if (split.Length < 7)
+                        throw new ReadFailedError("Invalid Material Data: " + face.Material.Name + ", for mesh: " + mesh.Name);
+
+                    // Verify that all data can be parsed
                     try
                     {
-                        Utilities.Parse(options[1].Split('/')[0], false, out uint f1);
-                        Utilities.Parse(options[2].Split('/')[0], false, out uint f2);
-                        Utilities.Parse(options[3].Split('/')[0], false, out uint f3);
-
-                        if (usedCurrentProperty)
-                        {
-                            currentProperty++;
-                            meshes[currentMesh].Properties.Add(lastUsedProperty?.Copy());
-                        }
-
-                        // find the face's points
-                        Vector3 v1 = points[(int) f1 - 1];
-                        Vector3 v2 = points[(int) f2 - 1];
-                        Vector3 v3 = points[(int) f3 - 1];
-                        meshes[currentMesh].Min = MathUtils.MinBounds(v1, v2, v3, meshes[currentMesh].Min);
-                        meshes[currentMesh].Max = MathUtils.MaxBounds(v1, v2, v3, meshes[currentMesh].Max);
-                        meshes[currentMesh].Position = meshes[currentMesh].Min;
-
-                        uint vert1 = (uint)(f1 - 1 - curStartVertex);
-                        uint vert2 = (uint)(f2 - 1 - curStartVertex);
-                        uint vert3 = (uint)(f3 - 1 - curStartVertex);
-
-                        if (vert1 > 255 || vert2 > 255 || vert3 > 255)
-                            throw new ReadFailedError("PolygonSoupLists require that each mesh has less than 255 vertices.\nSplit up your mesh and try again.\n\nThis error occurred while importing: " + currentMesh);
-
-                        byte localIndex1 = (byte) vert1;
-                        byte localIndex2 = (byte) vert2;
-                        byte localIndex3 = (byte) vert3;
-
-                        // add the three points we just read in for this mesh to the current property (polygon)
-                        meshes[currentMesh].Properties[currentProperty].Indices[0] = localIndex1;
-                        meshes[currentMesh].Properties[currentProperty].Indices[1] = localIndex2;
-                        meshes[currentMesh].Properties[currentProperty].Indices[2] = localIndex3;
-
-                        if (!meshes[currentMesh].Points.ContainsKey(localIndex1))
-                        {
-                            meshes[currentMesh].Points.Add(localIndex1, v1);
-                        }
-                        if (!meshes[currentMesh].Points.ContainsKey(localIndex2))
-                        {
-                            meshes[currentMesh].Points.Add(localIndex2, v2);
-                        }
-                        if (!meshes[currentMesh].Points.ContainsKey(localIndex3))
-                        {
-                            meshes[currentMesh].Points.Add(localIndex3, v3);
-                        }
-                        meshes[currentMesh].Properties[currentProperty].Indices[3] = 0xFF;
-
-                        usedCurrentProperty = true;
-                        
-                        /* Doesn't work - TODO: FIX
-                        
-                        // If there are more than 240 points then put them into another mesh
-                        // 255 is the limit but let's use 240 to be safe
-                        byte meshPointMax = 0;
-                        foreach (byte key in meshes[currentMesh].Points.Keys)
-                        {
-                            if (meshPointMax < key)
-                            {
-                                meshPointMax = key;
-                            }
-                        }
-                        if (meshPointMax >= 240)
-                        {
-                            currentMesh = currentMesh + "_";
-
-                            curStartVertex = nextStartVertex;
-                            nextStartVertex = (int)(globalVertCount - 1);
-                            currentProperty = -1;
-
-                            ColMesh colMesh = new ColMesh
-                            {
-                                Points = new Dictionary<byte, Vector3>(),
-                                Properties = new List<PolygonSoupProperty>(),
-                                Scale = 0.015f,
-                                Position = new Vector3(float.MaxValue),
-                                Min = new Vector3(float.MaxValue),
-                                Max = new Vector3(float.MinValue)
-                            };
-                            meshes.Add(currentMesh, colMesh);
-                        }*/
+                        Utilities.Parse(split[1], true, out ushort _);
+                        Utilities.Parse(split[2], true, out ushort _);
+                        Utilities.Parse(split[3], true, out byte _);
+                        Utilities.Parse(split[4], true, out byte _);
+                        Utilities.Parse(split[5], true, out byte _);
+                        Utilities.Parse(split[6], true, out byte _);
                     }
                     catch (NotSupportedException)
                     {
-                        throw new ReadFailedError("Invalid Face Line: " + line);
+                        throw new ReadFailedError("Unable to Parse Material Data: " + face.Material.Name + ", for mesh: " + mesh.Name);
                     }
-
-                } else if (line.StartsWith("usemtl"))
-                {
-                    string[] options = line.Split(' ');
-                    if (options.Length < 2)
-                        throw new ReadFailedError("Invalid Material Line: " + line);
-                    string material = options[1];
-                    string[] matStrings = material.Split('_');
-                    if (matStrings.Length < 7)
-                        throw new ReadFailedError("Invalid Material: " + material);
-                    string property1 = matStrings[1];
-                    string property2 = matStrings[2];
-                    string newByte1 = matStrings[3];
-                    string newByte2 = matStrings[4];
-                    string newByte3 = matStrings[5];
-                    string newByte4 = matStrings[6];
-
-                    try
-                    {
-                        Utilities.Parse(property1, true, out ushort prop1);
-                        Utilities.Parse(property2, true, out ushort prop2);
-                        Utilities.Parse(newByte1, true, out byte nByte1);
-                        Utilities.Parse(newByte2, true, out byte nByte2);
-                        Utilities.Parse(newByte3, true, out byte nByte3);
-                        Utilities.Parse(newByte4, true, out byte nByte4);
-
-                        usedCurrentProperty = false;
-
-                        PolygonSoupProperty property = new PolygonSoupProperty();
-                        property.UnknownProperty = (uint) ((prop2 << 16) | prop1);
-                        //property.Indices is done above
-                        property.UnknownBytes[0] = nByte1;
-                        property.UnknownBytes[1] = nByte2;
-                        property.UnknownBytes[2] = nByte3;
-                        property.UnknownBytes[3] = nByte4;
-
-                        lastUsedProperty = property;
-
-                        currentProperty++;
-                        meshes[currentMesh].Properties.Add(property);
-                    }
-                    catch (NotSupportedException)
-                    {
-                        throw new ReadFailedError("Invalid Material: " + material);
-                    }
-
-                } else if (line.StartsWith("g"))
-                {
-                    string[] options = line.Split(' ');
-                    if (options.Length < 2)
-                        throw new ReadFailedError("Invalid Group: <none>");
-                    currentMesh = options[1];
-
-                    // the next 2 lines were flipped before. How did that even work?!
-                    nextStartVertex = (int)(globalVertCount - 1);
-					curStartVertex = nextStartVertex;
-                    currentProperty = -1;
-
-                    ColMesh colMesh = new ColMesh
-                    {
-                        Points = new Dictionary<byte, Vector3>(),
-                        Properties = new List<PolygonSoupProperty>(),
-                        Scale = 0.015f,
-                        Position = new Vector3(float.MaxValue),
-                        Min = new Vector3(float.MaxValue),
-                        Max = new Vector3(float.MinValue)
-                    };
-                    meshes.Add(currentMesh, colMesh);
                 }
             }
 
-            sr.Close();
-            s.Close();
-
-			Chunks.Clear();
+            // Clear existing data
+            Chunks.Clear();
 			BoundingBoxes.Clear();
 
-            // Convert ColMeshes to PolygonSoupChunks and generate bounding boxes
-            foreach (string meshName in meshes.Keys)
+            // Global vertices list to calculate the bounding box
+            List<Vector3> vertices = new List<Vector3>();
+
+            // Generate PolygonSoupChunks and BoundingBoxes
+            foreach (GenericMesh mesh in model.Meshes)
             {
-                ColMesh mesh = meshes[meshName];
+                PolygonSoupChunk chunk = new PolygonSoupChunk();
+                foreach (Face face in mesh.Faces)
+                {
+                    PolygonSoupProperty property = new PolygonSoupProperty();
 
-				// at this point we have the mesh, we need to process its points
-				// and we need to subtract the position and take scale into account here!
-				// make vectors out of the three points we just read in with their X, Y and Z and take into account the scale/base
+                    // Set Indices
+                    property.Indices[0] = (byte)face.Indices[0];
+                    property.Indices[1] = (byte)face.Indices[1];
+                    property.Indices[2] = (byte)face.Indices[2];
+                    property.Indices[3] = 0xFF;
 
-				PolygonSoupChunk chunk = new PolygonSoupChunk();
-                chunk.PropertyList = mesh.Properties;
-				byte meshPointMax = 0;
-				foreach (byte key in mesh.Points.Keys)
-				{
-					if (meshPointMax < key)
-					{
-						meshPointMax = key;
-					}
-				}
-				Vector3S[] verts = new Vector3S[meshPointMax + 1];
-				foreach (byte key in mesh.Points.Keys)
-				{
-                    Vector3S pointProcessed = new Vector3S((short)Math.Round((mesh.Points[key].X - mesh.Position.X) / mesh.Scale), (short)Math.Round((mesh.Points[key].Y - mesh.Position.Y) / mesh.Scale), (short)Math.Round((mesh.Points[key].Z - mesh.Position.Z) / mesh.Scale));
-                    verts[key] = pointProcessed;
-				}
-				chunk.PointList = verts.ToList();
-				chunk.PointCount = (byte)(meshPointMax + 1);
+                    // Get data from material name
+                    string materialName = face.Material.Name;
+                    string[] split = materialName.Split('_');
 
-                chunk.PropertyListCount = (byte)mesh.Properties.Count;
-                chunk.QuadCount = 0; // TODO: when quads are supported.
-				chunk.Scale = mesh.Scale;
-				chunk.Position = new Vector3I((int)Math.Round(mesh.Position.X / mesh.Scale), (int)Math.Round(mesh.Position.Y / mesh.Scale), (int)Math.Round(mesh.Position.Z / mesh.Scale));
-				int polygonSoupBoundingBoxUnknown = -1;
-				BoundingBoxes.Add(new PolygonSoupBoundingBox(new BoxF(mesh.Min, mesh.Max), polygonSoupBoundingBoxUnknown));
-				Chunks.Add(chunk);
+                    // Parse the values
+                    Utilities.Parse(split[1], true, out ushort unknownProperty1);
+                    Utilities.Parse(split[2], true, out ushort unknownProperty2);
+                    Utilities.Parse(split[3], true, out byte unknownByte1);
+                    Utilities.Parse(split[4], true, out byte unknownByte2);
+                    Utilities.Parse(split[5], true, out byte unknownByte3);
+                    Utilities.Parse(split[6], true, out byte unknownByte4);
+
+                    // Combine unknownProperty1 and unknownProperty2
+                    property.UnknownProperty = (uint) ((unknownProperty2 << 16) | unknownProperty1);
+
+                    // Set unknown bytes
+                    property.UnknownBytes[0] = unknownByte1;
+                    property.UnknownBytes[1] = unknownByte2;
+                    property.UnknownBytes[2] = unknownByte3;
+                    property.UnknownBytes[3] = unknownByte4;
+
+                    // Add the property
+                    chunk.PropertyList.Add(property);
+                }
+
+                // Add the vertices to the global vertices list
+                vertices.AddRange(mesh.Vertices.Values.ToArray());
+
+                // Get the minimum and maximum point of the mesh
+                Vector3 min = MathUtils.MinBounds(mesh.Vertices.Values.ToArray());
+                Vector3 max = MathUtils.MaxBounds(mesh.Vertices.Values.ToArray());
+
+                // Use the minimum as the position
+                Vector3 position = min;
+
+                // Set the scale to something standard
+                float scale = 0.015f;
+                
+                // Get the point count
+                uint pointCount = 0;
+                foreach (uint key in mesh.Vertices.Keys)
+                {
+                    if (pointCount < key)
+                    {
+                        pointCount = key;
+                    }
+                }
+                pointCount++;
+                Vector3S[] verts = new Vector3S[pointCount];
+                foreach (uint key in mesh.Vertices.Keys)
+                {
+                    // Convert the point to a short and apply position and scale
+                    verts[key] = new Vector3S((mesh.Vertices[key] - position) / scale);
+                }
+                chunk.PointList = verts.ToList();
+                
+                // Quads are currently unsupported
+                chunk.QuadCount = 0;
+
+                chunk.Scale = scale;
+
+                // Set the position and apply scale
+                chunk.Position = new Vector3I(position / scale);
+
+                // Add the chunk
+                Chunks.Add(chunk);
+
+                // Add the bounding box
+                BoundingBoxes.Add(new PolygonSoupBoundingBox(new BoxF(min, max), -1));
             }
+
+            // Calculate Bounding Box
+            Min = MathUtils.MinBounds(vertices.ToArray());
+            Max = MathUtils.MaxBounds(vertices.ToArray());
         }
     }
 }

@@ -98,6 +98,13 @@ namespace BundleFormat
                 BinaryReader2 br = new BinaryReader2(s);
 
                 BundleArchive result = Read(br);
+                if (result == null)
+                {
+                    br.Close();
+                    s.Close();
+
+                    return null;
+                }
                 result.Path = path;
 
                 br.Close();

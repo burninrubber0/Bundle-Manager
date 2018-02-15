@@ -156,6 +156,10 @@ namespace BundleFormat
                 entry.Platform = result.Platform;
 
                 entry.ID = br.ReadUInt64();
+
+                //if (entry.ID == 0xf66a4df8)
+                //    Debugger.Break();
+
                 entry.References = br.ReadInt32();
                 entry.Unknown12 = br.ReadInt32();
                 int uncompressedHeaderSize = br.ReadInt32();
@@ -170,9 +174,9 @@ namespace BundleFormat
                 entry.Unknown = br.ReadInt16();
 
                 entry.UncompressedHeaderSize = uncompressedHeaderSize & 0x0FFFFFFF;
-                entry.UncompressedHeaderSizeCache = uncompressedHeaderSize >> 16;
+                entry.UncompressedHeaderSizeCache = uncompressedHeaderSize >> 28;
                 entry.UncompressedBodySize = (int)(uncompressedBodySize & 0x0FFFFFFF);
-                entry.UncompressedBodySizeCache = (int)(uncompressedBodySize >> 16);
+                entry.UncompressedBodySizeCache = (int)(uncompressedBodySize >> 28);
 
                 entry.Type = (EntryType)fileType;
 

@@ -164,9 +164,6 @@ namespace BundleFormat
 
                 entry.ID = br.ReadUInt64();
 
-                //if (entry.ID == 0xf66a4df8)
-                //    Debugger.Break();
-
                 entry.References = br.ReadInt32();
                 entry.Unknown12 = br.ReadInt32();
                 int uncompressedHeaderSize = br.ReadInt32();

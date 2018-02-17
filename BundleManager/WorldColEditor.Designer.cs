@@ -38,6 +38,8 @@
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.debugInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeWreckSurfacesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -62,7 +64,8 @@
             // 
             this.mnuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.viewToolStripMenuItem});
+            this.viewToolStripMenuItem,
+            this.toolsToolStripMenuItem});
             this.mnuMain.Location = new System.Drawing.Point(0, 0);
             this.mnuMain.Name = "mnuMain";
             this.mnuMain.Size = new System.Drawing.Size(1008, 24);
@@ -121,6 +124,21 @@
             this.debugInfoToolStripMenuItem.Text = "Debug Info";
             this.debugInfoToolStripMenuItem.Click += new System.EventHandler(this.debugInfoToolStripMenuItem_Click);
             // 
+            // toolsToolStripMenuItem
+            // 
+            this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.removeWreckSurfacesToolStripMenuItem});
+            this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
+            this.toolsToolStripMenuItem.Text = "Tools";
+            // 
+            // removeWreckSurfacesToolStripMenuItem
+            // 
+            this.removeWreckSurfacesToolStripMenuItem.Name = "removeWreckSurfacesToolStripMenuItem";
+            this.removeWreckSurfacesToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.removeWreckSurfacesToolStripMenuItem.Text = "Remove Wreck Surfaces";
+            this.removeWreckSurfacesToolStripMenuItem.Click += new System.EventHandler(this.removeWreckSurfacesToolStripMenuItem_Click);
+            // 
             // WorldColEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -151,5 +169,7 @@
         private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem debugInfoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem removeWreckSurfacesToolStripMenuItem;
     }
 }

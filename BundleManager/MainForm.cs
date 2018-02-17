@@ -186,6 +186,7 @@ namespace BundleManager
             lstEntries.Items.Clear();
 
             dumpAllCollisionsToolStripMenuItem.Enabled = false;
+            removeWreckSurfacesToolStripMenuItem.Enabled = false;
 
             if (CurrentArchive == null)
             {
@@ -201,7 +202,10 @@ namespace BundleManager
             {
                 BundleEntry entry = CurrentArchive.Entries[i];
                 if (entry.Type == EntryType.PolygonSoupListResourceType)
+                {
                     dumpAllCollisionsToolStripMenuItem.Enabled = true;
+                    removeWreckSurfacesToolStripMenuItem.Enabled = true;
+                }
                 Color color = entry.GetColor();
                 string[] values = new string[]
                 {
@@ -1002,6 +1006,21 @@ namespace BundleManager
             }
 
             CurrentArchive.Platform = BundlePlatform.PC;
+        }
+
+        private void removeWreckSurfacesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < CurrentArchive.Entries.Count; i++)
+            {
+                BundleEntry entry = CurrentArchive.Entries[i];
+
+                if (entry.Type == EntryType.PolygonSoupListResourceType)
+                {
+                    PolygonSoupList list = PolygonSoupList.Read(entry);
+                    list.RemoveWreckSurfaces();
+                    list.Write(entry);
+                }
+            }
         }
     }
 }

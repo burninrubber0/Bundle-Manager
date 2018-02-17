@@ -497,6 +497,26 @@ namespace BundleManager
             entry.Dirty = true;
         }
 
+        public void RemoveWreckSurfaces()
+        {
+            foreach (PolygonSoupChunk chunk in Chunks)
+            {
+                foreach (PolygonSoupProperty property in chunk.PropertyList)
+                {
+                    ushort unknownProperty1 = (ushort)(property.UnknownProperty & 0xFFFF);
+
+                    ushort unknownProperty2 = (ushort)((property.UnknownProperty >> 16) & 0xFFFF);
+
+                    // Remove wreck surfaces - TODO: tmp
+                    unknownProperty2 &= unchecked((ushort)~0x4000);
+
+                    uint unknownProperty = (uint)((unknownProperty2 << 16) | unknownProperty1);
+
+                    property.UnknownProperty = unknownProperty;
+                }
+            }
+        }
+
         public Scene MakeScene(ILoader loader = null)
         {
             Scene scene = new Scene();

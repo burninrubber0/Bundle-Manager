@@ -93,5 +93,13 @@ namespace BundleManager
             if (_poly != null)
                 DebugUtil.ShowDebug(this, _poly);
         }
+
+        private void removeWreckSurfacesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _poly?.RemoveWreckSurfaces();
+            UpdateDisplay();
+
+            Changed?.Invoke();
+        }
     }
 }

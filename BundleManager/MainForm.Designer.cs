@@ -63,6 +63,7 @@
             this.previewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.viewDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeWreckSurfacesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuMain.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.mnuLst.SuspendLayout();
@@ -166,7 +167,8 @@
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.searchForEntryToolStripMenuItem,
-            this.dumpAllCollisionsToolStripMenuItem});
+            this.dumpAllCollisionsToolStripMenuItem,
+            this.removeWreckSurfacesToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -175,7 +177,7 @@
             // 
             this.searchForEntryToolStripMenuItem.Name = "searchForEntryToolStripMenuItem";
             this.searchForEntryToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.searchForEntryToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.searchForEntryToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.searchForEntryToolStripMenuItem.Text = "Search for entry";
             this.searchForEntryToolStripMenuItem.Click += new System.EventHandler(this.searchForEntryToolStripMenuItem_Click);
             // 
@@ -183,7 +185,7 @@
             // 
             this.dumpAllCollisionsToolStripMenuItem.Enabled = false;
             this.dumpAllCollisionsToolStripMenuItem.Name = "dumpAllCollisionsToolStripMenuItem";
-            this.dumpAllCollisionsToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.dumpAllCollisionsToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.dumpAllCollisionsToolStripMenuItem.Text = "Dump All Collisions";
             this.dumpAllCollisionsToolStripMenuItem.Click += new System.EventHandler(this.dumpAllCollisionsToolStripMenuItem_Click);
             // 
@@ -337,6 +339,14 @@
             this.viewDataToolStripMenuItem.Text = "View Header";
             this.viewDataToolStripMenuItem.Click += new System.EventHandler(this.viewDataToolStripMenuItem_Click);
             // 
+            // removeWreckSurfacesToolStripMenuItem
+            // 
+            this.removeWreckSurfacesToolStripMenuItem.Enabled = false;
+            this.removeWreckSurfacesToolStripMenuItem.Name = "removeWreckSurfacesToolStripMenuItem";
+            this.removeWreckSurfacesToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.removeWreckSurfacesToolStripMenuItem.Text = "Remove Wreck Surfaces";
+            this.removeWreckSurfacesToolStripMenuItem.Click += new System.EventHandler(this.removeWreckSurfacesToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -395,6 +405,7 @@
         private System.Windows.Forms.ToolStripMenuItem searchForEntryToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader colName;
         private System.Windows.Forms.ToolStripMenuItem dumpAllCollisionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem removeWreckSurfacesToolStripMenuItem;
     }
 }
 

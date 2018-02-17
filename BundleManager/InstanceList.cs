@@ -25,18 +25,6 @@ namespace BundleManager
         public Vector3 Scale => Transform.ExtractScale();
 
         public Vector4 Rotation => Transform.ExtractRotation().ToAxisAngle();
-        /*public Vector3D Scale
-        {
-            get
-            {
-                float x = new Vector3D(Transform.M11, Transform.M21, Transform.M31).Length();
-                float y = new Vector3D(Transform.M12, Transform.M22, Transform.M32).Length();
-                float z = new Vector3D(Transform.M13, Transform.M23, Transform.M33).Length();
-                return new Vector3D(x, y, z);
-            }
-        }
-
-        public AxisAngleRotation3D Rotation => new AxisAngleRotation3D(Quaternion.CreateFromRotationMatrix(Transform));*/
 
         public static ModelInstance Read(BinaryReader br)
         {

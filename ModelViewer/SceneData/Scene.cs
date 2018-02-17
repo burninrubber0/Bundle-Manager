@@ -89,11 +89,11 @@ namespace ModelViewer.SceneData
                     if (material != null && !result.Contains(material))
                         result.Add(material);
 
-                    if (material == null && mesh.Materials != null)
+                    if (material == null && mesh.Faces != null)
                     {
-                        foreach (uint index in mesh.Materials.Keys)
+                        foreach (MeshFace face in mesh.Faces)
                         {
-                            Material mat = mesh.Materials[index];
+                            Material mat = face.Material;
 
                             if (mat != null && !result.Contains(mat))
                                 result.Add(mat);
@@ -227,38 +227,55 @@ namespace ModelViewer.SceneData
                         sw.WriteLine();
 
                         List<Vector3> verts = mesh.Vertices;
-                        List<uint> inds = mesh.Indices;
 
-                        if (inds.Count == 0)
+                        if (mesh.Faces != null)
                         {
-                            for (int i = 0; i < verts.Count; i++)
+                            foreach (MeshFace face in mesh.Faces)
                             {
-                                inds.Add((uint)i);
+                                if (face.Material != null)
+                                    sw.WriteLine("usemtl material_" + face.Material.Name);
+
+                                StringBuilder sb = new StringBuilder("f");
+                                foreach (uint index in face.Indices)
+                                {
+                                    uint ind = index + 1 + usedIndices;
+                                    sb.Append(" " + ind + "/" + ind);
+                                }
+                                sw.WriteLine(sb.ToString());
                             }
                         }
-
-                        for (int j = 0; j < inds.Count; j += 3)
+                        else
                         {
-                            //if (j + 3 < inds.Count && inds[j + 3] == 0xFF)
-                                //sw.WriteLine("g broken_" + meshIndex);
-                            //if (inds[j] == 0xFF)
-                            //    continue;
-                            if (j + 2 >= inds.Count)
-                                break;
+                            List<uint> inds = mesh.Indices;
 
-                            if (mesh.Materials != null && mesh.Materials.ContainsKey(inds[j]))
+                            if (inds.Count == 0)
                             {
-                                Material mat = mesh.Materials[inds[j]];
-                                if (mat != null)
-                                    sw.WriteLine("usemtl material_" + mat.Name);
+                                for (int i = 0; i < verts.Count; i++)
+                                {
+                                    inds.Add((uint) i);
+                                }
                             }
 
-                            uint v0 = inds[j + 0] + 1 + usedIndices;
-                            uint v1 = inds[j + 1] + 1 + usedIndices;
-                            uint v2 = inds[j + 2] + 1 + usedIndices;
-                            sw.WriteLine("f " + v0 + "/" + v0 + " " + v1 + "/" + v1 + " " + v2 + "/" + v2);
-                        }
+                            //Dictionary<uint, Material> usedMats = new Dictionary<uint, Material>();
 
+                            for (int j = 0; j < inds.Count; j += 3)
+                            {
+                                if (j + 2 >= inds.Count)
+                                    break;
+
+                                /*if (mesh.Materials != null && mesh.Materials.ContainsKey(inds[j]))
+                                {
+                                    Material mat = mesh.Materials[inds[j]];
+                                    if (mat != null)
+                                        sw.WriteLine("usemtl material_" + mat.Name);
+                                }*/
+
+                                uint v0 = inds[j + 0] + 1 + usedIndices;
+                                uint v1 = inds[j + 1] + 1 + usedIndices;
+                                uint v2 = inds[j + 2] + 1 + usedIndices;
+                                sw.WriteLine("f " + v0 + "/" + v0 + " " + v1 + "/" + v1 + " " + v2 + "/" + v2);
+                            }
+                        }
                         usedIndices += (uint)verts.Count;
 
                         sw.WriteLine();

@@ -94,6 +94,19 @@ namespace BundleManager
                         Utilities.Parse(i2[0], false, out uint v2);
                         Utilities.Parse(i3[0], false, out uint v3);
 
+                        bool isQuad = false;
+                        uint v4 = 0;
+                        uint uv4 = 1;
+                        if (split.Length >= 4)
+                        {
+                            isQuad = true;
+                            string[] i4 = split[5].Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                            Utilities.Parse(i4[0], false, out v4);
+
+                            if (i4.Length > 1)
+                                Utilities.Parse(i4[1], false, out uv4);
+                        }
+
                         uint uv1 = 1;
                         uint uv2 = 1;
                         uint uv3 = 1;
@@ -101,20 +114,33 @@ namespace BundleManager
                         if (i1.Length > 1 && i2.Length > 1 && i3.Length > 1)
                         {
                             Utilities.Parse(i1[1], false, out uv1);
-                            Utilities.Parse(i2[2], false, out uv2);
-                            Utilities.Parse(i3[3], false, out uv3);
+                            Utilities.Parse(i2[1], false, out uv2);
+                            Utilities.Parse(i3[1], false, out uv3);
                         }
 
                         // OBJ is 1-indexed, so convert it to be 0-indexed
                         v1--;
                         v2--;
                         v3--;
+                        if (isQuad)
+                            v4--;
                         uv1--;
                         uv2--;
                         uv3--;
+                        if (isQuad)
+                            uv4--;
 
-                        Face face = new Face(new[] {v1 - startIndex, v2 - startIndex, v3 - startIndex},
-                            new[] {uv1 - startUVIndex, uv2 - startUVIndex, uv3 - startUVIndex}, lastMaterial);
+                        Face face;
+                        if (isQuad)
+                        {
+                            face = new Face(new[] { v1 - startIndex, v2 - startIndex, v3 - startIndex, v4 - startUVIndex },
+                                new[] { uv1 - startUVIndex, uv2 - startUVIndex, uv3 - startUVIndex, uv4 - startUVIndex }, lastMaterial);
+                        }
+                        else
+                        {
+                            face = new Face(new[] {v1 - startIndex, v2 - startIndex, v3 - startIndex},
+                                new[] {uv1 - startUVIndex, uv2 - startUVIndex, uv3 - startUVIndex}, lastMaterial);
+                        }
 
                         // If there is no mesh yet, the file isn't split up into meshes,
                         // so we should just make one here.
@@ -124,7 +150,7 @@ namespace BundleManager
                             currentMesh++;
                         }
 
-                        while (globalUVs.Count <= uv1 || globalUVs.Count <= uv2 || globalUVs.Count <= uv3)
+                        while (globalUVs.Count <= uv1 || globalUVs.Count <= uv2 || globalUVs.Count <= uv3 || (isQuad && globalUVs.Count <= uv4))
                         {
                             globalUVs.Add(new Vector2(0, 0));
                         }
@@ -135,6 +161,8 @@ namespace BundleManager
                             result.Meshes[currentMesh].UVs.Add(face.UVIndices[1], globalUVs[(int)uv2]);
                         if (!result.Meshes[currentMesh].UVs.ContainsKey(face.UVIndices[2]))
                             result.Meshes[currentMesh].UVs.Add(face.UVIndices[2], globalUVs[(int)uv3]);
+                        if (isQuad && (!result.Meshes[currentMesh].UVs.ContainsKey(face.UVIndices[3])))
+                            result.Meshes[currentMesh].UVs.Add(face.UVIndices[3], globalUVs[(int)uv4]);
 
                         if (!result.Meshes[currentMesh].Vertices.ContainsKey(face.Indices[0]))
                             result.Meshes[currentMesh].Vertices.Add(face.Indices[0], globalVertices[(int)v1]);
@@ -142,6 +170,8 @@ namespace BundleManager
                             result.Meshes[currentMesh].Vertices.Add(face.Indices[1], globalVertices[(int)v2]);
                         if (!result.Meshes[currentMesh].Vertices.ContainsKey(face.Indices[2]))
                             result.Meshes[currentMesh].Vertices.Add(face.Indices[2], globalVertices[(int)v3]);
+                        if (isQuad && (!result.Meshes[currentMesh].Vertices.ContainsKey(face.Indices[3])))
+                            result.Meshes[currentMesh].Vertices.Add(face.Indices[3], globalVertices[(int)v4]);
 
                         result.Meshes[currentMesh].Faces.Add(face);
                     }

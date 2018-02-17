@@ -220,107 +220,42 @@ namespace BundleManager
         public Mesh BuildMesh(Vector3I pos, float scale)
         {
             Mesh mesh = new Mesh();
-            mesh.Materials = new Dictionary<uint, Material>();
+            mesh.Faces = new List<MeshFace>();
 
-			for (int i = 0; i < PropertyList.Count; i++)
+            for (int i = 0; i < PropertyList.Count; i++)
             {
+                MeshFace face = new MeshFace();
                 PolygonSoupProperty property = PropertyList[i];
-                mesh.Indices.Add(property.Indices[0]);
-                mesh.Indices.Add(property.Indices[1]);
-                mesh.Indices.Add(property.Indices[2]);
+                face.Indices.Add(property.Indices[0]);
+                face.Indices.Add(property.Indices[1]);
+                face.Indices.Add(property.Indices[2]);
+
+                ushort unknownProperty1 = (ushort) (property.UnknownProperty & 0xFFFF);
+                ushort unknownProperty2 = (ushort) ((property.UnknownProperty >> 16)); // & 0xFFFF);
+
+                string unknownBytes = property.UnknownBytes[0].ToString("X2") + "_" +
+                                      property.UnknownBytes[1].ToString("X2") + "_" +
+                                      property.UnknownBytes[2].ToString("X2") + "_" +
+                                      property.UnknownBytes[3].ToString("X2");
+                face.Material = new Material(
+                    unknownProperty1.ToString("X4") + "_" + unknownProperty2.ToString("X4") + "_" + unknownBytes,
+                    Color.White);
+
+                mesh.Faces.Add(face);
+                
                 if (property.Indices[3] != 0xFF)
                 {
-                    mesh.Indices.Add(property.Indices[3]);
-                    mesh.Indices.Add(property.Indices[2]);
-                    mesh.Indices.Add(property.Indices[1]);
+                    MeshFace face2 = new MeshFace();
+                    face2.Material = face.Material;
+                    face2.Indices.Add(property.Indices[3]);
+                    face2.Indices.Add(property.Indices[2]);
+                    face2.Indices.Add(property.Indices[1]);
+                    mesh.Faces.Add(face2);
                 }
-
-                ushort unknownProperty1 = (ushort)(property.UnknownProperty & 0xFFFF);
-                ushort unknownProperty2 = (ushort)((property.UnknownProperty >> 16));// & 0xFFFF);
-
-                //ushort banana = (ushort)(unknownProperty1 & 0xFF);
-                //ushort id = (ushort) (unknownProperty1 & 0x7FFF);
-
-                //if (unknownProperty1 != 0xFFFF)
-                // Upper = Math.Max(unknownProperty1, Upper);
-
-                // To Reverse
-                //uint unknownProperty = (uint)((unknownProperty2 << 16) | unknownProperty1);
-
-                /*if (unknownProperty1 == 0x9DA2)
-                {
-                    Material mat = new Material(unknownProperty1.ToString("X4"), Color.Orange);
-                    mesh.Materials[property.Indices[0]] = mat;
-                    mesh.Materials[property.Indices[1]] = mat;
-                    mesh.Materials[property.Indices[2]] = mat;
-                    if (property.Indices[3] != 0xFF)
-                        mesh.Materials[property.Indices[3]] = mat;
-                } else if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
-                {
-                    Material mat = new Material(unknownProperty1.ToString("X4"), Color.Red);
-                    mesh.Materials[property.Indices[0]] = mat;
-                    mesh.Materials[property.Indices[1]] = mat;
-                    mesh.Materials[property.Indices[2]] = mat;
-                    if (property.Indices[3] != 0xFF)
-                        mesh.Materials[property.Indices[3]] = mat;
-                }
-                else
-                {
-                    Material mat = new Material(unknownProperty1.ToString("X4"), Color.White);
-                    mesh.Materials[property.Indices[0]] = mat;
-                    mesh.Materials[property.Indices[1]] = mat;
-                    mesh.Materials[property.Indices[2]] = mat;
-                    if (property.Indices[3] != 0xFF)
-                        mesh.Materials[property.Indices[3]] = mat;
-                }*/
-
-                /*int red = banana * 10 % 255;
-                int green = banana * 5 % 255;
-                int blue = banana * 12 % 255;
-
-                Color color = Color.FromArgb(red, green, blue);
-                Material mat = new Material(banana.ToString("X2"), color);
-                    //Color.FromArgb(banana & 0xFF, 0, (banana >> 8) & 0xFF));
-                mesh.Materials[property.Indices[0]] = mat;
-                mesh.Materials[property.Indices[1]] = mat;
-                mesh.Materials[property.Indices[2]] = mat;
-                if (property.Indices[3] != 0xFF)
-                    mesh.Materials[property.Indices[3]] = mat;*/
-
-                //if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
-                /*if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
-                {
-                    string bla = property.UnknownBytes[0].ToString("X2") + "_" +
-                                 property.UnknownBytes[1].ToString("X2") + "_" +
-                                 property.UnknownBytes[2].ToString("X2") + "_" +
-                                 property.UnknownBytes[3].ToString("X2");
-                    //Material mat = new Material(unknownProperty1.ToString("X4"),
-                    Material mat = new Material(unknownProperty1.ToString("X4") + "_" + unknownProperty2.ToString("X4") + "_" + bla,
-                        Color.FromArgb(unknownProperty1 & 0xFF, 0, (unknownProperty1 >> 8) & 0xFF));
-                    mesh.Materials[property.Indices[0]] = mat;
-                    mesh.Materials[property.Indices[1]] = mat;
-                    mesh.Materials[property.Indices[2]] = mat;
-                    if (property.Indices[3] != 0xFF)
-                        mesh.Materials[property.Indices[3]] = mat;
-                }
-                else
-                {*/
-                    string bla = property.UnknownBytes[0].ToString("X2") + "_" +
-                                 property.UnknownBytes[1].ToString("X2") + "_" +
-                                 property.UnknownBytes[2].ToString("X2") + "_" +
-                                 property.UnknownBytes[3].ToString("X2");
-                    //Material mat = new Material(unknownProperty1.ToString("X4"),
-                    Material mat = new Material(unknownProperty1.ToString("X4") + "_" + unknownProperty2.ToString("X4") + "_" + bla, Color.White);
-                    mesh.Materials[property.Indices[0]] = mat;
-                    mesh.Materials[property.Indices[1]] = mat;
-                    mesh.Materials[property.Indices[2]] = mat;
-                    if (property.Indices[3] != 0xFF)
-                        mesh.Materials[property.Indices[3]] = mat;
-                //}
             }
-			
 
-			List<Vector3S> points = PointList;
+
+            List<Vector3S> points = PointList;
 
             for (int i = 0; i < points.Count; i++)
             {
@@ -605,6 +540,10 @@ namespace BundleManager
                     throw new ReadFailedError("Too many points for mesh: " + mesh.Name + ", " + pointCount + " > 256");
                 foreach (Face face in mesh.Faces)
                 {
+                    // Triangulation required for now.
+                    if (face.Indices.Count > 3)
+                        throw new ReadFailedError("Please triangulate your mesh: " + mesh.Name);
+
                     // Material names are required
                     if (string.IsNullOrEmpty(face.Material?.Name))
                         throw new ReadFailedError("Invalid Material for mesh: " + mesh.Name);
@@ -650,7 +589,11 @@ namespace BundleManager
                     property.Indices[0] = (byte)face.Indices[0];
                     property.Indices[1] = (byte)face.Indices[1];
                     property.Indices[2] = (byte)face.Indices[2];
-                    property.Indices[3] = 0xFF;
+
+                    if (face.Indices.Count > 3)
+                        property.Indices[3] = (byte) face.Indices[3];
+                    else 
+                        property.Indices[3] = 0xFF;
 
                     // Get data from material name
                     string materialName = face.Material.Name;

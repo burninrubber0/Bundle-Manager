@@ -26,6 +26,17 @@ namespace ModelViewer.SceneData
         }
     }
 
+    public class MeshFace
+    {
+        public List<uint> Indices;
+        public Material Material;
+
+        public MeshFace()
+        {
+            Indices = new List<uint>();
+        }
+    }
+
     public class Mesh
     {
         private int _vertexArray;
@@ -38,12 +49,14 @@ namespace ModelViewer.SceneData
         public List<Vector3> Normals { get; set; }
         public List<Vector3> Normals2 { get; set; }
         public List<uint> Indices { get; set; }
+        private List<uint> TempIndices;
+        public List<MeshFace> Faces { get; set; }
         public List<Vector2> UV1 { get; set; }
         public List<Vector2> UV2 { get; set; }
         public int ID1 { get; set; }
         public int ID2 { get; set; }
 
-        public Dictionary<uint, Material> Materials { get; set; }
+        //public Dictionary<uint, Material> Materials { get; set; }
 
         public Mesh()
         {
@@ -74,8 +87,8 @@ namespace ModelViewer.SceneData
             result.ID1 = ID1;
             result.ID2 = ID2;
 
-            if (Materials != null)
-                result.Materials = new Dictionary<uint, Material>(Materials);
+            if (Faces != null)
+                result.Faces = new List<MeshFace>(Faces);
 
             return result;
         }
@@ -145,7 +158,31 @@ namespace ModelViewer.SceneData
             */
 
             List<uint> indices = Indices;
-            //indices.Reverse();
+
+            if (Faces != null)
+            {
+                indices = new List<uint>();
+                foreach (MeshFace face in Faces)
+                {
+                    /*for (int i = 2; i < face.Indices.Count; i++)
+                    {
+                        if ((i - 2) % 2 == 0)
+                        {
+                            indices.Add(face.Indices[i] - 0);
+                            indices.Add(face.Indices[i] - 1);
+                            indices.Add(face.Indices[i] - 2);
+                        }
+                        else
+                        {
+                            indices.Add(face.Indices[i] - 2);
+                            indices.Add(face.Indices[i] - 1);
+                            indices.Add(face.Indices[i] - 0);
+                        }
+                    }*/
+
+                    indices.AddRange(face.Indices);
+                }
+            }
 
             List<TexturedVertex> vertices = new List<TexturedVertex>();
             if (indices.Count == 0)
@@ -156,21 +193,40 @@ namespace ModelViewer.SceneData
                 }
             }
 
-            for (int i = 0; i < indices.Count; i++)
+            List<uint> indices2 = indices;
+            /*List<uint> indices2 = new List<uint>();
+
+            // Triangulate Faces
+            for (int i = 2; i < indices.Count; i++)
             {
-                // TODO: >=
-                if (indices[i] >= Vertices.Count)
+                if ((i - 2) % 2 == 0)
+                {
+                    indices2.Add(indices[i] - 0);
+                    indices2.Add(indices[i] - 1);
+                    indices2.Add(indices[i] - 2);
+                }
+                else
+                {
+                    indices2.Add(indices[i] - 2);
+                    indices2.Add(indices[i] - 1);
+                    indices2.Add(indices[i] - 0);
+                }
+            }*/
+
+            for (int i = 0; i < indices2.Count; i++)
+            {
+                if (indices2[i] >= Vertices.Count)
                 {
                     //MessageBox.Show("Index too large: " + indices[i].ToString("X2") + " >= " + Vertices.Count.ToString("X8"));
                     continue;
                 }
-                Vector3 pos = Vertices[(int) indices[i]];
+                Vector3 pos = Vertices[(int)indices2[i]];
                 //Vector2 uv = new Vector2();
                 //if (UV1.Count < indices[i])
                 //    uv = UV1[(int) indices[i]];
                 Vector2 uv1;
-                if (indices[i] < UV1.Count)
-                    uv1 = UV1[(int) indices[i]];
+                if (indices2[i] < UV1.Count)
+                    uv1 = UV1[(int)indices2[i]];
                 else
                     uv1 = new Vector2(0, 0);
 
@@ -178,6 +234,8 @@ namespace ModelViewer.SceneData
 
                 vertices.Add(new TexturedVertex(pos, uv));
             }
+
+            TempIndices = new List<uint>(indices2);
 
             _vertexArray = GL.GenVertexArray();
             int buffer = GL.GenBuffer();
@@ -287,7 +345,10 @@ namespace ModelViewer.SceneData
 
             GL.BindVertexArray(_vertexArray);
             //GL.PointSize(4.0f);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, Indices.Count);
+            if (TempIndices != null)
+                GL.DrawArrays(PrimitiveType.Triangles, 0, TempIndices.Count);
+            else
+                GL.DrawArrays(PrimitiveType.Triangles, 0, Indices.Count);
 
             /*GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.IndexArray);

@@ -79,6 +79,7 @@
   <ItemGroup>
     <Compile Include="AptData.cs" />
     <Compile Include="AttribSys.cs" />
+    <Compile Include="BundleResource.cs" />
     <Compile Include="EntryEditor.cs">
       <SubType>Form</SubType>
     </Compile>

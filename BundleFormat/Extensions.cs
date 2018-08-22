@@ -121,7 +121,7 @@ namespace BundleFormat
             long archiveSizeOffset = self.BaseStream.Position;
             self.Write((int)0);
 
-            self.Write((int)result.CompressionType);
+            self.Write((int)result.Flags);
             self.Write(result.Unknown7);
             self.Write(result.Unknown8);
 

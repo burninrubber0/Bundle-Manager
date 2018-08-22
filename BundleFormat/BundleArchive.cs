@@ -12,10 +12,13 @@ using BundleUtilities;
 
 namespace BundleFormat
 {
-    public enum CompressionType
+    [Flags]
+    public enum Flags
     {
-        Uncompressed = 6,
-        ZLib = 7
+        Compressed = 1,
+        UnknownFlag1 = 2,
+        UnknownFlag2 = 4,
+        HasResourceStringTable = 8
     }
 
     public enum BundlePlatform
@@ -39,7 +42,7 @@ namespace BundleFormat
         public int HeadStart;
         public int BodyStart;
         public int ArchiveSize;
-        public CompressionType CompressionType; // Normally 7
+        public Flags Flags;
         public int Unknown7; // Normally 0
         public int Unknown8; // Normally 0
         public BundlePlatform Platform;
@@ -144,11 +147,11 @@ namespace BundleFormat
             result.HeadStart = br.ReadInt32();
             result.BodyStart = br.ReadInt32();
             result.ArchiveSize = br.ReadInt32();
-            int compressionType = br.ReadInt32();
+            int flags = br.ReadInt32();
             result.Unknown7 = br.ReadInt32();
             result.Unknown8 = br.ReadInt32();
 
-            result.CompressionType = (CompressionType)compressionType;
+            result.Flags = (Flags)flags;
 
             //long dataOffset = result.HeadStart;
 

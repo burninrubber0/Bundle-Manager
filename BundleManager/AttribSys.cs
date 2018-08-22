@@ -21,7 +21,28 @@ namespace BundleManager
     {
         public ulong Hash1;
         public ulong Hash2;
-        public byte[] Data;
+        public byte[] Unknown1; // 8 bytes, undetermined data type
+        public int Unknown2;
+        public byte[] Unknown3; // 4 bytes, undetermined data type
+        public int Unknown4;
+        public short Unknown5;
+        public short Unknown6;
+        public byte[] Unknown7; // 8 bytes, undetermined data type
+        public ulong[] Unknown8; // 2 or 4 items?
+    }
+
+    public class PtrChunk
+    {
+        public PtrChunkData[] Data; // 20 items
+        public byte[] UnknownBytes; // 24 bytes, always null bytes?
+    }
+
+    public class PtrChunkData
+    {
+        public int Unknown1;
+        public short Unknown2;
+        public short Unknown3;
+        public long Unknown4;
     }
 
     public class AttribSys
@@ -43,7 +64,7 @@ namespace BundleManager
         public string String3;
         public string String4;
 
-        public byte[] PtrN;
+        public PtrChunk PtrN;
 
         public List<float> FloatBlock1;
         public List<ulong> HashBlock1;
@@ -51,8 +72,7 @@ namespace BundleManager
         public List<int> IntBlock;
         public List<short> ShortBlock;
         public List<ulong> HashBlock2;
-        public short Short1;
-        public short Short2;
+        public byte[] BytesUnknown;
         public List<float> FloatBlock3;
 
         public AttribSys()
@@ -116,7 +136,17 @@ namespace BundleManager
                         DataChunk dataChunk = new DataChunk();
                         dataChunk.Hash1 = br.ReadUInt64();
                         dataChunk.Hash2 = br.ReadUInt64();
-                        dataChunk.Data = br.ReadBytes(chunk.DataChunkSize - 16);
+                        dataChunk.Unknown1 = br.ReadBytes(8);
+                        dataChunk.Unknown2 = br.ReadInt32();
+                        dataChunk.Unknown3 = br.ReadBytes(4);
+                        dataChunk.Unknown4 = br.ReadInt32();
+                        dataChunk.Unknown5 = br.ReadInt16();
+                        dataChunk.Unknown6 = br.ReadInt16();
+                        dataChunk.Unknown7 = br.ReadBytes(8);
+                        int unknown8Count = (chunk.DataChunkSize - 48) / sizeof(ulong);
+                        dataChunk.Unknown8 = new ulong[unknown8Count];
+                        for (int j = 0; j < unknown8Count; j++)
+                            dataChunk.Unknown8[j] = br.ReadUInt64();
                         DataChunks.Add(dataChunk);
 
                         br.BaseStream.Position = pos;
@@ -124,7 +154,17 @@ namespace BundleManager
                     break;
                 case "PtrN":
                     // Unknown
-                    PtrN = br.ReadBytes(size);
+                    PtrN = new PtrChunk();
+                    PtrN.Data = new PtrChunkData[20];
+                    for (int i = 0; i < 20; i++)
+                    {
+                        PtrN.Data[i] = new PtrChunkData();
+                        PtrN.Data[i].Unknown1 = br.ReadInt32();
+                        PtrN.Data[i].Unknown2 = br.ReadInt16();
+                        PtrN.Data[i].Unknown3 = br.ReadInt16();
+                        PtrN.Data[i].Unknown4 = br.ReadInt64();
+                    }
+                    PtrN.UnknownBytes = br.ReadBytes(size - 320);
                     break;
                 /*case "StrE": // In Binary Section??
                     String1 = br.ReadCString();
@@ -200,8 +240,7 @@ namespace BundleManager
                     HashBlock2.Add(br.ReadUInt64());
                 }
 
-                Short1 = br.ReadInt16();
-                Short2 = br.ReadInt16();
+                BytesUnknown = br.ReadBytes(4);
 
                 for (int i = 0; i < 103; i++)
                 {

@@ -51,7 +51,8 @@ namespace BundleManager
         public List<int> IntBlock;
         public List<short> ShortBlock;
         public List<ulong> HashBlock2;
-        public int Int3;
+        public short Short1;
+        public short Short2;
         public List<float> FloatBlock3;
 
         public AttribSys()
@@ -71,7 +72,7 @@ namespace BundleManager
         private void ReadChunk(ILoader loader, BinaryReader br)
         {
             long initialPos = br.BaseStream.Position;
-            string fourcc = Encoding.ASCII.GetString(br.ReadBytes(4).Flip());
+            string fourcc = Encoding.ASCII.GetString(BitConverter.GetBytes(br.ReadInt32()).Flip());
             int size = br.ReadInt32();
 
             switch (fourcc)
@@ -199,7 +200,8 @@ namespace BundleManager
                     HashBlock2.Add(br.ReadUInt64());
                 }
 
-                Int3 = br.ReadInt32();
+                Short1 = br.ReadInt16();
+                Short2 = br.ReadInt16();
 
                 for (int i = 0; i < 103; i++)
                 {
@@ -230,7 +232,8 @@ namespace BundleManager
             byte[] vlt = br.ReadBytes(vltSize);
 
             MemoryStream vltStream = new MemoryStream(vlt);
-            BinaryReader vltBr = new BinaryReader(vltStream);
+            BinaryReader2 vltBr = new BinaryReader2(vltStream);
+            vltBr.BigEndian = entry.Console;
             result.ReadVlt(loader, vltBr);
             vltBr.Close();
 
@@ -239,7 +242,8 @@ namespace BundleManager
             byte[] bin = br.ReadBytes(binSize);
 
             MemoryStream binStream = new MemoryStream(bin);
-            BinaryReader binBr = new BinaryReader(binStream);
+            BinaryReader2 binBr = new BinaryReader2(binStream);
+            binBr.BigEndian = entry.Console;
             result.ReadBin(loader, binBr);
             binBr.Close();
 

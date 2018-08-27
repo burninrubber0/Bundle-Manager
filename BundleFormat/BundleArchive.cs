@@ -95,30 +95,31 @@ namespace BundleFormat
 
         public static BundleArchive Read(string path)
         {
-            try
+            using (Stream s = File.OpenRead(path))
             {
-                Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
-                BinaryReader2 br = new BinaryReader2(s);
-
-                BundleArchive result = Read(br);
-                if (result == null)
+                try
                 {
-                    br.Close();
-                    s.Close();
+                    BinaryReader2 br = new BinaryReader2(s);
 
+                    BundleArchive result = Read(br);
+                    if (result == null)
+                    {
+                        br.Close();
+
+                        return null;
+                    }
+
+                    result.Path = path;
+
+                    br.Close();
+
+                    return result;
+                }
+                catch (IOException ex)
+                {
+                    Debug.WriteLine(ex.Message + "\n" + ex.StackTrace);
                     return null;
                 }
-                result.Path = path;
-
-                br.Close();
-                s.Close();
-
-                return result;
-            }
-            catch (IOException ex)
-            {
-                Debug.WriteLine(ex.Message + "\n" + ex.StackTrace);
-                return null;
             }
         }
 

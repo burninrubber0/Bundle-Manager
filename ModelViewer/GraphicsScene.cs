@@ -6,9 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using ModelViewer.SceneData;
 using OpenTK;
-using OpenTK.Graphics.OpenGL4;
+using OpenTK.Graphics.OpenGL;
 
 namespace ModelViewer
 {
@@ -27,9 +28,16 @@ namespace ModelViewer
 
         public bool CanRender { get; set; }
 
-        public Scene Scene { get; set; }
+        public Scene Scene { get; }
 
-        public GraphicsScene(int width, int height)
+        public GraphicsScene(Scene scene, int width, int height)
+        {
+            Scene = scene;
+            Width = width;
+            Height = height;
+        }
+
+        public void Resize(int width, int height)
         {
             Width = width;
             Height = height;
@@ -95,7 +103,7 @@ namespace ModelViewer
             GL.Viewport(0, 0, Width, Height);
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            
+
             if (CanRender)
             {
                 _shader.Bind();

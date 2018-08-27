@@ -79,6 +79,10 @@
   <ItemGroup>
     <Compile Include="AptData.cs" />
     <Compile Include="AttribSys.cs" />
+    <Compile Include="BundleResource.cs" />
+    <Compile Include="BetterListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="EntryEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -91,6 +95,8 @@
     <Compile Include="FileView.Designer.cs">
       <DependentUpon>FileView.cs</DependentUpon>
     </Compile>
+    <Compile Include="GenericMesh.cs" />
+    <Compile Include="GenericModel.cs" />
     <Compile Include="IDList.cs" />
     <Compile Include="ILoader.cs" />
     <Compile Include="GraphicsSpec.cs" />
@@ -122,6 +128,7 @@
     </Compile>
     <Compile Include="MaterialEntry.cs" />
     <Compile Include="ModelResource.cs" />
+    <Compile Include="OBJImporter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProgressionData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -135,12 +142,19 @@
     </Compile>
     <Compile Include="StreetData.cs" />
     <Compile Include="TextureState.cs" />
+    <Compile Include="Traffic.cs" />
     <Compile Include="TriggerData.cs" />
     <Compile Include="VertexSizePicker.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="VertexSizePicker.Designer.cs">
       <DependentUpon>VertexSizePicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WorldColEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WorldColEditor.Designer.cs">
+      <DependentUpon>WorldColEditor.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="EntryEditor.resx">
       <DependentUpon>EntryEditor.cs</DependentUpon>
@@ -177,6 +191,9 @@
       <DependentUpon>VertexSizePicker.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="PolygonSoupList.cs" />
+    <EmbeddedResource Include="WorldColEditor.resx">
+      <DependentUpon>WorldColEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

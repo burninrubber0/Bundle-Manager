@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK;
 
 namespace MathLib
 {
@@ -17,6 +18,13 @@ namespace MathLib
             X = x;
             Y = y;
             Z = z;
+        }
+
+        public Vector3S(Vector3 vec3)
+        {
+            X = (short)Math.Round(vec3.X);
+            Y = (short)Math.Round(vec3.Y);
+            Z = (short)Math.Round(vec3.Z);
         }
 
         public override string ToString()

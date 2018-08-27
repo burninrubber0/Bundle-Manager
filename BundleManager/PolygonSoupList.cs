@@ -13,6 +13,7 @@ using DebugHelper;
 using MathLib;
 using ModelViewer.SceneData;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using StandardExtension;
 
 namespace BundleManager
@@ -21,12 +22,12 @@ namespace BundleManager
     {
         public uint UnknownProperty;
         public byte[] Indices;
-		public byte[] IndicesIndices;
+		public byte[] UnknownBytes;
 
 		public PolygonSoupProperty()
         {
             Indices = new byte[4];
-			IndicesIndices = new byte[4];
+			UnknownBytes = new byte[4];
         }
 
         public PolygonSoupProperty Copy()
@@ -38,9 +39,9 @@ namespace BundleManager
             {
                 result.Indices[i] = Indices[i];
             }
-            for (int i = 0; i < IndicesIndices.Length; i++)
+            for (int i = 0; i < UnknownBytes.Length; i++)
             {
-                result.IndicesIndices[i] = IndicesIndices[i];
+                result.UnknownBytes[i] = UnknownBytes[i];
             }
 
             return result;
@@ -57,9 +58,9 @@ namespace BundleManager
                 result.Indices[i] = br.ReadByte();
 			}
 
-			for (int i = 0; i < result.IndicesIndices.Length; i++)
+			for (int i = 0; i < result.UnknownBytes.Length; i++)
 			{
-				result.IndicesIndices[i] = br.ReadByte();
+				result.UnknownBytes[i] = br.ReadByte();
 			}
 
             return result;
@@ -69,32 +70,23 @@ namespace BundleManager
         {
             // Cap to 0x9D64 for PC
             ushort unknownProperty1 = (ushort)(UnknownProperty & 0xFFFF);
-            /*byte unk1 = (byte) (unknownProperty1 & 0xFF);
-            byte unk2 = (byte) (unknownProperty1 >> 8);
 
-            if (unk2 > 0x9D && unk2 != 0xFF)
-                unk2 = 0x9D;
-
-            if (unk1 > 0x64 && unk1 != 0xFF)
-                unk1 = 0x64;*/
-
-            //unknownProperty1 = (ushort)((unk2 << 8) | unk1);
-
+            // Patch values that are too high (from console) with Schembri Pass
             if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
             {
-                unknownProperty1 = 0x8316; //0x9531; // 0x9007 //0x8511 //0x8316;
+                // 0x8316, 0x9531,  0x9007, 0x8511, 0x8316, 0xFFFF
+                unknownProperty1 = 0x8316;
             }
 
-            // TODO: Test
-            /*if (unknownProperty1 == 0x8D35)
-            {
-                unknownProperty1 = 0x807B;
-            }*/
-
-
+            // Patch values that are too high(from console) with 0xFFFF
             //if (unknownProperty1 > 0x9D64)
             //    unknownProperty1 = 0xFFFF;
+
             ushort unknownProperty2 = (ushort) ((UnknownProperty >> 16) & 0xFFFF);
+
+            // Remove wreck surfaces - TODO: tmp
+            //unknownProperty2 &= unchecked((ushort)~0x4000);
+
             uint unknownProperty = (uint)((unknownProperty2 << 16) | unknownProperty1);
 
             bw.Write(unknownProperty);
@@ -104,9 +96,9 @@ namespace BundleManager
                 bw.Write(Indices[i]);
             }
 
-            for (int i = 0; i < IndicesIndices.Length; i++)
+            for (int i = 0; i < UnknownBytes.Length; i++)
             {
-                bw.Write(IndicesIndices[i]);
+                bw.Write(UnknownBytes[i]);
             }
         }
 
@@ -119,11 +111,17 @@ namespace BundleManager
     public class PolygonSoupBoundingBox
     {
         public BoxF Box;
-        public int Unknown;
+        public int Terminator;
+
+		public PolygonSoupBoundingBox(BoxF box, int terminator)
+		{
+			Box = box;
+			Terminator = terminator;
+		}
 
         public override string ToString()
         {
-            return Box.ToString() + ", " + Unknown;
+            return Box.ToString() + ", " + Terminator;
         }
     }
 
@@ -131,12 +129,7 @@ namespace BundleManager
     {
         public Vector3I Position;
         public float Scale;
-        public uint PropertyListStart;
-        public uint PointListStart;
-        public short Unknown7;
-        public byte PropertyListCount;
-        public byte Unknown9;
-        public byte PointCount;
+        public byte QuadCount;
         public byte Unknown10;
         public short Unknown11;
 
@@ -155,29 +148,24 @@ namespace BundleManager
 
             result.Position = br.ReadVector3I();
             result.Scale = br.ReadSingle();
-            result.PropertyListStart = br.ReadUInt32();
-            result.PointListStart = br.ReadUInt32();
-            result.Unknown7 = br.ReadInt16();
-            result.PropertyListCount = br.ReadByte();
-            result.Unknown9 = br.ReadByte();
-            result.PointCount = br.ReadByte();
+            uint propertyListStart = br.ReadUInt32();
+            uint pointListStart = br.ReadUInt32();
+            br.ReadInt16(); // Length
+            byte propertyListCount = br.ReadByte();
+            result.QuadCount = br.ReadByte();
+            int pointCount = br.ReadByte();
             result.Unknown10 = br.ReadByte();
             result.Unknown11 = br.ReadInt16();
 
-            br.BaseStream.Position = result.PointListStart;
-            for (int i = 0; i < result.PointCount; i++)
+            br.BaseStream.Position = pointListStart;
+            for (int i = 0; i < pointCount; i++)
             {
                 result.PointList.Add(br.ReadVector3S());
             }
 
-            br.BaseStream.Position = result.PropertyListStart;
+            br.BaseStream.Position = propertyListStart;
 
-            /*int count = (result.Unknown9 >> 1) * 2 +
-                        (result.Unknown9 - (result.Unknown9 >> 1) * 2) +
-                        (((result.PropertyListCount - result.Unknown9) >> 2) * 4) +
-                        ((result.PropertyListCount - result.Unknown9) - ((result.PropertyListCount - result.Unknown9) >> 2) * 4);*/
-
-            for (int i = 0; i < result.PropertyListCount; i++)
+            for (int i = 0; i < propertyListCount; i++)
             {
                 result.PropertyList.Add(PolygonSoupProperty.Read(br));
             }
@@ -186,160 +174,88 @@ namespace BundleManager
         }
 
         public void Write(BinaryWriter bw)
-        {
-            bw.Write(Position);
+		{
+			long chunkStartPtr = bw.BaseStream.Position;
+			bw.Write(Position);
             bw.Write(Scale);
-            //long propListStartPtr = bw.BaseStream.Position;
-            //bw.Write((uint) 0);//PropertyListStart);
-            bw.Write(PropertyListStart);
-            //long pointListStartPtr = bw.BaseStream.Position;
-            //bw.Write((uint) 0);//PointListStart);
-            bw.Write(PointListStart);
-            bw.Write(Unknown7);
-            bw.Write(PropertyListCount);
-            bw.Write(Unknown9);
-            bw.Write(PointCount);
+            long propListStartPtr = bw.BaseStream.Position;
+            bw.Write((uint) 0);
+            long pointListStartPtr = bw.BaseStream.Position;
+            bw.Write((uint) 0);
+			long lengthPtr = bw.BaseStream.Position;
+            bw.Write((ushort) 0);
+            bw.Write((byte)PropertyList.Count);
+            bw.Write(QuadCount);
+            bw.Write((byte)PointList.Count);
             bw.Write(Unknown10);
             bw.Write(Unknown11);
-
-            bw.BaseStream.Position = PointListStart;
-            /*bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
+            
             long cPos = bw.BaseStream.Position;
             bw.BaseStream.Position = pointListStartPtr;
             bw.Write((uint)cPos);
-            bw.BaseStream.Position = cPos;*/
+            bw.BaseStream.Position = cPos;
 
-            for (int i = 0; i < PointCount; i++)
+            for (int i = 0; i < PointList.Count; i++)
             {
                 bw.Write(PointList[i]);
             }
 
-            bw.BaseStream.Position = PropertyListStart;
-            
-            /*bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
+            bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
             cPos = bw.BaseStream.Position;
             bw.BaseStream.Position = propListStartPtr;
             bw.Write((uint)cPos);
-            bw.BaseStream.Position = cPos;*/
+            bw.BaseStream.Position = cPos;
 
-            int count = (Unknown9 >> 1) * 2 +
-                        (Unknown9 - (Unknown9 >> 1) * 2) +
-                        (((PropertyListCount - Unknown9) >> 2) * 4) +
-                        ((PropertyListCount - Unknown9) - ((PropertyListCount - Unknown9) >> 2) * 4);
-
-            //for (int i = 0; i < PropertyListCount; i++)
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < PropertyList.Count; i++)
             {
                 PropertyList[i].Write(bw);
             }
-        }
+			cPos = bw.BaseStream.Position;
+			bw.BaseStream.Position = lengthPtr;
+			bw.Write((short)(bw.BaseStream.Length - chunkStartPtr));
+			bw.BaseStream.Position = cPos;
 
-        //public static uint Upper = 0;
+		}
 
         public Mesh BuildMesh(Vector3I pos, float scale)
         {
             Mesh mesh = new Mesh();
-            mesh.Materials = new Dictionary<uint, Material>();
+            mesh.Faces = new List<MeshFace>();
 
-			for (int i = 0; i < PropertyList.Count; i++)
+            for (int i = 0; i < PropertyList.Count; i++)
             {
+                MeshFace face = new MeshFace();
                 PolygonSoupProperty property = PropertyList[i];
-                mesh.Indices.Add(property.Indices[0]);
-                mesh.Indices.Add(property.Indices[1]);
-                mesh.Indices.Add(property.Indices[2]);
+                face.Indices.Add(property.Indices[0]);
+                face.Indices.Add(property.Indices[1]);
+                face.Indices.Add(property.Indices[2]);
+
+                ushort unknownProperty1 = (ushort) (property.UnknownProperty & 0xFFFF);
+                ushort unknownProperty2 = (ushort) ((property.UnknownProperty >> 16)); // & 0xFFFF);
+
+                string unknownBytes = property.UnknownBytes[0].ToString("X2") + "_" +
+                                      property.UnknownBytes[1].ToString("X2") + "_" +
+                                      property.UnknownBytes[2].ToString("X2") + "_" +
+                                      property.UnknownBytes[3].ToString("X2");
+                face.Material = new Material(
+                    unknownProperty1.ToString("X4") + "_" + unknownProperty2.ToString("X4") + "_" + unknownBytes,
+                    Color.White);
+
+                mesh.Faces.Add(face);
+                
                 if (property.Indices[3] != 0xFF)
                 {
-                    mesh.Indices.Add(property.Indices[3]);
-                    mesh.Indices.Add(property.Indices[2]);
-                    mesh.Indices.Add(property.Indices[1]);
-                }
-
-                ushort unknownProperty1 = (ushort)(property.UnknownProperty & 0xFFFF);
-                ushort unknownProperty2 = (ushort)((property.UnknownProperty >> 16));// & 0xFFFF);
-
-                //ushort banana = (ushort)(unknownProperty1 & 0xFF);
-                //ushort id = (ushort) (unknownProperty1 & 0x7FFF);
-
-                //if (unknownProperty1 != 0xFFFF)
-                // Upper = Math.Max(unknownProperty1, Upper);
-
-                // To Reverse
-                //uint unknownProperty = (uint)((unknownProperty2 << 16) | unknownProperty1);
-
-                /*if (unknownProperty1 == 0x9DA2)
-                {
-                    Material mat = new Material(unknownProperty1.ToString("X4"), Color.Orange);
-                    mesh.Materials[property.Indices[0]] = mat;
-                    mesh.Materials[property.Indices[1]] = mat;
-                    mesh.Materials[property.Indices[2]] = mat;
-                    if (property.Indices[3] != 0xFF)
-                        mesh.Materials[property.Indices[3]] = mat;
-                } else if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
-                {
-                    Material mat = new Material(unknownProperty1.ToString("X4"), Color.Red);
-                    mesh.Materials[property.Indices[0]] = mat;
-                    mesh.Materials[property.Indices[1]] = mat;
-                    mesh.Materials[property.Indices[2]] = mat;
-                    if (property.Indices[3] != 0xFF)
-                        mesh.Materials[property.Indices[3]] = mat;
-                }
-                else
-                {
-                    Material mat = new Material(unknownProperty1.ToString("X4"), Color.White);
-                    mesh.Materials[property.Indices[0]] = mat;
-                    mesh.Materials[property.Indices[1]] = mat;
-                    mesh.Materials[property.Indices[2]] = mat;
-                    if (property.Indices[3] != 0xFF)
-                        mesh.Materials[property.Indices[3]] = mat;
-                }*/
-
-                /*int red = banana * 10 % 255;
-                int green = banana * 5 % 255;
-                int blue = banana * 12 % 255;
-
-                Color color = Color.FromArgb(red, green, blue);
-                Material mat = new Material(banana.ToString("X2"), color);
-                    //Color.FromArgb(banana & 0xFF, 0, (banana >> 8) & 0xFF));
-                mesh.Materials[property.Indices[0]] = mat;
-                mesh.Materials[property.Indices[1]] = mat;
-                mesh.Materials[property.Indices[2]] = mat;
-                if (property.Indices[3] != 0xFF)
-                    mesh.Materials[property.Indices[3]] = mat;*/
-
-                //if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
-                if (unknownProperty1 > 0x9D64 && unknownProperty1 != 0xFFFF)
-                {
-                    string bla = property.IndicesIndices[0].ToString("X2") + "_" +
-                                 property.IndicesIndices[1].ToString("X2") + "_" +
-                                 property.IndicesIndices[2].ToString("X2") + "_" +
-                                 property.IndicesIndices[3].ToString("X2");
-                    //Material mat = new Material(unknownProperty1.ToString("X4"),
-                    Material mat = new Material(unknownProperty1.ToString("X4") + "_" + unknownProperty2.ToString("X4") + "_" + bla,
-                        Color.FromArgb(unknownProperty1 & 0xFF, 0, (unknownProperty1 >> 8) & 0xFF));
-                    mesh.Materials[property.Indices[0]] = mat;
-                    mesh.Materials[property.Indices[1]] = mat;
-                    mesh.Materials[property.Indices[2]] = mat;
-                    if (property.Indices[3] != 0xFF)
-                        mesh.Materials[property.Indices[3]] = mat;
-                }
-                else
-                {
-                    string bla = property.IndicesIndices[0].ToString("X2") + "_" +
-                                 property.IndicesIndices[1].ToString("X2") + "_" +
-                                 property.IndicesIndices[2].ToString("X2") + "_" +
-                                 property.IndicesIndices[3].ToString("X2");
-                    //Material mat = new Material(unknownProperty1.ToString("X4"),
-                    Material mat = new Material(unknownProperty1.ToString("X4") + "_" + unknownProperty2.ToString("X4") + "_" + bla, Color.White);
-                    mesh.Materials[property.Indices[0]] = mat;
-                    mesh.Materials[property.Indices[1]] = mat;
-                    mesh.Materials[property.Indices[2]] = mat;
-                    if (property.Indices[3] != 0xFF)
-                        mesh.Materials[property.Indices[3]] = mat;
+                    MeshFace face2 = new MeshFace();
+                    face2.Material = face.Material;
+                    face2.Indices.Add(property.Indices[3]);
+                    face2.Indices.Add(property.Indices[2]);
+                    face2.Indices.Add(property.Indices[1]);
+                    mesh.Faces.Add(face2);
                 }
             }
-			
 
-			List<Vector3S> points = PointList;
+
+            List<Vector3S> points = PointList;
 
             for (int i = 0; i < points.Count; i++)
             {
@@ -352,7 +268,7 @@ namespace BundleManager
 
         public override string ToString()
         {
-            return "Pos: " + Position + ", Scale: " + Scale + ", Unk7: " + Unknown7 + ", PointCount: " + PointCount;
+            return "Pos: " + Position + ", Scale: " + Scale + ", PointCount: " + PointList.Count;
         }
     }
 
@@ -362,18 +278,18 @@ namespace BundleManager
         public int Unknown4;
         public Vector3 Max;
         public int Unknown8;
-        public uint ChunkPointerStart;
-        public uint BoxListStart;
-        public int ChunkCount;
-        public uint FileSize;
+        //public uint ChunkPointerStart;
+        //public uint BoxListStart;
+        //public int ChunkCount;
+        //public uint FileSize;
 
-        public List<uint> ChunkPointers;
+        //public List<uint> ChunkPointers;
         public List<PolygonSoupBoundingBox> BoundingBoxes;
         public List<PolygonSoupChunk> Chunks;
 
         public PolygonSoupList()
         {
-            ChunkPointers = new List<uint>();
+            //ChunkPointers = new List<uint>();
             BoundingBoxes = new List<PolygonSoupBoundingBox>();
             Chunks = new List<PolygonSoupChunk>();
         }
@@ -390,36 +306,33 @@ namespace BundleManager
             result.Unknown4 = br.ReadInt32();
             result.Max = br.ReadVector3F();
             result.Unknown8 = br.ReadInt32();
-            result.ChunkPointerStart = br.ReadUInt32();
-            result.BoxListStart = br.ReadUInt32();
-            result.ChunkCount = br.ReadInt32();
-            result.FileSize = br.ReadUInt32();
+            uint chunkPointerStart = br.ReadUInt32();
+            uint boxListStart = br.ReadUInt32();
+            int chunkCount = br.ReadInt32();
+            br.ReadUInt32(); // FileSize
+
+            List<uint> chunkPointers = new List<uint>();
 
             // No Data
-            if (result.ChunkCount == 0)
+            if (chunkCount == 0)
             {
                 br.Close();
                 ms.Close();
                 return result;
             }
 
-            br.BaseStream.Position = result.ChunkPointerStart;
+            br.BaseStream.Position = chunkPointerStart;
 
-            for (int i = 0; i < result.ChunkCount; i++)
+            for (int i = 0; i < chunkCount; i++)
             {
-                result.ChunkPointers.Add(br.ReadUInt32());
+                chunkPointers.Add(br.ReadUInt32());
             }
 
-            //br.BaseStream.Position += (16 - br.BaseStream.Position % 16);
-            //br.BaseStream.Position = result.BoxListStart;
-
-            for (int i = 0; i < result.ChunkCount; i++)
+            for (int i = 0; i < chunkCount; i++)
             {
                 // Read Vertically
 
-                long pos = result.BoxListStart + 0x70 * (i / 4) + 4 * (i % 4);
-
-                PolygonSoupBoundingBox box = new PolygonSoupBoundingBox();
+                long pos = boxListStart + 0x70 * (i / 4) + 4 * (i % 4);
 
                 BoxF boundingBox = new BoxF();
                 br.BaseStream.Position = pos;
@@ -429,7 +342,7 @@ namespace BundleManager
                 br.BaseStream.Position += 12;
                 float minZ = br.ReadSingle();
 
-                boundingBox.Min = new Vector3(minX, minY, minZ);
+				boundingBox.Min = new Vector3(minX, minY, minZ);
 
                 br.BaseStream.Position += 12;
                 float maxX = br.ReadSingle();
@@ -437,20 +350,18 @@ namespace BundleManager
                 float maxY = br.ReadSingle();
                 br.BaseStream.Position += 12;
                 float maxZ = br.ReadSingle();
+				br.BaseStream.Position += 12;
 
-                boundingBox.Max = new Vector3(maxX, maxY, maxZ);
+				boundingBox.Max = new Vector3(maxX, maxY, maxZ);
 
-                box.Box = boundingBox;
+				PolygonSoupBoundingBox box = new PolygonSoupBoundingBox(boundingBox, br.ReadInt32());
 
-                br.BaseStream.Position += 12;
-                box.Unknown = br.ReadInt32();
-
-                result.BoundingBoxes.Add(box);
+				result.BoundingBoxes.Add(box);
             }
 
-            for (int i = 0; i < result.ChunkPointers.Count; i++)
+            for (int i = 0; i < chunkPointers.Count; i++)
             {
-                br.BaseStream.Position = result.ChunkPointers[i];
+                br.BaseStream.Position = chunkPointers[i];
 
                 result.Chunks.Add(PolygonSoupChunk.Read(br));
             }
@@ -463,9 +374,6 @@ namespace BundleManager
 
         public void Write(BundleEntry entry)
         {
-            //if (entry.ID == Crc32.HashCrc32B("trk_col_221"))
-            //    ImportObj("E:\\notrains.obj");
-
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
@@ -473,13 +381,18 @@ namespace BundleManager
             bw.Write(Unknown4);
             bw.Write(Max);
             bw.Write(Unknown8);
-            bw.Write(ChunkPointerStart);
-            bw.Write(BoxListStart);
-            bw.Write(ChunkCount);
-            bw.Write(FileSize);
+            long chunkPointerStartPos = bw.BaseStream.Position;
+            bw.Write((uint)0);
+            long boxListStartPos = bw.BaseStream.Position;
+            bw.Write((uint)0);
+            bw.Write(Chunks.Count);
+            long fileSizePos = bw.BaseStream.Position;
+            bw.Write((uint)0);
+            
+            uint[] chunkPointers = new uint[Chunks.Count];
 
             // No Data
-            if (ChunkCount == 0)
+            if (Chunks.Count == 0)
             {
                 bw.Flush();
                 byte[] data2 = ms.ToArray();
@@ -491,22 +404,28 @@ namespace BundleManager
                 return;
             }
 
-            bw.BaseStream.Position = ChunkPointerStart;
+            long cPos = bw.BaseStream.Position;
+            uint chunkPointerStart = (uint)bw.BaseStream.Position;
+            bw.BaseStream.Position = chunkPointerStartPos;
+            bw.Write((uint)cPos);
+            bw.BaseStream.Position = cPos;
             
-            for (int i = 0; i < ChunkCount; i++)
+            for (int i = 0; i < Chunks.Count; i++)
             {
-                //bw.Write((uint)0); //ChunkPointers[i]);
-                bw.Write(ChunkPointers[i]);
+                bw.Write((uint)0);
             }
+            
+            bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
+            cPos = bw.BaseStream.Position;
+            uint boxListStart = (uint)bw.BaseStream.Position;
+            bw.BaseStream.Position = boxListStartPos;
+            bw.Write((uint) cPos);
 
-            //br.BaseStream.Position += (16 - br.BaseStream.Position % 16);
-            //br.BaseStream.Position = BoxListStart;
-
-            for (int i = 0; i < ChunkCount; i++)
+            for (int i = 0; i < Chunks.Count; i++)
             {
                 // Write Vertically
 
-                long pos = BoxListStart + 0x70 * (i / 4) + 4 * (i % 4);
+                long pos = boxListStart + 0x70 * (i / 4) + 4 * (i % 4);
 
                 PolygonSoupBoundingBox box = BoundingBoxes[i];
 
@@ -525,24 +444,49 @@ namespace BundleManager
                 bw.Write(box.Box.Max.Z);
 
                 bw.BaseStream.Position += 12;
-                bw.Write(box.Unknown);
+                bw.Write(box.Terminator);
             }
-            
-            for (int i = 0; i < ChunkPointers.Count; i++)
-            {
-                //bw.BaseStream.Position += (16 - bw.BaseStream.Position % 16);
 
-                bw.BaseStream.Position = ChunkPointers[i];
-                //ChunkPointers[i] = (uint)bw.BaseStream.Position;
+            bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
+
+            if (Chunks.Count > 0)
+            {
+                bw.BaseStream.Position = (128 * ((bw.BaseStream.Position + 127) / 128));
+
+                for (int i = 0; i < Chunks.Count / 4; i++)
+                {
+                    if ((i % 8) % 3 == 0)
+                    {
+                        bw.BaseStream.Position += 256;
+                    }
+                    else
+                    {
+                        bw.BaseStream.Position += 384;
+                    }
+                }
+            }
+
+            for (int i = 0; i < chunkPointers.Length; i++)
+            {
+                bw.BaseStream.Position = (128 * ((bw.BaseStream.Position + 127) / 128));
+
+                chunkPointers[i] = (uint)bw.BaseStream.Position;
 
                 Chunks[i].Write(bw);
             }
 
-            /*bw.BaseStream.Position = ChunkPointerStart;
-            for (int i = 0; i < ChunkCount; i++)
+            bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16)) + 0x5F;
+            bw.Write((byte)0);
+
+            cPos = bw.BaseStream.Position;
+            bw.BaseStream.Position = fileSizePos;
+            bw.Write((uint)cPos);
+
+            bw.BaseStream.Position = chunkPointerStart;
+            for (int i = 0; i < Chunks.Count; i++)
             {
-                bw.Write(ChunkPointers[i]);
-            }*/
+                bw.Write(chunkPointers[i]);
+            }
 
             bw.Flush();
             byte[] data = ms.ToArray();
@@ -551,6 +495,26 @@ namespace BundleManager
 
             entry.Header = data;
             entry.Dirty = true;
+        }
+
+        public void RemoveWreckSurfaces()
+        {
+            foreach (PolygonSoupChunk chunk in Chunks)
+            {
+                foreach (PolygonSoupProperty property in chunk.PropertyList)
+                {
+                    ushort unknownProperty1 = (ushort)(property.UnknownProperty & 0xFFFF);
+
+                    ushort unknownProperty2 = (ushort)((property.UnknownProperty >> 16) & 0xFFFF);
+
+                    // Remove wreck surfaces - TODO: tmp
+                    unknownProperty2 &= unchecked((ushort)~0x4000);
+
+                    uint unknownProperty = (uint)((unknownProperty2 << 16) | unknownProperty1);
+
+                    property.UnknownProperty = unknownProperty;
+                }
+            }
         }
 
         public Scene MakeScene(ILoader loader = null)
@@ -564,293 +528,167 @@ namespace BundleManager
 
                 Vector3I pos = chunk.Position;
                 float scale = chunk.Scale;
-                /*List<Mesh> meshes = chunk.BuildMesh(pos, scale);
-                for (int i = 0; i < meshes.Count; i++)
-                {
-                    Mesh mesh = meshes[i];
-                    Model model = new Model(mesh);
-                    SceneObject sceneObject = new SceneObject(id + "_" + i, model);
-                    //sceneObject.ID = id;
-                    //sceneObject.Transform = Matrix4.CreateScale(scale) *
-                    //                        Matrix4.CreateTranslation(new Vector3(pos.X, pos.Y, pos.Z));
-                    scene.AddObject(sceneObject);
-                }*/
                 Model model = new Model(chunk.BuildMesh(pos, scale));
                 SceneObject sceneObject = new SceneObject(id, model);
-                //sceneObject.ID = id;
-                //sceneObject.Transform = Matrix4.CreateScale(scale) *
-                //                        Matrix4.CreateTranslation(new Vector3(pos.X, pos.Y, pos.Z));
                 scene.AddObject(sceneObject);
                 index++;
-
-                // TODO: TEMP
-                //break;
             }
 
             return scene;
         }
 
-        private class ColMesh
-        {
-            public int ID;
-            public string Name;
-            public List<Vector3S> Points;
-            public List<PolygonSoupProperty> Properties;
-            //public List<uint> Indices;
-        }
-
         public void ImportObj(string path)
         {
-            Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
-            StreamReader sr = new StreamReader(s);
+            GenericModel model = OBJImporter.ImportOBJ(path);
+            model.SplitByPointCount(255);
 
-            List<Vector3> points = new List<Vector3>();
-            //List<uint> indices = new List<uint>();
-
-            Dictionary<string, ColMesh> meshes = new Dictionary<string, ColMesh>();
-
-            float scale = 1.0f;
-            Vector3I pos = new Vector3I();
-
-            PolygonSoupProperty lastUsedProperty = null;
-            bool usedCurrentProperty = false;
-            uint globalVertCount = 0;
-            int startVertex = 0;
-            int currentProperty = -1;
-            string currentMesh = "";
-            //PolygonSoupProperty currentProperty;
-
-            while (!sr.EndOfStream)
+            // Verify data before applying
+            foreach (GenericMesh mesh in model.Meshes)
             {
-                string line = sr.ReadLine();
-                if (line == null || line.Trim().StartsWith("#"))
-                    continue;
-
-                line = line.Trim();
-
-                if (line.StartsWith("v"))
+                // Get highest point
+                uint pointCount = 0;
+                foreach (uint key in mesh.Vertices.Keys)
                 {
-                    string[] options = line.Split(' ');
-                    if (options.Length < 4)
-                        throw new ReadFailedError("Invalid Vertex Line: " + line);
-
-                    if (!float.TryParse(options[1], NumberStyles.Any, CultureInfo.CurrentCulture,
-                        out var x))
+                    if (pointCount < key)
                     {
-                        throw new ReadFailedError("Invalid Coord: " + options[1]);
+                        pointCount = key;
                     }
-
-                    if (!float.TryParse(options[2], NumberStyles.Any, CultureInfo.CurrentCulture,
-                        out var y))
-                    {
-                        throw new ReadFailedError("Invalid Coord: " + options[2]);
-                    }
-
-                    if (!float.TryParse(options[3], NumberStyles.Any, CultureInfo.CurrentCulture,
-                        out var z))
-                    {
-                        throw new ReadFailedError("Invalid Coord: " + options[3]);
-                    }
-
-                    globalVertCount++;
-                    points.Add(new Vector3(x, y, z));
-
-                } else if (line.StartsWith("f"))
+                }
+                pointCount++;
+                // Is it too big for a byte?
+                if (pointCount > 256)
+                    throw new ReadFailedError("Too many points for mesh: " + mesh.Name + ", " + pointCount + " > 256");
+                foreach (Face face in mesh.Faces)
                 {
-                    string[] options = line.Split(' ');
-                    if (options.Length < 4)
-                        throw new ReadFailedError("Invalid Face Line: " + line);
+                    // Triangulation required for now.
+                    if (face.Indices.Count > 3)
+                        throw new ReadFailedError("Please triangulate your mesh: " + mesh.Name);
 
-                    if (!uint.TryParse(options[1], NumberStyles.None, CultureInfo.CurrentCulture,
-                        out var f1))
+                    // Material names are required
+                    if (string.IsNullOrEmpty(face.Material?.Name))
+                        throw new ReadFailedError("Invalid Material for mesh: " + mesh.Name);
+
+                    // Verify that all data is there
+                    string[] split = face.Material.Name.Split('_');
+                    if (split.Length < 7)
+                        throw new ReadFailedError("Invalid Material Data: " + face.Material.Name + ", for mesh: " + mesh.Name);
+
+                    // Verify that all data can be parsed
+                    try
                     {
-                        throw new ReadFailedError("Invalid Index: " + options[1]);
+                        Utilities.Parse(split[1], true, out ushort _);
+                        Utilities.Parse(split[2], true, out ushort _);
+                        Utilities.Parse(split[3], true, out byte _);
+                        Utilities.Parse(split[4], true, out byte _);
+                        Utilities.Parse(split[5], true, out byte _);
+                        Utilities.Parse(split[6], true, out byte _);
                     }
-
-                    if (!uint.TryParse(options[2], NumberStyles.None, CultureInfo.CurrentCulture,
-                        out var f2))
+                    catch (NotSupportedException)
                     {
-                        throw new ReadFailedError("Invalid Index: " + options[2]);
+                        throw new ReadFailedError("Unable to Parse Material Data: " + face.Material.Name + ", for mesh: " + mesh.Name);
                     }
-
-                    if (!uint.TryParse(options[3], NumberStyles.None, CultureInfo.CurrentCulture,
-                        out var f3))
-                    {
-                        throw new ReadFailedError("Invalid Index: " + options[3]);
-                    }
-
-                    if (usedCurrentProperty)
-                    {
-                        currentProperty++;
-                        meshes[currentMesh].Properties.Add(lastUsedProperty.Copy());
-                    }
-
-                    Vector3 v1 = points[(int)f1 - 1];
-                    Vector3 v2 = points[(int)f2 - 1];
-                    Vector3 v3 = points[(int)f3 - 1];
-
-                    Vector3S v1S = new Vector3S((short)((v1.X / scale) - pos.X), (short)((v1.Y / scale) - pos.Y), (short)((v1.Z / scale) - pos.Z));
-                    Vector3S v2S = new Vector3S((short)((v2.X / scale) - pos.X), (short)((v2.Y / scale) - pos.Y), (short)((v2.Z / scale) - pos.Z));
-                    Vector3S v3S = new Vector3S((short)((v3.X / scale) - pos.X), (short)((v3.Y / scale) - pos.Y), (short)((v3.Z / scale) - pos.Z));
-
-
-                    meshes[currentMesh].Properties[currentProperty].Indices[0] = (byte)(meshes[currentMesh].Points.Count + 0);//(byte)(f1 - 1 - startVertex);
-                    meshes[currentMesh].Properties[currentProperty].Indices[1] =
-                        (byte) (meshes[currentMesh].Points.Count + 1);//1;//(byte)(f2 - 1 - startVertex);
-                    meshes[currentMesh].Properties[currentProperty].Indices[2] =
-                        (byte) (meshes[currentMesh].Points.Count + 2);//2;//(byte)(f3 - 1 - startVertex);
-                    
-                    meshes[currentMesh].Points.Add(v1S);
-                    meshes[currentMesh].Points.Add(v2S);
-                    meshes[currentMesh].Points.Add(v3S);
-
-                    if (options.Length > 4)
-                    {
-                        if (!uint.TryParse(options[4], NumberStyles.None, CultureInfo.CurrentCulture,
-                            out var f4))
-                        {
-                            throw new ReadFailedError("Invalid Index: " + options[4]);
-                        }
-
-                        Vector3 v4 = points[(int)f4 - 1];
-                        Vector3S v4S = new Vector3S((short)((v4.X / scale) - pos.X), (short)((v4.Y / scale) - pos.Y), (short)((v4.Z / scale) - pos.Z));
-
-                        meshes[currentMesh].Properties[currentProperty].Indices[3] =
-                            (byte) (meshes[currentMesh].Points.Count + 0); //3;//(byte)(f4 - 1 - startVertex);
-
-                        meshes[currentMesh].Points.Add(v4S);
-                    }
-                    else
-                    {
-                        meshes[currentMesh].Properties[currentProperty].Indices[3] = 0xFF;
-                    }
-
-                    usedCurrentProperty = true;
-
-                } else if (line.StartsWith("usemtl"))
-                {
-                    string[] options = line.Split(' ');
-                    if (options.Length < 2)
-                        throw new ReadFailedError("Invalid Material Line: " + line);
-                    string material = options[1];
-                    string[] matStrings = material.Split('_');
-                    if (matStrings.Length < 7)
-                        throw new ReadFailedError("Invalid Material: " + material);
-                    string property1 = matStrings[1];
-                    string property2 = matStrings[2];
-                    string newByte1 = matStrings[3];
-                    string newByte2 = matStrings[4];
-                    string newByte3 = matStrings[5];
-                    string newByte4 = matStrings[6];
-
-                    if (!ushort.TryParse(property1, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
-                        out var prop1))
-                    {
-                        throw new ReadFailedError("Invalid Property1: " + property1);
-                    }
-
-                    if (!ushort.TryParse(property2, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
-                        out var prop2))
-                    {
-                        throw new ReadFailedError("Invalid Property2: " + property1);
-                    }
-
-                    if (!byte.TryParse(newByte1, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
-                        out var nByte1))
-                    {
-                        throw new ReadFailedError("Invalid NByte1: " + property1);
-                    }
-
-                    if (!byte.TryParse(newByte2, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
-                        out var nByte2))
-                    {
-                        throw new ReadFailedError("Invalid NByte2: " + property1);
-                    }
-
-                    if (!byte.TryParse(newByte3, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
-                        out var nByte3))
-                    {
-                        throw new ReadFailedError("Invalid NByte3: " + property1);
-                    }
-
-                    if (!byte.TryParse(newByte4, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture,
-                        out var nByte4))
-                    {
-                        throw new ReadFailedError("Invalid NByte4: " + property1);
-                    }
-
-                    usedCurrentProperty = false;
-
-                    PolygonSoupProperty property = new PolygonSoupProperty();
-                    property.UnknownProperty = (uint) ((prop2 << 16) | prop1);
-                    //property.Indices is done above
-                    property.IndicesIndices[0] = nByte1;
-                    property.IndicesIndices[1] = nByte2;
-                    property.IndicesIndices[2] = nByte3;
-                    property.IndicesIndices[3] = nByte4;
-
-                    lastUsedProperty = property;
-
-                    currentProperty++;
-                    meshes[currentMesh].Properties.Add(property);
-
-                } else if (line.StartsWith("g"))
-                {
-                    string[] options = line.Split(' ');
-                    if (options.Length < 2)
-                        throw new ReadFailedError("Invalid Group: <none>");
-                    currentMesh = options[1];
-                    //if (currentMesh == "mesh0")
-                    //    Debugger.Break();
-
-                    startVertex = (int)(globalVertCount - 1);
-                    currentProperty = -1;
-
-                    ColMesh colMesh = new ColMesh();
-
-                    // TODO: Only works if mesh already exists in this PolygonSoupList
-                    {
-                        string meshId = currentMesh.Substring("mesh".Length);
-                        if (!int.TryParse(meshId, NumberStyles.None, CultureInfo.CurrentCulture, out var meshIndex))
-                        {
-                            throw new ReadFailedError("Invalid Group: " + meshId);
-                        }
-
-                        scale = Chunks[meshIndex].Scale;
-                        pos = Chunks[meshIndex].Position;
-
-                        colMesh.ID = meshIndex;
-                    }
-
-                    colMesh.Name = currentMesh;
-                    colMesh.Points = new List<Vector3S>();
-                    colMesh.Properties = new List<PolygonSoupProperty>();
-                    //colMesh.Indices = new List<uint>();
-                    meshes.Add(currentMesh, colMesh);
                 }
             }
 
-            sr.Close();
-            s.Close();
+            // Clear existing data
+            Chunks.Clear();
+			BoundingBoxes.Clear();
 
-            foreach (string meshName in meshes.Keys)
+            // Global vertices list to calculate the bounding box
+            List<Vector3> vertices = new List<Vector3>();
+
+            // Generate PolygonSoupChunks and BoundingBoxes
+            foreach (GenericMesh mesh in model.Meshes)
             {
-                ColMesh mesh = meshes[meshName];
+                PolygonSoupChunk chunk = new PolygonSoupChunk();
+                foreach (Face face in mesh.Faces)
+                {
+                    PolygonSoupProperty property = new PolygonSoupProperty();
 
-                PolygonSoupChunk chunk = Chunks[mesh.ID];
-                chunk.PropertyList = mesh.Properties;
-                chunk.PointList = mesh.Points;
-                chunk.PointCount = (byte)mesh.Points.Count;
+                    // Set Indices
+                    property.Indices[0] = (byte)face.Indices[0];
+                    property.Indices[1] = (byte)face.Indices[1];
+                    property.Indices[2] = (byte)face.Indices[2];
 
-                //int count = (Unknown9 >> 1) * 2 +
-                //            (Unknown9 - (Unknown9 >> 1) * 2) +
-                //            (((PropertyListCount - Unknown9) >> 2) * 4) +
-                //            ((PropertyListCount - Unknown9) - ((PropertyListCount - Unknown9) >> 2) * 4);
+                    if (face.Indices.Count > 3)
+                        property.Indices[3] = (byte) face.Indices[3];
+                    else 
+                        property.Indices[3] = 0xFF;
 
-                //int count = chunk.PropertyList.Count;
+                    // Get data from material name
+                    string materialName = face.Material.Name;
+                    string[] split = materialName.Split('_');
 
-                chunk.PropertyListCount = (byte)mesh.Properties.Count; //0;
+                    // Parse the values
+                    Utilities.Parse(split[1], true, out ushort unknownProperty1);
+                    Utilities.Parse(split[2], true, out ushort unknownProperty2);
+                    Utilities.Parse(split[3], true, out byte unknownByte1);
+                    Utilities.Parse(split[4], true, out byte unknownByte2);
+                    Utilities.Parse(split[5], true, out byte unknownByte3);
+                    Utilities.Parse(split[6], true, out byte unknownByte4);
+
+                    // Combine unknownProperty1 and unknownProperty2
+                    property.UnknownProperty = (uint) ((unknownProperty2 << 16) | unknownProperty1);
+
+                    // Set unknown bytes
+                    property.UnknownBytes[0] = unknownByte1;
+                    property.UnknownBytes[1] = unknownByte2;
+                    property.UnknownBytes[2] = unknownByte3;
+                    property.UnknownBytes[3] = unknownByte4;
+
+                    // Add the property
+                    chunk.PropertyList.Add(property);
+                }
+
+                // Add the vertices to the global vertices list
+                vertices.AddRange(mesh.Vertices.Values.ToArray());
+
+                // Get the minimum and maximum point of the mesh
+                Vector3 min = MathUtils.MinBounds(mesh.Vertices.Values.ToArray());
+                Vector3 max = MathUtils.MaxBounds(mesh.Vertices.Values.ToArray());
+
+                // Use the minimum as the position
+                Vector3 position = min;
+
+                // Set the scale to something standard
+                float scale = 0.015f;
+                
+                // Get the point count
+                uint pointCount = 0;
+                foreach (uint key in mesh.Vertices.Keys)
+                {
+                    if (pointCount < key)
+                    {
+                        pointCount = key;
+                    }
+                }
+                pointCount++;
+                Vector3S[] verts = new Vector3S[pointCount];
+                foreach (uint key in mesh.Vertices.Keys)
+                {
+                    // Convert the point to a short and apply position and scale
+                    verts[key] = new Vector3S((mesh.Vertices[key] - position) / scale);
+                }
+                chunk.PointList = verts.ToList();
+                
+                // Quads are currently unsupported
+                chunk.QuadCount = 0;
+
+                chunk.Scale = scale;
+
+                // Set the position and apply scale
+                chunk.Position = new Vector3I(position / scale);
+
+                // Add the chunk
+                Chunks.Add(chunk);
+
+                // Add the bounding box
+                BoundingBoxes.Add(new PolygonSoupBoundingBox(new BoxF(min, max), -1));
             }
+
+            // Calculate Bounding Box
+            Min = MathUtils.MinBounds(vertices.ToArray());
+            Max = MathUtils.MaxBounds(vertices.ToArray());
         }
     }
 }

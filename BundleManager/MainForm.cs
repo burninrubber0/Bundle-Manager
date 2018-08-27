@@ -185,6 +185,9 @@ namespace BundleManager
         {
             lstEntries.Items.Clear();
 
+            dumpAllCollisionsToolStripMenuItem.Enabled = false;
+            removeWreckSurfacesToolStripMenuItem.Enabled = false;
+
             if (CurrentArchive == null)
             {
                 lstEntries.Enabled = false;
@@ -195,9 +198,17 @@ namespace BundleManager
                 lstEntries.Enabled = true;
             }
 
+            lstEntries.BeginUpdate();
+            lstEntries.ListViewItemSorter = null; // Disable sorting while adding
+
             for (int i = 0; i < CurrentArchive.Entries.Count; i++)
             {
                 BundleEntry entry = CurrentArchive.Entries[i];
+                if (entry.Type == EntryType.PolygonSoupListResourceType)
+                {
+                    dumpAllCollisionsToolStripMenuItem.Enabled = true;
+                    removeWreckSurfacesToolStripMenuItem.Enabled = true;
+                }
                 Color color = entry.GetColor();
                 string[] values = new string[]
                 {
@@ -212,10 +223,10 @@ namespace BundleManager
                 ListViewItem item = new ListViewItem(values);
                 item.BackColor = color;
                 lstEntries.Items.Add(item);
-
-                lstEntries.ListViewItemSorter = new EntrySorter(0);
-                lstEntries.Sort();
             }
+
+            lstEntries.ListViewItemSorter = new EntrySorter(0); // Also calls Sort
+            lstEntries.EndUpdate();
         }
 
         private bool CheckSave()
@@ -429,8 +440,8 @@ namespace BundleManager
         {
             Application.Exit();
         }
-
-        public void PatchImages()
+        
+        public void ConvertImagesFromPS3ToPC_old()
         {
             if (CurrentArchive == null)
             {
@@ -683,8 +694,17 @@ namespace BundleManager
             } else if (entry.Type == EntryType.PolygonSoupListResourceType && !forceHex)
             {
                 PolygonSoupList list = PolygonSoupList.Read(entry);
-                Scene scene = list.MakeScene();
-                ModelViewerForm.ShowModelViewer(this, scene);
+                WorldColEditor editor = new WorldColEditor();
+                editor.Poly = list;
+                editor.Changed += () =>
+                {
+                    editor.Poly.Write(entry);
+                };
+                editor.ShowDialog(this);
+                
+                // UNCOMMENT ME TO DEBUG MODEL VIEWER!!
+                //Scene scene = list.MakeScene();
+                //ModelViewerForm.ShowModelViewer(this, scene);
                 //DebugUtil.ShowDebug(this, list);
             }
             else if (entry.Type == EntryType.IDList && !forceHex)
@@ -714,6 +734,22 @@ namespace BundleManager
                     edit.Lang.Write(entry);
                 };
                 edit.ShowDialog(this);
+            }
+            else if (entry.Type == EntryType.LanguageResourceType && !forceHex)
+            {
+                Language language = Language.Read(entry);
+                //DebugUtil.ShowDebug(this, language);
+                LangEdit edit = new LangEdit();
+                edit.Lang = language;
+                edit.Changed += () =>
+                {
+                    edit.Lang.Write(entry);
+                };
+                edit.ShowDialog(this);
+            } else if (entry.Type == EntryType.TrafficDataResourceType && !forceHex)
+            {
+                Traffic traffic = Traffic.Read(entry);
+                DebugUtil.ShowDebug(this, traffic);
             }
             /* else if (entry.Type == EntryType.ModelResourceType && !forceHex)
             {
@@ -803,11 +839,6 @@ namespace BundleManager
             EditSelectedEntry(true);
         }
 
-        private void patchImagesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            PatchImages();
-        }
-
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (!CheckSave())
@@ -835,18 +866,6 @@ namespace BundleManager
         {
             Close();
         }
-
-        /*private void modelCountToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            int modelCount = 0;
-            foreach (BundleEntry entry in CurrentArchive.Entries)
-            {
-                if (entry.Type == EntryType.Model)
-                    modelCount++;
-            }
-
-            MessageBox.Show(this, "Model Count: " + modelCount, "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }*/
 
         private void lstEntries_ColumnClick(object sender, ColumnClickEventArgs e)
         {
@@ -941,7 +960,6 @@ namespace BundleManager
             DialogResult result = fbd.ShowDialog(this);
             if (result == DialogResult.OK)
             {
-                //PolygonSoupChunk.Upper = 0;
                 string path = fbd.SelectedPath;
 
                 for (int i = 0; ; i++)
@@ -977,8 +995,6 @@ namespace BundleManager
                     scene.ExportWavefrontObj(path + "/" + polyName + ".obj");
                 }
 
-                //MessageBox.Show(this, PolygonSoupChunk.Upper.ToString("X4"), "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
                 MessageBox.Show(this, "Done!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
@@ -1006,6 +1022,21 @@ namespace BundleManager
             PatchImages();
             
             CurrentArchive.Platform = BundlePlatform.PC;
+        }
+
+        private void removeWreckSurfacesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < CurrentArchive.Entries.Count; i++)
+            {
+                BundleEntry entry = CurrentArchive.Entries[i];
+
+                if (entry.Type == EntryType.PolygonSoupListResourceType)
+                {
+                    PolygonSoupList list = PolygonSoupList.Read(entry);
+                    list.RemoveWreckSurfaces();
+                    list.Write(entry);
+                }
+            }
         }
     }
 }

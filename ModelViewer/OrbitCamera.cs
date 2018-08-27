@@ -40,19 +40,20 @@ namespace ModelViewer
             float horizDist = _scene.HorizSize;
             float vertDist = _scene.VertSize;
 
-            if (Math.Abs(vertDist - target.Y) < 1.2f)
+            /*if (Math.Abs(vertDist - target.Y) < 1.2f)
             {
                 vertDist += 4;
                 horizDist -= 5;
-            }
+            }*/
 
             Vector3 eye = new Vector3((float)-Math.Sin(_angle) * horizDist, vertDist, (float)-Math.Cos(_angle) * horizDist);
+            eye += target;
 
             LookAtMatrix = Matrix4.LookAt(eye, target, Vector3.UnitY);
 
             _angle += 0.025f;
-            if (_angle >= 360)
-                _angle -= 360;
+            if (_angle >= 2 * Math.PI)
+                _angle -= 2 * (float)Math.PI;
         }
     }
 }

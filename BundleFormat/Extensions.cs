@@ -121,7 +121,7 @@ namespace BundleFormat
             long archiveSizeOffset = self.BaseStream.Position;
             self.Write((int)0);
 
-            self.Write((int)result.CompressionType);
+            self.Write((int)result.Flags);
             self.Write(result.Unknown7);
             self.Write(result.Unknown8);
 
@@ -164,13 +164,13 @@ namespace BundleFormat
 
                 int uncompressedHeaderSize = entry.UncompressedHeaderSize;
                 int uncompressedHeaderSizeCache = entry.UncompressedHeaderSizeCache;
-                int uncompressedHeaderSizeAndCache = (uncompressedHeaderSizeCache << 16) | uncompressedHeaderSize;
+                int uncompressedHeaderSizeAndCache = (uncompressedHeaderSizeCache << 28) | uncompressedHeaderSize;
 
                 self.Write(uncompressedHeaderSizeAndCache);
 
                 int uncompressedBodySize = entry.UncompressedBodySize;
                 int uncompressedBodySizeCache = entry.UncompressedBodySizeCache;
-                long uncompressedBodySizeAndCache = (uncompressedBodySizeCache << 16) | uncompressedBodySize;
+                long uncompressedBodySizeAndCache = (uncompressedBodySizeCache << 28) | uncompressedBodySize;
                 self.Write(uncompressedBodySizeAndCache);
                 self.Write(entry.HeaderSize);
                 self.Write(entry.BodySize);

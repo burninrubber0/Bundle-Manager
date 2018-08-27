@@ -87,7 +87,7 @@ namespace VehicleList
                 vehicle.Unknown4 = self.ReadSingle();
                 vehicle.Flags = self.ReadInt32();
                 vehicle.Unknown6 = self.ReadInt16();
-                vehicle.Unknown7 = self.ReadByte();
+                vehicle.DisplayControl = self.ReadByte();
                 vehicle.DisplayStrength = self.ReadByte();
                 vehicle.Unknown8 = self.ReadInt32();
                 vehicle.Unknown9 = self.ReadInt32();
@@ -171,7 +171,7 @@ namespace VehicleList
                 self.Write(console ? Util.ReverseBytes(vehicle.Unknown4) : vehicle.Unknown4);
                 self.Write(console ? Util.ReverseBytes(vehicle.Flags) : vehicle.Flags);
                 self.Write(console ? Util.ReverseBytes(vehicle.Unknown6) : vehicle.Unknown6);
-                self.Write(vehicle.Unknown7);
+                self.Write(vehicle.DisplayControl);
                 self.Write(vehicle.DisplayStrength);
                 self.Write(console ? Util.ReverseBytes(vehicle.Unknown8) : vehicle.Unknown8);
                 self.Write(console ? Util.ReverseBytes(vehicle.Unknown9) : vehicle.Unknown9);

@@ -12,10 +12,13 @@ using BundleUtilities;
 
 namespace BundleFormat
 {
-    public enum CompressionType
+    [Flags]
+    public enum Flags
     {
-        Uncompressed = 6,
-        ZLib = 7
+        Compressed = 1,
+        UnknownFlag1 = 2,
+        UnknownFlag2 = 4,
+        HasResourceStringTable = 8
     }
 
     public enum BundlePlatform
@@ -39,7 +42,7 @@ namespace BundleFormat
         public int HeadStart;
         public int BodyStart;
         public int ArchiveSize;
-        public CompressionType CompressionType; // Normally 7
+        public Flags Flags;
         public int Unknown7; // Normally 0
         public int Unknown8; // Normally 0
         public BundlePlatform Platform;
@@ -92,23 +95,31 @@ namespace BundleFormat
 
         public static BundleArchive Read(string path)
         {
-            try
+            using (Stream s = File.OpenRead(path))
             {
-                Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
-                BinaryReader2 br = new BinaryReader2(s);
+                try
+                {
+                    BinaryReader2 br = new BinaryReader2(s);
 
-                BundleArchive result = Read(br);
-                result.Path = path;
+                    BundleArchive result = Read(br);
+                    if (result == null)
+                    {
+                        br.Close();
 
-                br.Close();
-                s.Close();
+                        return null;
+                    }
 
-                return result;
-            }
-            catch (IOException ex)
-            {
-                Debug.WriteLine(ex.Message + "\n" + ex.StackTrace);
-                return null;
+                    result.Path = path;
+
+                    br.Close();
+
+                    return result;
+                }
+                catch (IOException ex)
+                {
+                    Debug.WriteLine(ex.Message + "\n" + ex.StackTrace);
+                    return null;
+                }
             }
         }
 
@@ -137,11 +148,11 @@ namespace BundleFormat
             result.HeadStart = br.ReadInt32();
             result.BodyStart = br.ReadInt32();
             result.ArchiveSize = br.ReadInt32();
-            int compressionType = br.ReadInt32();
+            int flags = br.ReadInt32();
             result.Unknown7 = br.ReadInt32();
             result.Unknown8 = br.ReadInt32();
 
-            result.CompressionType = (CompressionType)compressionType;
+            result.Flags = (Flags)flags;
 
             //long dataOffset = result.HeadStart;
 
@@ -156,6 +167,7 @@ namespace BundleFormat
                 entry.Platform = result.Platform;
 
                 entry.ID = br.ReadUInt64();
+
                 entry.References = br.ReadInt32();
                 entry.Unknown12 = br.ReadInt32();
                 int uncompressedHeaderSize = br.ReadInt32();
@@ -170,9 +182,9 @@ namespace BundleFormat
                 entry.Unknown = br.ReadInt16();
 
                 entry.UncompressedHeaderSize = uncompressedHeaderSize & 0x0FFFFFFF;
-                entry.UncompressedHeaderSizeCache = uncompressedHeaderSize >> 16;
+                entry.UncompressedHeaderSizeCache = uncompressedHeaderSize >> 28;
                 entry.UncompressedBodySize = (int)(uncompressedBodySize & 0x0FFFFFFF);
-                entry.UncompressedBodySizeCache = (int)(uncompressedBodySize >> 16);
+                entry.UncompressedBodySizeCache = (int)(uncompressedBodySize >> 28);
 
                 entry.Type = (EntryType)fileType;
 
@@ -217,7 +229,7 @@ namespace BundleFormat
                     entry.CompressedBody = extra;
 
                     entry.Body = extra.Decompress(entry.UncompressedBodySize);
-                    if (entry.Body == null)
+                    if (entry.Body == null || entry.Body.NoData())
                     {
                         entry.ExtraDataCompressed = false;
                         entry.Body = extra;

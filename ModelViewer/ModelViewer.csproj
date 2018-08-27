@@ -63,6 +63,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SceneData\Scene.cs" />
     <Compile Include="SceneData\SceneObject.cs" />
+    <Compile Include="SceneRenderControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SceneRenderControl.Designer.cs">
+      <DependentUpon>SceneRenderControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Shader.cs" />
     <Compile Include="StaticCamera.cs" />
     <Compile Include="OrbitCamera.cs" />
@@ -71,6 +77,9 @@
   <ItemGroup>
     <EmbeddedResource Include="ModelViewerForm.resx">
       <DependentUpon>ModelViewerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SceneRenderControl.resx">
+      <DependentUpon>SceneRenderControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

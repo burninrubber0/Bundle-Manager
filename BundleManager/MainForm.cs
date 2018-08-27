@@ -1019,7 +1019,7 @@ namespace BundleManager
                 }
             }
 
-            PatchImages();
+            //PatchImages();
             
             CurrentArchive.Platform = BundlePlatform.PC;
         }

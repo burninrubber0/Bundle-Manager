@@ -634,149 +634,161 @@ namespace BundleManager
                 //DebugUtil.ShowDebug(this, instanceList);
             }
             else if (entry.Type == EntryType.RwRenderableResourceType && !forceHex)
-            {
-                TextureState.ResetCache();
-                LoadingDialog loader = new LoadingDialog();
-                loader.Status = "Loading: " + entry.ID.ToString("X8");
+	        {
+		        TextureState.ResetCache();
+		        LoadingDialog loader = new LoadingDialog();
+		        loader.Status = "Loading: " + entry.ID.ToString("X8");
 
-                Thread loadInstanceThread = null;
-                Renderable renderable = null;
-                loader.Done += (cancelled, value) =>
-                {
-                    if (cancelled)
-                        loadInstanceThread?.Abort();
-                    else
-                    {
-                        if (renderable == null)
-                        {
-                            MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
-                                MessageBoxIcon.Error);
-                        }
-                        else
-                        {
-                            loader.Hide();
-                            Scene scene = renderable.MakeScene();
-                            ModelViewerForm.ShowModelViewer(this, scene);
-                        }
-                    }
-                    TextureState.ResetCache();
-                };
-                
-                loadInstanceThread = new Thread(() =>
-                {
-                    renderable = Renderable.Read(entry, loader);
-                    loader.IsDone = true;
-                });
-                loadInstanceThread.Start();
-                loader.ShowDialog(this);
-            }
-            else if (entry.Type == EntryType.TriggerResourceType && !forceHex)
-            {
-                TriggerData triggers = TriggerData.Read(entry);
-                DebugUtil.ShowDebug(this, triggers);
-            }
-            else if (entry.Type == EntryType.StreetDataResourceType && !forceHex)
-            {
-                StreetData streets = StreetData.Read(entry);
-                DebugUtil.ShowDebug(this, streets);
-            }
-            else if (entry.Type == EntryType.AptDataHeaderType && !forceHex)
-            {
-                // TODO
-                AptData data = AptData.Read(entry);
-                //AptDataAlt data = AptDataAlt.Read(entry);
-                DebugUtil.ShowDebug(this, data);
-            }
-            else if (entry.Type == EntryType.ProgressionResourceType && !forceHex)
-            {
-                ProgressionData progression = ProgressionData.Read(entry);
-                DebugUtil.ShowDebug(this, progression);
-            } else if (entry.Type == EntryType.PolygonSoupListResourceType && !forceHex)
-            {
-                PolygonSoupList list = PolygonSoupList.Read(entry);
-                WorldColEditor editor = new WorldColEditor();
-                editor.Poly = list;
-                editor.Changed += () =>
-                {
-                    editor.Poly.Write(entry);
-                };
-                editor.ShowDialog(this);
-                
-                // UNCOMMENT ME TO DEBUG MODEL VIEWER!!
-                //Scene scene = list.MakeScene();
-                //ModelViewerForm.ShowModelViewer(this, scene);
-                //DebugUtil.ShowDebug(this, list);
-            }
-            else if (entry.Type == EntryType.IDList && !forceHex)
-            {
-                IDList list = IDList.Read(entry);
-                DebugUtil.ShowDebug(this, list);
-            }
-            else if (entry.Type == EntryType.AttribSysVaultResourceType && !forceHex)
-            {
-                try
-                {
-                    AttribSys at = AttribSys.Read(entry);
-                    DebugUtil.ShowDebug(this, at);
-                }
-                catch (ReadFailedError ex)
-                {
-                    MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            } else if (entry.Type == EntryType.LanguageResourceType && !forceHex)
-            {
-                Language language = Language.Read(entry);
-                //DebugUtil.ShowDebug(this, language);
-                LangEdit edit = new LangEdit();
-                edit.Lang = language;
-                edit.Changed += () =>
-                {
-                    edit.Lang.Write(entry);
-                };
-                edit.ShowDialog(this);
-            }
-            else if (entry.Type == EntryType.LanguageResourceType && !forceHex)
-            {
-                Language language = Language.Read(entry);
-                //DebugUtil.ShowDebug(this, language);
-                LangEdit edit = new LangEdit();
-                edit.Lang = language;
-                edit.Changed += () =>
-                {
-                    edit.Lang.Write(entry);
-                };
-                edit.ShowDialog(this);
-            } else if (entry.Type == EntryType.TrafficDataResourceType && !forceHex)
-            {
-                Traffic traffic = Traffic.Read(entry);
-                DebugUtil.ShowDebug(this, traffic);
-            }
-            /* else if (entry.Type == EntryType.ModelResourceType && !forceHex)
-            {
-                for (int i = 0; i < CurrentArchive.Entries.Count; i++)
-                {
-                    BundleEntry entry2 = CurrentArchive.Entries[i];
-                    if (entry2.Type == EntryType.ModelResourceType)
-                    {
-                        List<Dependency> dependencies = entry2.GetDependencies();
-                        foreach (Dependency dep in dependencies)
-                        {
-                            uint id = dep.EntryID;
-                            if (id == 0x172E1475 || id == 0x6D5CEDB6 || id == 0xF2DCDF89)
-                            {
-                                MessageBox.Show(this, "Found: 0x" + id.ToString("X8") + " in 0x" + entry2.ID.ToString("X8"));
-                            }
-                        }
-                    }
-                }
-            }*/
-            else
-            {
-                EntryEditor editor = new EntryEditor();
-                editor.ForceHex = forceHex;
-                Task.Run(() => openEditor(editor, index));
-                editor.ShowDialog(this);
-            }
+		        Thread loadInstanceThread = null;
+		        Renderable renderable = null;
+		        loader.Done += (cancelled, value) =>
+		        {
+			        if (cancelled)
+				        loadInstanceThread?.Abort();
+			        else
+			        {
+				        if (renderable == null)
+				        {
+					        MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
+						        MessageBoxIcon.Error);
+				        }
+				        else
+				        {
+					        loader.Hide();
+					        Scene scene = renderable.MakeScene();
+					        ModelViewerForm.ShowModelViewer(this, scene);
+				        }
+			        }
+			        TextureState.ResetCache();
+		        };
+
+		        loadInstanceThread = new Thread(() =>
+		        {
+			        try
+			        {
+				        renderable = Renderable.Read(entry, loader);
+			        }
+
+			        catch (Exception)
+			        {
+				        MessageBox.Show("Failed to load Entry", "Error", MessageBoxButtons.OK,
+					        MessageBoxIcon.Error);
+			        }
+			        loader.IsDone = true;
+		        });
+		        loadInstanceThread.Start();
+		        loader.ShowDialog(this);
+	        }
+	        else if (entry.Type == EntryType.TriggerResourceType && !forceHex)
+	        {
+		        TriggerData triggers = TriggerData.Read(entry);
+		        DebugUtil.ShowDebug(this, triggers);
+	        }
+	        else if (entry.Type == EntryType.StreetDataResourceType && !forceHex)
+	        {
+		        StreetData streets = StreetData.Read(entry);
+		        DebugUtil.ShowDebug(this, streets);
+	        }
+	        else if (entry.Type == EntryType.AptDataHeaderType && !forceHex)
+	        {
+		        // TODO
+		        AptData data = AptData.Read(entry);
+		        //AptDataAlt data = AptDataAlt.Read(entry);
+		        DebugUtil.ShowDebug(this, data);
+	        }
+	        else if (entry.Type == EntryType.ProgressionResourceType && !forceHex)
+	        {
+		        ProgressionData progression = ProgressionData.Read(entry);
+		        DebugUtil.ShowDebug(this, progression);
+	        }
+	        else if (entry.Type == EntryType.PolygonSoupListResourceType && !forceHex)
+	        {
+		        PolygonSoupList list = PolygonSoupList.Read(entry);
+		        WorldColEditor editor = new WorldColEditor();
+		        editor.Poly = list;
+		        editor.Changed += () =>
+		        {
+			        editor.Poly.Write(entry);
+		        };
+		        editor.ShowDialog(this);
+
+		        // UNCOMMENT ME TO DEBUG MODEL VIEWER!!
+		        //Scene scene = list.MakeScene();
+		        //ModelViewerForm.ShowModelViewer(this, scene);
+		        //DebugUtil.ShowDebug(this, list);
+	        }
+	        else if (entry.Type == EntryType.IDList && !forceHex)
+	        {
+		        IDList list = IDList.Read(entry);
+		        DebugUtil.ShowDebug(this, list);
+	        }
+	        else if (entry.Type == EntryType.AttribSysVaultResourceType && !forceHex)
+	        {
+		        try
+		        {
+			        AttribSys at = AttribSys.Read(entry);
+			        DebugUtil.ShowDebug(this, at);
+		        }
+		        catch (ReadFailedError ex)
+		        {
+			        MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+		        }
+	        }
+	        else if (entry.Type == EntryType.LanguageResourceType && !forceHex)
+	        {
+		        Language language = Language.Read(entry);
+		        //DebugUtil.ShowDebug(this, language);
+		        LangEdit edit = new LangEdit();
+		        edit.Lang = language;
+		        edit.Changed += () =>
+		        {
+			        edit.Lang.Write(entry);
+		        };
+		        edit.ShowDialog(this);
+	        }
+	        else if (entry.Type == EntryType.LanguageResourceType && !forceHex)
+	        {
+		        Language language = Language.Read(entry);
+		        //DebugUtil.ShowDebug(this, language);
+		        LangEdit edit = new LangEdit();
+		        edit.Lang = language;
+		        edit.Changed += () =>
+		        {
+			        edit.Lang.Write(entry);
+		        };
+		        edit.ShowDialog(this);
+	        }
+	        else if (entry.Type == EntryType.TrafficDataResourceType && !forceHex)
+	        {
+		        Traffic traffic = Traffic.Read(entry);
+		        DebugUtil.ShowDebug(this, traffic);
+	        }
+	        /* else if (entry.Type == EntryType.ModelResourceType && !forceHex)
+	        {
+	            for (int i = 0; i < CurrentArchive.Entries.Count; i++)
+	            {
+	                BundleEntry entry2 = CurrentArchive.Entries[i];
+	                if (entry2.Type == EntryType.ModelResourceType)
+	                {
+	                    List<Dependency> dependencies = entry2.GetDependencies();
+	                    foreach (Dependency dep in dependencies)
+	                    {
+	                        uint id = dep.EntryID;
+	                        if (id == 0x172E1475 || id == 0x6D5CEDB6 || id == 0xF2DCDF89)
+	                        {
+	                            MessageBox.Show(this, "Found: 0x" + id.ToString("X8") + " in 0x" + entry2.ID.ToString("X8"));
+	                        }
+	                    }
+	                }
+	            }
+	        }*/
+	        else
+	        {
+		        EntryEditor editor = new EntryEditor();
+		        editor.ForceHex = forceHex;
+		        Task.Run(() => openEditor(editor, index));
+		        editor.ShowDialog(this);
+	        }
         }
 
         public void openEditor(EntryEditor editor, int index)

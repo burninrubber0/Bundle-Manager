@@ -198,6 +198,9 @@ namespace BundleManager
                 lstEntries.Enabled = true;
             }
 
+            lstEntries.BeginUpdate();
+            lstEntries.ListViewItemSorter = null; // Disable sorting while adding
+
             for (int i = 0; i < CurrentArchive.Entries.Count; i++)
             {
                 BundleEntry entry = CurrentArchive.Entries[i];
@@ -220,10 +223,10 @@ namespace BundleManager
                 ListViewItem item = new ListViewItem(values);
                 item.BackColor = color;
                 lstEntries.Items.Add(item);
-
-                lstEntries.ListViewItemSorter = new EntrySorter(0);
-                lstEntries.Sort();
             }
+
+            lstEntries.ListViewItemSorter = new EntrySorter(0); // Also calls Sort
+            lstEntries.EndUpdate();
         }
 
         private bool CheckSave()

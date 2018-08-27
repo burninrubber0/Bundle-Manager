@@ -80,6 +80,9 @@
     <Compile Include="AptData.cs" />
     <Compile Include="AttribSys.cs" />
     <Compile Include="BundleResource.cs" />
+    <Compile Include="BetterListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="EntryEditor.cs">
       <SubType>Form</SubType>
     </Compile>

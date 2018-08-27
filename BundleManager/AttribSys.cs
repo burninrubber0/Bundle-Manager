@@ -33,8 +33,7 @@ namespace BundleManager
 
     public class PtrChunk
     {
-        public PtrChunkData[] Data; // 20 items
-        public byte[] UnknownBytes; // 24 bytes, always null bytes?
+        public PtrChunkData[] Data;
     }
 
     public class PtrChunkData
@@ -154,9 +153,10 @@ namespace BundleManager
                     break;
                 case "PtrN":
                     // Unknown
+                    int dataSize = size - 8;
                     PtrN = new PtrChunk();
-                    PtrN.Data = new PtrChunkData[20];
-                    for (int i = 0; i < 20; i++)
+                    PtrN.Data = new PtrChunkData[dataSize / 16];
+                    for (int i = 0; i < PtrN.Data.Length; i++)
                     {
                         PtrN.Data[i] = new PtrChunkData();
                         PtrN.Data[i].Unknown1 = br.ReadInt32();
@@ -164,7 +164,7 @@ namespace BundleManager
                         PtrN.Data[i].Unknown3 = br.ReadInt16();
                         PtrN.Data[i].Unknown4 = br.ReadInt64();
                     }
-                    PtrN.UnknownBytes = br.ReadBytes(size - 320);
+
                     break;
                 /*case "StrE": // In Binary Section??
                     String1 = br.ReadCString();

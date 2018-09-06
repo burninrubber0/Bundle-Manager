@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using BundleUtilities;
 
@@ -194,7 +195,132 @@ namespace BurnoutImage
             }
         }
 
-        public static Image GetImagePS3(byte[] data, byte[] extraData)
+	    public static Image GetImage(byte[] data, byte[] extraData)
+	    {
+		    try
+		    {
+			    MemoryStream ms = new MemoryStream(data);
+			    BinaryReader br = new BinaryReader(ms);
+			    br.BaseStream.Seek(8, SeekOrigin.Begin);
+			    uint unk1 = br.ReadUInt32();
+			    uint unk2 = br.ReadUInt32();
+			    //if ((unk1 == 7 && unk2 == 0) || (unk1 == 0 && unk2 == 7))
+				if (data.Length == 0x40 || data.Length == 0x30)
+			    {
+					// Remaster
+
+				    br.BaseStream.Seek(0x1C, SeekOrigin.Begin);
+
+					CompressionType type = CompressionType.UNKNOWN;
+					byte[] compression = br.ReadBytes(4);
+					string compressionString = Encoding.ASCII.GetString(compression);
+					if (compression.Matches(new byte[] { 0x15, 0x00, 0x00, 0x00 }))
+					{
+						type = CompressionType.BGRA;
+					}
+					else if (compression.Matches(new byte[] { 0x1C, 0x00, 0x00, 0x00 }))
+					{
+						type = CompressionType.RGBA;
+					}
+					else if (compression.Matches(new byte[] { 0xFF, 0x00, 0x00, 0x00 }))
+					{
+						type = CompressionType.ARGB;
+					}
+					else if (compression.Matches(new byte[] {0x47, 0x00, 0x00, 0x00}))
+				    {
+					    type = CompressionType.DXT1;
+				    }
+					else if (compression.Matches(new byte[] { 0x4A, 0x00, 0x00, 0x00 }))
+					{
+						type = CompressionType.DXT3;
+					}
+					else if (compression.Matches(new byte[] { 0x4D, 0x00, 0x00, 0x00 }))
+					{
+						type = CompressionType.DXT5;
+					}
+
+					uint unk3 = br.ReadUInt32();
+
+					int width = br.ReadInt16();
+					int height = br.ReadInt16();
+					br.Close();
+
+					byte[] pixels = extraData;
+
+					//DebugTimer t = DebugTimer.Start("Decompress[" + width + "x" + height + "]");
+					if (type == CompressionType.DXT1)
+					{
+						pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT1);
+					}
+					else if (type == CompressionType.DXT3)
+					{
+						pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT3);
+					}
+					else if (type == CompressionType.DXT5)
+					{
+						pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT5);
+					}
+					//t.StopLog();
+
+					Bitmap bitmap = new Bitmap(width, height);
+
+					int index = 0;
+					for (int i = 0; i < height; i++)
+					{
+						for (int j = 0; j < width; j++)
+						{
+							//DebugTimer t = DebugTimer.Start("Pixel[" + width + "x" + height + "]");
+							byte red;
+							byte green;
+							byte blue;
+							byte alpha;
+							if (type == CompressionType.BGRA)
+							{
+								blue = pixels[index + 0];
+								green = pixels[index + 1];
+								red = pixels[index + 2];
+								alpha = pixels[index + 3];
+							}
+							else if (type == CompressionType.RGBA)
+							{
+								red = pixels[index + 0];
+								green = pixels[index + 1];
+								blue = pixels[index + 2];
+								alpha = pixels[index + 3];
+							} else 
+							{
+								alpha = pixels[index + 0];
+								red = pixels[index + 1];
+								green = pixels[index + 2];
+								blue = pixels[index + 3];
+							}
+
+							Color color = Color.FromArgb(alpha, red, green, blue);
+							bitmap.SetPixel(j, i, color);
+							index += 4;
+							//t.StopLog();
+						}
+					}
+					return bitmap;
+				}
+			    else// if (unk1 == 0 && unk2 == 1)
+			    {
+				    // OLD PC
+					br.Close();
+
+				    return GetImagePC(data, extraData);
+			    }
+
+			    return null;
+		    }
+		    catch (Exception ex)
+		    {
+			    MessageBox.Show(ex.Message + "\r\n" + ex.StackTrace);
+			    return null;
+		    }
+	    }
+
+	    public static Image GetImagePS3(byte[] data, byte[] extraData)
         {
             if (extraData != null && data.Length == 48)
             {

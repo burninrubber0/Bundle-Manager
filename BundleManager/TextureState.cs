@@ -63,8 +63,8 @@ namespace BundleManager
                     {
                         if (entry.Console)
                             result.Texture = GameImage.GetImagePS3(descEntry1.Header, descEntry1.Body);
-                        else
-                            result.Texture = GameImage.GetImagePC(descEntry1.Header, descEntry1.Body);
+						else
+                            result.Texture = GameImage.GetImage(descEntry1.Header, descEntry1.Body);
 
                         _cachedTextures.Add(id, result.Texture);
 

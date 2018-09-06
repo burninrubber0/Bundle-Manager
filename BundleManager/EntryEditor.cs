@@ -682,8 +682,8 @@ namespace BundleManager
             {
                 if (_entry.Console)
                     Image = GameImage.GetImagePS3(_entry.Header, _entry.Body);
-                else
-                    Image = GameImage.GetImagePC(_entry.Header, _entry.Body);
+				else
+                    Image = GameImage.GetImage(_entry.Header, _entry.Body);
 
                 ImageVisible = Image != null;
 

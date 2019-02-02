@@ -18,7 +18,7 @@ namespace BundleManager
 
     public class DataChunk
     {
-        public ulong MethodHash;
+        public ulong CollectionHash;
         public ulong ClassHash;
         public byte[] Unknown1; // always 0?
         public int ItemCount;
@@ -141,7 +141,7 @@ namespace BundleManager
                         if (chunk.EntryTypeHash == 0xAD303B8F42B3307E)
                         {
                             DataChunk dataChunk = new DataChunk();
-                            dataChunk.MethodHash = br.ReadUInt64();
+                            dataChunk.CollectionHash = br.ReadUInt64();
                             dataChunk.ClassHash = br.ReadUInt64();
                             dataChunk.Unknown1 = br.ReadBytes(8);
                             dataChunk.ItemCount = br.ReadInt32();

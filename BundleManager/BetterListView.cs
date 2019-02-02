@@ -1,4 +1,6 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace BundleManager
 {
@@ -17,6 +19,21 @@ namespace BundleManager
             {
                 base.OnNotifyMessage(m);
             }
+        }
+
+
+        private void ScaleListViewColumns(SizeF factor)
+        {
+            foreach (ColumnHeader column in Columns)
+            {
+                column.Width = (int)Math.Round(column.Width * factor.Width);
+            }
+        }
+
+        protected override void ScaleControl(SizeF factor, BoundsSpecified specified)
+        {
+            base.ScaleControl(factor, specified);
+            ScaleListViewColumns(factor);
         }
     }
 }

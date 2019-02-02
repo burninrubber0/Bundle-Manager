@@ -288,20 +288,27 @@ namespace BundleManager
             result.Unknown18 = br.ReadInt32();
             result.VertexBlockSize = br.ReadInt32();
 
-            // Padding
-            br.BaseStream.Position += 16 - br.BaseStream.Position % 16;
 
             for (int i = 0; i < result.MeshCount; i++)
             {
+                br.BaseStream.Position = result.MeshVertexOffsets[i];
+
                 RenderableMesh mesh = new RenderableMesh();
 
                 mesh.RotationMatrix = br.ReadMatrix4();
                 mesh.Unknown19 = br.ReadInt32();
                 mesh.Unknown20 = br.ReadInt32();
                 mesh.IndexOffsetCount = br.ReadInt32();
-                mesh.NumVertices = br.ReadInt32();
-                mesh.VertexOffsetCount = br.ReadInt32();
-                mesh.NumFaces = br.ReadInt32();
+                if (result.NumIndices == 0) // BPR
+                {
+                    mesh.NumFaces = br.ReadInt32() / 3;
+                }
+                else
+                {
+                    mesh.NumVertices = br.ReadInt32();
+                    mesh.VertexOffsetCount = br.ReadInt32();
+                    mesh.NumFaces = br.ReadInt32();
+                }
                 int cPos = (int)br.BaseStream.Position;
                 mesh.MaterialIDInternal = br.ReadInt32();
                 foreach (BundleDependency dependency in dependencies)

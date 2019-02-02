@@ -83,6 +83,7 @@
     <Compile Include="BetterListView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Colour.cs" />
     <Compile Include="EntryEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -95,6 +96,7 @@
     <Compile Include="FileView.Designer.cs">
       <DependentUpon>FileView.cs</DependentUpon>
     </Compile>
+    <Compile Include="FlaptFile.cs" />
     <Compile Include="GenericMesh.cs" />
     <Compile Include="GenericModel.cs" />
     <Compile Include="IDList.cs" />

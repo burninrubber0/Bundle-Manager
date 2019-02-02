@@ -746,18 +746,6 @@ namespace BundleManager
 		        };
 		        edit.ShowDialog(this);
 	        }
-	        else if (entry.Type == EntryType.LanguageResourceType && !forceHex)
-	        {
-		        Language language = Language.Read(entry);
-		        //DebugUtil.ShowDebug(this, language);
-		        LangEdit edit = new LangEdit();
-		        edit.Lang = language;
-		        edit.Changed += () =>
-		        {
-			        edit.Lang.Write(entry);
-		        };
-		        edit.ShowDialog(this);
-	        }
 	        else if (entry.Type == EntryType.TrafficDataResourceType && !forceHex)
 	        {
 		        Traffic traffic = Traffic.Read(entry);
@@ -782,6 +770,11 @@ namespace BundleManager
 	                }
 	            }
 	        }*/
+            else if (entry.Type == EntryType.FlaptFileResourceType && !forceHex)
+            {
+                FlaptFile flaptFile = FlaptFile.Read(entry);
+                DebugUtil.ShowDebug(this, flaptFile);
+            }
 	        else
 	        {
 		        EntryEditor editor = new EntryEditor();

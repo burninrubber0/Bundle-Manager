@@ -30,8 +30,8 @@ namespace ModelViewer
         public Shader(string name)
         {
             ShaderID = -1;
-            _vertex = File.ReadAllText("Shaders/" + name + "V.glsl");
-            _fragment = File.ReadAllText("Shaders/" + name + "P.glsl");
+            _vertex = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Shaders/" + name + "V.glsl"));
+            _fragment = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Shaders/" + name + "P.glsl"));
         }
 
         public int Compile()

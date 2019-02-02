@@ -159,5 +159,8 @@ namespace VehicleList
                 return current;
             }
         }
+
+
+        public override string ToString() => Value;
     }
 }

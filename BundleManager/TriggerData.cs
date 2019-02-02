@@ -104,7 +104,7 @@ namespace BundleManager
 
     public class TriggerData
     {
-        public int RevisionNumber;
+        public int FormatRevision;
         public uint FileSize;
         public int Unknown0C;
         public int Unknown10;
@@ -161,7 +161,7 @@ namespace BundleManager
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            result.RevisionNumber = br.ReadInt32();
+            result.FormatRevision = br.ReadInt32();
             result.FileSize = br.ReadUInt32();
             result.Unknown0C = br.ReadInt32();
             result.Unknown10 = br.ReadInt32();
@@ -359,7 +359,7 @@ namespace BundleManager
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
-            bw.Write(RevisionNumber);
+            bw.Write(FormatRevision);
             long fileSizeOffset = bw.BaseStream.Position;
             bw.Write((int)0);
             bw.Write(Unknown0C);

@@ -689,13 +689,13 @@ namespace BundleManager
 		        StreetData streets = StreetData.Read(entry);
 		        DebugUtil.ShowDebug(this, streets);
 	        }
-	        else if (entry.Type == EntryType.AptDataHeaderType && !forceHex)
+	        /*else if (entry.Type == EntryType.AptDataHeaderType && !forceHex)
 	        {
 		        // TODO
 		        AptData data = AptData.Read(entry);
 		        //AptDataAlt data = AptDataAlt.Read(entry);
 		        DebugUtil.ShowDebug(this, data);
-	        }
+	        }*/
 	        else if (entry.Type == EntryType.ProgressionResourceType && !forceHex)
 	        {
 		        ProgressionData progression = ProgressionData.Read(entry);

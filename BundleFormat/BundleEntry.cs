@@ -32,8 +32,7 @@ namespace BundleFormat
         public int Index;
 
         public ulong ID;
-        public int References;
-        public int Unknown12;
+        public ulong References;
         public int UncompressedHeaderSize;
         public int UncompressedHeaderSizeCache;
         public int UncompressedBodySize;
@@ -44,7 +43,6 @@ namespace BundleFormat
         public long BodyOffset;
         public int DependenciesListOffset;
         public short DependencyCount;
-        public short Unknown;
         public int Unknown24;
         public int Unknown25;
 

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ManagedZLib;
 using System.Runtime.InteropServices;
+using BundleUtilities;
 
 namespace BundleFormat
 {
@@ -108,9 +109,14 @@ namespace BundleFormat
             self.Write(BundleArchive.Magic);
             self.Write(result.Version);
             self.Write((int)result.Platform);
-            self.Write(result.Unknown3);
+
+            long rstOffset = self.BaseStream.Position;
+            self.Write((int)0);
+
             self.Write(result.Entries.Count);
-            self.Write(result.MetadataStart);
+
+            long metadataStartOffset = self.BaseStream.Position;
+            self.Write((int)0);
 
             long dataStartOffset = self.BaseStream.Position;
             self.Write((int)0);
@@ -122,8 +128,24 @@ namespace BundleFormat
             self.Write((int)0);
 
             self.Write((int)result.Flags);
-            self.Write(result.Unknown7);
-            self.Write(result.Unknown8);
+
+            self.BaseStream.Position += 8;
+
+
+            long currentOffset = self.BaseStream.Position;
+            self.Seek((int)rstOffset, SeekOrigin.Begin);
+            self.Write((int)currentOffset);
+            self.Seek((int)currentOffset, SeekOrigin.Begin);
+            self.WriteCStr(result.ResourceStringTable);
+            currentOffset = self.BaseStream.Position;
+            for (int i = 0; i < (16 - (currentOffset % 16)); i++)
+                self.Write((byte) 0); // padding
+
+
+            currentOffset = self.BaseStream.Position;
+            self.Seek((int)metadataStartOffset, SeekOrigin.Begin);
+            self.Write((int)currentOffset);
+            self.Seek((int)currentOffset, SeekOrigin.Begin);
 
             long[] startOffOffsets = new long[result.Entries.Count];
             long[] extraStartOffOffsets = new long[result.Entries.Count];
@@ -160,7 +182,6 @@ namespace BundleFormat
 
                 self.Write(entry.ID);
                 self.Write(entry.References);
-                self.Write(entry.Unknown12);
 
                 int uncompressedHeaderSize = entry.UncompressedHeaderSize;
                 int uncompressedHeaderSizeCache = entry.UncompressedHeaderSizeCache;
@@ -184,11 +205,11 @@ namespace BundleFormat
                 self.Write(entry.DependenciesListOffset);
                 self.Write((int)entry.Type);
                 self.Write(entry.DependencyCount);
-                self.Write(entry.Unknown);
+                self.BaseStream.Position += 2;
             }
 
 
-            long currentOffset = self.BaseStream.Position;
+            currentOffset = self.BaseStream.Position;
             long startData = currentOffset;
             self.Seek((int)dataStartOffset, SeekOrigin.Begin);
             self.Write((int)currentOffset);

@@ -35,19 +35,18 @@ namespace BundleFormat
         public string Path;
 
         public int Version;
-        //public int Unknown2; // Normally 1
-        public int Unknown3; // Normally 30
+        public BundlePlatform Platform;
+        public int RSTOffset; // Normally 30
         public int FileCount;
-        public int MetadataStart; // Normally 30
+        public int MetadataStart;
         public int HeadStart;
         public int BodyStart;
         public int ArchiveSize;
         public Flags Flags;
-        public int Unknown7; // Normally 0
-        public int Unknown8; // Normally 0
-        public BundlePlatform Platform;
+        
         public bool Console => Platform == BundlePlatform.X360 || Platform == BundlePlatform.PS3;
 
+        public string ResourceStringTable;
         public List<BundleEntry> Entries;
 
         private bool _dirty;
@@ -142,19 +141,19 @@ namespace BundleFormat
             result.Version = br.ReadInt32();
             br.BaseStream.Position += 4;
 
-            result.Unknown3 = br.ReadInt32();
+            result.RSTOffset = br.ReadInt32();
             result.FileCount = br.ReadInt32();
             result.MetadataStart = br.ReadInt32();
             result.HeadStart = br.ReadInt32();
             result.BodyStart = br.ReadInt32();
             result.ArchiveSize = br.ReadInt32();
-            int flags = br.ReadInt32();
-            result.Unknown7 = br.ReadInt32();
-            result.Unknown8 = br.ReadInt32();
-
-            result.Flags = (Flags)flags;
+            result.Flags = (Flags)br.ReadInt32();
 
             //long dataOffset = result.HeadStart;
+
+            br.BaseStream.Position = result.RSTOffset;
+
+            result.ResourceStringTable = br.ReadCStr();
 
             br.BaseStream.Position = result.MetadataStart;
 
@@ -168,8 +167,7 @@ namespace BundleFormat
 
                 entry.ID = br.ReadUInt64();
 
-                entry.References = br.ReadInt32();
-                entry.Unknown12 = br.ReadInt32();
+                entry.References = br.ReadUInt64();
                 int uncompressedHeaderSize = br.ReadInt32();
                 long uncompressedBodySize = br.ReadInt64();
                 entry.HeaderSize = br.ReadInt32();
@@ -179,7 +177,8 @@ namespace BundleFormat
                 entry.DependenciesListOffset = br.ReadInt32();
                 int fileType = br.ReadInt32();
                 entry.DependencyCount = br.ReadInt16();
-                entry.Unknown = br.ReadInt16();
+
+                br.BaseStream.Position += 2;
 
                 entry.UncompressedHeaderSize = uncompressedHeaderSize & 0x0FFFFFFF;
                 entry.UncompressedHeaderSizeCache = uncompressedHeaderSize >> 28;

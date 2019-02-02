@@ -89,9 +89,14 @@ namespace BundleUtilities
         {
             string result = "";
 
+            bool readNull = false;
             for (int i = 0; i < size; i++)
             {
-                result += (char)self.ReadByte();
+                char c = (char)self.ReadByte();
+                if (c == '\0')
+                    readNull = true;
+                if (!readNull)
+                    result += c;
             }
 
             return result;

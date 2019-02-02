@@ -67,7 +67,7 @@ namespace BundleManager
         public int Unknown9;
         public short Unknown10;
         public short Unknown10_1;
-        public int Unknown11;
+        public int UnknownOffset;
         public int Unknown12;
         public int Unknown13;
         public List<int> MeshVertexOffsets;
@@ -128,11 +128,11 @@ namespace BundleManager
             Model = new Model(meshes);
         }
 
-        public VertexData ReadVertex(BinaryReader br, int stride)
+        public VertexData ReadVertex(BinaryReader br, VertexAttribute attribute)
         {
-            switch (stride)
+            switch (attribute.Size) // We don't use type here. This is wrong tbh.
             {
-                case 0x0C:
+                case 0xC:
                     return new VertexData()
                     {
                         Vertex = new Vector3(br.ReadSingle(), br.ReadSingle(), br.ReadSingle())
@@ -217,21 +217,26 @@ namespace BundleManager
                     mesh.Indices.Add(index);
                 }
 
-                int stride = 0;
+                VertexAttribute attributeToUse = new VertexAttribute();
                 foreach (VertexDesc desc in mesh.VertexDescriptions)
                 {
                     if (desc == null)
                         continue;
 
-                    stride = desc.Stride;
+                    foreach (VertexAttribute attribute in desc.Attributes)
+                    {
+                        if (attribute.Type != VertexAttributeType.Positions)
+                            continue; // TODO
+
+                        attributeToUse = attribute; // This is just wrong
+                    }
                 }
 
-                br.BaseStream.Position = VertexBlockAddress + mesh.VertexOffsetCount * stride;
                 mesh.Vertices = new List<VertexData>();
-
-                for (int j = 0; j < mesh.NumVertices; j++)
+                br.BaseStream.Position = VertexBlockAddress + mesh.VertexOffsetCount * attributeToUse.Size + attributeToUse.Offset;
+                while (br.BaseStream.Position + attributeToUse.Size < br.BaseStream.Length) // Really, this should not be done like this.
                 {
-                    mesh.Vertices.Add(ReadVertex(br, stride));
+                    mesh.Vertices.Add(ReadVertex(br, attributeToUse));
                 }
             }
         }
@@ -258,7 +263,7 @@ namespace BundleManager
             result.Unknown9 = br.ReadInt32();
             result.Unknown10 = br.ReadInt16();
             result.Unknown10_1 = br.ReadInt16();
-            result.Unknown11 = br.ReadInt32();
+            result.UnknownOffset = br.ReadInt32();
             result.Unknown12 = br.ReadInt32();
             result.Unknown13 = br.ReadInt32();
 
@@ -284,8 +289,16 @@ namespace BundleManager
             result.Unknown15 = br.ReadInt32();
             result.Unknown16 = br.ReadInt32();
             result.Unknown17 = br.ReadInt32();
+            // some extra data here in BPR
+
+            br.BaseStream.Position = result.UnknownOffset;
+            if (result.NumIndices == 0) // BPR
+            {
+                // ???
+                br.BaseStream.Position += 12;
+            }
             result.VertexBlockAddress = br.ReadInt32();
-            result.Unknown18 = br.ReadInt32();
+            result.Unknown18 = (result.NumIndices == 0) ? 0 : br.ReadInt32();
             result.VertexBlockSize = br.ReadInt32();
 
 
@@ -307,6 +320,7 @@ namespace BundleManager
                 {
                     mesh.NumVertices = br.ReadInt32();
                     mesh.VertexOffsetCount = br.ReadInt32();
+                    mesh.VertexOffsetCount = 0;
                     mesh.NumFaces = br.ReadInt32();
                 }
                 int cPos = (int)br.BaseStream.Position;

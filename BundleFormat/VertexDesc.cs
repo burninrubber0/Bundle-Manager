@@ -4,27 +4,44 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using BundleFormat;
 using BundleUtilities;
 
 namespace BundleFormat
 {
+    public enum VertexAttributeType
+    {
+        Invalid = 0,
+        Positions = 1,
+        Normals = 3,
+        UV1 = 5,
+        UV2 = 6,
+        BoneIndexes = 13,
+        BoneWeights = 14,
+        Tangents = 15
+    };
+
+    public struct VertexAttribute
+    {
+        public VertexAttributeType Type;
+        public uint Unknown1;
+        public uint Offset;
+        public uint Unknown2;
+        public uint Size;
+    }
+
     public class VertexDesc
     {
         public int Unknown1;
         public int Unknown2;
         public int Unknown3;
-        public int Unknown4;
-        public byte Unknown5;
-        public byte Stride;
-        public short Unknown6;
-        public int Unknown7;
-        public int Unknown8;
-        public int Unknown9;
+        public int AttributeCount;
+        public List<VertexAttribute> Attributes;
 
         public VertexDesc()
         {
-            
+            Attributes = new List<VertexAttribute>();
         }
 
         public static VertexDesc Read(BundleEntry entry)
@@ -38,13 +55,69 @@ namespace BundleFormat
             result.Unknown1 = br.ReadInt32();
             result.Unknown2 = br.ReadInt32();
             result.Unknown3 = br.ReadInt32();
-            result.Unknown4 = br.ReadInt32();
-            result.Unknown5 = br.ReadByte();
-            result.Stride = br.ReadByte();
-            result.Unknown6 = br.ReadInt16();
-            result.Unknown7 = br.ReadInt32();
-            result.Unknown8 = br.ReadInt32();
-            result.Unknown9 = br.ReadInt32();
+            result.AttributeCount = br.ReadInt32();
+
+            for (int i = 0; i < result.AttributeCount; i++)
+            {
+                VertexAttribute attribute = new VertexAttribute();
+                
+                if (result.Unknown2 != 0) // BPR
+                {
+                    attribute.Type = (VertexAttributeType)br.ReadInt32();
+                    if (!Enum.IsDefined(typeof(VertexAttributeType), attribute.Type))
+                        MessageBox.Show("Unknown vertex attribute type: " + attribute.Type);
+                    attribute.Unknown1 = br.ReadUInt32();
+                    attribute.Offset = br.ReadUInt32();
+                    attribute.Unknown2 = br.ReadUInt32();
+                    attribute.Size = br.ReadUInt32();
+                }
+                else
+                {
+                    br.BaseStream.Position += 1;
+                    attribute.Size = br.ReadByte();
+                    attribute.Offset = br.ReadByte();
+
+                    // These are probably in the following bytes but I'll need to check where.
+                    attribute.Unknown1 = 0;
+                    attribute.Unknown2 = 0;
+
+                    br.BaseStream.Position += 8;
+
+                    byte type = br.ReadByte();
+                    switch (type)
+                    {
+                        case 1:
+                            attribute.Type = VertexAttributeType.Positions;
+                            break;
+                        case 3:
+                            attribute.Type = VertexAttributeType.Normals;
+                            break;
+                        case 6:
+                            attribute.Type = VertexAttributeType.UV1;
+                            break;
+                        case 7:
+                            attribute.Type = VertexAttributeType.UV2;
+                            break;
+                        case 14:
+                            attribute.Type = VertexAttributeType.BoneIndexes;
+                            break;
+                        case 15:
+                            attribute.Type = VertexAttributeType.BoneWeights;
+                            break;
+                        case 21:
+                            attribute.Type = VertexAttributeType.Tangents;
+                            break;
+                        default:
+                            attribute.Type = VertexAttributeType.Invalid;
+                            MessageBox.Show("Unknown vertex attribute type: " + type);
+                            break;
+                    }
+
+                    br.BaseStream.Position += 4;
+                }
+
+                result.Attributes.Add(attribute);
+            }
 
             br.Close();
             ms.Close();
@@ -60,13 +133,15 @@ namespace BundleFormat
             bw.Write(Unknown1);
             bw.Write(Unknown2);
             bw.Write(Unknown3);
-            bw.Write(Unknown4);
-            bw.Write(Unknown5);
-            bw.Write(Stride);
-            bw.Write(Unknown6);
-            bw.Write(Unknown7);
-            bw.Write(Unknown8);
-            bw.Write(Unknown9);
+            bw.Write(Attributes.Count);
+            foreach (VertexAttribute attribute in Attributes)
+            {
+                bw.Write((int)attribute.Type);
+                bw.Write(attribute.Unknown1);
+                bw.Write(attribute.Offset);
+                bw.Write(attribute.Unknown2);
+                bw.Write(attribute.Size);
+            }
 
             bw.Flush();
             byte[] Data = ms.GetBuffer();

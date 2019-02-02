@@ -37,7 +37,7 @@ namespace BundleFormat
             if (Entry != null && Entry.Type == EntryType.RwVertexDescResourceType)
             {
                 VertexDesc desc = VertexDesc.Read(Entry);
-                value = ", Stride: " + desc.Stride.ToString("D2");
+                value = ", Attribute Count: " + desc.AttributeCount.ToString("D2");
             }
 
             string location = external ? "External" : "Internal";

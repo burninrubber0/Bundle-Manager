@@ -198,8 +198,8 @@ namespace BurnoutImage
 	    public static Image GetImage(byte[] data, byte[] extraData)
 	    {
 		    try
-		    {
-			    MemoryStream ms = new MemoryStream(data);
+			{
+				MemoryStream ms = new MemoryStream(data);
 			    BinaryReader br = new BinaryReader(ms);
 			    br.BaseStream.Seek(8, SeekOrigin.Begin);
 			    uint unk1 = br.ReadUInt32();
@@ -208,8 +208,9 @@ namespace BurnoutImage
 				if (data.Length == 0x40 || data.Length == 0x30)
 			    {
 					// Remaster
+					//DebugTimer t3 = DebugTimer.Start("Checking Header");
 
-				    br.BaseStream.Seek(0x1C, SeekOrigin.Begin);
+					br.BaseStream.Seek(0x1C, SeekOrigin.Begin);
 
 					CompressionType type = CompressionType.UNKNOWN;
 					byte[] compression = br.ReadBytes(4);
@@ -246,8 +247,9 @@ namespace BurnoutImage
 					br.Close();
 
 					byte[] pixels = extraData;
+					//t3.StopLog();
 
-					//DebugTimer t = DebugTimer.Start("Decompress[" + width + "x" + height + "]");
+					//DebugTimer t2 = DebugTimer.Start("Decompress[" + width + "x" + height + "]");
 					if (type == CompressionType.DXT1)
 					{
 						pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT1);
@@ -260,10 +262,11 @@ namespace BurnoutImage
 					{
 						pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT5);
 					}
-					//t.StopLog();
+					//t2.StopLog();
 
 					DirectBitmap bitmap = new DirectBitmap(width, height);
 
+					//DebugTimer t = DebugTimer.Start("Copying Pixels[" + width + "x" + height + "]");
 					int index = 0;
 					for (int y = 0; y < height; y++)
 					{
@@ -301,6 +304,7 @@ namespace BurnoutImage
 							//t.StopLog();
 						}
 					}
+					//t.StopLog();
 					return bitmap.Bitmap;
 				}
 			    else// if (unk1 == 0 && unk2 == 1)

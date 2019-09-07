@@ -24,3 +24,7 @@ StandardExtension.dll
 StandardExtension.pdb
 VehicleList.dll
 VehicleList.pdb
+VaultFormat.dll
+VaultFormat.pdb
+ComponentTester.exe
+ComponentTester.pdb

@@ -57,6 +57,7 @@
     <Compile Include="ColourFit.cs" />
     <Compile Include="ColourSet.cs" />
     <Compile Include="CompressionTools.cs" />
+    <Compile Include="DirectBitmap.cs" />
     <Compile Include="ImageUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RangeFit.cs" />

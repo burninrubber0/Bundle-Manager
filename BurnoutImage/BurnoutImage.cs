@@ -262,12 +262,12 @@ namespace BurnoutImage
 					}
 					//t.StopLog();
 
-					Bitmap bitmap = new Bitmap(width, height);
+					DirectBitmap bitmap = new DirectBitmap(width, height);
 
 					int index = 0;
-					for (int i = 0; i < height; i++)
+					for (int y = 0; y < height; y++)
 					{
-						for (int j = 0; j < width; j++)
+						for (int x = 0; x < width; x++)
 						{
 							//DebugTimer t = DebugTimer.Start("Pixel[" + width + "x" + height + "]");
 							byte red;
@@ -296,12 +296,12 @@ namespace BurnoutImage
 							}
 
 							Color color = Color.FromArgb(alpha, red, green, blue);
-							bitmap.SetPixel(j, i, color);
+							bitmap.Bits[x + y * width] = color.ToArgb();
 							index += 4;
 							//t.StopLog();
 						}
 					}
-					return bitmap;
+					return bitmap.Bitmap;
 				}
 			    else// if (unk1 == 0 && unk2 == 1)
 			    {

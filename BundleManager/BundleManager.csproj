@@ -104,7 +104,6 @@
     <Compile Include="GenericMesh.cs" />
     <Compile Include="GenericModel.cs" />
     <Compile Include="IDList.cs" />
-    <Compile Include="ILoader.cs" />
     <Compile Include="GraphicsSpec.cs" />
     <Compile Include="InputDialog.cs">
       <SubType>Form</SubType>

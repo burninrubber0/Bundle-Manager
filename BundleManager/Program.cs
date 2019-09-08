@@ -42,7 +42,7 @@ namespace BundleManager
             }
             else
             {
-                if (args.Length == 1)
+                if (args.Length >= 1)
                 {
                     string path = args[0];
                     if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
@@ -53,6 +53,15 @@ namespace BundleManager
                     else
                     {
                         fileModeForm.Open(path);
+						if (args.Length >= 2)
+						{
+							string indexString = args[1];
+							if (int.TryParse(indexString, out int index))
+							{
+								fileModeForm.ForceOnlySpecificEntry = true;
+								fileModeForm.EditEntry(index);
+							}
+						}
                         Application.Run(fileModeForm);
                     }
                 }

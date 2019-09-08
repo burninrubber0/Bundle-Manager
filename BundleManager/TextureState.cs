@@ -32,6 +32,11 @@ namespace BundleManager
             _cachedTextures.Clear();
         }
 
+		public static void AddToCache(ulong id, Image image)
+		{
+			_cachedTextures[id] = image;
+		}
+
         public static TextureState Read(BundleEntry entry)
         {
             TextureState result = new TextureState();

@@ -79,7 +79,7 @@ namespace PVSFormat
             Entries = new List<PVSEntry>();
         }
 
-        public static PVS Read(BundleEntry entry)
+        public static PVS Read(BundleEntry entry, ILoader loader)
         {
             PVS result = new PVS();
 

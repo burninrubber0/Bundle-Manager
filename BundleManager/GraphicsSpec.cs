@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using BundleFormat;
+using BundleUtilities;
 using MathLib;
 using ModelViewer.SceneData;
 using OpenTK;

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using BundleFormat;
 using BundleUtilities;
+using BurnoutImage;
 using DebugHelper;
 using ModelViewer;
 using ModelViewer.SceneData;
@@ -138,7 +139,9 @@ namespace BundleManager
 
         public bool _console => CurrentArchive.Console;
 
-        public MainForm()
+		public bool ForceOnlySpecificEntry = false;
+
+		public MainForm()
         {
             InitializeComponent();
 
@@ -523,7 +526,7 @@ namespace BundleManager
             }
         }
 
-        public void EditSelectedEntry(bool forceHex)
+        public void EditSelectedEntry(bool forceHex = false)
         {
             int count = lstEntries.SelectedIndices.Count;
             if (count <= 0)
@@ -533,225 +536,275 @@ namespace BundleManager
             if (!int.TryParse(lstEntries.SelectedItems[0].Text, out index))
                 return;
 
-            //int index = lstEntries.SelectedIndices[0];
+			EditEntry(index, forceHex);
+        }
 
-            BundleEntry entry = GetEntry(index);
-            if (entry.Type == EntryType.VehicleListResourceType && !forceHex)
-            {
-                VehicleListForm vehicleList = new VehicleListForm();
-                vehicleList.Edit += () =>
-                {
-                    entry = vehicleList.Write(entry.Console);
-                    CurrentArchive.Entries[index] = entry;
-                    CurrentArchive.Entries[index].Dirty = true;
-                };
-                vehicleList.Open(entry);
-                vehicleList.ShowDialog(this);
-            }
-            else if (entry.Type == EntryType.ZoneListResourceType && !forceHex)
-            {
-                PVSEditor pvsForm = new PVSEditor();
-                pvsForm.Open(entry);
-                pvsForm.ShowDialog(this);
-            }
-            else if (entry.Type == EntryType.InstanceListResourceType && !forceHex)
-            {
-                TextureState.ResetCache();
-                LoadingDialog loader = new LoadingDialog();
-                loader.Status = "Loading: " + entry.ID.ToString("X8");
+		public void EditEntry(int index, bool forceHex = false)
+		{
+			BundleEntry entry = GetEntry(index);
+			if (entry.Type == EntryType.VehicleListResourceType && !forceHex)
+			{
+				VehicleListForm vehicleList = new VehicleListForm();
+				vehicleList.Edit += () =>
+				{
+					entry = vehicleList.Write(entry.Console);
+					CurrentArchive.Entries[index] = entry;
+					CurrentArchive.Entries[index].Dirty = true;
+				};
+				vehicleList.Open(entry);
+				vehicleList.ShowDialog(this);
+			}
+			else if (entry.Type == EntryType.ZoneListResourceType && !forceHex)
+			{
+				TextureState.ResetCache();
+				LoadingDialog loader = new LoadingDialog();
+				loader.Status = "Loading: " + entry.ID.ToString("X8");
 
-                Thread loadInstanceThread = null;
-                InstanceList instanceList = null;
-                Scene scene = null;
-                loader.Done += (cancelled, value) =>
-                {
-                    if (cancelled)
-                        loadInstanceThread?.Abort();
-                    else
-                    {
-                        if (instanceList == null)
-                        {
-                            MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
-                                MessageBoxIcon.Error);
-                        }
-                        else
-                        {
-                            loader.Hide();
-                            ModelViewerForm.ShowModelViewer(this, scene);
-                        }
-                    }
-                    TextureState.ResetCache();
-                };
+				Thread loadInstanceThread = null;
+				PVS pvs = null;
+				Image gameMap = null;
+				loader.Done += (cancelled, value) =>
+				{
+					if (cancelled)
+						loadInstanceThread?.Abort();
+					else
+					{
+						if (pvs == null)
+						{
+							MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
+								MessageBoxIcon.Error);
+						}
+						else
+						{
+							loader.Hide();
 
-                loadInstanceThread = new Thread(() =>
-                {
-                    instanceList = InstanceList.Read(entry, loader);
-                    scene = instanceList.MakeScene(loader);
-                    loader.IsDone = true;
-                });
-                loadInstanceThread.Start();
-                loader.ShowDialog(this);
-                //DebugUtil.ShowDebug(this, InstanceList.Read(entry, null));
-            }
-            else if (entry.Type == EntryType.GraphicsSpecResourceType && !forceHex)
-            {
-                TextureState.ResetCache();
-                LoadingDialog loader = new LoadingDialog();
-                loader.Status = "Loading: " + entry.ID.ToString("X8");
+							PVSEditor pvsForm = new PVSEditor();
+							pvsForm.GameMap = gameMap;
+							pvsForm.Open(pvs);
+							pvsForm.ShowDialog(this);
+							if (ForceOnlySpecificEntry)
+								Environment.Exit(0);
+						}
+					}
+					TextureState.ResetCache();
+				};
 
-                Thread loadInstanceThread = null;
-                GraphicsSpec instanceList = null;
-                Scene scene = null;
-                loader.Done += (cancelled, value) =>
-                {
-                    if (cancelled)
-                        loadInstanceThread?.Abort();
-                    else
-                    {
-                        if (instanceList == null)
-                        {
-                            MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
-                                MessageBoxIcon.Error);
-                        }
-                        else
-                        {
-                            loader.Hide();
-                            ModelViewerForm.ShowModelViewer(this, scene);
-                        }
-                    }
+				loadInstanceThread = new Thread(() =>
+				{
+					try
+					{
+						pvs = PVS.Read(entry, loader);
+						gameMap = GetGameMap();
+					}
+					catch (Exception)
+					{
+						MessageBox.Show("Failed to load Entry", "Error", MessageBoxButtons.OK,
+							MessageBoxIcon.Error);
+					}
+					loader.IsDone = true;
+				});
+				loadInstanceThread.Start();
+				loader.ShowDialog(this);
 
-                    TextureState.ResetCache();
-                };
+			}
+			else if (entry.Type == EntryType.InstanceListResourceType && !forceHex)
+			{
+				TextureState.ResetCache();
+				LoadingDialog loader = new LoadingDialog();
+				loader.Status = "Loading: " + entry.ID.ToString("X8");
 
-                loadInstanceThread = new Thread(() =>
-                {
-                    instanceList = GraphicsSpec.Read(entry, loader);
-                    scene = instanceList.MakeScene();
-                    loader.IsDone = true;
-                });
-                loadInstanceThread.Start();
-                loader.ShowDialog(this);
-                //DebugUtil.ShowDebug(this, instanceList);
-            }
-            else if (entry.Type == EntryType.RwRenderableResourceType && !forceHex)
-	        {
-		        TextureState.ResetCache();
-		        LoadingDialog loader = new LoadingDialog();
-		        loader.Status = "Loading: " + entry.ID.ToString("X8");
+				Thread loadInstanceThread = null;
+				InstanceList instanceList = null;
+				Scene scene = null;
+				loader.Done += (cancelled, value) =>
+				{
+					if (cancelled)
+						loadInstanceThread?.Abort();
+					else
+					{
+						if (instanceList == null)
+						{
+							MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
+								MessageBoxIcon.Error);
+						}
+						else
+						{
+							loader.Hide();
+							ModelViewerForm.ShowModelViewer(this, scene);
+						}
+					}
+					TextureState.ResetCache();
+				};
 
-		        Thread loadInstanceThread = null;
-		        Renderable renderable = null;
-		        loader.Done += (cancelled, value) =>
-		        {
-			        if (cancelled)
-				        loadInstanceThread?.Abort();
-			        else
-			        {
-				        if (renderable == null)
-				        {
-					        MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
-						        MessageBoxIcon.Error);
-				        }
-				        else
-				        {
-					        loader.Hide();
-					        Scene scene = renderable.MakeScene();
-					        ModelViewerForm.ShowModelViewer(this, scene);
-				        }
-			        }
-			        TextureState.ResetCache();
-		        };
+				loadInstanceThread = new Thread(() =>
+				{
+					instanceList = InstanceList.Read(entry, loader);
+					scene = instanceList.MakeScene(loader);
+					loader.IsDone = true;
+				});
+				loadInstanceThread.Start();
+				loader.ShowDialog(this);
+				//DebugUtil.ShowDebug(this, InstanceList.Read(entry, null));
+			}
+			else if (entry.Type == EntryType.GraphicsSpecResourceType && !forceHex)
+			{
+				TextureState.ResetCache();
+				LoadingDialog loader = new LoadingDialog();
+				loader.Status = "Loading: " + entry.ID.ToString("X8");
 
-		        loadInstanceThread = new Thread(() =>
-		        {
-			        try
-			        {
-				        renderable = Renderable.Read(entry, loader);
-			        }
+				Thread loadInstanceThread = null;
+				GraphicsSpec instanceList = null;
+				Scene scene = null;
+				loader.Done += (cancelled, value) =>
+				{
+					if (cancelled)
+						loadInstanceThread?.Abort();
+					else
+					{
+						if (instanceList == null)
+						{
+							MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
+								MessageBoxIcon.Error);
+						}
+						else
+						{
+							loader.Hide();
+							ModelViewerForm.ShowModelViewer(this, scene);
+						}
+					}
 
-			        catch (Exception)
-			        {
-				        MessageBox.Show("Failed to load Entry", "Error", MessageBoxButtons.OK,
-					        MessageBoxIcon.Error);
-			        }
-			        loader.IsDone = true;
-		        });
-		        loadInstanceThread.Start();
-		        loader.ShowDialog(this);
-	        }
-	        else if (entry.Type == EntryType.TriggerResourceType && !forceHex)
-	        {
-		        TriggerData triggers = TriggerData.Read(entry);
-		        DebugUtil.ShowDebug(this, triggers);
-	        }
-	        else if (entry.Type == EntryType.StreetDataResourceType && !forceHex)
-	        {
-		        StreetData streets = StreetData.Read(entry);
-		        DebugUtil.ShowDebug(this, streets);
-	        }
-	        /*else if (entry.Type == EntryType.AptDataHeaderType && !forceHex)
+					TextureState.ResetCache();
+				};
+
+				loadInstanceThread = new Thread(() =>
+				{
+					instanceList = GraphicsSpec.Read(entry, loader);
+					scene = instanceList.MakeScene();
+					loader.IsDone = true;
+				});
+				loadInstanceThread.Start();
+				loader.ShowDialog(this);
+				//DebugUtil.ShowDebug(this, instanceList);
+			}
+			else if (entry.Type == EntryType.RwRenderableResourceType && !forceHex)
+			{
+				TextureState.ResetCache();
+				LoadingDialog loader = new LoadingDialog();
+				loader.Status = "Loading: " + entry.ID.ToString("X8");
+
+				Thread loadInstanceThread = null;
+				Renderable renderable = null;
+				loader.Done += (cancelled, value) =>
+				{
+					if (cancelled)
+						loadInstanceThread?.Abort();
+					else
+					{
+						if (renderable == null)
+						{
+							MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
+								MessageBoxIcon.Error);
+						}
+						else
+						{
+							loader.Hide();
+							Scene scene = renderable.MakeScene();
+							ModelViewerForm.ShowModelViewer(this, scene);
+						}
+					}
+					TextureState.ResetCache();
+				};
+
+				loadInstanceThread = new Thread(() =>
+				{
+					try
+					{
+						renderable = Renderable.Read(entry, loader);
+					}
+
+					catch (Exception)
+					{
+						MessageBox.Show("Failed to load Entry", "Error", MessageBoxButtons.OK,
+							MessageBoxIcon.Error);
+					}
+					loader.IsDone = true;
+				});
+				loadInstanceThread.Start();
+				loader.ShowDialog(this);
+			}
+			else if (entry.Type == EntryType.TriggerResourceType && !forceHex)
+			{
+				TriggerData triggers = TriggerData.Read(entry);
+				DebugUtil.ShowDebug(this, triggers);
+			}
+			else if (entry.Type == EntryType.StreetDataResourceType && !forceHex)
+			{
+				StreetData streets = StreetData.Read(entry);
+				DebugUtil.ShowDebug(this, streets);
+			}
+			/*else if (entry.Type == EntryType.AptDataHeaderType && !forceHex)
 	        {
 		        // TODO
 		        AptData data = AptData.Read(entry);
 		        //AptDataAlt data = AptDataAlt.Read(entry);
 		        DebugUtil.ShowDebug(this, data);
 	        }*/
-	        else if (entry.Type == EntryType.ProgressionResourceType && !forceHex)
-	        {
-		        ProgressionData progression = ProgressionData.Read(entry);
-		        DebugUtil.ShowDebug(this, progression);
-	        }
-	        else if (entry.Type == EntryType.PolygonSoupListResourceType && !forceHex)
-	        {
-		        PolygonSoupList list = PolygonSoupList.Read(entry);
-		        WorldColEditor editor = new WorldColEditor();
-		        editor.Poly = list;
-		        editor.Changed += () =>
-		        {
-			        editor.Poly.Write(entry);
-		        };
-		        editor.ShowDialog(this);
+			else if (entry.Type == EntryType.ProgressionResourceType && !forceHex)
+			{
+				ProgressionData progression = ProgressionData.Read(entry);
+				DebugUtil.ShowDebug(this, progression);
+			}
+			else if (entry.Type == EntryType.PolygonSoupListResourceType && !forceHex)
+			{
+				PolygonSoupList list = PolygonSoupList.Read(entry);
+				WorldColEditor editor = new WorldColEditor();
+				editor.Poly = list;
+				editor.Changed += () =>
+				{
+					editor.Poly.Write(entry);
+				};
+				editor.ShowDialog(this);
 
-		        // UNCOMMENT ME TO DEBUG MODEL VIEWER!!
-		        //Scene scene = list.MakeScene();
-		        //ModelViewerForm.ShowModelViewer(this, scene);
-		        //DebugUtil.ShowDebug(this, list);
-	        }
-	        else if (entry.Type == EntryType.IDList && !forceHex)
-	        {
-		        IDList list = IDList.Read(entry);
-		        DebugUtil.ShowDebug(this, list);
-	        }
-	        else if (entry.Type == EntryType.AttribSysVaultResourceType && !forceHex)
-	        {
-		        try
-		        {
-			        AttribSys at = AttribSys.Read(entry);
-			        DebugUtil.ShowDebug(this, at);
-		        }
-		        catch (ReadFailedError ex)
-		        {
-			        MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-		        }
-	        }
-	        else if (entry.Type == EntryType.LanguageResourceType && !forceHex)
-	        {
-		        Language language = Language.Read(entry);
-		        //DebugUtil.ShowDebug(this, language);
-		        LangEdit edit = new LangEdit();
-		        edit.Lang = language;
-		        edit.Changed += () =>
-		        {
-			        edit.Lang.Write(entry);
-		        };
-		        edit.ShowDialog(this);
-	        }
-	        else if (entry.Type == EntryType.TrafficDataResourceType && !forceHex)
-	        {
-		        Traffic traffic = Traffic.Read(entry);
-		        DebugUtil.ShowDebug(this, traffic);
-	        }
-	        /* else if (entry.Type == EntryType.ModelResourceType && !forceHex)
+				// UNCOMMENT ME TO DEBUG MODEL VIEWER!!
+				//Scene scene = list.MakeScene();
+				//ModelViewerForm.ShowModelViewer(this, scene);
+				//DebugUtil.ShowDebug(this, list);
+			}
+			else if (entry.Type == EntryType.IDList && !forceHex)
+			{
+				IDList list = IDList.Read(entry);
+				DebugUtil.ShowDebug(this, list);
+			}
+			else if (entry.Type == EntryType.AttribSysVaultResourceType && !forceHex)
+			{
+				try
+				{
+					AttribSys at = AttribSys.Read(entry);
+					DebugUtil.ShowDebug(this, at);
+				}
+				catch (ReadFailedError ex)
+				{
+					MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				}
+			}
+			else if (entry.Type == EntryType.LanguageResourceType && !forceHex)
+			{
+				Language language = Language.Read(entry);
+				//DebugUtil.ShowDebug(this, language);
+				LangEdit edit = new LangEdit();
+				edit.Lang = language;
+				edit.Changed += () =>
+				{
+					edit.Lang.Write(entry);
+				};
+				edit.ShowDialog(this);
+			}
+			else if (entry.Type == EntryType.TrafficDataResourceType && !forceHex)
+			{
+				Traffic traffic = Traffic.Read(entry);
+				DebugUtil.ShowDebug(this, traffic);
+			}
+			/* else if (entry.Type == EntryType.ModelResourceType && !forceHex)
 	        {
 	            for (int i = 0; i < CurrentArchive.Entries.Count; i++)
 	            {
@@ -770,19 +823,56 @@ namespace BundleManager
 	                }
 	            }
 	        }*/
-            else if (entry.Type == EntryType.FlaptFileResourceType && !forceHex)
-            {
-                FlaptFile flaptFile = FlaptFile.Read(entry);
-                DebugUtil.ShowDebug(this, flaptFile);
-            }
-	        else
-	        {
-		        EntryEditor editor = new EntryEditor();
-		        editor.ForceHex = forceHex;
-		        Task.Run(() => openEditor(editor, index));
-		        editor.ShowDialog(this);
-	        }
-        }
+			else if (entry.Type == EntryType.FlaptFileResourceType && !forceHex)
+			{
+				FlaptFile flaptFile = FlaptFile.Read(entry);
+				DebugUtil.ShowDebug(this, flaptFile);
+			}
+			else
+			{
+				EntryEditor editor = new EntryEditor();
+				editor.ForceHex = forceHex;
+				Task.Run(() => openEditor(editor, index));
+				editor.ShowDialog(this);
+			}
+		}
+
+		public Image GetGameMap()
+		{
+			ulong id = 0x9F55039D;
+			BundleEntry descEntry1 = CurrentArchive.GetEntryByID(id);
+			if (descEntry1 == null)
+			{
+				string file = BundleCache.GetFileByEntryID(id);
+				if (!string.IsNullOrEmpty(file))
+				{
+					BundleArchive archive = BundleArchive.Read(file);
+					if (archive != null)
+						descEntry1 = archive.GetEntryByID(id);
+				}
+			}
+
+			if (descEntry1 == null)
+			{
+				string path = Path.GetDirectoryName(_currentFileName) + Path.DirectorySeparatorChar + "GUITEXTURES.BIN";
+				BundleArchive archive = BundleArchive.Read(path);
+				if (archive != null)
+					descEntry1 = archive.GetEntryByID(id);
+			}
+
+			Image image = null;
+
+			if (descEntry1 != null && descEntry1.Type == EntryType.RasterResourceType)
+			{
+				if (CurrentArchive.Console)
+					image = GameImage.GetImagePS3(descEntry1.Header, descEntry1.Body);
+				else
+					image = GameImage.GetImage(descEntry1.Header, descEntry1.Body);
+
+				TextureState.AddToCache(id, image);
+			}
+			return image;
+		}
 
         public void openEditor(EntryEditor editor, int index)
         {

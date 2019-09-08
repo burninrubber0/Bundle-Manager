@@ -46,8 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Polygon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PVS.cs" />
+    <Compile Include="PVSEditControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="PVSEditor.cs">
       <SubType>Form</SubType>
     </Compile>

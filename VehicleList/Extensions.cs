@@ -62,7 +62,7 @@ namespace VehicleList
             self.Write((byte)info.Type);
         }
 
-        public static VehicleListData ReadVehicleList(this BinaryReader self)
+        /*public static VehicleListData ReadVehicleList(this BinaryReader self)
         {
             VehicleListData list = new VehicleListData();
 
@@ -122,7 +122,7 @@ namespace VehicleList
             }
 
             return list;
-        }
+        }*/
 
         public static void WriteLenString(this BinaryWriter self, string s, int len, bool console = false)
         {
@@ -148,7 +148,7 @@ namespace VehicleList
             }
         }
 
-        public static void WriteVehicleList(this BinaryWriter self, VehicleListData list, bool console = false)
+        /*public static void WriteVehicleList(this BinaryWriter self, VehicleListData list, bool console = false)
         {
             // TODO: Implement Console Saving
 
@@ -203,6 +203,6 @@ namespace VehicleList
                 self.WriteColorInfo(vehicle.Color);
                 self.Write(console ? Util.ReverseBytes(vehicle.Unknown28) : vehicle.Unknown28);
             }
-        }
+        }*/
     }
 }

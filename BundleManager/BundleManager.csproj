@@ -94,6 +94,7 @@
     <Compile Include="EntryEditor.Designer.cs">
       <DependentUpon>EntryEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntryTypeRegistry.cs" />
     <Compile Include="FileView.cs">
       <SubType>Form</SubType>
     </Compile>

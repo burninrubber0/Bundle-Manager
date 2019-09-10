@@ -7,13 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BundleFormat;
 using BundleUtilities;
 using DebugHelper;
 using ModelViewer.SceneData;
 
 namespace BundleManager
 {
-    public partial class WorldColEditor : Form
+    public partial class WorldColEditor : Form, IEntryEditor
     {
         public delegate void OnChanged();
         public event OnChanged Changed;

@@ -389,17 +389,19 @@ namespace BundleManager
 		public void EditEntry(int index, bool forceHex = false)
 		{
 			BundleEntry entry = GetEntry(index);
-			if (entry.Type == EntryType.VehicleListResourceType && !forceHex)
+
+			if (EntryTypeRegistry.IsRegistered(entry.Type) && !forceHex)
 			{
-				VehicleListForm vehicleList = new VehicleListForm();
-				vehicleList.Edit += () =>
+				IEntryData data = EntryTypeRegistry.GetHandler(entry.Type);
+
+				if (data.Read(entry))
 				{
-					entry = vehicleList.Write(entry.Console);
-					CurrentArchive.Entries[index] = entry;
-					CurrentArchive.Entries[index].Dirty = true;
-				};
-				vehicleList.Open(entry);
-				vehicleList.ShowDialog(this);
+					IEntryEditor editor = data.GetEditor(entry);
+					if (editor != null)
+						editor.ShowDialog(this);
+					else
+						DebugUtil.ShowDebug(this, data);
+				}
 			}
 			else if (entry.Type == EntryType.ZoneListResourceType && !forceHex)
 			{
@@ -600,22 +602,6 @@ namespace BundleManager
 			{
 				ProgressionData progression = ProgressionData.Read(entry);
 				DebugUtil.ShowDebug(this, progression);
-			}
-			else if (entry.Type == EntryType.PolygonSoupListResourceType && !forceHex)
-			{
-				PolygonSoupList list = PolygonSoupList.Read(entry);
-				WorldColEditor editor = new WorldColEditor();
-				editor.Poly = list;
-				editor.Changed += () =>
-				{
-					editor.Poly.Write(entry);
-				};
-				editor.ShowDialog(this);
-
-				// UNCOMMENT ME TO DEBUG MODEL VIEWER!!
-				//Scene scene = list.MakeScene();
-				//ModelViewerForm.ShowModelViewer(this, scene);
-				//DebugUtil.ShowDebug(this, list);
 			}
 			else if (entry.Type == EntryType.IDList && !forceHex)
 			{
@@ -937,7 +923,8 @@ namespace BundleManager
 					bwPoly.Close();
 					outFilePoly.Close();
 
-					PolygonSoupList poly = PolygonSoupList.Read(polyEntry);
+					PolygonSoupList poly = new PolygonSoupList();
+					poly.Read(polyEntry);
 					Scene scene = poly.MakeScene();
 					scene.ExportWavefrontObj(path + "/" + polyName + ".obj");
 				}
@@ -954,7 +941,8 @@ namespace BundleManager
 
                 if (entry.Type == EntryType.PolygonSoupListResourceType)
                 {
-                    PolygonSoupList list = PolygonSoupList.Read(entry);
+					PolygonSoupList list = new PolygonSoupList();
+					list.Read(entry);
                     list.RemoveWreckSurfaces();
                     list.Write(entry);
                 }
@@ -1135,7 +1123,8 @@ namespace BundleManager
 				}
 				else if (entry.Type == EntryType.PolygonSoupListResourceType)
 				{
-					PolygonSoupList list = PolygonSoupList.Read(entry);
+					PolygonSoupList list = new PolygonSoupList();
+					list.Read(entry);
 					list.Write(entry);
 				}
 			}

@@ -16,13 +16,21 @@ using Util = BundleFormat.Util;
 
 namespace VehicleList
 {
-    public partial class VehicleListForm : Form
+    public partial class VehicleListForm : Form, IEntryEditor
     {
         public delegate void OnEdit();
         public event OnEdit Edit;
 
-        private BundleEntry Entry;
-        private VehicleListData currentList;
+		private VehicleListData _list;
+        public VehicleListData List
+		{
+			get => _list;
+			set
+			{
+				_list = value;
+				UpdateDisplay();
+			}
+		}
 
         public VehicleListForm()
         {
@@ -33,12 +41,12 @@ namespace VehicleList
         {
             lstVehicles.Items.Clear();
 
-            if (currentList == null)
+            if (List == null)
                 return;
 
-            for (int i = 0; i < currentList.Entries.Count; i++)
+            for (int i = 0; i < List.Entries.Count; i++)
             {
-                Vehicle vehicle = currentList.Entries[i];
+                Vehicle vehicle = List.Entries[i];
 
                 string[] value = {
                     vehicle.Index.ToString("D3"),
@@ -76,7 +84,7 @@ namespace VehicleList
             lstVehicles.Sort();
         }
 
-        public void Open(BundleEntry entry)
+        /*public void Open(BundleEntry entry)
         {
             Entry = entry;
             byte[] data = entry.Header;
@@ -87,32 +95,32 @@ namespace VehicleList
             mbr.Close();
 
             UpdateDisplay();
-        }
+        }*/
 
-        public BundleEntry Write(bool console)
+        /*public BundleEntry Write(bool console)
         {
             MemoryStream ms = new MemoryStream();
             BinaryWriter mbw = new BinaryWriter(ms);
-            mbw.WriteVehicleList(currentList, console);
+            mbw.WriteVehicleList(List, console);
             byte[] data = ms.ToArray();
             mbw.Close();
 
             Entry.Header = data;
 
             return Entry;
-        }
+        }*/
 
         private void EditSelectedEntry()
         {
             if (lstVehicles.SelectedItems.Count > 1)
                 return;
-            if (currentList == null || lstVehicles.SelectedIndices.Count <= 0)
+            if (List == null || lstVehicles.SelectedIndices.Count <= 0)
                 return;
 
             int index;
             if (!int.TryParse(lstVehicles.SelectedItems[0].Text, out index))
                 return;
-            Vehicle vehicle = currentList.Entries[index];
+            Vehicle vehicle = List.Entries[index];
 
             VehicleEditor editor = new VehicleEditor();
             editor.Vehicle = vehicle;
@@ -122,10 +130,10 @@ namespace VehicleList
 
         private void AddItem()
         {
-            if (currentList == null)
+            if (List == null)
                 return;
             Vehicle vehicle = new Vehicle();
-            vehicle.Index = currentList.Entries.Count;
+            vehicle.Index = List.Entries.Count;
             vehicle.ID = new EncryptedString("");
 
             VehicleEditor editor = new VehicleEditor();
@@ -136,16 +144,14 @@ namespace VehicleList
 
         private void Editor_OnDone1(Vehicle vehicle)
         {
-            currentList.Entries.Add(vehicle);
-            Entry.Dirty = true;
+            List.Entries.Add(vehicle);
             Edit?.Invoke();
             UpdateDisplay();
         }
 
         private void Editor_OnDone(Vehicle vehicle)
         {
-            currentList.Entries[vehicle.Index] = vehicle;
-            Entry.Dirty = true;
+            List.Entries[vehicle.Index] = vehicle;
             Edit?.Invoke();
             UpdateDisplay();
         }

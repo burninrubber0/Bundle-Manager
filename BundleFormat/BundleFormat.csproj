@@ -51,6 +51,8 @@
     <Compile Include="BundleEntry.cs" />
     <Compile Include="EntryType.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="IEntryEditor.cs" />
+    <Compile Include="IEntryHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="VertexDesc.cs" />

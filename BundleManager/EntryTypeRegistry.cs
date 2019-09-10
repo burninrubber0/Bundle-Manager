@@ -48,6 +48,8 @@ namespace BundleManager
 		{
 			Register(EntryType.PolygonSoupListResourceType, new PolygonSoupList());
 			Register(EntryType.VehicleListResourceType, new VehicleListData());
+			Register(EntryType.TriggerResourceType, new TriggerData());
+			Register(EntryType.StreetDataResourceType, new StreetData());
 		}
 	}
 }

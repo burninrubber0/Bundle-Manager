@@ -581,16 +581,6 @@ namespace BundleManager
 				loadInstanceThread.Start();
 				loader.ShowDialog(this);
 			}
-			else if (entry.Type == EntryType.TriggerResourceType && !forceHex)
-			{
-				TriggerData triggers = TriggerData.Read(entry);
-				DebugUtil.ShowDebug(this, triggers);
-			}
-			else if (entry.Type == EntryType.StreetDataResourceType && !forceHex)
-			{
-				StreetData streets = StreetData.Read(entry);
-				DebugUtil.ShowDebug(this, streets);
-			}
 			/*else if (entry.Type == EntryType.AptDataHeaderType && !forceHex)
 	        {
 		        // TODO

@@ -93,7 +93,7 @@ namespace BundleManager
         }
     }
 
-    public class StreetData
+    public class StreetData : IEntryData
     {
         public int Unknown1;
         private int FileSize;
@@ -122,28 +122,50 @@ namespace BundleManager
             StreetSection5s = new List<StreetSection5>();
         }
 
-        public static StreetData Read(BundleEntry entry)
+		private void Clear()
+		{
+			Unknown1 = default;
+			FileSize = default;
+			Unknown3 = default;
+			Section2Offset = default;
+			StreetOffset = default;
+			RoadRuleOffset = default;
+			Section1Count = default;
+			RoadRuleCount = default;
+			StreetCount = default;
+			Unknown9 = default;
+			Unknown10 = default;
+			Unknown11 = default;
+
+			StreetSection1s.Clear();
+			StreetSection2s.Clear();
+			StreetInfos.Clear();
+			RoadRuleInfos.Clear();
+			StreetSection5s.Clear();
+		}
+
+        public bool Read(BundleEntry entry)
         {
+			Clear();
+
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            StreetData result = new StreetData();
+            Unknown1 = br.ReadInt32();
+            FileSize = br.ReadInt32();
+            Unknown3 = br.ReadInt32();
+            Section2Offset = br.ReadInt32();
+            StreetOffset = br.ReadInt32();
+            RoadRuleOffset = br.ReadInt32();
+            Section1Count = br.ReadInt32();
+            RoadRuleCount = br.ReadInt32();
+            StreetCount = br.ReadInt32();
+            Unknown9 = br.ReadInt32();
+            Unknown10 = br.ReadInt32();
+            Unknown11 = br.ReadInt32();
 
-            result.Unknown1 = br.ReadInt32();
-            result.FileSize = br.ReadInt32();
-            result.Unknown3 = br.ReadInt32();
-            result.Section2Offset = br.ReadInt32();
-            result.StreetOffset = br.ReadInt32();
-            result.RoadRuleOffset = br.ReadInt32();
-            result.Section1Count = br.ReadInt32();
-            result.RoadRuleCount = br.ReadInt32();
-            result.StreetCount = br.ReadInt32();
-            result.Unknown9 = br.ReadInt32();
-            result.Unknown10 = br.ReadInt32();
-            result.Unknown11 = br.ReadInt32();
-
-            for (int i = 0; i < result.Section1Count; i++)
+            for (int i = 0; i < Section1Count; i++)
             {
                 StreetSection1 streetSection1 = new StreetSection1();
 
@@ -154,12 +176,12 @@ namespace BundleManager
                 streetSection1.Unknown5 = br.ReadInt16();
                 streetSection1.Unknown6 = br.ReadInt16();
 
-                result.StreetSection1s.Add(streetSection1);
+                StreetSection1s.Add(streetSection1);
             }
 
-            br.BaseStream.Seek(result.Section2Offset, SeekOrigin.Begin);
+            br.BaseStream.Seek(Section2Offset, SeekOrigin.Begin);
 
-            for (int i = 0; i < result.RoadRuleCount; i++)
+            for (int i = 0; i < RoadRuleCount; i++)
             {
                 StreetSection2 section2 = new StreetSection2();
 
@@ -176,12 +198,12 @@ namespace BundleManager
                 section2.Unknown11 = br.ReadInt32();
                 section2.Unknown12 = br.ReadInt32();
 
-                result.StreetSection2s.Add(section2);
+                StreetSection2s.Add(section2);
             }
 
-            br.BaseStream.Seek(result.StreetOffset, SeekOrigin.Begin);
+            br.BaseStream.Seek(StreetOffset, SeekOrigin.Begin);
 
-            for (int i = 0; i < result.StreetCount; i++)
+            for (int i = 0; i < StreetCount; i++)
             {
                 StreetInfo section3 = new StreetInfo();
 
@@ -199,12 +221,12 @@ namespace BundleManager
                 section3.Unknown9 = br.ReadInt32();
                 section3.Unknown10 = br.ReadInt32();
 
-                result.StreetInfos.Add(section3);
+                StreetInfos.Add(section3);
             }
             
-            br.BaseStream.Seek(result.RoadRuleOffset, SeekOrigin.Begin);
+            br.BaseStream.Seek(RoadRuleOffset, SeekOrigin.Begin);
 
-            for (int i = 0; i < result.RoadRuleCount; i++)
+            for (int i = 0; i < RoadRuleCount; i++)
             {
                 RoadRuleInfo section4 = new RoadRuleInfo();
 
@@ -215,10 +237,10 @@ namespace BundleManager
                 section4.Unknown5 = br.ReadInt64();
                 section4.Unknown6 = br.ReadInt64();
 
-                result.RoadRuleInfos.Add(section4);
+                RoadRuleInfos.Add(section4);
             }
 
-            while (br.BaseStream.Position < result.FileSize)
+            while (br.BaseStream.Position < FileSize)
             {
                 StreetSection5 section5 = new StreetSection5();
 
@@ -227,7 +249,7 @@ namespace BundleManager
                 section5.Unknown3 = br.ReadInt16();
                 section5.Unknown4 = br.ReadInt16();
 
-                result.StreetSection5s.Add(section5);
+                StreetSection5s.Add(section5);
             }
 
             // TODO: TEMP
@@ -237,10 +259,10 @@ namespace BundleManager
             //result.StreetInfos[70] = info1;
             //result.Write(entry);
 
-            return result;
+            return true;
         }
 
-        public void Write(BundleEntry entry)
+        public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -368,6 +390,18 @@ namespace BundleManager
 
             entry.Header = data;
             entry.Dirty = true;
+
+			return true;
         }
-    }
+
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.StreetDataResourceType;
+		}
+
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			return null;
+		}
+	}
 }

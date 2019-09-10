@@ -102,7 +102,7 @@ namespace BundleManager
         public int UnknownInt32;
     }
 
-    public class TriggerData
+    public class TriggerData : IEntryData
     {
         public int FormatRevision;
         public uint FileSize;
@@ -153,49 +153,91 @@ namespace BundleManager
             TriggerOffsets = new List<uint>();
         }
 
-        public static TriggerData Read(BundleEntry entry)
+		private void Clear()
+		{
+			FormatRevision = default;
+			FileSize = default;
+			Unknown0C = default;
+			Unknown10 = default;
+			DevSpawnPositionX = default;
+			DevSpawnPositionY = default;
+			DevSpawnPositionZ = default;
+			DevSpawnUnknownHash = default;
+			DevSpawnRotationX = default;
+			DevSpawnRotationY = default;
+			DevSpawnRotationZ = default;
+			DevSpawnUnknownFloat = default;
+			LandmarkTriggersOffset = default;
+			LandmarkTriggersCount = default;
+			LandmarkNonFinishLineCount = default;
+			BlackspotTriggersOffset = default;
+			BlackspotTriggersCount = default;
+			GenericRegionTriggersOffset = default;
+			GenericRegionTriggersCount = default;
+			Section4Offset = default;
+			Section4Count = default;
+			VFXBoxRegionOffset = default;
+			VFXBoxRegionCount = default;
+			StartPositionsOffset = default;
+			StartPositionsCount = default;
+			RoamingLocationsOffset = default;
+			RoamingLocationsCount = default;
+			SpawnLocationsOffset = default;
+			SpawnLocationsCount = default;
+			TriggerOffsetListOffset = default;
+			TriggerOffsetListCount = default;
+
+			LandmarkTriggers.Clear();
+			GenericRegionTriggers.Clear();
+			Section4Entries.Clear();
+			RoamingLocationEntries.Clear();
+			SpawnLocationEntries.Clear();
+			TriggerOffsets.Clear();
+		}
+
+        public bool Read(BundleEntry entry)
         {
-            TriggerData result = new TriggerData();
+			Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            result.FormatRevision = br.ReadInt32();
-            result.FileSize = br.ReadUInt32();
-            result.Unknown0C = br.ReadInt32();
-            result.Unknown10 = br.ReadInt32();
-            result.DevSpawnPositionX = br.ReadSingle();
-            result.DevSpawnPositionY = br.ReadSingle();
-            result.DevSpawnPositionZ = br.ReadSingle();
-            result.DevSpawnUnknownHash = br.ReadUInt32();
-            result.DevSpawnRotationX = br.ReadSingle();
-            result.DevSpawnRotationY = br.ReadSingle();
-            result.DevSpawnRotationZ = br.ReadSingle();
-            result.DevSpawnUnknownFloat = br.ReadSingle();
-            result.LandmarkTriggersOffset = br.ReadUInt32();
-            result.LandmarkTriggersCount = br.ReadInt32();
-            result.LandmarkNonFinishLineCount = br.ReadInt32();
-            result.BlackspotTriggersOffset = br.ReadUInt32();
-            result.BlackspotTriggersCount = br.ReadInt32();
-            result.GenericRegionTriggersOffset = br.ReadUInt32();
-            result.GenericRegionTriggersCount = br.ReadInt32();
-            result.Section4Offset = br.ReadUInt32();
-            result.Section4Count = br.ReadInt32();
-            result.VFXBoxRegionOffset = br.ReadUInt32();
-            result.VFXBoxRegionCount = br.ReadInt32();
-            result.StartPositionsOffset = br.ReadUInt32();
-            result.StartPositionsCount = br.ReadInt32();
-            result.RoamingLocationsOffset = br.ReadUInt32();
-            result.RoamingLocationsCount = br.ReadInt32();
-            result.SpawnLocationsOffset = br.ReadUInt32();
-            result.SpawnLocationsCount = br.ReadInt32();
-            result.TriggerOffsetListOffset = br.ReadUInt32();
-            result.TriggerOffsetListCount = br.ReadInt32();
+            FormatRevision = br.ReadInt32();
+            FileSize = br.ReadUInt32();
+            Unknown0C = br.ReadInt32();
+            Unknown10 = br.ReadInt32();
+            DevSpawnPositionX = br.ReadSingle();
+            DevSpawnPositionY = br.ReadSingle();
+            DevSpawnPositionZ = br.ReadSingle();
+            DevSpawnUnknownHash = br.ReadUInt32();
+            DevSpawnRotationX = br.ReadSingle();
+            DevSpawnRotationY = br.ReadSingle();
+            DevSpawnRotationZ = br.ReadSingle();
+            DevSpawnUnknownFloat = br.ReadSingle();
+            LandmarkTriggersOffset = br.ReadUInt32();
+            LandmarkTriggersCount = br.ReadInt32();
+            LandmarkNonFinishLineCount = br.ReadInt32();
+            BlackspotTriggersOffset = br.ReadUInt32();
+            BlackspotTriggersCount = br.ReadInt32();
+            GenericRegionTriggersOffset = br.ReadUInt32();
+            GenericRegionTriggersCount = br.ReadInt32();
+            Section4Offset = br.ReadUInt32();
+            Section4Count = br.ReadInt32();
+            VFXBoxRegionOffset = br.ReadUInt32();
+            VFXBoxRegionCount = br.ReadInt32();
+            StartPositionsOffset = br.ReadUInt32();
+            StartPositionsCount = br.ReadInt32();
+            RoamingLocationsOffset = br.ReadUInt32();
+            RoamingLocationsCount = br.ReadInt32();
+            SpawnLocationsOffset = br.ReadUInt32();
+            SpawnLocationsCount = br.ReadInt32();
+            TriggerOffsetListOffset = br.ReadUInt32();
+            TriggerOffsetListCount = br.ReadInt32();
 
-            br.BaseStream.Position = result.LandmarkTriggersOffset;
+            br.BaseStream.Position = LandmarkTriggersOffset;
 
-            for (int i = 0; i < result.LandmarkTriggersCount; i++)
+            for (int i = 0; i < LandmarkTriggersCount; i++)
             {
                 LandmarkTrigger landmarkTrigger = new LandmarkTrigger();
 
@@ -218,12 +260,12 @@ namespace BundleManager
                 landmarkTrigger.Subtype = br.ReadByte();
                 landmarkTrigger.UnknownByte33 = br.ReadByte();
 
-                result.LandmarkTriggers.Add(landmarkTrigger);
+                LandmarkTriggers.Add(landmarkTrigger);
             }
 
-            br.BaseStream.Position = result.GenericRegionTriggersOffset;
+            br.BaseStream.Position = GenericRegionTriggersOffset;
 
-            for (int i = 0; i < result.GenericRegionTriggersCount; i++)
+            for (int i = 0; i < GenericRegionTriggersCount; i++)
             {
                 long startPosition = br.BaseStream.Position;
 
@@ -250,12 +292,12 @@ namespace BundleManager
                 genericRegionTrigger.Subtype = br.ReadByte();
                 genericRegionTrigger.UnknownByte37 = br.ReadByte();
 
-                result.GenericRegionTriggers.Add((uint)startPosition, genericRegionTrigger);
+                GenericRegionTriggers.Add((uint)startPosition, genericRegionTrigger);
             }
 
-            br.BaseStream.Position = result.Section4Offset;
+            br.BaseStream.Position = Section4Offset;
 
-            for (int i = 0; i < result.Section4Count; i++)
+            for (int i = 0; i < Section4Count; i++)
             {
                 TriggerSection4Entry section4Entry = new TriggerSection4Entry();
 
@@ -271,7 +313,7 @@ namespace BundleManager
                 for (int j = 0; j < section4Entry.TriggerOffsetListCount; j++)
                 {
                     uint offset = br.ReadUInt32();
-                    section4Entry.Triggers.Add(result.GenericRegionTriggers[offset]);
+                    section4Entry.Triggers.Add(GenericRegionTriggers[offset]);
                 }
 
                 br.BaseStream.Position = section4Entry.GameDBIDListOffset;
@@ -283,12 +325,12 @@ namespace BundleManager
 
                 br.BaseStream.Position = oldPosition;
 
-                result.Section4Entries.Add(section4Entry);
+                Section4Entries.Add(section4Entry);
             }
 
-            br.BaseStream.Position = result.RoamingLocationsOffset;
+            br.BaseStream.Position = RoamingLocationsOffset;
 
-            for (int i = 0; i < result.RoamingLocationsCount; i++)
+            for (int i = 0; i < RoamingLocationsCount; i++)
             {
                 RoamingLocation roamingLocation = new RoamingLocation();
 
@@ -304,12 +346,12 @@ namespace BundleManager
                 roamingLocation.UnknownInt18 = br.ReadInt32();
                 roamingLocation.UnknownInt1C = br.ReadInt32();
 
-                result.RoamingLocationEntries.Add(roamingLocation);
+                RoamingLocationEntries.Add(roamingLocation);
             }
 
-            br.BaseStream.Position = result.SpawnLocationsOffset;
+            br.BaseStream.Position = SpawnLocationsOffset;
 
-            for (int i = 0; i < result.SpawnLocationsCount; i++)
+            for (int i = 0; i < SpawnLocationsCount; i++)
             {
                 SpawnLocation spawnLocation = new SpawnLocation();
 
@@ -328,7 +370,7 @@ namespace BundleManager
                 spawnLocation.UnknownByte31 = br.ReadByte();
                 spawnLocation.UnknownInt32 = br.ReadInt32();
 
-                foreach (GenericRegionTrigger trigger in result.GenericRegionTriggers.Values)
+                foreach (GenericRegionTrigger trigger in GenericRegionTriggers.Values)
                 {
                     if (trigger.GameDBID == spawnLocation.JunkyardGameDBID)
                     {
@@ -337,24 +379,34 @@ namespace BundleManager
                     }
                 }
 
-                result.SpawnLocationEntries.Add(spawnLocation);
+                SpawnLocationEntries.Add(spawnLocation);
             }
 
-            br.BaseStream.Position = result.TriggerOffsetListOffset;
+            br.BaseStream.Position = TriggerOffsetListOffset;
 
-            for (int i = 0; i < result.TriggerOffsetListCount; i++)
+            for (int i = 0; i < TriggerOffsetListCount; i++)
             {
                 uint section6Entry = br.ReadUInt32();
-                result.TriggerOffsets.Add(section6Entry);
+                TriggerOffsets.Add(section6Entry);
             }
 
             br.Close();
             ms.Close();
 
-            return result;
+			return true;
         }
 
-        public void Write(BundleEntry entry)
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			return null;
+		}
+
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.TriggerResourceType;
+		}
+
+		public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -524,6 +576,8 @@ namespace BundleManager
 
             entry.Header = data;
             entry.Dirty = true;
+
+			return true;
         }
-    }
+	}
 }

@@ -588,16 +588,6 @@ namespace BundleManager
 		        //AptDataAlt data = AptDataAlt.Read(entry);
 		        DebugUtil.ShowDebug(this, data);
 	        }*/
-			else if (entry.Type == EntryType.ProgressionResourceType && !forceHex)
-			{
-				ProgressionData progression = ProgressionData.Read(entry);
-				DebugUtil.ShowDebug(this, progression);
-			}
-			else if (entry.Type == EntryType.IDList && !forceHex)
-			{
-				IDList list = IDList.Read(entry);
-				DebugUtil.ShowDebug(this, list);
-			}
 			else if (entry.Type == EntryType.AttribSysVaultResourceType && !forceHex)
 			{
 				try
@@ -1108,7 +1098,8 @@ namespace BundleManager
 
 				if (entry.Type == EntryType.IDList)
 				{
-					IDList list = IDList.Read(entry);
+					IDList list = new IDList();
+					list.Read(entry);
 					list.Write(entry);
 				}
 				else if (entry.Type == EntryType.PolygonSoupListResourceType)

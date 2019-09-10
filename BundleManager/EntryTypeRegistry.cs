@@ -50,6 +50,8 @@ namespace BundleManager
 			Register(EntryType.VehicleListResourceType, new VehicleListData());
 			Register(EntryType.TriggerResourceType, new TriggerData());
 			Register(EntryType.StreetDataResourceType, new StreetData());
+			Register(EntryType.ProgressionResourceType, new ProgressionData());
+			Register(EntryType.IDList, new IDList());
 		}
 	}
 }

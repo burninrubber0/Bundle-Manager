@@ -220,7 +220,7 @@ namespace BundleManager
         public override string ToString() => $"Player Vehicle ID {PlayerVehicleID}";
     }
 
-    public class ProgressionData
+    public class ProgressionData : IEntryData
     {
         public int FormatRevision;
         public uint FileSize;
@@ -266,45 +266,60 @@ namespace BundleManager
             PlayerOpponentsDataEntries = new List<PlayerOpponentsData>();
         }
 
-        public static ProgressionData Read(BundleEntry entry)
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			return null;
+		}
+
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.ProgressionResourceType;
+		}
+
+		private void Clear()
+		{
+
+		}
+
+		public bool Read(BundleEntry entry)
         {
-            ProgressionData result = new ProgressionData();
+			Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            result.FormatRevision = br.ReadInt32();
-            result.FileSize = br.ReadUInt32();
-            result.InitialCarIDListOffset = br.ReadUInt32();
-            result.InitialCarIDCount = br.ReadInt32();
-            result.LicenceDataOffset = br.ReadUInt32();
-            result.LicenceDataCount = br.ReadInt32();
-            result.EventJunctionOffset = br.ReadUInt32();
-            result.EventJunctionCount = br.ReadInt32();
-            result.EventDataOffset = br.ReadUInt32();
-            result.EventDataCount = br.ReadInt32();
-            result.RivalOffset = br.ReadUInt32();
-            result.RivalCount = br.ReadInt32();
-            result.Section6Offset = br.ReadUInt32();
-            result.Section6Count = br.ReadInt32();
-            result.Section7Offset = br.ReadUInt32();
-            result.Section7Count = br.ReadInt32();
-            result.CarbonCarUnlockDataOffset = br.ReadUInt32();
-            result.CarbonCarUnlockDataCount = br.ReadInt32();
-            result.PlayerOpponentsDataOffset = br.ReadUInt32();
-            result.PlayerOpponentsDataCount = br.ReadInt32();
+            FormatRevision = br.ReadInt32();
+            FileSize = br.ReadUInt32();
+            InitialCarIDListOffset = br.ReadUInt32();
+            InitialCarIDCount = br.ReadInt32();
+            LicenceDataOffset = br.ReadUInt32();
+            LicenceDataCount = br.ReadInt32();
+            EventJunctionOffset = br.ReadUInt32();
+            EventJunctionCount = br.ReadInt32();
+            EventDataOffset = br.ReadUInt32();
+            EventDataCount = br.ReadInt32();
+            RivalOffset = br.ReadUInt32();
+            RivalCount = br.ReadInt32();
+            Section6Offset = br.ReadUInt32();
+            Section6Count = br.ReadInt32();
+            Section7Offset = br.ReadUInt32();
+            Section7Count = br.ReadInt32();
+            CarbonCarUnlockDataOffset = br.ReadUInt32();
+            CarbonCarUnlockDataCount = br.ReadInt32();
+            PlayerOpponentsDataOffset = br.ReadUInt32();
+            PlayerOpponentsDataCount = br.ReadInt32();
 
 
-            br.BaseStream.Position = result.InitialCarIDListOffset;
-            for (int i = 0; i < result.InitialCarIDCount; i++)
+            br.BaseStream.Position = InitialCarIDListOffset;
+            for (int i = 0; i < InitialCarIDCount; i++)
             {
-                result.InitialCarIDEntries.Add(new EncryptedString(br.ReadUInt64()));
+                InitialCarIDEntries.Add(new EncryptedString(br.ReadUInt64()));
             }
 
 
-            br.BaseStream.Position = result.LicenceDataOffset;
-            for (int i = 0; i < result.LicenceDataCount; i++)
+            br.BaseStream.Position = LicenceDataOffset;
+            for (int i = 0; i < LicenceDataCount; i++)
             {
                 LicenceData licenceData = new LicenceData();
 
@@ -346,28 +361,28 @@ namespace BundleManager
                 br.BaseStream.Position += 4; // padding
                 licenceData.VehicleUnlocked = new EncryptedString(br.ReadUInt64());
                 
-                result.LicenceDataEntries.Add(licenceData);
+                LicenceDataEntries.Add(licenceData);
             }
 
 
-            br.BaseStream.Position = result.EventJunctionOffset;
-            for (int i = 0; i < result.EventJunctionCount; i++)
+            br.BaseStream.Position = EventJunctionOffset;
+            for (int i = 0; i < EventJunctionCount; i++)
             {
                 EventJunction eventJunction = new EventJunction();
 
                 eventJunction.GameDBID = br.ReadInt32();
                 eventJunction.CarEventDataOffset = br.ReadUInt32();
                 eventJunction.BTTEventDataOffset = br.ReadUInt32();
-                if (result.FormatRevision >= 44)
+                if (FormatRevision >= 44)
                     eventJunction.BikeEventDataOffset = br.ReadUInt32();
                 eventJunction.UnknownGameDBID = br.ReadInt32();
 
-                result.EventJunctionEntries.Add(eventJunction);
+                EventJunctionEntries.Add(eventJunction);
             }
 
 
-            br.BaseStream.Position = result.EventDataOffset;
-            for (int i = 0; i < result.EventDataCount; i++)
+            br.BaseStream.Position = EventDataOffset;
+            for (int i = 0; i < EventDataCount; i++)
             {
                 long origPosition = br.BaseStream.Position;
 
@@ -446,26 +461,26 @@ namespace BundleManager
                 }
                 br.BaseStream.Position = oldPos;
 
-                result.EventDataEntries.Add((uint)origPosition, eventData);
+                EventDataEntries.Add((uint)origPosition, eventData);
             }
 
-            for (int i = 0; i < result.EventJunctionCount; i++)
+            for (int i = 0; i < EventJunctionCount; i++)
             {
-                EventJunction junction = result.EventJunctionEntries[i];
+                EventJunction junction = EventJunctionEntries[i];
 
                 if (junction.CarEventDataOffset != 0)
-                    junction.CarEventData = result.EventDataEntries[junction.CarEventDataOffset];
+                    junction.CarEventData = EventDataEntries[junction.CarEventDataOffset];
                 if (junction.BTTEventDataOffset != 0)
-                    junction.BTTEventData = result.EventDataEntries[junction.BTTEventDataOffset];
+                    junction.BTTEventData = EventDataEntries[junction.BTTEventDataOffset];
                 if (junction.BikeEventDataOffset != 0)
-                    junction.BikeEventData = result.EventDataEntries[junction.BikeEventDataOffset];
+                    junction.BikeEventData = EventDataEntries[junction.BikeEventDataOffset];
 
-                result.EventJunctionEntries[i] = junction;
+                EventJunctionEntries[i] = junction;
             }
 
 
-            br.BaseStream.Position = result.RivalOffset;
-            for (int i = 0; i < result.RivalCount; i++)
+            br.BaseStream.Position = RivalOffset;
+            for (int i = 0; i < RivalCount; i++)
             {
                 Rival rival = new Rival();
 
@@ -479,12 +494,12 @@ namespace BundleManager
                 rival.DoesNotRoam = br.ReadBoolean();
                 rival.Name = br.ReadLenString(0x20);
 
-                result.RivalEntries.Add(rival);
+                RivalEntries.Add(rival);
             }
 
 
-            br.BaseStream.Position = result.Section6Offset;
-            for (int i = 0; i < result.Section6Count; i++)
+            br.BaseStream.Position = Section6Offset;
+            for (int i = 0; i < Section6Count; i++)
             {
                 ProgressionSection6Entry section6Entry = new ProgressionSection6Entry();
 
@@ -509,12 +524,12 @@ namespace BundleManager
                 section6Entry.Unknown42 = br.ReadByte();
                 section6Entry.Unknown43 = br.ReadByte();
 
-                result.Section6Entries.Add(section6Entry);
+                Section6Entries.Add(section6Entry);
             }
 
 
-            br.BaseStream.Position = result.Section7Offset;
-            for (int i = 0; i < result.Section7Count; i++)
+            br.BaseStream.Position = Section7Offset;
+            for (int i = 0; i < Section7Count; i++)
             {
                 ProgressionSection7Entry section7Entry = new ProgressionSection7Entry();
 
@@ -523,12 +538,12 @@ namespace BundleManager
                 section7Entry.Unknown08 = br.ReadSingle();
                 section7Entry.Unknown0C = br.ReadSingle();
 
-                result.Section7Entries.Add(section7Entry);
+                Section7Entries.Add(section7Entry);
             }
 
 
-            br.BaseStream.Position = result.CarbonCarUnlockDataOffset;
-            for (int i = 0; i < result.CarbonCarUnlockDataCount; i++)
+            br.BaseStream.Position = CarbonCarUnlockDataOffset;
+            for (int i = 0; i < CarbonCarUnlockDataCount; i++)
             {
                 CarbonCarUnlockData unlockData = new CarbonCarUnlockData();
 
@@ -538,12 +553,12 @@ namespace BundleManager
                 unlockData.Unknown07 = br.ReadByte();
                 unlockData.VehicleID = new EncryptedString(br.ReadUInt64());
 
-                result.CarbonCarUnlockDataEntries.Add(unlockData);
+                CarbonCarUnlockDataEntries.Add(unlockData);
             }
 
 
-            br.BaseStream.Position = result.PlayerOpponentsDataOffset;
-            for (int i = 0; i < result.PlayerOpponentsDataCount; i++)
+            br.BaseStream.Position = PlayerOpponentsDataOffset;
+            for (int i = 0; i < PlayerOpponentsDataCount; i++)
             {
                 PlayerOpponentsData opponentsData = new PlayerOpponentsData();
 
@@ -575,17 +590,17 @@ namespace BundleManager
                 opponentsData.Unknown88 = br.ReadInt32();
                 opponentsData.NumOpponents = br.ReadInt32();
 
-                result.PlayerOpponentsDataEntries.Add(opponentsData);
+                PlayerOpponentsDataEntries.Add(opponentsData);
             }
 
 
             br.Close();
             ms.Close();
 
-            return result;
+            return true;
         }
 
-        public void Write(BundleEntry entry)
+        public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -599,6 +614,8 @@ namespace BundleManager
 
             entry.Header = data;
             entry.Dirty = true;
+
+			return true;
         }
     }
 }

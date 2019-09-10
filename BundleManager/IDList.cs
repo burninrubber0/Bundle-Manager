@@ -9,7 +9,7 @@ using BundleUtilities;
 
 namespace BundleManager
 {
-    public class IDList
+    public class IDList : IEntryData
     {
         public int ReferenceEntryIDOffset;
         public int Unknown2; // Might be a count of some sort
@@ -24,29 +24,50 @@ namespace BundleManager
             
         }
 
-        public static IDList Read(BundleEntry entry)
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			return null;
+		}
+
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.IDList;
+		}
+
+		private void Clear()
+		{
+			ReferenceEntryIDOffset = default;
+			Unknown2 = default;
+			Unknown3 = default;
+			Unknown4 = default;
+			ReferenceEntryID = default;
+			Unknown6 = default;
+			Unknown7 = default;
+		}
+
+		public bool Read(BundleEntry entry)
         {
-            IDList result = new IDList();
+			Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            result.ReferenceEntryIDOffset = br.ReadInt32();
-            result.Unknown2 = br.ReadInt32();
-            result.Unknown3 = br.ReadInt32();
-            result.Unknown4 = br.ReadInt32();
-            result.ReferenceEntryID = br.ReadUInt64();
-            result.Unknown6 = br.ReadInt32();
-            result.Unknown7 = br.ReadInt32();
+            ReferenceEntryIDOffset = br.ReadInt32();
+            Unknown2 = br.ReadInt32();
+            Unknown3 = br.ReadInt32();
+            Unknown4 = br.ReadInt32();
+            ReferenceEntryID = br.ReadUInt64();
+            Unknown6 = br.ReadInt32();
+            Unknown7 = br.ReadInt32();
 
             br.Close();
             ms.Close();
 
-            return result;
+			return true;
         }
 
-        public void Write(BundleEntry entry)
+        public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -68,6 +89,8 @@ namespace BundleManager
 
             entry.Header = data;
             entry.Dirty = true;
+
+			return true;
         }
     }
 }

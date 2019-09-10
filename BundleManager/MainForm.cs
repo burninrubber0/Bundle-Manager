@@ -24,7 +24,9 @@ namespace BundleManager
 {
     public partial class MainForm : Form
     {
-        private bool _subForm;
+		#region Variables and Properties
+
+		private bool _subForm;
         public bool SubForm
         {
             get { return _subForm; }
@@ -141,47 +143,16 @@ namespace BundleManager
 
 		public bool ForceOnlySpecificEntry = false;
 
+		private Thread _openSaveThread;
+
+		#endregion
+
 		public MainForm()
         {
             InitializeComponent();
 
             //doNew();
             UpdateDisplay();
-        }
-
-        private void Search()
-        {
-            if (CurrentArchive == null)
-                return;
-
-            SearchDialog search = new SearchDialog();
-            search.Search += id =>
-            {
-                BundleEntry entry = CurrentArchive.GetEntryByID(id);
-                if (entry == null)
-                {
-                    MessageBox.Show(this, "Entry not found!", "Information", MessageBoxButtons.OK,
-                        MessageBoxIcon.Information);
-                    return;
-                }
-
-                string indexText = CurrentArchive.Entries.IndexOf(entry).ToString("D3");
-                int listIndex = -1;
-                for (int i = 0; i < lstEntries.Items.Count; i++)
-                {
-                    ListViewItem item = lstEntries.Items[i];
-                    if (item.Text == indexText)
-                    {
-                        listIndex = i;
-                        break;
-                    }
-                }
-
-                lstEntries.SelectedIndices.Clear();
-                lstEntries.SelectedIndices.Add(listIndex);
-                lstEntries.EnsureVisible(listIndex);
-            };
-            search.ShowDialog(this);
         }
 
         private void UpdateDisplay()
@@ -232,39 +203,6 @@ namespace BundleManager
             lstEntries.EndUpdate();
         }
 
-        private bool CheckSave()
-        {
-            if (CurrentArchive == null)
-            {
-                return true;
-            }
-            else if (CurrentArchive.Dirty)
-            {
-                DialogResult result = MessageBox.Show(this, "There are unsaved changes!\nWould you like to save?",
-                    "Save", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
-                if (result == DialogResult.Yes)
-                {
-                    return Save();
-                }
-                else if (result == DialogResult.No)
-                {
-                    CurrentArchive = null;
-                    CurrentFileName = null;
-                    UpdateDisplay();
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-
-            }
-            else
-            {
-                return true;
-            }
-        }
-
         private void DoNew()
         {
             if (!CheckSave())
@@ -277,7 +215,6 @@ namespace BundleManager
                 "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
-        private Thread _openSaveThread;
         private void Open()
         {
             if (!CheckSave())
@@ -335,27 +272,6 @@ namespace BundleManager
         
         public void DoOpenBundle(LoadingDialog loader, string path)
         {
-            /*Stream s = null;
-            try
-            {
-                s = File.Open(path, FileMode.Open, FileAccess.Read);
-            }
-            catch (IOException ex)
-            {
-                MessageBox.Show(this, "Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            if (s == null)
-                return;
-
-            BinaryReader2 br = new BinaryReader2(s);
-
-            BundleArchive archive = BundleArchive.Read(br);
-
-            loader.Value = new object[] { archive, path };
-
-            br.Close();
-            */
-
             BundleArchive archive = BundleArchive.Read(path);
 
             loader.Value = new object[] { archive, path };
@@ -442,75 +358,6 @@ namespace BundleManager
         public void Exit()
         {
             Application.Exit();
-        }
-        
-        public void ConvertImagesFromPS3ToPC_old()
-        {
-            if (CurrentArchive == null)
-            {
-                MessageBox.Show(this, "No Archive Open!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            if (CurrentArchive.Console)
-            {
-                for (int i = 0; i < CurrentArchive.Entries.Count; i++)
-                {
-                    BundleEntry entry = CurrentArchive.Entries[i];
-                    if (entry.Header.Length == 48 && entry.Body != null && entry.BodySize > 0)
-                    {
-                        MemoryStream ms = new MemoryStream(entry.Header);
-                        BinaryReader2 br = new BinaryReader2(ms);
-                        br.BigEndian = entry.Console;
-
-                        byte compression = br.ReadByte();
-                        byte[] unknown1 = br.ReadBytes(3);
-                        byte[] type = Encoding.ASCII.GetBytes("DXT1");
-                        if (compression == 0x85)
-                        {
-                            type = new byte[] { 0x15, 0x00, 0x00, 0x00 };
-                        }
-                        else if (compression == 0x86)
-                        {
-                            type = Encoding.ASCII.GetBytes("DXT1");
-                        }
-                        else if (compression == 0x88)
-                        {
-                            type = Encoding.ASCII.GetBytes("DXT5");
-                        }
-                        int unknown2 = Util.ReverseBytes(br.ReadInt32());
-                        int width = Util.ReverseBytes(br.ReadInt16());
-                        int height = Util.ReverseBytes(br.ReadInt16());
-                        br.Close();
-
-                        MemoryStream msx = new MemoryStream();
-                        BinaryWriter bw = new BinaryWriter(msx);
-
-                        bw.Write((int)0);
-                        bw.Write((int)0);
-                        bw.Write((int)0);
-                        bw.Write((int)1);
-
-                        bw.Write(type);
-                        bw.Write((short)width);
-                        bw.Write((short)height);
-                        bw.Write((int)0x15);
-                        bw.Write((int)0);
-
-                        bw.Flush();
-
-                        byte[] Data = msx.ToArray();
-
-                        bw.Close();
-
-                        entry.Header = Data;
-
-                        entry.Dirty = true;
-                    }
-                }
-            } else
-            {
-                MessageBox.Show(this, "This feature only works on PS3 Bundle Files", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
         }
 
         private delegate BundleEntry GetEntryDelegate(int index);
@@ -837,49 +684,15 @@ namespace BundleManager
 			}
 		}
 
-		public Image GetGameMap()
-		{
-			ulong id = 0x9F55039D;
-			BundleEntry descEntry1 = CurrentArchive.GetEntryByID(id);
-			if (descEntry1 == null)
-			{
-				string file = BundleCache.GetFileByEntryID(id);
-				if (!string.IsNullOrEmpty(file))
-				{
-					BundleArchive archive = BundleArchive.Read(file);
-					if (archive != null)
-						descEntry1 = archive.GetEntryByID(id);
-				}
-			}
-
-			if (descEntry1 == null)
-			{
-				string path = Path.GetDirectoryName(_currentFileName) + Path.DirectorySeparatorChar + "GUITEXTURES.BIN";
-				BundleArchive archive = BundleArchive.Read(path);
-				if (archive != null)
-					descEntry1 = archive.GetEntryByID(id);
-			}
-
-			Image image = null;
-
-			if (descEntry1 != null && descEntry1.Type == EntryType.RasterResourceType)
-			{
-				if (CurrentArchive.Console)
-					image = GameImage.GetImagePS3(descEntry1.Header, descEntry1.Body);
-				else
-					image = GameImage.GetImage(descEntry1.Header, descEntry1.Body);
-
-				TextureState.AddToCache(id, image);
-			}
-			return image;
-		}
 
         public void openEditor(EntryEditor editor, int index)
         {
             editor.Entry = GetEntry(index);
         }
 
-        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+		#region Event Handlers
+
+		private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DoNew();
         }
@@ -947,14 +760,7 @@ namespace BundleManager
 
         private void tsbSwitchMode_Click(object sender, EventArgs e)
         {
-            if (!CheckSave())
-                return;
-
-            CurrentArchive = null;
-            CurrentFileName = null;
-
-            Hide();
-            Program.folderModeForm.Show();
+			SwitchMode();
         }
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -964,7 +770,110 @@ namespace BundleManager
 
         private void lstEntries_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-            int column = e.Column;
+			SortColumn(e.Column);
+		}
+
+        private void searchForEntryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Search();
+        }
+
+        private void dumpAllCollisionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			DumpAllCollisions();
+        }
+
+        private void removeWreckSurfacesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			RemoveWreckSurfaces();
+		}
+
+		#endregion
+
+		#region Utility
+
+		private bool CheckSave()
+		{
+			if (CurrentArchive == null)
+			{
+				return true;
+			}
+			else if (CurrentArchive.Dirty)
+			{
+				DialogResult result = MessageBox.Show(this, "There are unsaved changes!\nWould you like to save?",
+					"Save", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+				if (result == DialogResult.Yes)
+				{
+					return Save();
+				}
+				else if (result == DialogResult.No)
+				{
+					CurrentArchive = null;
+					CurrentFileName = null;
+					UpdateDisplay();
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		private void Search()
+		{
+			if (CurrentArchive == null)
+				return;
+
+			SearchDialog search = new SearchDialog();
+			search.Search += id =>
+			{
+				BundleEntry entry = CurrentArchive.GetEntryByID(id);
+				if (entry == null)
+				{
+					MessageBox.Show(this, "Entry not found!", "Information", MessageBoxButtons.OK,
+						MessageBoxIcon.Information);
+					return;
+				}
+
+				string indexText = CurrentArchive.Entries.IndexOf(entry).ToString("D3");
+				int listIndex = -1;
+				for (int i = 0; i < lstEntries.Items.Count; i++)
+				{
+					ListViewItem item = lstEntries.Items[i];
+					if (item.Text == indexText)
+					{
+						listIndex = i;
+						break;
+					}
+				}
+
+				lstEntries.SelectedIndices.Clear();
+				lstEntries.SelectedIndices.Add(listIndex);
+				lstEntries.EnsureVisible(listIndex);
+			};
+			search.ShowDialog(this);
+		}
+
+		private void SwitchMode()
+		{
+			if (!CheckSave())
+				return;
+
+			CurrentArchive = null;
+			CurrentFileName = null;
+
+			Hide();
+			Program.folderModeForm.Show();
+		}
+
+		private void SortColumn(int column)
+		{
 			EntrySorter sorter;
 
 			if (lstEntries.ListViewItemSorter is EntrySorter)
@@ -980,40 +889,210 @@ namespace BundleManager
 				lstEntries.ListViewItemSorter = sorter;
 			}
 			// if you're clicking the same column already being sorted
-            //if (sorter.Column == column)
-            //{
-				// change the direction state from true to false or vice-versa
-                sorter.Swap();
-				// bop-it
-				lstEntries.Sort();
+			//if (sorter.Column == column)
+			//{
+			// change the direction state from true to false or vice-versa
+			sorter.Swap();
+			// bop-it
+			lstEntries.Sort();
 			//}
 		}
 
-        private class EntrySorter : IComparer
-        {
-            public int Column;
-            public bool Direction;
+		private void DumpAllCollisions()
+		{
+			if (CurrentArchive == null)
+				return;
 
-            public EntrySorter(int column)
+			FolderBrowserDialog fbd = new FolderBrowserDialog();
+			DialogResult result = fbd.ShowDialog(this);
+			if (result == DialogResult.OK)
+			{
+				string path = fbd.SelectedPath;
+
+				for (int i = 0; ; i++)
+				{
+					string idListName = "trk_clil" + i;
+					string polyName = "trk_col_" + i;
+
+					ulong idListID = Crc32.HashCrc32B(idListName);
+					ulong polyID = Crc32.HashCrc32B(polyName);
+
+					BundleEntry entry = CurrentArchive.GetEntryByID(idListID);
+					if (entry == null)
+						break;
+					Stream outFile = File.Open(path + "/" + idListName + ".bin", FileMode.Create, FileAccess.Write);
+					BinaryWriter bw = new BinaryWriter(outFile);
+					bw.Write(entry.Header);
+					bw.Flush();
+					bw.Close();
+					outFile.Close();
+
+					BundleEntry polyEntry = CurrentArchive.GetEntryByID(polyID);
+					if (polyEntry == null)
+						break;
+					Stream outFilePoly = File.Open(path + "/" + polyName + ".bin", FileMode.Create, FileAccess.Write);
+					BinaryWriter bwPoly = new BinaryWriter(outFilePoly);
+					bwPoly.Write(polyEntry.Header);
+					bwPoly.Flush();
+					bwPoly.Close();
+					outFilePoly.Close();
+
+					PolygonSoupList poly = PolygonSoupList.Read(polyEntry);
+					Scene scene = poly.MakeScene();
+					scene.ExportWavefrontObj(path + "/" + polyName + ".obj");
+				}
+
+				MessageBox.Show(this, "Done!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+			}
+		}
+
+		private void RemoveWreckSurfaces()
+		{
+			for (int i = 0; i < CurrentArchive.Entries.Count; i++)
             {
-                this.Column = column;
-                this.Direction = false;
-            }
+                BundleEntry entry = CurrentArchive.Entries[i];
 
-            public int Compare(object x, object y)
-            {
-                ListViewItem itemX = (ListViewItem)x;
-                ListViewItem itemY = (ListViewItem)y;
-
-                if (Column > itemX?.SubItems.Count || Column > itemY?.SubItems.Count)
+                if (entry.Type == EntryType.PolygonSoupListResourceType)
                 {
-                    if (this.Direction)
-                        return -1;
-                    return 1;
+                    PolygonSoupList list = PolygonSoupList.Read(entry);
+                    list.RemoveWreckSurfaces();
+                    list.Write(entry);
                 }
+            }
+		}
 
-                string iX = itemX?.SubItems[Column].Text;
-                string iY = itemY?.SubItems[Column].Text;
+		public void ConvertImagesFromPS3ToPC_old()
+		{
+			if (CurrentArchive == null)
+			{
+				MessageBox.Show(this, "No Archive Open!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				return;
+			}
+			if (CurrentArchive.Console)
+			{
+				for (int i = 0; i < CurrentArchive.Entries.Count; i++)
+				{
+					BundleEntry entry = CurrentArchive.Entries[i];
+					if (entry.Header.Length == 48 && entry.Body != null && entry.BodySize > 0)
+					{
+						MemoryStream ms = new MemoryStream(entry.Header);
+						BinaryReader2 br = new BinaryReader2(ms);
+						br.BigEndian = entry.Console;
+
+						byte compression = br.ReadByte();
+						byte[] unknown1 = br.ReadBytes(3);
+						byte[] type = Encoding.ASCII.GetBytes("DXT1");
+						if (compression == 0x85)
+						{
+							type = new byte[] { 0x15, 0x00, 0x00, 0x00 };
+						}
+						else if (compression == 0x86)
+						{
+							type = Encoding.ASCII.GetBytes("DXT1");
+						}
+						else if (compression == 0x88)
+						{
+							type = Encoding.ASCII.GetBytes("DXT5");
+						}
+						int unknown2 = Util.ReverseBytes(br.ReadInt32());
+						int width = Util.ReverseBytes(br.ReadInt16());
+						int height = Util.ReverseBytes(br.ReadInt16());
+						br.Close();
+
+						MemoryStream msx = new MemoryStream();
+						BinaryWriter bw = new BinaryWriter(msx);
+
+						bw.Write((int)0);
+						bw.Write((int)0);
+						bw.Write((int)0);
+						bw.Write((int)1);
+
+						bw.Write(type);
+						bw.Write((short)width);
+						bw.Write((short)height);
+						bw.Write((int)0x15);
+						bw.Write((int)0);
+
+						bw.Flush();
+
+						byte[] Data = msx.ToArray();
+
+						bw.Close();
+
+						entry.Header = Data;
+
+						entry.Dirty = true;
+					}
+				}
+			}
+			else
+			{
+				MessageBox.Show(this, "This feature only works on PS3 Bundle Files", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			}
+		}
+
+		public Image GetGameMap()
+		{
+			ulong id = 0x9F55039D;
+			BundleEntry descEntry1 = CurrentArchive.GetEntryByID(id);
+			if (descEntry1 == null)
+			{
+				string file = BundleCache.GetFileByEntryID(id);
+				if (!string.IsNullOrEmpty(file))
+				{
+					BundleArchive archive = BundleArchive.Read(file);
+					if (archive != null)
+						descEntry1 = archive.GetEntryByID(id);
+				}
+			}
+
+			if (descEntry1 == null)
+			{
+				string path = Path.GetDirectoryName(_currentFileName) + Path.DirectorySeparatorChar + "GUITEXTURES.BIN";
+				BundleArchive archive = BundleArchive.Read(path);
+				if (archive != null)
+					descEntry1 = archive.GetEntryByID(id);
+			}
+
+			Image image = null;
+
+			if (descEntry1 != null && descEntry1.Type == EntryType.RasterResourceType)
+			{
+				if (CurrentArchive.Console)
+					image = GameImage.GetImagePS3(descEntry1.Header, descEntry1.Body);
+				else
+					image = GameImage.GetImage(descEntry1.Header, descEntry1.Body);
+
+				TextureState.AddToCache(id, image);
+			}
+			return image;
+		}
+
+		private class EntrySorter : IComparer
+		{
+			public int Column;
+			public bool Direction;
+
+			public EntrySorter(int column)
+			{
+				this.Column = column;
+				this.Direction = false;
+			}
+
+			public int Compare(object x, object y)
+			{
+				ListViewItem itemX = (ListViewItem)x;
+				ListViewItem itemY = (ListViewItem)y;
+
+				if (Column > itemX?.SubItems.Count || Column > itemY?.SubItems.Count)
+				{
+					if (this.Direction)
+						return -1;
+					return 1;
+				}
+
+				string iX = itemX?.SubItems[Column].Text;
+				string iY = itemY?.SubItems[Column].Text;
 
 				/*
                 if (int.TryParse(iX, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var iXint))
@@ -1028,110 +1107,44 @@ namespace BundleManager
                 }
 				*/
 
-                int val = Math.Sign(string.Compare(iX, iY, StringComparison.CurrentCultureIgnoreCase));
-                if (this.Direction)
-                    return val * -1;
-                return val;
+				int val = Math.Sign(string.Compare(iX, iY, StringComparison.CurrentCultureIgnoreCase));
+				if (this.Direction)
+					return val * -1;
+				return val;
 
-            }
+			}
 
-            public void Swap()
-            {
-                this.Direction = !this.Direction;
-            }
-        }
+			public void Swap()
+			{
+				this.Direction = !this.Direction;
+			}
+		}
 
-        private void searchForEntryToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Search();
-        }
+		public void ConvertToPC()
+		{
+			// TODO: Support everything
 
-        private void dumpAllCollisionsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (CurrentArchive == null)
-                return;
+			for (int i = 0; i < CurrentArchive.Entries.Count; i++)
+			{
+				BundleEntry entry = CurrentArchive.Entries[i];
 
-            FolderBrowserDialog fbd = new FolderBrowserDialog();
-            DialogResult result = fbd.ShowDialog(this);
-            if (result == DialogResult.OK)
-            {
-                string path = fbd.SelectedPath;
+				if (entry.Type == EntryType.IDList)
+				{
+					IDList list = IDList.Read(entry);
+					list.Write(entry);
+				}
+				else if (entry.Type == EntryType.PolygonSoupListResourceType)
+				{
+					PolygonSoupList list = PolygonSoupList.Read(entry);
+					list.Write(entry);
+				}
+			}
 
-                for (int i = 0; ; i++)
-                {
-                    string idListName = "trk_clil" + i;
-                    string polyName = "trk_col_" + i;
+			//PatchImages();
 
-                    ulong idListID = Crc32.HashCrc32B(idListName);
-                    ulong polyID = Crc32.HashCrc32B(polyName);
+			CurrentArchive.Platform = BundlePlatform.PC;
+		}
 
-                    BundleEntry entry = CurrentArchive.GetEntryByID(idListID);
-                    if (entry == null)
-                        break;
-                    Stream outFile = File.Open(path + "/" + idListName + ".bin", FileMode.Create, FileAccess.Write);
-                    BinaryWriter bw = new BinaryWriter(outFile);
-                    bw.Write(entry.Header);
-                    bw.Flush();
-                    bw.Close();
-                    outFile.Close();
-
-                    BundleEntry polyEntry = CurrentArchive.GetEntryByID(polyID);
-                    if (polyEntry == null)
-                        break;
-                    Stream outFilePoly = File.Open(path + "/" + polyName + ".bin", FileMode.Create, FileAccess.Write);
-                    BinaryWriter bwPoly = new BinaryWriter(outFilePoly);
-                    bwPoly.Write(polyEntry.Header);
-                    bwPoly.Flush();
-                    bwPoly.Close();
-                    outFilePoly.Close();
-
-                    PolygonSoupList poly = PolygonSoupList.Read(polyEntry);
-                    Scene scene = poly.MakeScene();
-                    scene.ExportWavefrontObj(path + "/" + polyName + ".obj");
-                }
-
-                MessageBox.Show(this, "Done!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-        }
-
-        public void ConvertToPC()
-        {
-            // TODO: Support everything
-
-            for (int i = 0; i < CurrentArchive.Entries.Count; i++)
-            {
-                BundleEntry entry = CurrentArchive.Entries[i];
-
-                if (entry.Type == EntryType.IDList)
-                {
-                    IDList list = IDList.Read(entry);
-                    list.Write(entry);
-                }
-                else if (entry.Type == EntryType.PolygonSoupListResourceType)
-                {
-                    PolygonSoupList list = PolygonSoupList.Read(entry);
-                    list.Write(entry);
-                }
-            }
-
-            //PatchImages();
-            
-            CurrentArchive.Platform = BundlePlatform.PC;
-        }
-
-        private void removeWreckSurfacesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            for (int i = 0; i < CurrentArchive.Entries.Count; i++)
-            {
-                BundleEntry entry = CurrentArchive.Entries[i];
-
-                if (entry.Type == EntryType.PolygonSoupListResourceType)
-                {
-                    PolygonSoupList list = PolygonSoupList.Read(entry);
-                    list.RemoveWreckSurfaces();
-                    list.Write(entry);
-                }
-            }
-        }
-    }
+		#endregion
+	}
 }

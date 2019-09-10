@@ -242,6 +242,9 @@ namespace BundleManager
                 int progress = (index - 1) * 100 / Instances.Count;
                 loader?.SetProgress(progress);
 
+				if (!InRange(instance))
+					continue;
+
                 loader?.SetStatus("Loading(" + progress.ToString("D2") + "%): ModelInstance: " + index + "/" + Instances.Count);
                 //DebugTimer t = DebugTimer.Start("ModelInstance[" + index + "/" + Instances.Count + "]");
                 index++;
@@ -290,5 +293,10 @@ namespace BundleManager
 
             return scene;
         }
+
+		private bool InRange(ModelInstance instance)
+		{
+			return true;
+		}
     }
 }

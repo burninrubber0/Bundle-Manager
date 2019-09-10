@@ -242,14 +242,14 @@ namespace BundleManager
                 int progress = (index - 1) * 100 / Instances.Count;
                 loader?.SetProgress(progress);
 
-				if (!InRange(instance))
-					continue;
-
                 loader?.SetStatus("Loading(" + progress.ToString("D2") + "%): ModelInstance: " + index + "/" + Instances.Count);
                 //DebugTimer t = DebugTimer.Start("ModelInstance[" + index + "/" + Instances.Count + "]");
                 index++;
 
-                if (models.ContainsKey(instance.ModelEntryID))
+				if (!InRange(instance))
+					continue;
+
+				if (models.ContainsKey(instance.ModelEntryID))
                 {
                     Renderable renderable = models[instance.ModelEntryID];
                     SceneObject sceneObject = new SceneObject(instance.ModelEntryID.ToString("X8"), renderable.Model);

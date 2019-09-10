@@ -55,7 +55,7 @@ namespace BundleManager
                     if (string.IsNullOrEmpty(line))
                         continue;
 
-                    if (line.StartsWith("v"))
+                    if (line.StartsWith("v "))
                     {
                         string[] split = line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
                         if (split.Length < 4)
@@ -68,7 +68,7 @@ namespace BundleManager
                         // Add to global vertices as we might not have a mesh yet.
                         globalVertices.Add(new Vector3(x, y, z));
                     }
-                    else if (line.StartsWith("vt"))
+                    else if (line.StartsWith("vt "))
                     {
                         string[] split = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         if (split.Length < 3)
@@ -80,7 +80,7 @@ namespace BundleManager
                         // Add to global uvs as we might not have a mesh yet.
                         globalUVs.Add(new Vector2(u, v));
                     }
-                    else if (line.StartsWith("f"))
+                    else if (line.StartsWith("f "))
                     {
                         string[] split = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         if (split.Length < 4)
@@ -97,7 +97,7 @@ namespace BundleManager
                         bool isQuad = false;
                         uint v4 = 0;
                         uint uv4 = 1;
-                        if (split.Length >= 4)
+                        if (split.Length > 5)
                         {
                             isQuad = true;
                             string[] i4 = split[5].Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
@@ -175,14 +175,14 @@ namespace BundleManager
 
                         result.Meshes[currentMesh].Faces.Add(face);
                     }
-                    else if (line.StartsWith("usemtl"))
+                    else if (line.StartsWith("usemtl "))
                     {
                         string[] split = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         if (split.Length < 2)
                             throw new ReadFailedError("Invalid Material: " + line);
                         lastMaterial = new Material(split[1], Color.White);
                     }
-                    else if (line.StartsWith("g"))
+                    else if (line.StartsWith("g "))
                     {
                         string meshName = "";
                         string[] split = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);

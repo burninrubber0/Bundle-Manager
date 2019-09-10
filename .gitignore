@@ -1,5 +1,6 @@
 .vs
 *.sdf
+*.user
 obj
 BundleFormat.dll
 BundleFormat.pdb

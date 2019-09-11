@@ -82,5 +82,11 @@
       <DependentUpon>SceneRenderControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BundleFormat\BundleFormat.csproj">
+      <Project>{49B81828-760C-42DB-9FAD-96755597C871}</Project>
+      <Name>BundleFormat</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

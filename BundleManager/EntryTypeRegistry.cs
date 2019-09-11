@@ -56,6 +56,7 @@ namespace BundleManager
 			Register(EntryType.TrafficDataResourceType, new Traffic());
 			Register(EntryType.FlaptFileResourceType, new FlaptFile());
 			Register(EntryType.ZoneListResourceType, new PVS());
+			Register(EntryType.InstanceListResourceType, new InstanceList());
 		}
 	}
 }

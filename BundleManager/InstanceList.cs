@@ -5,6 +5,7 @@ using System.IO;
 using BundleFormat;
 using BundleUtilities;
 using MathLib;
+using ModelViewer;
 using ModelViewer.SceneData;
 using OpenTK;
 
@@ -54,8 +55,10 @@ namespace BundleManager
         }
     }
 
-    public class InstanceList
+    public class InstanceList : IEntryData
     {
+		private Scene _scene;
+
         public BundleEntry Entry;
 
         public int Unknown1;
@@ -70,22 +73,32 @@ namespace BundleManager
             Instances = new List<ModelInstance>();
         }
 
-        public static InstanceList Read(BundleEntry entry, ILoader loader)
+		private void Clear()
+		{
+			_scene = null;
+
+			Entry = default;
+			Unknown1 = default;
+			Unknown2 = default;
+			Unknown3 = default;
+
+			Instances.Clear();
+		}
+
+        public bool Read(BundleEntry entry, ILoader loader = null)
         {
-            InstanceList result = new InstanceList();
-            result.Entry = entry;
+			Clear();
+
+            Entry = entry;
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            result.Unknown1 = br.ReadInt32();
+            Unknown1 = br.ReadInt32();
             int instanceCount = br.ReadInt32();
-            result.Unknown2 = br.ReadInt32();
-            result.Unknown3 = br.ReadInt32();
-
-            //List<uint> UsedEntries = new List<uint>();
-            //Dictionary<uint, int> MultiEntries = new Dictionary<uint, int>();
+            Unknown2 = br.ReadInt32();
+            Unknown3 = br.ReadInt32();
 
             for (int i = 0; i < instanceCount; i++)
             {
@@ -93,113 +106,20 @@ namespace BundleManager
 
                 instance.ModelEntryID = entry.GetDependencies()[i].EntryID;
 
-                /*if (UsedEntries.Contains(instance.ModelEntryID))
-                {
-                    if (MultiEntries.ContainsKey(instance.ModelEntryID))
-                    {
-                        MultiEntries[instance.ModelEntryID]++;
-                    }
-                    else
-                    {
-                        MultiEntries.Add(instance.ModelEntryID, 1);
-                    }
-                }
-                else
-                {
-                    UsedEntries.Add(instance.ModelEntryID);
-                }*/
-
-                result.Instances.Add(instance);
+                Instances.Add(instance);
             }
 
-            result.RemainingBytes = br.ReadBytes((int)(br.BaseStream.Length - br.BaseStream.Position));
+            RemainingBytes = br.ReadBytes((int)(br.BaseStream.Length - br.BaseStream.Position));
 
             br.Close();
             ms.Close();
 
-            /*foreach (uint key in MultiEntries.Keys)
-            {
-                int timesUsed = MultiEntries[key];
+			_scene = MakeScene(loader);
 
-                Debug.WriteLine("EntryID: 0x" + key.ToString("X8") + " was used " + timesUsed + " times");
-            }*/
-
-            /*{
-                ModelInstance inst = result.Instances[318];
-                Vector4 originalCol = inst.Transform.Column3;
-                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
-                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
-                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
-                inst.Transform = r * s * t;
-                inst.Transform.Column3 = originalCol;
-            }
-
-            {
-                ModelInstance inst = result.Instances[316];
-                Vector4 originalCol = inst.Transform.Column3;
-                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
-                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
-                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
-                inst.Transform = r * s * t;
-                inst.Transform.Column3 = originalCol;
-            }
-
-            {
-                ModelInstance inst = result.Instances[148];
-                Vector4 originalCol = inst.Transform.Column3;
-                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
-                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
-                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
-                inst.Transform = r * s * t;
-                inst.Transform.Column3 = originalCol;
-            }
-
-            {
-                ModelInstance inst = result.Instances[147];
-                Vector4 originalCol = inst.Transform.Column3;
-                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
-                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
-                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
-                inst.Transform = r * s * t;
-                inst.Transform.Column3 = originalCol;
-            }
-
-            {
-                ModelInstance inst = result.Instances[146];
-                Vector4 originalCol = inst.Transform.Column3;
-                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
-                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
-                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
-                inst.Transform = r * s * t;
-                inst.Transform.Column3 = originalCol;
-            }
-
-            {
-                ModelInstance inst = result.Instances[145];
-                Vector4 originalCol = inst.Transform.Column3;
-                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
-                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
-                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
-                inst.Transform = r * s * t;
-                inst.Transform.Column3 = originalCol;
-            }
-
-            {
-                ModelInstance inst = result.Instances[144];
-                Vector4 originalCol = inst.Transform.Column3;
-                Matrix4 t = Matrix4.CreateTranslation(inst.Transform.ExtractTranslation() + new Vector3(0, -999, 0));
-                Matrix4 r = Matrix4.CreateFromQuaternion(inst.Transform.ExtractRotation());
-                Matrix4 s = Matrix4.CreateScale(inst.Transform.ExtractScale());
-                inst.Transform = r * s * t;
-                inst.Transform.Column3 = originalCol;
-            }
-
-            result.Write(entry);*/
-
-            return result;
+			return true;
         }
 
-        public void Write(BundleEntry entry)
+        public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -225,6 +145,8 @@ namespace BundleManager
 
             entry.Header = data;
             entry.Dirty = true;
+
+			return true;
         }
 
         public Scene MakeScene(ILoader loader = null)
@@ -298,5 +220,18 @@ namespace BundleManager
 		{
 			return true;
 		}
-    }
+
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.InstanceListResourceType;
+		}
+
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			ModelViewerForm viewer = new ModelViewerForm();
+			viewer.Renderer.Scene = _scene;
+
+			return viewer;
+		}
+	}
 }

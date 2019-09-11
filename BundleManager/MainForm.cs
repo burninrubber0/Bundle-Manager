@@ -432,7 +432,7 @@ namespace BundleManager
 				{
 					try
 					{
-						failure = !data.Read(entry);
+						failure = !data.Read(entry, loader);
 
 						// TODO: Handle this better
 						if (entry.Type == EntryType.ZoneListResourceType)// && PVS.GameMap == null)
@@ -447,45 +447,6 @@ namespace BundleManager
 				});
 				loadInstanceThread.Start();
 				loader.ShowDialog(this);
-			}
-			else if (entry.Type == EntryType.InstanceListResourceType && !forceHex)
-			{
-				TextureState.ResetCache();
-				LoadingDialog loader = new LoadingDialog();
-				loader.Status = "Loading: " + entry.ID.ToString("X8");
-
-				Thread loadInstanceThread = null;
-				InstanceList instanceList = null;
-				Scene scene = null;
-				loader.Done += (cancelled, value) =>
-				{
-					if (cancelled)
-						loadInstanceThread?.Abort();
-					else
-					{
-						if (instanceList == null)
-						{
-							MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
-								MessageBoxIcon.Error);
-						}
-						else
-						{
-							loader.Hide();
-							ModelViewerForm.ShowModelViewer(this, scene);
-						}
-					}
-					TextureState.ResetCache();
-				};
-
-				loadInstanceThread = new Thread(() =>
-				{
-					instanceList = InstanceList.Read(entry, loader);
-					scene = instanceList.MakeScene(loader);
-					loader.IsDone = true;
-				});
-				loadInstanceThread.Start();
-				loader.ShowDialog(this);
-				//DebugUtil.ShowDebug(this, InstanceList.Read(entry, null));
 			}
 			else if (entry.Type == EntryType.GraphicsSpecResourceType && !forceHex)
 			{

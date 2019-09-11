@@ -144,7 +144,7 @@ namespace BundleManager
 			StreetSection5s.Clear();
 		}
 
-        public bool Read(BundleEntry entry)
+        public bool Read(BundleEntry entry, ILoader loader = null)
         {
 			Clear();
 

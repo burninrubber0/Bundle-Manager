@@ -122,7 +122,7 @@ namespace VehicleList
 			Entries.Clear();
 		}
 
-		public bool Read(BundleEntry entry)
+		public bool Read(BundleEntry entry, ILoader loader = null)
 		{
 			Clear();
 

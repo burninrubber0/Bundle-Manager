@@ -7,13 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BundleFormat;
 using ModelViewer.SceneData;
 using OpenTK.Graphics.OpenGL;
 
 namespace ModelViewer
 {
-    public partial class ModelViewerForm : Form
+    public partial class ModelViewerForm : Form, IEntryEditor
     {
+		public SceneRenderControl Renderer => rndMain;
+
         public ModelViewerForm()
         {
             InitializeComponent();

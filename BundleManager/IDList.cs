@@ -45,7 +45,7 @@ namespace BundleManager
 			Unknown7 = default;
 		}
 
-		public bool Read(BundleEntry entry)
+		public bool Read(BundleEntry entry, ILoader loader = null)
         {
 			Clear();
 

@@ -434,6 +434,7 @@ namespace BundleManager
 					{
 						failure = !data.Read(entry);
 
+						// TODO: Handle this better
 						if (entry.Type == EntryType.ZoneListResourceType)// && PVS.GameMap == null)
 							PVS.GameMap = GetGameMap();
 					}

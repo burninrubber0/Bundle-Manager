@@ -61,8 +61,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DebugHelper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Lib\DotNet\DebugHelper\DebugHelper.dll</HintPath>
+      <HintPath>..\packages\DebugHelper.1.0.0\lib\net452\DebugHelper.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -151,6 +150,7 @@
     <None Include="App.manifest">
       <SubType>Designer</SubType>
     </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

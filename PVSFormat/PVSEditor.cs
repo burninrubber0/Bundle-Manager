@@ -5,7 +5,7 @@ using DebugHelper;
 
 namespace PVSFormat
 {
-    public partial class PVSEditor : Form
+    public partial class PVSEditor : Form, IEntryEditor
     {
         private PVS _currentPVS;
 

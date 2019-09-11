@@ -1,4 +1,5 @@
 ﻿using BundleFormat;
+using PVSFormat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,6 +55,7 @@ namespace BundleManager
 			Register(EntryType.IDList, new IDList());
 			Register(EntryType.TrafficDataResourceType, new Traffic());
 			Register(EntryType.FlaptFileResourceType, new FlaptFile());
+			Register(EntryType.ZoneListResourceType, new PVS());
 		}
 	}
 }

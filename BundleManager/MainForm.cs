@@ -394,31 +394,20 @@ namespace BundleManager
 			{
 				IEntryData data = EntryTypeRegistry.GetHandler(entry.Type);
 
-				if (data.Read(entry))
-				{
-					IEntryEditor editor = data.GetEditor(entry);
-					if (editor != null)
-						editor.ShowDialog(this);
-					else
-						DebugUtil.ShowDebug(this, data);
-				}
-			}
-			else if (entry.Type == EntryType.ZoneListResourceType && !forceHex)
-			{
 				TextureState.ResetCache();
 				LoadingDialog loader = new LoadingDialog();
 				loader.Status = "Loading: " + entry.ID.ToString("X8");
 
 				Thread loadInstanceThread = null;
-				PVS pvs = null;
-				Image gameMap = null;
+				bool failure = false;
+
 				loader.Done += (cancelled, value) =>
 				{
 					if (cancelled)
 						loadInstanceThread?.Abort();
 					else
 					{
-						if (pvs == null)
+						if (failure)
 						{
 							MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
 								MessageBoxIcon.Error);
@@ -427,10 +416,11 @@ namespace BundleManager
 						{
 							loader.Hide();
 
-							PVSEditor pvsForm = new PVSEditor();
-							pvsForm.GameMap = gameMap;
-							pvsForm.Open(pvs);
-							pvsForm.ShowDialog(this);
+							IEntryEditor editor = data.GetEditor(entry);
+							if (editor != null)
+								editor.ShowDialog(this);
+							else
+								DebugUtil.ShowDebug(this, data);
 							if (ForceOnlySpecificEntry)
 								Environment.Exit(0);
 						}
@@ -442,8 +432,10 @@ namespace BundleManager
 				{
 					try
 					{
-						pvs = PVS.Read(entry, loader);
-						gameMap = GetGameMap();
+						failure = !data.Read(entry);
+
+						if (entry.Type == EntryType.ZoneListResourceType)// && PVS.GameMap == null)
+							PVS.GameMap = GetGameMap();
 					}
 					catch (Exception)
 					{
@@ -454,7 +446,6 @@ namespace BundleManager
 				});
 				loadInstanceThread.Start();
 				loader.ShowDialog(this);
-
 			}
 			else if (entry.Type == EntryType.InstanceListResourceType && !forceHex)
 			{

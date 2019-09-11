@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -63,8 +64,10 @@ namespace PVSFormat
         }
     }
 
-    public class PVS
+    public class PVS : IEntryData
     {
+		public static Image GameMap;
+
         public int Unknown1;
         public int Unknown2;
         public int Unknown3;
@@ -79,22 +82,35 @@ namespace PVSFormat
             Entries = new List<PVSEntry>();
         }
 
-        public static PVS Read(BundleEntry entry, ILoader loader)
+		private void Clear()
+		{
+			Unknown1 = default;
+			Unknown2 = default;
+			Unknown3 = default;
+			Unknown4 = default;
+			Unknown6 = default;
+			Unknown7 = default;
+			Unknown8 = default;
+
+			Entries.Clear();
+		}
+
+        public bool Read(BundleEntry entry)
         {
-            PVS result = new PVS();
+			Clear();
 
             Stream s = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(s);
             br.BigEndian = entry.Console;
 
-            result.Unknown1 = br.ReadInt32();
-            result.Unknown2 = br.ReadInt32();
-            result.Unknown3 = br.ReadInt32();
-            result.Unknown4 = br.ReadInt32();
+            Unknown1 = br.ReadInt32();
+            Unknown2 = br.ReadInt32();
+            Unknown3 = br.ReadInt32();
+            Unknown4 = br.ReadInt32();
             int numEntries = br.ReadInt32();
-            result.Unknown6 = br.ReadInt32();
-            result.Unknown7 = br.ReadInt32();
-            result.Unknown8 = br.ReadInt32();
+            Unknown6 = br.ReadInt32();
+            Unknown7 = br.ReadInt32();
+            Unknown8 = br.ReadInt32();
 
             for (int i = 0; i < numEntries; i++)
             {
@@ -152,21 +168,21 @@ namespace PVSFormat
 
                 br.BaseStream.Position = pos;
 
-                result.Entries.Add(pvsEntry);
+                Entries.Add(pvsEntry);
             }
 
-            for (int i = 0; i < result.Entries.Count; i++)
+            for (int i = 0; i < Entries.Count; i++)
             {
-                for (int k = 0; k < result.Entries[i].NeighborData.Count; k++)
+                for (int k = 0; k < Entries[i].NeighborData.Count; k++)
                 {
-                    NeighborData data = result.Entries[i].NeighborData[k];
+                    NeighborData data = Entries[i].NeighborData[k];
                     uint ptr = data.NeighborPtr;
-                    for (int j = 0; j < result.Entries.Count; j++)
+                    for (int j = 0; j < Entries.Count; j++)
                     {
-                        if (result.Entries[j].Address == ptr)
+                        if (Entries[j].Address == ptr)
                         {
                             data.NeighborIndex = j;
-                            result.Entries[i].NeighborData[k] = data;
+                            Entries[i].NeighborData[k] = data;
                             break;
                         }
                     }
@@ -176,12 +192,26 @@ namespace PVSFormat
             br.Close();
             s.Close();
 
-            return result;
+            return true;
         }
 
-        public static BundleEntry Write(BundleEntry entry)
+        public bool Write(BundleEntry entry)
         {
-            return entry;
+            return true;
         }
-    }
+
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.ZoneListResourceType;
+		}
+
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			PVSEditor pvsForm = new PVSEditor();
+			pvsForm.GameMap = GameMap;
+			pvsForm.Open(this);
+
+			return pvsForm;
+		}
+	}
 }

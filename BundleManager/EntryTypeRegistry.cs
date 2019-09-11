@@ -55,6 +55,7 @@ namespace BundleManager
 			Register(EntryType.IDList, new IDList());
 			Register(EntryType.TrafficDataResourceType, new Traffic());
 			Register(EntryType.FlaptFileResourceType, new FlaptFile());
+			//Register(EntryType.AptDataHeaderType, new AptData());
 			Register(EntryType.ZoneListResourceType, new PVS());
 			Register(EntryType.InstanceListResourceType, new InstanceList());
 			Register(EntryType.GraphicsSpecResourceType, new GraphicsSpec());

@@ -20,8 +20,18 @@ namespace BundleManager
             Data = new Dictionary<uint, string>();
         }
 
+		private void Clear()
+		{
+			Unknown1 = default;
+			Unknown2 = default;
+
+			Data.Clear();
+		}
+
         public bool Read(BundleEntry entry, ILoader loader = null)
         {
+			Clear();
+
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;

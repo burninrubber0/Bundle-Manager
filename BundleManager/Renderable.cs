@@ -246,7 +246,38 @@ namespace BundleManager
 
 		private void Clear()
 		{
-			// TODO: Implement
+			_scene = null;
+
+			Unknown1 = default;
+			Unknown2 = default;
+			Unknown3 = default;
+			Unknown4 = default;
+			Unknown5 = default;
+			MeshCount = default;
+
+			StartOffset = default;
+			Unknown8 = default;
+			Unknown9 = default;
+			Unknown10 = default;
+			Unknown10_1 = default;
+			UnknownOffset = default;
+			Unknown12 = default;
+			Unknown13 = default;
+
+			NumIndices = default;
+			Unknown15 = default;
+			Unknown16 = default;
+			Unknown17 = default;
+			VertexBlockAddress = default;
+			Unknown18 = default;
+			VertexBlockSize = default;
+
+			ID = default;
+			Model = default;
+
+			MeshVertexOffsets.Clear();
+			Meshes.Clear();
+			Indices.Clear();
 		}
 
         public bool Read(BundleEntry entry, ILoader loader)

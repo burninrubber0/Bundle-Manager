@@ -691,7 +691,7 @@ namespace BundleManager
         }
     }
 
-    public class AptData
+    public class AptData : IEntryData
     {
         public string Component1Name;
         public string Component2Name;
@@ -705,9 +705,19 @@ namespace BundleManager
             Constants = new List<AptConst>();
         }
 
-        public static AptData Read(BundleEntry entry)
+		private void Clear()
+		{
+			Component1Name = default;
+			Component2Name = default;
+
+			RootMovie = default;
+
+			Constants.Clear();
+		}
+
+        public bool Read(BundleEntry entry, ILoader loader = null)
         {
-            AptData result = new AptData();
+			Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -724,10 +734,10 @@ namespace BundleManager
             for (int i = 0; i < numPadding; i++)
                 br.ReadByte();*/
 
-        br.BaseStream.Position = componentName1Ptr;
-            result.Component1Name = br.ReadCStr();
+			br.BaseStream.Position = componentName1Ptr;
+            Component1Name = br.ReadCStr();
             br.BaseStream.Position = componentName2Ptr;
-            result.Component2Name = br.ReadCStr();
+            Component2Name = br.ReadCStr();
 
             br.BaseStream.Position = constOffset;
             byte[] constMagic = br.ReadBytes(20);
@@ -745,15 +755,15 @@ namespace BundleManager
                 constant.Type = (AptConstType)br.ReadUInt32();
                 constant.Data = br.ReadUInt32();
 
-                result.Constants.Add(constant);
+                Constants.Add(constant);
             }
 
-            for (int i = 0; i < result.Constants.Count; i++)
+            for (int i = 0; i < Constants.Count; i++)
             {
-                if (result.Constants[i].Type == AptConstType.String)
+                if (Constants[i].Type == AptConstType.String)
                 {
-                    br.BaseStream.Position = constOffset + result.Constants[i].Data;
-                    result.Constants[i].String = br.ReadCStr(); // 4 byte aligned
+                    br.BaseStream.Position = constOffset + Constants[i].Data;
+                    Constants[i].String = br.ReadCStr(); // 4 byte aligned
                 }
             }
 
@@ -761,17 +771,17 @@ namespace BundleManager
             byte[] dataMagic = br.ReadBytes(16);
 
             br.BaseStream.Position = aptDataOffset + movieOffset;
-            result.RootMovie = Character.Read(br, aptDataOffset);
+            RootMovie = Character.Read(br, aptDataOffset);
 
             // TODO: Finish Read
 
             br.Close();
             ms.Close();
 
-            return result;
+            return true;
         }
 
-        public void Write(BundleEntry entry)
+        public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -785,6 +795,18 @@ namespace BundleManager
 
             entry.Header = data;
             entry.Dirty = true;
+
+			return true;
         }
-    }
+
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.AptDataHeaderType;
+		}
+
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			return null;
+		}
+	}
 }

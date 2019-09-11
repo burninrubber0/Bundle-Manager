@@ -302,7 +302,21 @@ namespace BundleManager
 
 		private void Clear()
 		{
-			// TODO: Implement
+			VersionHash = default;
+			DepHash1 = default;
+			DepHash2 = default;
+			DepNop = default;
+
+			StrUnknown1 = default;
+
+			PtrN = default;
+
+			Data = default;
+
+			Dependencies.Clear();
+			NestedChunks.Clear();
+			DataChunks.Clear();
+			Strings.Clear();
 		}
 
         public bool Read(BundleEntry entry, ILoader loader = null)

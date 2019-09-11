@@ -9,7 +9,7 @@ using BundleUtilities;
 
 namespace BundleManager
 {
-    public class Language
+    public class Language : IEntryData
     {
         public int Unknown1;
         public Dictionary<uint, string> Data;
@@ -20,23 +20,21 @@ namespace BundleManager
             Data = new Dictionary<uint, string>();
         }
 
-        public static Language Read(BundleEntry entry)
+        public bool Read(BundleEntry entry, ILoader loader = null)
         {
-            Language result = new Language();
-
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            result.Unknown1 = br.ReadInt32();
+            Unknown1 = br.ReadInt32();
             int count = br.ReadInt32();
-            result.Unknown2 = br.ReadInt32();
+            Unknown2 = br.ReadInt32();
 
             for (int i = 0; i < count - 1; i++)
             {
                 uint id = br.ReadUInt32();
                 string txt = br.ReadCStringPtr();
-                result.Data.Add(id, txt);
+                Data.Add(id, txt);
             }
 
             br.Close();
@@ -44,10 +42,10 @@ namespace BundleManager
 
             //result.Write(entry);
 
-            return result;
+            return true;
         }
 
-        public void Write(BundleEntry entry)
+        public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -106,9 +104,28 @@ namespace BundleManager
 
             entry.Header = data;
             entry.Dirty = true;
+
+			return true;
         }
 
-        public static uint HashID(string id)
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.LanguageResourceType;
+		}
+
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			LangEdit edit = new LangEdit();
+			edit.Lang = this;
+			edit.Changed += () =>
+			{
+				edit.Lang.Write(entry);
+			};
+
+			return edit;
+		}
+
+		public static uint HashID(string id)
         {
             /*uint result = 0xFFFFFFFF;
             for (int i = 0; i < id.Length; i++)
@@ -139,5 +156,5 @@ namespace BundleManager
 
             return hash;
         }
-    }
+	}
 }

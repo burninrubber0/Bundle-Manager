@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BundleFormat;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,7 +12,7 @@ using System.Windows.Forms;
 
 namespace BundleManager
 {
-    public partial class LangEdit : Form
+    public partial class LangEdit : Form, IEntryEditor
     {
         public delegate void OnChanged();
         public event OnChanged Changed;

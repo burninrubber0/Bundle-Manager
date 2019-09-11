@@ -466,30 +466,6 @@ namespace BundleManager
 		        //AptDataAlt data = AptDataAlt.Read(entry);
 		        DebugUtil.ShowDebug(this, data);
 	        }*/
-			/*else if (entry.Type == EntryType.AttribSysVaultResourceType && !forceHex)
-			{
-				try
-				{
-					AttribSys at = AttribSys.Read(entry);
-					DebugUtil.ShowDebug(this, at);
-				}
-				catch (ReadFailedError ex)
-				{
-					MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				}
-			}*/
-			else if (entry.Type == EntryType.LanguageResourceType && !forceHex)
-			{
-				Language language = Language.Read(entry);
-				//DebugUtil.ShowDebug(this, language);
-				LangEdit edit = new LangEdit();
-				edit.Lang = language;
-				edit.Changed += () =>
-				{
-					edit.Lang.Write(entry);
-				};
-				edit.ShowDialog(this);
-			}
 			/* else if (entry.Type == EntryType.ModelResourceType && !forceHex)
 	        {
 	            for (int i = 0; i < CurrentArchive.Entries.Count; i++)

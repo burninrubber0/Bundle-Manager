@@ -60,6 +60,7 @@ namespace BundleManager
 			Register(EntryType.GraphicsSpecResourceType, new GraphicsSpec());
 			Register(EntryType.RwRenderableResourceType, new Renderable());
 			Register(EntryType.AttribSysVaultResourceType, new AttribSys());
+			Register(EntryType.LanguageResourceType, new Language());
 		}
 	}
 }

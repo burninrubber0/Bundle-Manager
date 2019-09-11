@@ -31,7 +31,11 @@ namespace PluginSystem.Util
 				if (self.ContainsAssembly(reference.FullName))
 					continue;
 
-				self.AddAssemblyWithReferences(Assembly.Load(reference));
+				try
+				{
+					self.AddAssemblyWithReferences(Assembly.Load(reference));
+				}
+				catch { }
 			}
 		}
 

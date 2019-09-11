@@ -432,7 +432,17 @@ namespace BundleManager
 				{
 					try
 					{
-						failure = !data.Read(entry, loader);
+						try
+						{
+							failure = !data.Read(entry, loader);
+						}
+						catch (ReadFailedError ex)
+						{
+							MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+							failure = true;
+
+							throw;
+						}
 
 						// TODO: Handle this better
 						if (entry.Type == EntryType.ZoneListResourceType)// && PVS.GameMap == null)
@@ -442,6 +452,7 @@ namespace BundleManager
 					{
 						MessageBox.Show("Failed to load Entry", "Error", MessageBoxButtons.OK,
 							MessageBoxIcon.Error);
+						failure = true;
 					}
 					loader.IsDone = true;
 				});
@@ -455,7 +466,7 @@ namespace BundleManager
 		        //AptDataAlt data = AptDataAlt.Read(entry);
 		        DebugUtil.ShowDebug(this, data);
 	        }*/
-			else if (entry.Type == EntryType.AttribSysVaultResourceType && !forceHex)
+			/*else if (entry.Type == EntryType.AttribSysVaultResourceType && !forceHex)
 			{
 				try
 				{
@@ -466,7 +477,7 @@ namespace BundleManager
 				{
 					MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
-			}
+			}*/
 			else if (entry.Type == EntryType.LanguageResourceType && !forceHex)
 			{
 				Language language = Language.Read(entry);

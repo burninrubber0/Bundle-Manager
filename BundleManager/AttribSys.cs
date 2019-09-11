@@ -51,7 +51,7 @@ namespace BundleManager
         public ulong Data;
     }
 
-    public class AttribSys
+    public class AttribSys : IEntryData
     {
         public ulong VersionHash;
 
@@ -300,9 +300,14 @@ namespace BundleManager
             }
         }
 
-        public static AttribSys Read(BundleEntry entry, ILoader loader = null)
+		private void Clear()
+		{
+			// TODO: Implement
+		}
+
+        public bool Read(BundleEntry entry, ILoader loader = null)
         {
-            AttribSys result = new AttribSys();
+			Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -320,7 +325,7 @@ namespace BundleManager
             MemoryStream vltStream = new MemoryStream(vlt);
             BinaryReader2 vltBr = new BinaryReader2(vltStream);
             vltBr.BigEndian = entry.Console;
-            result.ReadVlt(loader, vltBr);
+            ReadVlt(loader, vltBr);
             vltBr.Close();
 
             br.BaseStream.Position = binPos;
@@ -330,13 +335,28 @@ namespace BundleManager
             MemoryStream binStream = new MemoryStream(bin);
             BinaryReader2 binBr = new BinaryReader2(binStream);
             binBr.BigEndian = entry.Console;
-            result.ReadBin(loader, binBr);
+            ReadBin(loader, binBr);
             binBr.Close();
 
             br.Close();
             ms.Close();
 
-            return result;
+            return true;
         }
-    }
+
+		public bool Write(BundleEntry entry)
+		{
+			return true;
+		}
+
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.AttribSysVaultResourceType;
+		}
+
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			return null;
+		}
+	}
 }

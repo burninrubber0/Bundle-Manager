@@ -244,8 +244,15 @@ namespace BundleManager
             }
         }
 
+		private void Clear()
+		{
+			// TODO: Implement
+		}
+
         public bool Read(BundleEntry entry, ILoader loader)
         {
+			Clear();
+
             List<BundleDependency> dependencies = entry.GetDependencies();
 
             ID = entry.ID;

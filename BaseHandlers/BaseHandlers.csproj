@@ -54,7 +54,6 @@
   <ItemGroup>
     <Compile Include="AptData.cs" />
     <Compile Include="BasePlugin.cs" />
-    <Compile Include="Config.cs" />
     <Compile Include="FlaptFile.cs" />
     <Compile Include="GraphicsSpec.cs" />
     <Compile Include="IDList.cs" />

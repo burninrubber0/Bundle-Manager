@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BundleFormat;
 using BundleUtilities;
+using BurnoutImage;
 using PluginAPI;
 
 namespace PVSFormat
@@ -67,7 +68,7 @@ namespace PVSFormat
 
     public class PVS : IEntryData
     {
-		public static Image GameMap;
+		private Image _gameMap;
 
         public int Unknown1;
         public int Unknown2;
@@ -193,10 +194,12 @@ namespace PVSFormat
             br.Close();
             s.Close();
 
+			_gameMap = GetGameMap(entry.Archive);
+
             return true;
         }
 
-        public bool Write(BundleEntry entry)
+		public bool Write(BundleEntry entry)
         {
             return true;
         }
@@ -209,10 +212,47 @@ namespace PVSFormat
 		public IEntryEditor GetEditor(BundleEntry entry)
 		{
 			PVSEditor pvsForm = new PVSEditor();
-			pvsForm.GameMap = GameMap;
+			pvsForm.GameMap = _gameMap;
 			pvsForm.Open(this);
 
 			return pvsForm;
+		}
+
+		private Image GetGameMap(BundleArchive archive)
+		{
+			ulong id = 0x9F55039D;
+			BundleEntry descEntry1 = archive.GetEntryByID(id);
+			if (descEntry1 == null)
+			{
+				string file = BundleCache.GetFileByEntryID(id);
+				if (!string.IsNullOrEmpty(file))
+				{
+					BundleArchive archive2 = BundleArchive.Read(file);
+					if (archive2 != null)
+						descEntry1 = archive2.GetEntryByID(id);
+				}
+			}
+
+			if (descEntry1 == null)
+			{
+				string path = Path.GetDirectoryName(archive.Path) + Path.DirectorySeparatorChar + "GUITEXTURES.BIN";
+				BundleArchive archive2 = BundleArchive.Read(path);
+				if (archive2 != null)
+					descEntry1 = archive2.GetEntryByID(id);
+			}
+
+			Image image = null;
+
+			if (descEntry1 != null && descEntry1.Type == EntryType.RasterResourceType)
+			{
+				if (archive.Console)
+					image = GameImage.GetImagePS3(descEntry1.Header, descEntry1.Body);
+				else
+					image = GameImage.GetImage(descEntry1.Header, descEntry1.Body);
+
+				TextureCache.AddToCache(id, image);
+			}
+			return image;
 		}
 	}
 }

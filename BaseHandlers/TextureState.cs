@@ -13,29 +13,12 @@ namespace BaseHandlers
 {
     public class TextureState
     {
-        private static readonly Dictionary<ulong, Image> _cachedTextures = new Dictionary<ulong, Image>();
-
         public Image Texture;
 
         public TextureState()
         {
             
         }
-
-        public static void ResetCache()
-        {
-            foreach (uint key in _cachedTextures.Keys)
-            {
-                Image img = _cachedTextures[key];
-                img.Dispose();
-            }
-            _cachedTextures.Clear();
-        }
-
-		public static void AddToCache(ulong id, Image image)
-		{
-			_cachedTextures[id] = image;
-		}
 
         public static TextureState Read(BundleEntry entry)
         {
@@ -46,9 +29,9 @@ namespace BaseHandlers
             {
                 ulong id = dependency.EntryID;
 
-                if (_cachedTextures.ContainsKey(id))
+                if (TextureCache.Contains(id))
                 {
-                    result.Texture = _cachedTextures[id];
+                    result.Texture = TextureCache.GetTexture(id);
                 }
                 else
                 {
@@ -71,7 +54,7 @@ namespace BaseHandlers
 						else
                             result.Texture = GameImage.GetImage(descEntry1.Header, descEntry1.Body);
 
-                        _cachedTextures.Add(id, result.Texture);
+						TextureCache.AddToCache(id, result.Texture);
 
                         break;
                     }

@@ -15,11 +15,8 @@ using BundleFormat;
 using BundleUtilities;
 using BurnoutImage;
 using DebugHelper;
-using ModelViewer;
 using ModelViewer.SceneData;
 using PluginAPI;
-using PVSFormat;
-using VehicleList;
 using Util = BundleFormat.Util;
 
 namespace BundleManager
@@ -396,7 +393,7 @@ namespace BundleManager
 			{
 				IEntryData data = EntryTypeRegistry.GetHandler(entry.Type);
 
-				TextureState.ResetCache();
+				TextureCache.ResetCache();
 				LoadingDialog loader = new LoadingDialog();
 				loader.Status = "Loading: " + entry.ID.ToString("X8");
 
@@ -427,7 +424,7 @@ namespace BundleManager
 								Environment.Exit(0);
 						}
 					}
-					TextureState.ResetCache();
+					TextureCache.ResetCache();
 				};
 
 				loadInstanceThread = new Thread(() =>
@@ -445,10 +442,6 @@ namespace BundleManager
 
 							throw;
 						}
-
-						// TODO: Handle this better
-						if (entry.Type == EntryType.ZoneListResourceType)// && PVS.GameMap == null)
-							PVS.GameMap = GetGameMap();
 					}
 					catch (Exception)
 					{
@@ -684,6 +677,62 @@ namespace BundleManager
 			//}
 		}
 
+		private class EntrySorter : IComparer
+		{
+			public int Column;
+			public bool Direction;
+
+			public EntrySorter(int column)
+			{
+				this.Column = column;
+				this.Direction = false;
+			}
+
+			public int Compare(object x, object y)
+			{
+				ListViewItem itemX = (ListViewItem)x;
+				ListViewItem itemY = (ListViewItem)y;
+
+				if (Column > itemX?.SubItems.Count || Column > itemY?.SubItems.Count)
+				{
+					if (this.Direction)
+						return -1;
+					return 1;
+				}
+
+				string iX = itemX?.SubItems[Column].Text;
+				string iY = itemY?.SubItems[Column].Text;
+
+				/*
+                if (int.TryParse(iX, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var iXint))
+                {
+                    if (int.TryParse(iY, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var iYint))
+                    {
+                        int val2 = iXint.CompareTo(iYint);
+                        if (this.Direction)
+                            return val2 * -1;
+                        return val2;
+                    }
+                }
+				*/
+
+				int val = Math.Sign(string.Compare(iX, iY, StringComparison.CurrentCultureIgnoreCase));
+				if (this.Direction)
+					return val * -1;
+				return val;
+
+			}
+
+			public void Swap()
+			{
+				this.Direction = !this.Direction;
+			}
+		}
+
+		#endregion
+
+		#region Extra Tools
+
 		private void DumpAllCollisions()
 		{
 			if (CurrentArchive == null)
@@ -816,95 +865,6 @@ namespace BundleManager
 			else
 			{
 				MessageBox.Show(this, "This feature only works on PS3 Bundle Files", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-			}
-		}
-
-		public Image GetGameMap()
-		{
-			ulong id = 0x9F55039D;
-			BundleEntry descEntry1 = CurrentArchive.GetEntryByID(id);
-			if (descEntry1 == null)
-			{
-				string file = BundleCache.GetFileByEntryID(id);
-				if (!string.IsNullOrEmpty(file))
-				{
-					BundleArchive archive = BundleArchive.Read(file);
-					if (archive != null)
-						descEntry1 = archive.GetEntryByID(id);
-				}
-			}
-
-			if (descEntry1 == null)
-			{
-				string path = Path.GetDirectoryName(_currentFileName) + Path.DirectorySeparatorChar + "GUITEXTURES.BIN";
-				BundleArchive archive = BundleArchive.Read(path);
-				if (archive != null)
-					descEntry1 = archive.GetEntryByID(id);
-			}
-
-			Image image = null;
-
-			if (descEntry1 != null && descEntry1.Type == EntryType.RasterResourceType)
-			{
-				if (CurrentArchive.Console)
-					image = GameImage.GetImagePS3(descEntry1.Header, descEntry1.Body);
-				else
-					image = GameImage.GetImage(descEntry1.Header, descEntry1.Body);
-
-				TextureState.AddToCache(id, image);
-			}
-			return image;
-		}
-
-		private class EntrySorter : IComparer
-		{
-			public int Column;
-			public bool Direction;
-
-			public EntrySorter(int column)
-			{
-				this.Column = column;
-				this.Direction = false;
-			}
-
-			public int Compare(object x, object y)
-			{
-				ListViewItem itemX = (ListViewItem)x;
-				ListViewItem itemY = (ListViewItem)y;
-
-				if (Column > itemX?.SubItems.Count || Column > itemY?.SubItems.Count)
-				{
-					if (this.Direction)
-						return -1;
-					return 1;
-				}
-
-				string iX = itemX?.SubItems[Column].Text;
-				string iY = itemY?.SubItems[Column].Text;
-
-				/*
-                if (int.TryParse(iX, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var iXint))
-                {
-                    if (int.TryParse(iY, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var iYint))
-                    {
-                        int val2 = iXint.CompareTo(iYint);
-                        if (this.Direction)
-                            return val2 * -1;
-                        return val2;
-                    }
-                }
-				*/
-
-				int val = Math.Sign(string.Compare(iX, iY, StringComparison.CurrentCultureIgnoreCase));
-				if (this.Direction)
-					return val * -1;
-				return val;
-
-			}
-
-			public void Swap()
-			{
-				this.Direction = !this.Direction;
 			}
 		}
 

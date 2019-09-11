@@ -70,6 +70,10 @@
       <Project>{34471573-f236-4a7c-abd9-c1fe4686b37e}</Project>
       <Name>BundleUtilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BurnoutImage\BurnoutImage.csproj">
+      <Project>{DB46CA66-275C-40CB-AB0B-06DA7973BA69}</Project>
+      <Name>BurnoutImage</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PluginAPI\PluginAPI.csproj">
       <Project>{757F0204-F091-464D-AA42-FE8919FF73BB}</Project>
       <Name>PluginAPI</Name>

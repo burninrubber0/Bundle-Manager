@@ -52,6 +52,8 @@ namespace BundleManager
 			Register(EntryType.StreetDataResourceType, new StreetData());
 			Register(EntryType.ProgressionResourceType, new ProgressionData());
 			Register(EntryType.IDList, new IDList());
+			Register(EntryType.TrafficDataResourceType, new Traffic());
+			Register(EntryType.FlaptFileResourceType, new FlaptFile());
 		}
 	}
 }

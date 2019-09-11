@@ -89,7 +89,7 @@ namespace BundleManager
         public override string ToString() => String;
     }
 
-    public class FlaptFile
+    public class FlaptFile : IEntryData
     {
         public uint FileSize;
         public float SecondsPerFrame; // 1/30
@@ -138,41 +138,76 @@ namespace BundleManager
             CharacterRefStrings = new List<StringPointer>();
         }
 
-        public static FlaptFile Read(BundleEntry entry)
+		private void Clear()
+		{
+			FileSize = default;
+			SecondsPerFrame = default;
+			Section1RecordCount = default;
+			Section1Offset = default;
+			ImageIDCount = default;
+			ImageIDListOffset = default;
+			GeometryVerticesCount = default;
+			GeometryVerticesOffset = default;
+			TextStyleCount = default;
+			TextStyleListOffset = default;
+			Section5And6RecordCount = default;
+			Section5Offset = default;
+			Section6Offset = default;
+			EventBindsCount = default;
+			EventBindsOffset = default;
+			TextStringsCount = default;
+			TextStringsOffset = default;
+			DependencyRefStringsCount = default;
+			DependencyRefStringsOffset = default;
+			CharacterRefStringsCount = default;
+			CharacterRefStringsOffset = default;
+
+			Section1Entries.Clear();
+			ImageIDs.Clear();
+			GeometryVertices.Clear();
+			TextStyleEntries.Clear();
+			Section5Entries.Clear();
+			Section6Entries.Clear();
+			EventBinds.Clear();
+			TextStrings.Clear();
+			DependencyRefStrings.Clear();
+			CharacterRefStrings.Clear();
+		}
+
+        public bool Read(BundleEntry entry)
         {
-            FlaptFile result = new FlaptFile();
+			Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-
             br.BaseStream.Position += 4; // magic or something: 0C B0 B0 B0
-            result.FileSize = br.ReadUInt32();
-            result.SecondsPerFrame = br.ReadSingle();
-            result.Section1RecordCount = br.ReadInt32();
-            result.Section1Offset = br.ReadUInt32();
-            result.ImageIDCount = br.ReadInt32();
-            result.ImageIDListOffset = br.ReadUInt32();
-            result.GeometryVerticesCount = br.ReadInt32();
-            result.GeometryVerticesOffset = br.ReadUInt32();
-            result.TextStyleCount = br.ReadInt32();
-            result.TextStyleListOffset = br.ReadUInt32();
-            result.Section5And6RecordCount = br.ReadInt32();
-            result.Section5Offset = br.ReadUInt32();
-            result.Section6Offset = br.ReadUInt32();
-            result.EventBindsCount = br.ReadInt32();
-            result.EventBindsOffset = br.ReadUInt32();
-            result.TextStringsCount = br.ReadInt32();
-            result.TextStringsOffset = br.ReadUInt32();
-            result.DependencyRefStringsCount = br.ReadInt32();
-            result.DependencyRefStringsOffset = br.ReadUInt32();
-            result.CharacterRefStringsCount = br.ReadInt32();
-            result.CharacterRefStringsOffset = br.ReadUInt32();
+            FileSize = br.ReadUInt32();
+            SecondsPerFrame = br.ReadSingle();
+            Section1RecordCount = br.ReadInt32();
+            Section1Offset = br.ReadUInt32();
+            ImageIDCount = br.ReadInt32();
+            ImageIDListOffset = br.ReadUInt32();
+            GeometryVerticesCount = br.ReadInt32();
+            GeometryVerticesOffset = br.ReadUInt32();
+            TextStyleCount = br.ReadInt32();
+            TextStyleListOffset = br.ReadUInt32();
+            Section5And6RecordCount = br.ReadInt32();
+            Section5Offset = br.ReadUInt32();
+            Section6Offset = br.ReadUInt32();
+            EventBindsCount = br.ReadInt32();
+            EventBindsOffset = br.ReadUInt32();
+            TextStringsCount = br.ReadInt32();
+            TextStringsOffset = br.ReadUInt32();
+            DependencyRefStringsCount = br.ReadInt32();
+            DependencyRefStringsOffset = br.ReadUInt32();
+            CharacterRefStringsCount = br.ReadInt32();
+            CharacterRefStringsOffset = br.ReadUInt32();
 
 
-            br.BaseStream.Position = result.Section1Offset;
-            for (int i = 0; i < result.Section1RecordCount; i++)
+            br.BaseStream.Position = Section1Offset;
+            for (int i = 0; i < Section1RecordCount; i++)
             {
                 FlaptSection1Entry section1Entry = new FlaptSection1Entry();
 
@@ -225,20 +260,20 @@ namespace BundleManager
                 br.BaseStream.Position = oldPos;
 
 
-                result.Section1Entries.Add(section1Entry);
+                Section1Entries.Add(section1Entry);
             }
 
 
-            br.BaseStream.Position = result.ImageIDListOffset;
-            for (int i = 0; i < result.ImageIDCount; i++)
+            br.BaseStream.Position = ImageIDListOffset;
+            for (int i = 0; i < ImageIDCount; i++)
             {
-                result.ImageIDs.Add(br.ReadSByte());
+                ImageIDs.Add(br.ReadSByte());
                 br.BaseStream.Position += 3; // Weird padding?
             }
 
 
-            br.BaseStream.Position = result.GeometryVerticesOffset;
-            for (int i = 0; i < result.GeometryVerticesCount; i++)
+            br.BaseStream.Position = GeometryVerticesOffset;
+            for (int i = 0; i < GeometryVerticesCount; i++)
             {
                 GeometryVertex vertex = new GeometryVertex();
 
@@ -248,12 +283,12 @@ namespace BundleManager
                 vertex.U = br.ReadSingle();
                 vertex.V = br.ReadSingle();
 
-                result.GeometryVertices.Add(vertex);
+                GeometryVertices.Add(vertex);
             }
 
 
-            br.BaseStream.Position = result.TextStyleListOffset;
-            for (int i = 0; i < result.TextStyleCount; i++)
+            br.BaseStream.Position = TextStyleListOffset;
+            for (int i = 0; i < TextStyleCount; i++)
             {
                 TextStyle textStyle = new TextStyle();
 
@@ -267,12 +302,12 @@ namespace BundleManager
                 textStyle.Colour = U8Colour.FromARGB32(br.ReadUInt32());
                 textStyle.TextHeight = br.ReadSingle();
 
-                result.TextStyleEntries.Add(textStyle);
+                TextStyleEntries.Add(textStyle);
             }
 
 
-            br.BaseStream.Position = result.Section5Offset;
-            for (int i = 0; i < result.Section5And6RecordCount; i++)
+            br.BaseStream.Position = Section5Offset;
+            for (int i = 0; i < Section5And6RecordCount; i++)
             {
                 FlaptSection5Entry section5Entry = new FlaptSection5Entry();
 
@@ -284,11 +319,11 @@ namespace BundleManager
                 section5Entry.CharacterName = br.ReadCStr();
                 br.BaseStream.Position = oldPos;
 
-                result.Section5Entries.Add(section5Entry);
+                Section5Entries.Add(section5Entry);
             }
 
-            br.BaseStream.Position = result.Section6Offset;
-            for (int i = 0; i < result.Section5And6RecordCount; i++)
+            br.BaseStream.Position = Section6Offset;
+            for (int i = 0; i < Section5And6RecordCount; i++)
             {
                 byte[] bytes = new byte[33];
 
@@ -297,12 +332,12 @@ namespace BundleManager
                     bytes[j] = br.ReadByte();
                 }
 
-                result.Section6Entries.Add(bytes);
+                Section6Entries.Add(bytes);
             }
 
 
-            br.BaseStream.Position = result.EventBindsOffset;
-            for (int i = 0; i < result.EventBindsCount; i++)
+            br.BaseStream.Position = EventBindsOffset;
+            for (int i = 0; i < EventBindsCount; i++)
             {
                 FlaptEventBinding eventBinding = new FlaptEventBinding();
 
@@ -330,12 +365,12 @@ namespace BundleManager
 
                 br.BaseStream.Position = oldPos;
                 
-                result.EventBinds.Add(eventBinding);
+                EventBinds.Add(eventBinding);
             }
 
 
-            br.BaseStream.Position = result.TextStringsOffset;
-            for (int i = 0; i < result.TextStringsCount; i++)
+            br.BaseStream.Position = TextStringsOffset;
+            for (int i = 0; i < TextStringsCount; i++)
             {
                 StringPointer textString = new StringPointer();
 
@@ -346,12 +381,12 @@ namespace BundleManager
                 textString.String = br.ReadCStr();
                 br.BaseStream.Position = oldPos;
 
-                result.TextStrings.Add(textString);
+                TextStrings.Add(textString);
             }
 
 
-            br.BaseStream.Position = result.DependencyRefStringsOffset;
-            for (int i = 0; i < result.DependencyRefStringsCount; i++)
+            br.BaseStream.Position = DependencyRefStringsOffset;
+            for (int i = 0; i < DependencyRefStringsCount; i++)
             {
                 StringPointer dependencyRefString = new StringPointer();
 
@@ -362,12 +397,12 @@ namespace BundleManager
                 dependencyRefString.String = br.ReadCStr();
                 br.BaseStream.Position = oldPos;
 
-                result.DependencyRefStrings.Add(dependencyRefString);
+                DependencyRefStrings.Add(dependencyRefString);
             }
 
 
-            br.BaseStream.Position = result.CharacterRefStringsOffset;
-            for (int i = 0; i < result.CharacterRefStringsCount; i++)
+            br.BaseStream.Position = CharacterRefStringsOffset;
+            for (int i = 0; i < CharacterRefStringsCount; i++)
             {
                 StringPointer characterRefString = new StringPointer();
 
@@ -378,19 +413,30 @@ namespace BundleManager
                 characterRefString.String = br.ReadCStr();
                 br.BaseStream.Position = oldPos;
 
-                result.CharacterRefStrings.Add(characterRefString);
+                CharacterRefStrings.Add(characterRefString);
             }
 
 
             br.Close();
             ms.Close();
 
-            return result;
+            return true;
         }
 
-        public void Write(BundleEntry entry)
+        public bool Write(BundleEntry entry)
         {
-            // TODO
+			// TODO
+			return true;
         }
-    }
+
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.FlaptFileResourceType;
+		}
+
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			return null;
+		}
+	}
 }

@@ -9,7 +9,7 @@ using BundleUtilities;
 
 namespace BundleManager
 {
-    public class Traffic
+    public class Traffic : IEntryData
     {
         public short Unknown1;
         public short Unknown2;
@@ -50,60 +50,107 @@ namespace BundleManager
             UnknownShorts = new List<short>();
         }
 
-        public static Traffic Read(BundleEntry entry)
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			return null;
+		}
+
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.TrafficDataResourceType;
+		}
+
+		private void Clear()
+		{
+			Unknown1 = default;
+			Unknown2 = default;
+			FileSize = default;
+			TrackCount = default;
+			Unknown3 = default;
+			PointerOffset = default;
+			Unknown4 = default;
+			Unknown5 = default;
+			Unknown6 = default;
+			Unknown7 = default;
+			Unknown8 = default;
+			Unknown9 = default;
+			Unknown10 = default;
+			Section1Offset = default;
+			Section2Offset = default;
+			Section3Offset = default;
+			Section4Offset = default;
+			Section5Offset = default;
+			Section6Offset = default;
+			Section7Offset = default;
+			Section8Offset = default;
+			Unknown11 = default;
+			Unknown12 = default;
+			Unknown13 = default;
+			UnknownOffset1 = default;
+			UnknownOffset2 = default;
+			UnknownOffset3 = default;
+			UnknownOffset4 = default;
+			UnknownOffset5 = default;
+			Unknown14 = default;
+			Unknown15 = default;
+
+			UnknownShorts.Clear();
+		}
+
+		public bool Read(BundleEntry entry)
         {
-            Traffic result = new Traffic();
+			Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            result.Unknown1 = br.ReadInt16();
-            result.Unknown2 = br.ReadInt16();
-            result.FileSize = br.ReadInt32();
-            result.TrackCount = br.ReadInt32();
-            result.Unknown3 = br.ReadInt32();
-            result.PointerOffset = br.ReadInt32();
-            result.Unknown4 = br.ReadInt16();
-            result.Unknown5 = br.ReadInt16();
-            result.Unknown6 = br.ReadByte();
-            result.Unknown7 = br.ReadByte();
-            result.Unknown8 = br.ReadInt16();
-            result.Unknown9 = br.ReadInt16();
-            result.Unknown10 = br.ReadInt16();
-            result.Section1Offset = br.ReadUInt32();
-            result.Section2Offset = br.ReadUInt32();
-            result.Section3Offset = br.ReadUInt32();
-            result.Section4Offset = br.ReadUInt32();
-            result.Section5Offset = br.ReadUInt32();
-            result.Section6Offset = br.ReadUInt32();
-            result.Section7Offset = br.ReadUInt32();
-            result.Section8Offset = br.ReadUInt32();
-            result.Unknown11 = br.ReadByte();
-            result.Unknown12 = br.ReadByte();
-            result.Unknown13 = br.ReadInt16();
-            result.UnknownOffset1 = br.ReadUInt32();
-            result.UnknownOffset2 = br.ReadUInt32();
-            result.UnknownOffset3 = br.ReadUInt32();
-            result.UnknownOffset4 = br.ReadUInt32();
-            result.UnknownOffset5 = br.ReadUInt32();
-            result.Unknown14 = br.ReadInt16();
-            result.Unknown15 = br.ReadInt16();
+            Unknown1 = br.ReadInt16();
+            Unknown2 = br.ReadInt16();
+            FileSize = br.ReadInt32();
+            TrackCount = br.ReadInt32();
+            Unknown3 = br.ReadInt32();
+            PointerOffset = br.ReadInt32();
+            Unknown4 = br.ReadInt16();
+            Unknown5 = br.ReadInt16();
+            Unknown6 = br.ReadByte();
+            Unknown7 = br.ReadByte();
+            Unknown8 = br.ReadInt16();
+            Unknown9 = br.ReadInt16();
+            Unknown10 = br.ReadInt16();
+            Section1Offset = br.ReadUInt32();
+            Section2Offset = br.ReadUInt32();
+            Section3Offset = br.ReadUInt32();
+            Section4Offset = br.ReadUInt32();
+            Section5Offset = br.ReadUInt32();
+            Section6Offset = br.ReadUInt32();
+            Section7Offset = br.ReadUInt32();
+            Section8Offset = br.ReadUInt32();
+            Unknown11 = br.ReadByte();
+            Unknown12 = br.ReadByte();
+            Unknown13 = br.ReadInt16();
+            UnknownOffset1 = br.ReadUInt32();
+            UnknownOffset2 = br.ReadUInt32();
+            UnknownOffset3 = br.ReadUInt32();
+            UnknownOffset4 = br.ReadUInt32();
+            UnknownOffset5 = br.ReadUInt32();
+            Unknown14 = br.ReadInt16();
+            Unknown15 = br.ReadInt16();
 
             for (int i = 0; i < 128; i++)
             {
-                result.UnknownShorts.Add(br.ReadInt16());
+                UnknownShorts.Add(br.ReadInt16());
             }
 
             br.Close();
             ms.Close();
 
-            return result;
+            return true;
         }
 
-        public void Write(BundleEntry entry)
+        public bool Write(BundleEntry entry)
         {
-            
+			return true;
         }
     }
 }

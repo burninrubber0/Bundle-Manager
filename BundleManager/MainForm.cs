@@ -612,11 +612,6 @@ namespace BundleManager
 				};
 				edit.ShowDialog(this);
 			}
-			else if (entry.Type == EntryType.TrafficDataResourceType && !forceHex)
-			{
-				Traffic traffic = Traffic.Read(entry);
-				DebugUtil.ShowDebug(this, traffic);
-			}
 			/* else if (entry.Type == EntryType.ModelResourceType && !forceHex)
 	        {
 	            for (int i = 0; i < CurrentArchive.Entries.Count; i++)
@@ -636,11 +631,6 @@ namespace BundleManager
 	                }
 	            }
 	        }*/
-			else if (entry.Type == EntryType.FlaptFileResourceType && !forceHex)
-			{
-				FlaptFile flaptFile = FlaptFile.Read(entry);
-				DebugUtil.ShowDebug(this, flaptFile);
-			}
 			else
 			{
 				EntryEditor editor = new EntryEditor();

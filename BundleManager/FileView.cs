@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BaseHandlers;
 using BundleFormat;
 using BundleUtilities;
 
@@ -20,7 +21,15 @@ namespace BundleManager
     {
         private static FileView _instance;
 
-        public static bool LoadMaterials => _instance.loadMaterialsToolStripMenuItem.CheckState == CheckState.Checked;
+		private static bool _loadMaterials;
+        public static bool LoadMaterials {
+			get => _loadMaterials;
+			set
+			{
+				_loadMaterials = value;
+				Config.LoadMaterials = _loadMaterials;
+			}
+		}
 
         private bool AlwaysIgnore => ignoreIDConflictsToolStripMenuItem.CheckState == CheckState.Checked;
 
@@ -486,6 +495,8 @@ namespace BundleManager
                 loadMaterialsToolStripMenuItem.CheckState = CheckState.Unchecked;
             else
                 loadMaterialsToolStripMenuItem.CheckState = CheckState.Checked;
+
+			LoadMaterials = loadMaterialsToolStripMenuItem.CheckState == CheckState.Checked;
         }
 
         private void dumpInfoToolStripMenuItem_Click(object sender, EventArgs e)

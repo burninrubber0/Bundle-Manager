@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BundleUtilities</RootNamespace>
     <AssemblyName>BundleUtilities</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -42,8 +42,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BinaryReader2.cs" />
+    <Compile Include="Colour.cs" />
     <Compile Include="Crc32.cs" />
     <Compile Include="DebugTimer.cs" />
+    <Compile Include="EncryptedString.cs" />
     <Compile Include="ILoader.cs" />
     <Compile Include="ReadFailedError.cs" />
     <Compile Include="Utilities.cs" />

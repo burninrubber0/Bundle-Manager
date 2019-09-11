@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using BundleFormat;
 using ModelViewer.SceneData;
 using OpenTK.Graphics.OpenGL;
+using PluginAPI;
 
 namespace ModelViewer
 {

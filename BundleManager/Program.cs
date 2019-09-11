@@ -21,6 +21,8 @@ namespace BundleManager
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+			EntryTypeList.InitEntryTypes();
+
             fileModeForm = new MainForm();
             folderModeForm = new FileView();
 

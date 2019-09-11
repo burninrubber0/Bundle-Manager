@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using BundleFormat;
 using BundleUtilities;
+using PluginAPI;
 using Util = BundleFormat.Util;
 
 namespace VehicleList

@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using BundleFormat;
 using DebugHelper;
+using PluginAPI;
 
 namespace PVSFormat
 {

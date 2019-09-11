@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PVSFormat</RootNamespace>
     <AssemblyName>PVSFormat</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -68,6 +68,10 @@
     <ProjectReference Include="..\BundleUtilities\BundleUtilities.csproj">
       <Project>{34471573-f236-4a7c-abd9-c1fe4686b37e}</Project>
       <Name>BundleUtilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PluginAPI\PluginAPI.csproj">
+      <Project>{757F0204-F091-464D-AA42-FE8919FF73BB}</Project>
+      <Name>PluginAPI</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

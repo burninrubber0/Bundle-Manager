@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BundleManager", "BundleManager\BundleManager.csproj", "{F11A0DF0-A25C-4E94-AA54-D0DD51F15A8E}"
 EndProject
@@ -28,6 +28,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IconLibrary", "IconLibrary\IconLibrary.csproj", "{A56B769D-941F-4B1E-9905-F5A981FA6EAD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelViewer", "ModelViewer\ModelViewer.csproj", "{463D5389-3704-473E-B4C3-B334474CEFDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LangEditor", "LangEditor\LangEditor.csproj", "{20E7A1C4-AFCD-4B8A-8AEF-06B0C27E72B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginAPI", "PluginAPI\PluginAPI.csproj", "{757F0204-F091-464D-AA42-FE8919FF73BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginSystem", "PluginSystem\PluginSystem.csproj", "{4FC1C1EE-618A-4B65-A103-A51568A01629}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseHandlers", "BaseHandlers\BaseHandlers.csproj", "{7743D330-6A1A-496C-872B-E36C9EB38CE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +95,22 @@ Global
 		{463D5389-3704-473E-B4C3-B334474CEFDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{463D5389-3704-473E-B4C3-B334474CEFDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{463D5389-3704-473E-B4C3-B334474CEFDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20E7A1C4-AFCD-4B8A-8AEF-06B0C27E72B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20E7A1C4-AFCD-4B8A-8AEF-06B0C27E72B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20E7A1C4-AFCD-4B8A-8AEF-06B0C27E72B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20E7A1C4-AFCD-4B8A-8AEF-06B0C27E72B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{757F0204-F091-464D-AA42-FE8919FF73BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{757F0204-F091-464D-AA42-FE8919FF73BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{757F0204-F091-464D-AA42-FE8919FF73BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{757F0204-F091-464D-AA42-FE8919FF73BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FC1C1EE-618A-4B65-A103-A51568A01629}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FC1C1EE-618A-4B65-A103-A51568A01629}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FC1C1EE-618A-4B65-A103-A51568A01629}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FC1C1EE-618A-4B65-A103-A51568A01629}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7743D330-6A1A-496C-872B-E36C9EB38CE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7743D330-6A1A-496C-872B-E36C9EB38CE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7743D330-6A1A-496C-872B-E36C9EB38CE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7743D330-6A1A-496C-872B-E36C9EB38CE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

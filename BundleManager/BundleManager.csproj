@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BundleManager</RootNamespace>
     <AssemblyName>BundleManager</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <PublishUrl>publish\</PublishUrl>
@@ -64,10 +64,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Lib\DotNet\DebugHelper\DebugHelper.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ModelViewer\bin\Debug\OpenTK.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -81,45 +77,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AptData.cs" />
-    <Compile Include="AttribSys.cs" />
     <Compile Include="BundleResource.cs" />
     <Compile Include="BetterListView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Colour.cs" />
     <Compile Include="EntryEditor.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="EntryEditor.Designer.cs">
       <DependentUpon>EntryEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="EntryTypeRegistry.cs" />
+    <Compile Include="EntryTypeList.cs" />
     <Compile Include="FileView.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FileView.Designer.cs">
       <DependentUpon>FileView.cs</DependentUpon>
     </Compile>
-    <Compile Include="FlaptFile.cs" />
-    <Compile Include="GenericMesh.cs" />
-    <Compile Include="GenericModel.cs" />
-    <Compile Include="IDList.cs" />
-    <Compile Include="GraphicsSpec.cs" />
-    <Compile Include="InputDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="InputDialog.Designer.cs">
-      <DependentUpon>InputDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InstanceList.cs" />
-    <Compile Include="LangEdit.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="LangEdit.Designer.cs">
-      <DependentUpon>LangEdit.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Language.cs" />
     <Compile Include="LoadingDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -132,13 +106,8 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MaterialEntry.cs" />
-    <Compile Include="ModelResource.cs" />
-    <Compile Include="OBJImporter.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ProgressionData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Renderable.cs" />
     <Compile Include="SaveData.cs" />
     <Compile Include="SearchDialog.cs">
       <SubType>Form</SubType>
@@ -146,33 +115,17 @@
     <Compile Include="SearchDialog.Designer.cs">
       <DependentUpon>SearchDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="StreetData.cs" />
-    <Compile Include="TextureState.cs" />
-    <Compile Include="Traffic.cs" />
-    <Compile Include="TriggerData.cs" />
     <Compile Include="VertexSizePicker.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="VertexSizePicker.Designer.cs">
       <DependentUpon>VertexSizePicker.cs</DependentUpon>
     </Compile>
-    <Compile Include="WorldColEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="WorldColEditor.Designer.cs">
-      <DependentUpon>WorldColEditor.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="EntryEditor.resx">
       <DependentUpon>EntryEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FileView.resx">
       <DependentUpon>FileView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InputDialog.resx">
-      <DependentUpon>InputDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="LangEdit.resx">
-      <DependentUpon>LangEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoadingDialog.resx">
       <DependentUpon>LoadingDialog.cs</DependentUpon>
@@ -196,10 +149,6 @@
     <EmbeddedResource Include="VertexSizePicker.resx">
       <DependentUpon>VertexSizePicker.cs</DependentUpon>
     </EmbeddedResource>
-    <Compile Include="PolygonSoupList.cs" />
-    <EmbeddedResource Include="WorldColEditor.resx">
-      <DependentUpon>WorldColEditor.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="App.manifest">
       <SubType>Designer</SubType>
     </None>
@@ -219,6 +168,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BaseHandlers\BaseHandlers.csproj">
+      <Project>{7743D330-6A1A-496C-872B-E36C9EB38CE7}</Project>
+      <Name>BaseHandlers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BundleFormat\BundleFormat.csproj">
       <Project>{49b81828-760c-42db-9fad-96755597c871}</Project>
       <Name>BundleFormat</Name>
@@ -240,6 +193,10 @@
       <Project>{a56b769d-941f-4b1e-9905-f5a981fa6ead}</Project>
       <Name>IconLibrary</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LangEditor\LangEditor.csproj">
+      <Project>{20E7A1C4-AFCD-4B8A-8AEF-06B0C27E72B7}</Project>
+      <Name>LangEditor</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MathLib\MathLib.csproj">
       <Project>{e9e7ffa3-84ae-42af-bfe3-c50d2b034c28}</Project>
       <Name>MathLib</Name>
@@ -248,6 +205,10 @@
       <Project>{463d5389-3704-473e-b4c3-b334474cefde}</Project>
       <Name>ModelViewer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PluginAPI\PluginAPI.csproj">
+      <Project>{757F0204-F091-464D-AA42-FE8919FF73BB}</Project>
+      <Name>PluginAPI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PVSFormat\PVSFormat.csproj">
       <Project>{07e80234-b95f-42dc-99a3-a89a929dddbf}</Project>
       <Name>PVSFormat</Name>
@@ -255,6 +216,10 @@
     <ProjectReference Include="..\StandardExtension\StandardExtension.csproj">
       <Project>{1d9c18c6-b506-4cb7-9e3e-e22fbb24ac3b}</Project>
       <Name>StandardExtension</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VaultFormat\VaultFormat.csproj">
+      <Project>{47381AB0-8EEC-49E2-AC2F-D8AD2AC0F2DC}</Project>
+      <Name>VaultFormat</Name>
     </ProjectReference>
     <ProjectReference Include="..\VehicleList\VehicleList.csproj">
       <Project>{557fc08f-7acd-44d7-ac1f-fb815a267a36}</Project>

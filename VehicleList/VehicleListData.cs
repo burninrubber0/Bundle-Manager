@@ -1,5 +1,6 @@
 ﻿using BundleFormat;
 using BundleUtilities;
+using PluginAPI;
 using System;
 using System.Collections.Generic;
 using System.IO;

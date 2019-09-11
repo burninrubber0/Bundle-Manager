@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BundleFormat;
 using BundleUtilities;
 using MathLib;
+using ModelViewer;
 using ModelViewer.SceneData;
 using OpenTK;
 
@@ -52,11 +53,13 @@ namespace BundleManager
         public List<VertexData> Vertices;
     }
 
-    public class Renderable
+    public class Renderable : IEntryData
     {
         public static bool LoadMaterials => FileView.LoadMaterials;
 
-        public float Unknown1;
+		private Scene _scene;
+
+		public float Unknown1;
         public float Unknown2;
         public float Unknown3;
         public float Unknown4;
@@ -241,38 +244,37 @@ namespace BundleManager
             }
         }
 
-        public static Renderable Read(BundleEntry entry, ILoader loader)
+        public bool Read(BundleEntry entry, ILoader loader)
         {
             List<BundleDependency> dependencies = entry.GetDependencies();
 
-            Renderable result = new Renderable();
-            result.ID = entry.ID;
+            ID = entry.ID;
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            result.Unknown1 = br.ReadSingle();
-            result.Unknown2 = br.ReadSingle();
-            result.Unknown3 = br.ReadSingle();
-            result.Unknown4 = br.ReadSingle();
-            result.Unknown5 = br.ReadInt16();
-            result.MeshCount = br.ReadInt16();
-            result.StartOffset = br.ReadInt32();
-            result.Unknown8 = br.ReadInt32();
-            result.Unknown9 = br.ReadInt32();
-            result.Unknown10 = br.ReadInt16();
-            result.Unknown10_1 = br.ReadInt16();
-            result.UnknownOffset = br.ReadInt32();
-            result.Unknown12 = br.ReadInt32();
-            result.Unknown13 = br.ReadInt32();
+            Unknown1 = br.ReadSingle();
+            Unknown2 = br.ReadSingle();
+            Unknown3 = br.ReadSingle();
+            Unknown4 = br.ReadSingle();
+            Unknown5 = br.ReadInt16();
+            MeshCount = br.ReadInt16();
+            StartOffset = br.ReadInt32();
+            Unknown8 = br.ReadInt32();
+            Unknown9 = br.ReadInt32();
+            Unknown10 = br.ReadInt16();
+            Unknown10_1 = br.ReadInt16();
+            UnknownOffset = br.ReadInt32();
+            Unknown12 = br.ReadInt32();
+            Unknown13 = br.ReadInt32();
 
-            br.BaseStream.Position = result.StartOffset;
+            br.BaseStream.Position = StartOffset;
 
-            for (int i = 0; i < result.MeshCount; i++)
+            for (int i = 0; i < MeshCount; i++)
             {
                 int offset = br.ReadInt32();
-                result.MeshVertexOffsets.Add(offset);
+                MeshVertexOffsets.Add(offset);
             }
 
             /*if (entry.Platform == BundlePlatform.PS3)
@@ -283,28 +285,28 @@ namespace BundleManager
             }
             else
             {*/
-                result.NumIndices = br.ReadInt32();
+                NumIndices = br.ReadInt32();
             //}
 
-            result.Unknown15 = br.ReadInt32();
-            result.Unknown16 = br.ReadInt32();
-            result.Unknown17 = br.ReadInt32();
+            Unknown15 = br.ReadInt32();
+            Unknown16 = br.ReadInt32();
+            Unknown17 = br.ReadInt32();
             // some extra data here in BPR
 
-            br.BaseStream.Position = result.UnknownOffset;
-            if (result.NumIndices == 0) // BPR
+            br.BaseStream.Position = UnknownOffset;
+            if (NumIndices == 0) // BPR
             {
                 // ???
                 br.BaseStream.Position += 12;
             }
-            result.VertexBlockAddress = br.ReadInt32();
-            result.Unknown18 = (result.NumIndices == 0) ? 0 : br.ReadInt32();
-            result.VertexBlockSize = br.ReadInt32();
+            VertexBlockAddress = br.ReadInt32();
+            Unknown18 = (NumIndices == 0) ? 0 : br.ReadInt32();
+            VertexBlockSize = br.ReadInt32();
 
 
-            for (int i = 0; i < result.MeshCount; i++)
+            for (int i = 0; i < MeshCount; i++)
             {
-                br.BaseStream.Position = result.MeshVertexOffsets[i];
+                br.BaseStream.Position = MeshVertexOffsets[i];
 
                 RenderableMesh mesh = new RenderableMesh();
 
@@ -312,7 +314,7 @@ namespace BundleManager
                 mesh.Unknown19 = br.ReadInt32();
                 mesh.Unknown20 = br.ReadInt32();
                 mesh.IndexOffsetCount = br.ReadInt32();
-                if (result.NumIndices == 0) // BPR
+                if (NumIndices == 0) // BPR
                 {
                     mesh.NumFaces = br.ReadInt32() / 3;
                 }
@@ -355,15 +357,15 @@ namespace BundleManager
                     mesh.VertexDescriptionsInternal[j] = br.ReadInt32();
                 }
 
-                result.Meshes.Add(mesh);
+                Meshes.Add(mesh);
             }
 
             br.Close();
             ms.Close();
             
-            for (int i = 0; i < result.Meshes.Count; i++)
+            for (int i = 0; i < Meshes.Count; i++)
             {
-                RenderableMesh mesh = result.Meshes[i];
+                RenderableMesh mesh = Meshes[i];
 
                 if (LoadMaterials)
                 {
@@ -405,22 +407,42 @@ namespace BundleManager
             ms = entry.MakeStream(true);
             br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
-            result.ReadBody(br);
+            ReadBody(br);
             br.Close();
             ms.Close();
 
-            result.BuildModel();
+            BuildModel();
 
-            return result;
+			_scene = MakeScene(loader);
+
+			return true;
         }
 
-        public Scene MakeScene()
-        {
-            Scene scene = new Scene();
-            SceneObject obj = new SceneObject(ID.ToString("X8"), Model);
-            scene.AddObject(obj);
+		public bool Write(BundleEntry entry)
+		{
+			return true;
+		}
 
-            return scene;
-        }
-    }
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.RwRenderableResourceType;
+		}
+
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			ModelViewerForm viewer = new ModelViewerForm();
+			viewer.Renderer.Scene = _scene;
+
+			return viewer;
+		}
+
+		public Scene MakeScene(ILoader loader)
+		{
+			Scene scene = new Scene();
+			SceneObject obj = new SceneObject(ID.ToString("X8"), Model);
+			scene.AddObject(obj);
+
+			return scene;
+		}
+	}
 }

@@ -196,7 +196,8 @@ namespace BundleManager
                     if (modelEntry != null)
                     {
                         BundleEntry renderableEntry = modelEntry.GetDependencies()[0].Entry;
-                        Renderable renderable = Renderable.Read(renderableEntry, null); // TODO: Null Loader
+						Renderable renderable = new Renderable();
+						renderable.Read(renderableEntry, null); // TODO: Null Loader
                         models.Add(instance.ModelEntryID, renderable);
                         SceneObject sceneObject =
                             new SceneObject(instance.ModelEntryID.ToString("X8"), renderable.Model);

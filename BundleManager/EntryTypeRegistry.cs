@@ -57,6 +57,8 @@ namespace BundleManager
 			Register(EntryType.FlaptFileResourceType, new FlaptFile());
 			Register(EntryType.ZoneListResourceType, new PVS());
 			Register(EntryType.InstanceListResourceType, new InstanceList());
+			Register(EntryType.GraphicsSpecResourceType, new GraphicsSpec());
+			Register(EntryType.RwRenderableResourceType, new Renderable());
 		}
 	}
 }

@@ -3,14 +3,17 @@ using System.IO;
 using BundleFormat;
 using BundleUtilities;
 using MathLib;
+using ModelViewer;
 using ModelViewer.SceneData;
 using OpenTK;
 
 namespace BundleManager
 {
-    public class GraphicsSpec
-    {
-        public BundleEntry Entry;
+    public class GraphicsSpec : IEntryData
+	{
+		private Scene _scene;
+
+		public BundleEntry Entry;
 
         public int Unknown1;
         public List<ulong> Instances;
@@ -22,22 +25,56 @@ namespace BundleManager
             Instances = new List<ulong>();
         }
 
-        public static GraphicsSpec Read(BundleEntry entry, ILoader loader)
+		private void Clear()
+		{
+			_scene = null;
+
+			Entry = default;
+
+			Unknown1 = default;
+			Unknown2 = default;
+			Unknown3 = default;
+
+			Instances.Clear();
+		}
+
+        public bool Read(BundleEntry entry, ILoader loader)
         {
-            GraphicsSpec result = new GraphicsSpec();
-            result.Entry = entry;
+			Clear();
+
+            Entry = entry;
 
             // TODO: Process Data
 
             for (int i = 0; i < entry.GetDependencies().Count; i++)
             {
-                result.Instances.Add(entry.GetDependencies()[i].EntryID);
-            }
+                Instances.Add(entry.GetDependencies()[i].EntryID);
+			}
 
-            return result;
-        }
+			_scene = MakeScene(loader);
 
-        public Scene MakeScene()
+			return true;
+		}
+
+		public bool Write(BundleEntry entry)
+		{
+			return true;
+		}
+
+		public EntryType GetEntryType(BundleEntry entry)
+		{
+			return EntryType.GraphicsSpecResourceType;
+		}
+
+		public IEntryEditor GetEditor(BundleEntry entry)
+		{
+			ModelViewerForm viewer = new ModelViewerForm();
+			viewer.Renderer.Scene = _scene;
+
+			return viewer;
+		}
+
+		public Scene MakeScene(ILoader loader)
         {
             Scene scene = new Scene();
 
@@ -57,7 +94,8 @@ namespace BundleManager
                 if (modelEntry != null)
                 {
                     BundleEntry renderableEntry = modelEntry.GetDependencies()[0].Entry;
-                    Renderable renderable = Renderable.Read(renderableEntry, null); // TODO: Null Loader
+					Renderable renderable = new Renderable();
+					renderable.Read(renderableEntry, null); // TODO: Null Loader
                     SceneObject sceneObject = new SceneObject(instance.ToString("X8"), renderable.Model);
                     //sceneObject.Transform = instance.Transform;
 
@@ -67,5 +105,5 @@ namespace BundleManager
 
             return scene;
         }
-    }
+	}
 }

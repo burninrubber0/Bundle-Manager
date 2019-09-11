@@ -87,7 +87,6 @@
     <Compile Include="EntryEditor.Designer.cs">
       <DependentUpon>EntryEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="EntryTypeList.cs" />
     <Compile Include="FileView.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -209,8 +208,12 @@
       <Project>{757F0204-F091-464D-AA42-FE8919FF73BB}</Project>
       <Name>PluginAPI</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PluginSystem\PluginSystem.csproj">
+      <Project>{4FC1C1EE-618A-4B65-A103-A51568A01629}</Project>
+      <Name>PluginSystem</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PVSFormat\PVSFormat.csproj">
-      <Project>{07e80234-b95f-42dc-99a3-a89a929dddbf}</Project>
+      <Project>{07E80234-B95F-42DC-99A3-A89A929DDDBF}</Project>
       <Name>PVSFormat</Name>
     </ProjectReference>
     <ProjectReference Include="..\StandardExtension\StandardExtension.csproj">

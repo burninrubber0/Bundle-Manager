@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PluginSystem;
+using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -21,7 +22,7 @@ namespace BundleManager
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-			EntryTypeList.InitEntryTypes();
+			PluginLoader.LoadPlugins();
 
             fileModeForm = new MainForm();
             folderModeForm = new FileView();

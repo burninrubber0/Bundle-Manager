@@ -45,7 +45,7 @@
     <Compile Include="EntryTypeRegistry.cs" />
     <Compile Include="IEntryData.cs" />
     <Compile Include="IEntryEditor.cs" />
-    <Compile Include="IPlugin.cs" />
+    <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

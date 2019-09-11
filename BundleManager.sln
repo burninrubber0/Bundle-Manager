@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginSystem", "PluginSyste
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseHandlers", "BaseHandlers\BaseHandlers.csproj", "{7743D330-6A1A-496C-872B-E36C9EB38CE7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{60F98E02-807F-4EDC-8747-147C365606B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -114,6 +116,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{557FC08F-7ACD-44D7-AC1F-FB815A267A36} = {60F98E02-807F-4EDC-8747-147C365606B1}
+		{47381AB0-8EEC-49E2-AC2F-D8AD2AC0F2DC} = {60F98E02-807F-4EDC-8747-147C365606B1}
+		{07E80234-B95F-42DC-99A3-A89A929DDDBF} = {60F98E02-807F-4EDC-8747-147C365606B1}
+		{20E7A1C4-AFCD-4B8A-8AEF-06B0C27E72B7} = {60F98E02-807F-4EDC-8747-147C365606B1}
+		{7743D330-6A1A-496C-872B-E36C9EB38CE7} = {60F98E02-807F-4EDC-8747-147C365606B1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {566130B7-31A2-4407-A2E1-C22E60C85C2C}

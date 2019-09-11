@@ -8,3 +8,6 @@ obj
 *.pdb
 *.config
 *.xml
+
+!ManagedZLib_native.dll
+!DDSTools_Native.dll

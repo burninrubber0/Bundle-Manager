@@ -198,20 +198,20 @@ namespace PVSFormat
 				return;
 
 			// Draw all plates
-			for (int i = 0; i < PVS.Entries.Count; i++)
+			for (int i = 0; i < PVS.Zones.Count; i++)
 			{
-				PVSEntry plate = PVS.Entries[i];
+				PVSZone plate = PVS.Zones[i];
 
 				DrawMapSection(g, plate);
 			}
 		}
 
-		protected void DrawMapSection(Graphics g, PVSEntry entry)
+		protected void DrawMapSection(Graphics g, PVSZone entry)
 		{
-			PointF[] points = new PointF[entry.LocationData.Count];
-			for (int i = 0; i < entry.LocationData.Count; i++)
+			PointF[] points = new PointF[entry.Points.Count];
+			for (int i = 0; i < entry.Points.Count; i++)
 			{
-				LocationData data = entry.LocationData[i];
+				ZonePoint data = entry.Points[i];
 				points[i] = new PointF(data.X * Multiplier * RenderScale + RenderOffset.X, data.Y * Multiplier * RenderScale + RenderOffset.Y);
 			}
 
@@ -245,7 +245,7 @@ namespace PVSFormat
 					}
 					float textScale = RenderScale / (Multiplier * 2) - times;
 					font = new Font(Font.FontFamily, textScale);
-					infoText = entry.TrackID.ToString();
+					infoText = entry.ZoneID.ToString();
 					textSize = g.MeasureString(infoText, font);
 
 					times++;

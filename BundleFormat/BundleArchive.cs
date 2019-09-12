@@ -149,6 +149,8 @@ namespace BundleFormat
             result.ArchiveSize = br.ReadInt32();
             result.Flags = (Flags)br.ReadInt32();
 
+			// 8 Bytes Padding
+
             //long dataOffset = result.HeadStart;
 
             br.BaseStream.Position = result.RSTOffset;
@@ -171,10 +173,13 @@ namespace BundleFormat
                 int uncompressedHeaderSize = br.ReadInt32();
                 long uncompressedBodySize = br.ReadInt64();
                 entry.HeaderSize = br.ReadInt32();
-                entry.BodySize = br.ReadInt64();
+                entry.BodySize = br.ReadInt32();
+				entry.ThirdSize = br.ReadInt32();
+
                 entry.HeadOffset = br.ReadInt32();
-                entry.BodyOffset = br.ReadInt64();
-                entry.DependenciesListOffset = br.ReadInt32();
+                entry.BodyOffset = br.ReadInt32();
+				entry.ThirdOffset = br.ReadInt32();
+				entry.DependenciesListOffset = br.ReadInt32();
                 int fileType = br.ReadInt32();
                 entry.DependencyCount = br.ReadInt16();
 

@@ -38,10 +38,12 @@ namespace BundleFormat
         public int UncompressedBodySize;
         public int UncompressedBodySizeCache;
         public int HeaderSize;
-        public long BodySize;
-        public int HeadOffset;
-        public long BodyOffset;
-        public int DependenciesListOffset;
+        public int BodySize;
+		public int ThirdSize;
+		public int HeadOffset;
+        public int BodyOffset;
+		public int ThirdOffset;
+		public int DependenciesListOffset;
         public short DependencyCount;
         public int Unknown24;
         public int Unknown25;

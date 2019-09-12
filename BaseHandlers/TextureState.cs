@@ -54,7 +54,8 @@ namespace BaseHandlers
 						else
                             result.Texture = GameImage.GetImage(descEntry1.Header, descEntry1.Body);
 
-						TextureCache.AddToCache(id, result.Texture);
+						if (result.Texture != null)
+							TextureCache.AddToCache(id, result.Texture);
 
                         break;
                     }

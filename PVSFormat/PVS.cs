@@ -12,57 +12,64 @@ using PluginAPI;
 
 namespace PVSFormat
 {
-    public struct LocationData
+    public struct ZonePoint
     {
         public float X;
         public float Y;
-        public float Unknown1;
-        public int Unknown2;
+        public int Padding1; // Padding???
+		public int Padding2; // Padding???
 
-        public override string ToString()
+		public override string ToString()
         {
-            return "X: " + X + ", Y: " + Y + ", Unk1: " + Unknown1 + ", Unk2: " + Unknown2;
+            return "X: " + X + ", Y: " + Y + ", Padding1: " + Padding1 + ", Padding2: " + Padding2;
         }
     }
 
-    public struct NeighborData
+	public enum NeighbourFlags
+	{
+		E_RENDERFLAG_NONE = 0x0,
+		E_NEIGHBOURFLAG_RENDER = 0x1,
+		E_NEIGHBOURFLAG_IMMEDIATE = 0x2,
+		E_NEIGHBOURFLAG_RENDER_IMMEDIATE = 0x3,
+	}
+
+    public struct ZoneNeighbour
     {
         public int NeighborIndex;
         public uint NeighborPtr;
-        public int Type;
-        public int Unknown1;
-        public int Unknown2;
+        public NeighbourFlags Flags;
+        public int Padding1; // Padding???
+		public int Padding2; // Padding???
 
-        public override string ToString()
+		public override string ToString()
         {
-            return "NeighborIndex: " + NeighborIndex + ", Type: " + Type + ", Unk1: " + Unknown1 + ", Unk2: " + Unknown2;
+            return "NeighborIndex: " + NeighborIndex + ", Type: " + Flags + ", Unk1: " + Padding1 + ", Unk2: " + Padding2;
         }
     }
 
-    public struct PVSEntry
+    public struct PVSZone
     {
         public uint Address;
-        public uint Ptr1;
-        public int Unknown1;
-        public uint Ptr2;
-        public int Unknown2;
-        public int TrackID;
-        public int Unknown3;
-        public short Unknown4;
-        public short Count1;
-        public short Unknown5;
-        public short Count2;
-        public int Unknown6;
-        public int Unknown7;
-        public int Unknown8;
-        public int Unknown9;
+        public uint PointsPtr;
+        public uint SafeNeighboursPtr;
+        public uint UnsafeNeighboursPtr;
+        public uint Unknown;
+        public long ZoneID;
+		public short ZoneType;
+		public short NumPoints;
+        public short NumSafeNeighbours;
+        public short NumUnsafeNeighbours;
+        public int Flags;
+        public int Padding1; // Padding???
+		public int Padding2; // Padding???
+		public int Padding3; // Padding???
 
-        public List<LocationData> LocationData;
-        public List<NeighborData> NeighborData;
+		public List<ZonePoint> Points;
+        public List<ZoneNeighbour> UnsafeNeighbours;
 
         public override string ToString()
         {
-            return "TrackID: " + TrackID;
+            return "ZoneID: " + ZoneID;
         }
     }
 
@@ -70,31 +77,32 @@ namespace PVSFormat
     {
 		private Image _gameMap;
 
-        public int Unknown1;
-        public int Unknown2;
-        public int Unknown3;
-        public int Unknown4;
-        public int Unknown6;
-        public int Unknown7;
-        public int Unknown8;
-        public List<PVSEntry> Entries;
+		public uint PointsPtr;
+		public uint ZonePtr;
+		public uint ZonePointStart1;
+		public uint ZonePointStart2;
+		public uint ZonePointCount;
+		public uint TotalZones;
+        public uint TotalPoints;
+		public uint Padding; // Padding???
+		public List<PVSZone> Zones;
 
         public PVS()
         {
-            Entries = new List<PVSEntry>();
+            Zones = new List<PVSZone>();
         }
 
 		private void Clear()
 		{
-			Unknown1 = default;
-			Unknown2 = default;
-			Unknown3 = default;
-			Unknown4 = default;
-			Unknown6 = default;
-			Unknown7 = default;
-			Unknown8 = default;
+			PointsPtr = default;
+			ZonePtr = default;
+			ZonePointStart1 = default;
+			ZonePointStart2 = default;
+			ZonePointCount = default;
+			TotalZones = default;
+			TotalPoints = default;
 
-			Entries.Clear();
+			Zones.Clear();
 		}
 
         public bool Read(BundleEntry entry, ILoader loader)
@@ -105,86 +113,87 @@ namespace PVSFormat
             BinaryReader2 br = new BinaryReader2(s);
             br.BigEndian = entry.Console;
 
-            Unknown1 = br.ReadInt32();
-            Unknown2 = br.ReadInt32();
-            Unknown3 = br.ReadInt32();
-            Unknown4 = br.ReadInt32();
-            int numEntries = br.ReadInt32();
-            Unknown6 = br.ReadInt32();
-            Unknown7 = br.ReadInt32();
-            Unknown8 = br.ReadInt32();
+			PointsPtr = br.ReadUInt32();
+			ZonePtr = br.ReadUInt32();
 
-            for (int i = 0; i < numEntries; i++)
+			ZonePointStart1 = br.ReadUInt32();
+			ZonePointStart2 = br.ReadUInt32();
+
+			ZonePointCount = br.ReadUInt32();
+			TotalZones = br.ReadUInt32();
+            TotalPoints = br.ReadUInt32();
+			Padding = br.ReadUInt32();
+
+            for (uint i = 0; i < ZonePointCount; i++)
             {
-                PVSEntry pvsEntry = new PVSEntry();
+                PVSZone pvsEntry = new PVSZone();
 
                 pvsEntry.Address = (uint)br.BaseStream.Position;
-                pvsEntry.Ptr1 = br.ReadUInt32();
-                pvsEntry.Unknown1 = br.ReadInt32();
-                pvsEntry.Ptr2 = br.ReadUInt32();
-                pvsEntry.Unknown2 = br.ReadInt32();
-                pvsEntry.TrackID = br.ReadInt32();
-                pvsEntry.Unknown3 = br.ReadInt32();
-                pvsEntry.Unknown4 = br.ReadInt16();
-                pvsEntry.Count1 = br.ReadInt16();
-                pvsEntry.Unknown5 = br.ReadInt16();
-                pvsEntry.Count2 = br.ReadInt16();
-                pvsEntry.Unknown6 = br.ReadInt32();
-                pvsEntry.Unknown7 = br.ReadInt32();
-                pvsEntry.Unknown8 = br.ReadInt32();
-                pvsEntry.Unknown9 = br.ReadInt32();
+                pvsEntry.PointsPtr = br.ReadUInt32();
+                pvsEntry.SafeNeighboursPtr = br.ReadUInt32();
+                pvsEntry.UnsafeNeighboursPtr = br.ReadUInt32();
+                pvsEntry.Unknown = br.ReadUInt32();
+                pvsEntry.ZoneID = br.ReadInt64();
+				pvsEntry.ZoneType = br.ReadInt16();
+				pvsEntry.NumPoints = br.ReadInt16();
+				pvsEntry.NumSafeNeighbours = br.ReadInt16();
+                pvsEntry.NumUnsafeNeighbours = br.ReadInt16();
+                pvsEntry.Flags = br.ReadInt32();
+                pvsEntry.Padding1 = br.ReadInt32();
+				pvsEntry.Padding2 = br.ReadInt32();
+                pvsEntry.Padding3 = br.ReadInt32();
 
                 long pos = br.BaseStream.Position;
 
-                br.BaseStream.Position = (long)pvsEntry.Ptr1;
+                br.BaseStream.Position = (long)pvsEntry.PointsPtr;
 
-                pvsEntry.LocationData = new List<LocationData>();
-                for (int j = 0; j < pvsEntry.Count1; j++)
+                pvsEntry.Points = new List<ZonePoint>();
+                for (int j = 0; j < pvsEntry.NumPoints; j++)
                 {
-                    LocationData data = new LocationData();
+                    ZonePoint data = new ZonePoint();
 
                     data.X = br.ReadSingle();
                     data.Y = br.ReadSingle();
-                    data.Unknown1 = br.ReadSingle();
-                    data.Unknown2 = br.ReadInt32();
+                    data.Padding1 = br.ReadInt32();
+                    data.Padding2 = br.ReadInt32();
 
-                    pvsEntry.LocationData.Add(data);
+                    pvsEntry.Points.Add(data);
                 }
 
-                br.BaseStream.Position = (long) pvsEntry.Ptr2;
+                br.BaseStream.Position = (long) pvsEntry.UnsafeNeighboursPtr;
 
-                pvsEntry.NeighborData = new List<NeighborData>();
-                for (int j = 0; j < pvsEntry.Count2; j++)
+                pvsEntry.UnsafeNeighbours = new List<ZoneNeighbour>();
+                for (int j = 0; j < pvsEntry.NumUnsafeNeighbours; j++)
                 {
-                    NeighborData data = new NeighborData();
+                    ZoneNeighbour data = new ZoneNeighbour();
 
                     data.NeighborIndex = -1;
 
                     data.NeighborPtr = br.ReadUInt32();
-                    data.Type = br.ReadInt32();
-                    data.Unknown1 = br.ReadInt32();
-                    data.Unknown2 = br.ReadInt32();
+                    data.Flags = (NeighbourFlags)br.ReadInt32();
+                    data.Padding1 = br.ReadInt32();
+                    data.Padding2 = br.ReadInt32();
 
-                    pvsEntry.NeighborData.Add(data);
+                    pvsEntry.UnsafeNeighbours.Add(data);
                 }
 
                 br.BaseStream.Position = pos;
 
-                Entries.Add(pvsEntry);
+                Zones.Add(pvsEntry);
             }
 
-            for (int i = 0; i < Entries.Count; i++)
+            for (int i = 0; i < Zones.Count; i++)
             {
-                for (int k = 0; k < Entries[i].NeighborData.Count; k++)
+                for (int k = 0; k < Zones[i].UnsafeNeighbours.Count; k++)
                 {
-                    NeighborData data = Entries[i].NeighborData[k];
+                    ZoneNeighbour data = Zones[i].UnsafeNeighbours[k];
                     uint ptr = data.NeighborPtr;
-                    for (int j = 0; j < Entries.Count; j++)
+                    for (int j = 0; j < Zones.Count; j++)
                     {
-                        if (Entries[j].Address == ptr)
+                        if (Zones[j].Address == ptr)
                         {
                             data.NeighborIndex = j;
-                            Entries[i].NeighborData[k] = data;
+                            Zones[i].UnsafeNeighbours[k] = data;
                             break;
                         }
                     }
@@ -250,7 +259,8 @@ namespace PVSFormat
 				else
 					image = GameImage.GetImage(descEntry1.Header, descEntry1.Body);
 
-				TextureCache.AddToCache(id, image);
+				if (image != null)
+					TextureCache.AddToCache(id, image);
 			}
 			return image;
 		}

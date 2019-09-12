@@ -171,7 +171,8 @@ namespace BundleFormat
 
                 entry.References = br.ReadUInt64();
                 int uncompressedHeaderSize = br.ReadInt32();
-                long uncompressedBodySize = br.ReadInt64();
+                long uncompressedBodySize = br.ReadInt32();
+				long uncompressedThirdSize = br.ReadInt32();
                 entry.HeaderSize = br.ReadInt32();
                 entry.BodySize = br.ReadInt32();
 				entry.ThirdSize = br.ReadInt32();

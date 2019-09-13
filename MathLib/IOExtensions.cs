@@ -74,7 +74,23 @@ namespace MathLib
             self.Write(value.Z);
         }
 
-        public static Vector3S ReadVector3S(this BinaryReader self)
+		public static Vector2I ReadVector2I(this BinaryReader self)
+		{
+			Vector2I result = new Vector2I();
+
+			result.X = self.ReadInt32();
+			result.Y = self.ReadInt32();
+
+			return result;
+		}
+
+		public static void Write(this BinaryWriter self, Vector2I value)
+		{
+			self.Write(value.X);
+			self.Write(value.Y);
+		}
+
+		public static Vector3S ReadVector3S(this BinaryReader self)
         {
             Vector3S result = new Vector3S();
 

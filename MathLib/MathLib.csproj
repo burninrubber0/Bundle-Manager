@@ -51,6 +51,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RectF.cs" />
     <Compile Include="Triangle.cs" />
+    <Compile Include="Vector2i.cs" />
     <Compile Include="Vector3i.cs" />
     <Compile Include="Vector3s.cs" />
   </ItemGroup>

@@ -188,14 +188,6 @@
       <Project>{a56b769d-941f-4b1e-9905-f5a981fa6ead}</Project>
       <Name>IconLibrary</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MathLib\MathLib.csproj">
-      <Project>{e9e7ffa3-84ae-42af-bfe3-c50d2b034c28}</Project>
-      <Name>MathLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ModelViewer\ModelViewer.csproj">
-      <Project>{463d5389-3704-473e-b4c3-b334474cefde}</Project>
-      <Name>ModelViewer</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PluginAPI\PluginAPI.csproj">
       <Project>{757F0204-F091-464D-AA42-FE8919FF73BB}</Project>
       <Name>PluginAPI</Name>

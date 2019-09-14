@@ -12,9 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using BundleFormat;
 using BundleUtilities;
-using BurnoutImage;
 using DebugHelper;
-using ModelViewer.SceneData;
 using PluginAPI;
 using Util = BundleFormat.Util;
 

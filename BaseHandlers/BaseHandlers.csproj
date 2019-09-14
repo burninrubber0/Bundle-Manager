@@ -120,6 +120,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)BundleManager\bin\$(ConfigurationName)\plugins\"</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)BundleManager\bin\$(ConfigurationName)\plugins\" /s /e /y</PostBuildEvent>
   </PropertyGroup>
 </Project>

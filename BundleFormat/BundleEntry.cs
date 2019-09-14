@@ -87,7 +87,7 @@ namespace BundleFormat
 		{
 			return EntryBlocks != null &&
 				   section < EntryBlocks.Length &&
-				   section > 0 &&
+				   section >= 0 &&
 				   EntryBlocks[section] != null &&
 				   EntryBlocks[section].Data != null &&
 				   EntryBlocks[section].Data.Length > 0;

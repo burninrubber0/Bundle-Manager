@@ -2,12 +2,5 @@
 /packages/
 *.sdf
 *.user
+bin
 obj
-*.dll
-*.exe
-*.pdb
-*.config
-*.xml
-
-!ManagedZLib_native.dll
-!DDSTools_Native.dll

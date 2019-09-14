@@ -251,8 +251,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(SolutionDir)libs\*" "$(ProjectDir)$(OutDir)"
-copy "$(SolutionDir)resources\*" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(SolutionDir)libs\*" "$(ProjectDir)$(OutDir)" /s /e /y
+xcopy "$(SolutionDir)resources\*" "$(ProjectDir)$(OutDir)" /s /e /y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

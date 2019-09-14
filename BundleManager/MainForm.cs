@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BaseHandlers;
 using BundleFormat;
 using BundleUtilities;
 using BurnoutImage;
@@ -158,8 +157,7 @@ namespace BundleManager
         {
             lstEntries.Items.Clear();
 
-            dumpAllCollisionsToolStripMenuItem.Enabled = false;
-            removeWreckSurfacesToolStripMenuItem.Enabled = false;
+			UpdatePluginMenu();
 
             if (CurrentArchive == null)
             {
@@ -177,11 +175,6 @@ namespace BundleManager
             for (int i = 0; i < CurrentArchive.Entries.Count; i++)
             {
                 BundleEntry entry = CurrentArchive.Entries[i];
-                if (entry.Type == EntryType.PolygonSoupListResourceType)
-                {
-                    dumpAllCollisionsToolStripMenuItem.Enabled = true;
-                    removeWreckSurfacesToolStripMenuItem.Enabled = true;
-                }
                 Color color = entry.GetColor();
                 string[] values = new string[]
                 {
@@ -201,6 +194,51 @@ namespace BundleManager
             lstEntries.ListViewItemSorter = new EntrySorter(0); // Also calls Sort
             lstEntries.EndUpdate();
         }
+
+		private void UpdatePluginMenu()
+		{
+			int index = toolsToolStripMenuItem.DropDownItems.IndexOf(pluginToolsSeparatorItem) + 1;
+
+			while(true)
+			{
+				if (index >= toolsToolStripMenuItem.DropDownItems.Count)
+					break;
+
+				if (toolsToolStripMenuItem.DropDownItems[index] is ToolStripSeparator)
+					break;
+
+				toolsToolStripMenuItem.DropDownItems.RemoveAt(index);
+			}
+
+			PluginCommand[] commands = PluginCommandRegistry.Commands;
+
+			if (commands.Length == 0)
+			{
+				ToolStripItem item = new ToolStripMenuItem("No Plugin Commands");
+				item.Enabled = false;
+
+				toolsToolStripMenuItem.DropDownItems.Insert(index, item);
+			}
+			else
+			{
+				for (int i = 0; i < commands.Length; i++)
+				{
+					PluginCommand command = commands[i];
+
+					ToolStripItem item = new ToolStripMenuItem(command.Text);
+					if (CurrentArchive == null)
+						item.Enabled = false;
+					else if (command.CheckConditions == null)
+						item.Enabled = true;
+					else
+						item.Enabled = command.CheckConditions(CurrentArchive);
+
+					item.Click += (sender, args) => command.Use(this, CurrentArchive);
+
+					toolsToolStripMenuItem.DropDownItems.Insert(index + i, item);
+				}
+			}
+		}
 
         private void DoNew()
         {
@@ -341,8 +379,8 @@ namespace BundleManager
 
         public void DoSaveBundle(LoadingDialog loader, string path)
         {
-            if (CurrentArchive.Console)
-                ConvertToPC();
+            //if (CurrentArchive.Console)
+            //    ConvertToPC();
             Stream s = File.Open(path, FileMode.Create);
             BinaryWriter bw = new BinaryWriter(s);
 
@@ -557,16 +595,6 @@ namespace BundleManager
             Search();
         }
 
-        private void dumpAllCollisionsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-			DumpAllCollisions();
-        }
-
-        private void removeWreckSurfacesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-			RemoveWreckSurfaces();
-		}
-
 		#endregion
 
 		#region Utility
@@ -727,172 +755,6 @@ namespace BundleManager
 			{
 				this.Direction = !this.Direction;
 			}
-		}
-
-		#endregion
-
-		#region Extra Tools
-
-		private void DumpAllCollisions()
-		{
-			if (CurrentArchive == null)
-				return;
-
-			FolderBrowserDialog fbd = new FolderBrowserDialog();
-			DialogResult result = fbd.ShowDialog(this);
-			if (result == DialogResult.OK)
-			{
-				string path = fbd.SelectedPath;
-
-				for (int i = 0; ; i++)
-				{
-					string idListName = "trk_clil" + i;
-					string polyName = "trk_col_" + i;
-
-					ulong idListID = Crc32.HashCrc32B(idListName);
-					ulong polyID = Crc32.HashCrc32B(polyName);
-
-					BundleEntry entry = CurrentArchive.GetEntryByID(idListID);
-					if (entry == null)
-						break;
-					Stream outFile = File.Open(path + "/" + idListName + ".bin", FileMode.Create, FileAccess.Write);
-					BinaryWriter bw = new BinaryWriter(outFile);
-					bw.Write(entry.EntryBlocks[0].Data);
-					bw.Flush();
-					bw.Close();
-					outFile.Close();
-
-					BundleEntry polyEntry = CurrentArchive.GetEntryByID(polyID);
-					if (polyEntry == null)
-						break;
-					Stream outFilePoly = File.Open(path + "/" + polyName + ".bin", FileMode.Create, FileAccess.Write);
-					BinaryWriter bwPoly = new BinaryWriter(outFilePoly);
-					bwPoly.Write(polyEntry.EntryBlocks[0].Data);
-					bwPoly.Flush();
-					bwPoly.Close();
-					outFilePoly.Close();
-
-					PolygonSoupList poly = new PolygonSoupList();
-					poly.Read(polyEntry);
-					Scene scene = poly.MakeScene();
-					scene.ExportWavefrontObj(path + "/" + polyName + ".obj");
-				}
-
-				MessageBox.Show(this, "Done!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-			}
-		}
-
-		private void RemoveWreckSurfaces()
-		{
-			for (int i = 0; i < CurrentArchive.Entries.Count; i++)
-            {
-                BundleEntry entry = CurrentArchive.Entries[i];
-
-                if (entry.Type == EntryType.PolygonSoupListResourceType)
-                {
-					PolygonSoupList list = new PolygonSoupList();
-					list.Read(entry);
-                    list.RemoveWreckSurfaces();
-                    list.Write(entry);
-                }
-            }
-		}
-
-		public void ConvertImagesFromPS3ToPC_old()
-		{
-			if (CurrentArchive == null)
-			{
-				MessageBox.Show(this, "No Archive Open!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-				return;
-			}
-			if (CurrentArchive.Console)
-			{
-				for (int i = 0; i < CurrentArchive.Entries.Count; i++)
-				{
-					BundleEntry entry = CurrentArchive.Entries[i];
-					if (entry.EntryBlocks[0].Data.Length == 48 && entry.EntryBlocks[1].Data != null && entry.EntryBlocks[1].Data.Length > 0)
-					{
-						MemoryStream ms = new MemoryStream(entry.EntryBlocks[0].Data);
-						BinaryReader2 br = new BinaryReader2(ms);
-						br.BigEndian = entry.Console;
-
-						byte compression = br.ReadByte();
-						byte[] unknown1 = br.ReadBytes(3);
-						byte[] type = Encoding.ASCII.GetBytes("DXT1");
-						if (compression == 0x85)
-						{
-							type = new byte[] { 0x15, 0x00, 0x00, 0x00 };
-						}
-						else if (compression == 0x86)
-						{
-							type = Encoding.ASCII.GetBytes("DXT1");
-						}
-						else if (compression == 0x88)
-						{
-							type = Encoding.ASCII.GetBytes("DXT5");
-						}
-						int unknown2 = Util.ReverseBytes(br.ReadInt32());
-						int width = Util.ReverseBytes(br.ReadInt16());
-						int height = Util.ReverseBytes(br.ReadInt16());
-						br.Close();
-
-						MemoryStream msx = new MemoryStream();
-						BinaryWriter bw = new BinaryWriter(msx);
-
-						bw.Write((int)0);
-						bw.Write((int)0);
-						bw.Write((int)0);
-						bw.Write((int)1);
-
-						bw.Write(type);
-						bw.Write((short)width);
-						bw.Write((short)height);
-						bw.Write((int)0x15);
-						bw.Write((int)0);
-
-						bw.Flush();
-
-						byte[] Data = msx.ToArray();
-
-						bw.Close();
-
-						entry.EntryBlocks[0].Data = Data;
-
-						entry.Dirty = true;
-					}
-				}
-			}
-			else
-			{
-				MessageBox.Show(this, "This feature only works on PS3 Bundle Files", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-			}
-		}
-
-		public void ConvertToPC()
-		{
-			// TODO: Support everything
-
-			for (int i = 0; i < CurrentArchive.Entries.Count; i++)
-			{
-				BundleEntry entry = CurrentArchive.Entries[i];
-
-				if (entry.Type == EntryType.IDList)
-				{
-					IDList list = new IDList();
-					list.Read(entry);
-					list.Write(entry);
-				}
-				else if (entry.Type == EntryType.PolygonSoupListResourceType)
-				{
-					PolygonSoupList list = new PolygonSoupList();
-					list.Read(entry);
-					list.Write(entry);
-				}
-			}
-
-			//PatchImages();
-
-			CurrentArchive.Platform = BundlePlatform.PC;
 		}
 
 		#endregion

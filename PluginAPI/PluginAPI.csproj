@@ -42,10 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PluginCommandRegistry.cs" />
     <Compile Include="EntryTypeRegistry.cs" />
     <Compile Include="IEntryData.cs" />
     <Compile Include="IEntryEditor.cs" />
     <Compile Include="Plugin.cs" />
+    <Compile Include="PluginCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

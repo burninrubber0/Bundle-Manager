@@ -167,10 +167,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BaseHandlers\BaseHandlers.csproj">
-      <Project>{7743d330-6a1a-496c-872b-e36c9eb38ce7}</Project>
-      <Name>BaseHandlers</Name>
-    </ProjectReference>
     <ProjectReference Include="..\BundleFormat\BundleFormat.csproj">
       <Project>{49b81828-760c-42db-9fad-96755597c871}</Project>
       <Name>BundleFormat</Name>

@@ -794,7 +794,7 @@ namespace BaseHandlers
             bw.Close();
             ms.Close();
 
-            entry.Header = data;
+            entry.EntryBlocks[0].Data = data;
             entry.Dirty = true;
 
 			return true;

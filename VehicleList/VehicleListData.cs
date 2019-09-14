@@ -127,7 +127,7 @@ namespace VehicleList
 		{
 			Clear();
 
-			MemoryStream ms = new MemoryStream(entry.Header);
+			MemoryStream ms = new MemoryStream(entry.EntryBlocks[0].Data);
 			BinaryReader2 br = new BinaryReader2(ms);
 			br.BigEndian = entry.Console;
 			//currentList = mbr.ReadVehicleList();
@@ -256,7 +256,7 @@ namespace VehicleList
 			bw.Close();
 			ms.Close();
 
-			entry.Header = data;
+			entry.EntryBlocks[0].Data = data;
 			entry.Dirty = true;
 
 			return true;

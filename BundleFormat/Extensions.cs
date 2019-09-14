@@ -104,6 +104,17 @@ namespace BundleFormat
             return false;
         }
 
+		public static void Align(this BinaryWriter self, byte alignment)
+		{
+			self.BaseStream.Position = alignment * ((self.BaseStream.Position + (alignment - 1)) / alignment);
+			self.BaseStream.Position--;
+			self.Write((byte)0);
+
+			/*long currentOffset = self.BaseStream.Position;
+			for (int i = 0; i < (alignment - (currentOffset % alignment)); i++)
+				self.Write((byte)0);*/
+		}
+
         public static void WriteBND2Archive(this BinaryWriter self, BundleArchive result)
         {
             self.Write(BundleArchive.Magic);
@@ -115,163 +126,122 @@ namespace BundleFormat
 
             self.Write(result.Entries.Count);
 
-            long metadataStartOffset = self.BaseStream.Position;
+            long idBlockOffsetPos = self.BaseStream.Position;
             self.Write((int)0);
 
-            long dataStartOffset = self.BaseStream.Position;
-            self.Write((int)0);
+			long[] fileBlockOffsetsPos = new long[3];
 
-            long extraDataStartOffset = self.BaseStream.Position;
-            self.Write((int)0);
-
-            long archiveSizeOffset = self.BaseStream.Position;
-            self.Write((int)0);
+			for (int i = 0; i < fileBlockOffsetsPos.Length; i++)
+			{
+				fileBlockOffsetsPos[i] = self.BaseStream.Position;
+				self.BaseStream.Position += 4;
+			}
 
             self.Write((int)result.Flags);
 
-            self.BaseStream.Position += 8;
+			self.Align(16);
 
+			long currentOffset = self.BaseStream.Position;
+			self.BaseStream.Position = rstOffset;
+			self.Write((uint)currentOffset);
+			self.BaseStream.Position = currentOffset;
+			
+			if (result.Flags.HasFlag(Flags.HasResourceStringTable))
+			{
+				self.WriteCStr(result.ResourceStringTable);
 
-            long currentOffset = self.BaseStream.Position;
-            self.Seek((int)rstOffset, SeekOrigin.Begin);
+				self.Align(16);
+			}
+
+			// ID Block
+            currentOffset = self.BaseStream.Position;
+            self.Seek((int)idBlockOffsetPos, SeekOrigin.Begin);
             self.Write((int)currentOffset);
             self.Seek((int)currentOffset, SeekOrigin.Begin);
-            self.WriteCStr(result.ResourceStringTable);
-            currentOffset = self.BaseStream.Position;
-            for (int i = 0; i < (16 - (currentOffset % 16)); i++)
-                self.Write((byte) 0); // padding
 
+			List<long[]> entryDataPointerPos = new List<long[]>();
 
-            currentOffset = self.BaseStream.Position;
-            self.Seek((int)metadataStartOffset, SeekOrigin.Begin);
-            self.Write((int)currentOffset);
-            self.Seek((int)currentOffset, SeekOrigin.Begin);
+			List<byte[][]> compressedBlocks = new List<byte[][]>();
 
-            long[] startOffOffsets = new long[result.Entries.Count];
-            long[] extraStartOffOffsets = new long[result.Entries.Count];
-
-            for (int i = 0; i < result.Entries.Count; i++)
+			for (int i = 0; i < result.Entries.Count; i++)
             {
                 BundleEntry entry = result.Entries[i];
 
-                if (entry.Dirty)
-                {
-                    byte[] compressedData = entry.Header;
-                    byte[] compressedExtraData = entry.Body;
-                    if (compressedData != null)
-                        entry.UncompressedHeaderSize = compressedData.Length;
-                    if (compressedExtraData != null)
-                        entry.UncompressedBodySize = compressedExtraData.Length;
-                    if (entry.DataCompressed)
-                        compressedData = compressedData.Compress();
-                    if (entry.ExtraDataCompressed)
-                        compressedExtraData = compressedExtraData.Compress();
-
-                    entry.CompressedHeader = compressedData;
-                    entry.CompressedBody = compressedExtraData;
-                    entry.HeaderSize = compressedData.Length;
-                    if (compressedExtraData == null)
-                    {
-                        entry.BodySize = 0;
-                    }
-                    else
-                    {
-                        entry.BodySize = compressedExtraData.Length;
-                    }
-                }
+				compressedBlocks.Add(new byte[3][]);
 
                 self.Write(entry.ID);
                 self.Write(entry.References);
 
-                int uncompressedHeaderSize = entry.UncompressedHeaderSize;
-                int uncompressedHeaderSizeCache = entry.UncompressedHeaderSizeCache;
-                int uncompressedHeaderSizeAndCache = (uncompressedHeaderSizeCache << 28) | uncompressedHeaderSize;
+				for (int j = 0; j < entry.EntryBlocks.Length; j++)
+				{
+					EntryBlock entryBlock = entry.EntryBlocks[j];
+					uint uncompressedSize = 0;
+					if (entryBlock.Data != null)
+						uncompressedSize = (uint)entryBlock.Data.Length;
+					//self.Write((entryBlock.UncompressedAlignment << 28) | uncompressedSize);
+					self.Write((uint)(uncompressedSize | (BitScan.BitScanReverse(entryBlock.UncompressedAlignment) << 28)));
+				}
 
-                self.Write(uncompressedHeaderSizeAndCache);
+				for (int j = 0; j < entry.EntryBlocks.Length; j++)
+				{
+					EntryBlock entryBlock = entry.EntryBlocks[j];
+					if (entryBlock.Data == null)
+						self.Write((uint)0);
+					else
+					{
+						compressedBlocks[i][j] = entryBlock.Data.Compress();
+						self.Write(compressedBlocks[i][j].Length);
+					}
+				}
 
-                int uncompressedBodySize = entry.UncompressedBodySize;
-                int uncompressedBodySizeCache = entry.UncompressedBodySizeCache;
-                long uncompressedBodySizeAndCache = (uncompressedBodySizeCache << 28) | uncompressedBodySize;
-                self.Write(uncompressedBodySizeAndCache);
-                self.Write(entry.HeaderSize);
-                self.Write(entry.BodySize);
-
-                startOffOffsets[i] = self.BaseStream.Position;
-                self.Write((int)0);
-
-                extraStartOffOffsets[i] = self.BaseStream.Position;
-                self.Write((long)0);
+				entryDataPointerPos.Add(new long[3]);
+				for (int j = 0; j < entryDataPointerPos[i].Length; j++)
+				{
+					entryDataPointerPos[i][j] = self.BaseStream.Position;
+					self.BaseStream.Position += 4;
+				}
                 
                 self.Write(entry.DependenciesListOffset);
                 self.Write((int)entry.Type);
                 self.Write(entry.DependencyCount);
-                self.BaseStream.Position += 2;
+
+                self.BaseStream.Position += 2; // Padding
             }
 
+			// Data Block
+			for (int i = 0; i < 3; i++)
+			{
+				long blockStart = self.BaseStream.Position;
+				self.BaseStream.Position = fileBlockOffsetsPos[i];
+				self.Write((uint)blockStart);
+				self.BaseStream.Position = blockStart;
 
-            currentOffset = self.BaseStream.Position;
-            long startData = currentOffset;
-            self.Seek((int)dataStartOffset, SeekOrigin.Begin);
-            self.Write((int)currentOffset);
-            self.Seek((int)currentOffset, SeekOrigin.Begin);
+				for (int j = 0; j < result.Entries.Count; j++)
+				{
+					BundleEntry entry = result.Entries[j];
+					EntryBlock entryBlock = entry.EntryBlocks[i];
+					bool compressed = result.Flags.HasFlag(Flags.Compressed);
+					uint size = compressed ? (compressedBlocks[j][i] == null ? 0 : (uint)compressedBlocks[j][i].Length) : (uint)entryBlock.Data.Length;
 
-            for (int i = 0; i < result.Entries.Count; i++)
-            {
-                BundleEntry entry = result.Entries[i];
+					if (size > 0)
+					{
+						long pos = self.BaseStream.Position;
+						self.BaseStream.Position = entryDataPointerPos[j][i];
+						self.Write((uint)(pos - blockStart));
+						self.BaseStream.Position = pos;
 
-                currentOffset = self.BaseStream.Position;
-                self.Seek((int)startOffOffsets[i], SeekOrigin.Begin);
-                self.Write(currentOffset - startData);
-                self.Seek((int)currentOffset, SeekOrigin.Begin);
+						if (compressed)
+							self.Write(compressedBlocks[j][i]);
+						else
+							self.Write(entryBlock.Data);
 
-                self.Write(entry.CompressedHeader);
-                self.Write(entry.Unknown24);
-                int numPadding = 16 - (entry.CompressedHeader.Length + 4) % 16;
-                for (int j = 0; j < numPadding; j++)
-                    self.Write((byte)0);
-            }
+						self.Align((i != 0 && j != result.Entries.Count - 1) ? (byte)0x80 : (byte)16);
+					}
+				}
 
-            currentOffset = self.BaseStream.Position;
-            int padding = 16 - (int)currentOffset % 16;
-            for (int j = 0; j < padding; j++)
-                self.Write((byte)0);
-
-            for (int j = 0; j < 16 * 4; j++)
-                self.Write((byte)0);
-
-            currentOffset = self.BaseStream.Position;
-            long startExtraData = currentOffset;
-            self.Seek((int)extraDataStartOffset, SeekOrigin.Begin);
-            self.Write((int)currentOffset);
-            self.Seek((int)currentOffset, SeekOrigin.Begin);
-
-
-            for (int i = 0; i < result.Entries.Count; i++)
-            {
-                BundleEntry entry = result.Entries[i];
-                if (entry.CompressedBody == null || entry.Body == null)
-                    continue;
-
-                currentOffset = self.BaseStream.Position;
-                self.Seek((int)extraStartOffOffsets[i], SeekOrigin.Begin);
-                self.Write(currentOffset - startExtraData);
-                self.Seek((int)currentOffset, SeekOrigin.Begin);
-
-                self.Write(entry.CompressedBody);
-                self.Write(entry.Unknown25);
-
-                int numPadding = 16 - (entry.CompressedBody.Length + 4) % 16;
-                for (int j = 0; j < numPadding; j++)
-                    self.Write((byte)0);
-
-                for (int j = 0; j < 16 * 4; j++)
-                    self.Write((byte)0);
-            }
-
-            currentOffset = self.BaseStream.Position;
-            self.Seek((int)archiveSizeOffset, SeekOrigin.Begin);
-            self.Write((int)currentOffset);
-            self.Seek((int)currentOffset, SeekOrigin.Begin);
+				if (i != 2)
+					self.Align(0x80);
+			}
         }
     }
 }

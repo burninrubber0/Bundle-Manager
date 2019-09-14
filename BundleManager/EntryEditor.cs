@@ -681,9 +681,9 @@ namespace BundleManager
             else if (_entry.Type == EntryType.RasterResourceType)
             {
                 if (_entry.Console)
-                    Image = GameImage.GetImagePS3(_entry.Header, _entry.Body);
+                    Image = GameImage.GetImagePS3(_entry.EntryBlocks[0].Data, _entry.EntryBlocks[1].Data);
 				else
-                    Image = GameImage.GetImage(_entry.Header, _entry.Body);
+                    Image = GameImage.GetImage(_entry.EntryBlocks[0].Data, _entry.EntryBlocks[1].Data);
 
                 ImageVisible = Image != null;
 
@@ -697,8 +697,8 @@ namespace BundleManager
 
             if (TabsVisible)
             {
-                DataHex = _entry.Header;//.AsString();
-                ExtraDataHex = _entry.Body;//.AsString();
+				DataHex = _entry.EntryBlocks[0].Data;//.AsString();
+                ExtraDataHex = _entry.EntryBlocks[1].Data;//.AsString();
             }
 
             MenuVisible = true;
@@ -767,7 +767,7 @@ namespace BundleManager
             ImageMenuVisible = false;
             BinaryMenuVisible = false;
 
-            MemoryStream ms = new MemoryStream(_entry.Header);
+            MemoryStream ms = new MemoryStream(_entry.EntryBlocks[0].Data);
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = _entry.Console;
 
@@ -829,7 +829,7 @@ namespace BundleManager
                     }
                 }
 
-                _entry.Body = mspixels.ToArray();
+                _entry.EntryBlocks[1].Data = mspixels.ToArray();
 
                 MemoryStream msx = new MemoryStream();
                 BinaryWriter bw = new BinaryWriter(msx);
@@ -856,7 +856,7 @@ namespace BundleManager
 
                 bw.Flush();
 
-                _entry.Header = msx.ToArray();
+                _entry.EntryBlocks[0].Data = msx.ToArray();
 
                 bw.Close();
             }
@@ -895,10 +895,10 @@ namespace BundleManager
 
                 bw.Flush();
 
-                Entry.Header = msx.ToArray();
+                Entry.EntryBlocks[0].Data = msx.ToArray();
 
                 //bw.Close();
-                Entry.Body = info.ExtraData;
+                Entry.EntryBlocks[1].Data = info.ExtraData;
             }
 
             ImageVisible = false;
@@ -930,7 +930,7 @@ namespace BundleManager
             byte[] data = ms.ToArray();
             ms.Close();
 
-            Entry.Header = data;
+            Entry.EntryBlocks[0].Data = data;
             Entry.Dirty = true;
             
             Task.Run(() => UpdateDisplay());
@@ -952,7 +952,7 @@ namespace BundleManager
                 return;
 
             Stream s = sfd.OpenFile();
-            MemoryStream ms = new MemoryStream(Entry.Header);
+            MemoryStream ms = new MemoryStream(Entry.EntryBlocks[0].Data);
             ms.CopyTo(s);
             s.Flush();
             s.Close();
@@ -981,7 +981,7 @@ namespace BundleManager
             byte[] data = ms.ToArray();
             ms.Close();
 
-            Entry.Body = data;
+            Entry.EntryBlocks[1].Data = data;
             Entry.Dirty = true;
 
             Task.Run(() => UpdateDisplay());
@@ -1003,7 +1003,7 @@ namespace BundleManager
                 return;
 
             Stream s = sfd.OpenFile();
-            MemoryStream ms = new MemoryStream(Entry.Body);
+            MemoryStream ms = new MemoryStream(Entry.EntryBlocks[1].Data);
             ms.CopyTo(s);
             s.Flush();
             s.Close();
@@ -1039,7 +1039,7 @@ namespace BundleManager
                 if (entry.Type != EntryType.RwVertexDescResourceType)
                     continue;
 
-                byte[] entryData = entry.Header;
+                byte[] entryData = entry.EntryBlocks[0].Data;
 
                 MemoryStream ems = new MemoryStream(entryData);
                 BinaryReader2 ebr = new BinaryReader2(ems);
@@ -1085,7 +1085,7 @@ namespace BundleManager
 
             string modelInfo = "";
 
-            byte[] header = Entry.Header;
+            byte[] header = Entry.EntryBlocks[0].Data;
 
             MemoryStream ms = new MemoryStream(header);
             BinaryReader2 br = new BinaryReader2(ms);
@@ -1135,7 +1135,7 @@ namespace BundleManager
                 return;
             }
             
-            byte[] header = Entry.Header;
+            byte[] header = Entry.EntryBlocks[0].Data;
 
             MemoryStream ms = new MemoryStream(header);
             BinaryReader2 br = new BinaryReader2(ms);
@@ -1166,7 +1166,7 @@ namespace BundleManager
             try
             {
 
-                byte[] data = Entry.Body;
+                byte[] data = Entry.EntryBlocks[1].Data;
                 ms = new MemoryStream(data);
                 br = new BinaryReader2(ms);
                 br.BigEndian = Entry.Console;

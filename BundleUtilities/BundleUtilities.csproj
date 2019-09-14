@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BinaryReader2.cs" />
+    <Compile Include="BitScan.cs" />
     <Compile Include="Colour.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Crc32.cs" />

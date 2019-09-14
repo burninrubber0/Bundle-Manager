@@ -101,7 +101,7 @@ namespace LangEditor
 
             bw.BaseStream.Position = pos2;
 
-            int paddingCount = (int)(entry.Header.Length - bw.BaseStream.Position);
+            int paddingCount = (int)(entry.EntryBlocks[0].Data.Length - bw.BaseStream.Position);
 
             string padding = "";
             for (int i = 0; i < paddingCount; i++)
@@ -113,7 +113,7 @@ namespace LangEditor
             bw.Close();
             ms.Close();
 
-            entry.Header = data;
+            entry.EntryBlocks[0].Data = data;
             entry.Dirty = true;
 
 			return true;

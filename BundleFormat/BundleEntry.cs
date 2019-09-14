@@ -11,6 +11,14 @@ using Microsoft.SqlServer.Server;
 
 namespace BundleFormat
 {
+	public class EntryBlock
+	{
+		//public uint UncompressedSize;
+		public uint UncompressedAlignment; // default depending on file type
+		//public uint CompressedSize;
+		public byte[] Data;
+	}
+
     public class EntryInfo
     {
         public uint ID;
@@ -33,34 +41,37 @@ namespace BundleFormat
 
         public ulong ID;
         public ulong References;
-        public int UncompressedHeaderSize;
-        public int UncompressedHeaderSizeCache;
-        public int UncompressedBodySize;
-        public int UncompressedBodySizeCache;
-        public int HeaderSize;
-        public int BodySize;
-		public int ThirdSize;
-		public int HeadOffset;
-        public int BodyOffset;
-		public int ThirdOffset;
+        //public int UncompressedHeaderSize;
+        //public int UncompressedHeaderSizeCache;
+        //public int UncompressedBodySize;
+        //public int UncompressedBodySizeCache;
+        //public int HeaderSize;
+        //public int BodySize;
+		//public int ThirdSize;
+		//public int HeadOffset;
+        //public int BodyOffset;
+		//public int ThirdOffset;
 		public int DependenciesListOffset;
         public short DependencyCount;
-        public int Unknown24;
-        public int Unknown25;
+        //public int Unknown24;
+        //public int Unknown25;
 
-        public byte[] Header;
-        public byte[] Body;
+        //public byte[] Header;
+        //public byte[] Body;
 
-        public byte[] CompressedHeader;
-        public byte[] CompressedBody;
+        //public byte[] CompressedHeader;
+        //public byte[] CompressedBody;
 
-        public bool DataCompressed;
-        public bool ExtraDataCompressed;
+		public EntryBlock[] EntryBlocks;
 
-        public bool HasHeader => Header != null && Header.Length > 0;
-        public bool HasBody => Body != null && Body.Length > 0;
+		//public bool DataCompressed;
+		//public bool ExtraDataCompressed;
 
-        public EntryType Type;
+		public bool HasHeader => HasSection(0);
+        public bool HasBody => HasSection(1);
+		public bool HasThird => HasSection(2);
+
+		public EntryType Type;
 
         public BundlePlatform Platform;
         public bool Console => Platform == BundlePlatform.X360 || Platform == BundlePlatform.PS3;
@@ -72,11 +83,24 @@ namespace BundleFormat
             Archive = archive;
         }
 
+		public bool HasSection(int section)
+		{
+			return EntryBlocks != null &&
+				   section < EntryBlocks.Length &&
+				   section > 0 &&
+				   EntryBlocks[section] != null &&
+				   EntryBlocks[section].Data != null &&
+				   EntryBlocks[section].Data.Length > 0;
+		}
+
         public MemoryStream MakeStream(bool body = false)
         {
+			if (EntryBlocks == null)
+				return null;
+
             if (body)
-                return new MemoryStream(Body);
-            return new MemoryStream(Header);
+                return new MemoryStream(EntryBlocks[1].Data);
+            return new MemoryStream(EntryBlocks[0].Data);
         }
 
         public List<BundleDependency> GetDependencies()

@@ -604,7 +604,7 @@ namespace BaseHandlers
 				bw.Close();
 				ms.Close();
 
-				entry.Header = data2;
+				entry.EntryBlocks[0].Data = data2;
 				entry.Dirty = true;
 				return true;
 			}
@@ -698,7 +698,7 @@ namespace BaseHandlers
 			bw.Close();
 			ms.Close();
 
-			entry.Header = data;
+			entry.EntryBlocks[0].Data = data;
 			entry.Dirty = true;
 
 			return true;

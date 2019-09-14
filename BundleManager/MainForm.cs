@@ -189,8 +189,8 @@ namespace BundleManager
                     entry.DetectName(),
                     "0x" + entry.ID.ToString("X8"),
                     entry.Type.ToString(),
-                    entry.Header.Length.ToString(),
-                    entry.Header.MakePreview(0, 16)
+                    entry.EntryBlocks[0].Data.Length.ToString(),
+                    entry.EntryBlocks[0].Data.MakePreview(0, 16)
                 };
 
                 ListViewItem item = new ListViewItem(values);
@@ -757,7 +757,7 @@ namespace BundleManager
 						break;
 					Stream outFile = File.Open(path + "/" + idListName + ".bin", FileMode.Create, FileAccess.Write);
 					BinaryWriter bw = new BinaryWriter(outFile);
-					bw.Write(entry.Header);
+					bw.Write(entry.EntryBlocks[0].Data);
 					bw.Flush();
 					bw.Close();
 					outFile.Close();
@@ -767,7 +767,7 @@ namespace BundleManager
 						break;
 					Stream outFilePoly = File.Open(path + "/" + polyName + ".bin", FileMode.Create, FileAccess.Write);
 					BinaryWriter bwPoly = new BinaryWriter(outFilePoly);
-					bwPoly.Write(polyEntry.Header);
+					bwPoly.Write(polyEntry.EntryBlocks[0].Data);
 					bwPoly.Flush();
 					bwPoly.Close();
 					outFilePoly.Close();
@@ -810,9 +810,9 @@ namespace BundleManager
 				for (int i = 0; i < CurrentArchive.Entries.Count; i++)
 				{
 					BundleEntry entry = CurrentArchive.Entries[i];
-					if (entry.Header.Length == 48 && entry.Body != null && entry.BodySize > 0)
+					if (entry.EntryBlocks[0].Data.Length == 48 && entry.EntryBlocks[1].Data != null && entry.EntryBlocks[1].Data.Length > 0)
 					{
-						MemoryStream ms = new MemoryStream(entry.Header);
+						MemoryStream ms = new MemoryStream(entry.EntryBlocks[0].Data);
 						BinaryReader2 br = new BinaryReader2(ms);
 						br.BigEndian = entry.Console;
 
@@ -856,7 +856,7 @@ namespace BundleManager
 
 						bw.Close();
 
-						entry.Header = Data;
+						entry.EntryBlocks[0].Data = Data;
 
 						entry.Dirty = true;
 					}

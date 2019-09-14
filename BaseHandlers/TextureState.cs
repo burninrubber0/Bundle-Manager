@@ -50,9 +50,9 @@ namespace BaseHandlers
                     if (descEntry1 != null && descEntry1.Type == EntryType.RasterResourceType)
                     {
                         if (entry.Console)
-                            result.Texture = GameImage.GetImagePS3(descEntry1.Header, descEntry1.Body);
+                            result.Texture = GameImage.GetImagePS3(descEntry1.EntryBlocks[0].Data, descEntry1.EntryBlocks[1].Data);
 						else
-                            result.Texture = GameImage.GetImage(descEntry1.Header, descEntry1.Body);
+                            result.Texture = GameImage.GetImage(descEntry1.EntryBlocks[0].Data, descEntry1.EntryBlocks[1].Data);
 
 						if (result.Texture != null)
 							TextureCache.AddToCache(id, result.Texture);

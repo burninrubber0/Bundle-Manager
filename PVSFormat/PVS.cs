@@ -255,9 +255,9 @@ namespace PVSFormat
 			if (descEntry1 != null && descEntry1.Type == EntryType.RasterResourceType)
 			{
 				if (archive.Console)
-					image = GameImage.GetImagePS3(descEntry1.Header, descEntry1.Body);
+					image = GameImage.GetImagePS3(descEntry1.EntryBlocks[0].Data, descEntry1.EntryBlocks[1].Data);
 				else
-					image = GameImage.GetImage(descEntry1.Header, descEntry1.Body);
+					image = GameImage.GetImage(descEntry1.EntryBlocks[0].Data, descEntry1.EntryBlocks[1].Data);
 
 				if (image != null)
 					TextureCache.AddToCache(id, image);

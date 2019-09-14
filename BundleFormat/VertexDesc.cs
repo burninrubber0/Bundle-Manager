@@ -148,7 +148,7 @@ namespace BundleFormat
             bw.Close();
             ms.Close();
 
-            entry.Header = Data;
+            entry.EntryBlocks[0].Data = Data;
             entry.Dirty = true;
         }
     }

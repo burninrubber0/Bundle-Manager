@@ -16,8 +16,8 @@ namespace BundleFormat
     public enum Flags
     {
         Compressed = 1,
-        UnknownFlag1 = 2,
-        UnknownFlag2 = 4,
+        UnusedFlag1 = 2, // Always set
+        UnusedFlag2 = 4, // Always set
         HasResourceStringTable = 8
     }
 
@@ -37,11 +37,11 @@ namespace BundleFormat
         public int Version;
         public BundlePlatform Platform;
         public int RSTOffset; // Normally 30
-        public int FileCount;
-        public int MetadataStart;
-        public int HeadStart;
-        public int BodyStart;
-        public int ArchiveSize;
+        public int EntryCount;
+        public int IDBlockOffset;
+        //public int HeadStart;
+        //public int BodyStart;
+        //public int ArchiveSize;
         public Flags Flags;
         
         public bool Console => Platform == BundlePlatform.X360 || Platform == BundlePlatform.PS3;
@@ -118,7 +118,11 @@ namespace BundleFormat
                 {
                     Debug.WriteLine(ex.Message + "\n" + ex.StackTrace);
                     return null;
-                }
+                } catch (ReadFailedError ex)
+				{
+					Debug.WriteLine(ex.Message + "\n" + ex.StackTrace);
+					return null;
+				}
             }
         }
 
@@ -139,27 +143,26 @@ namespace BundleFormat
 
             br.BaseStream.Position -= 8;
             result.Version = br.ReadInt32();
+			if (result.Version != 2)
+			{
+				throw new ReadFailedError("Unsupported Bundle Version: " + result.Version);
+			}
             br.BaseStream.Position += 4;
 
             result.RSTOffset = br.ReadInt32();
-            result.FileCount = br.ReadInt32();
-            result.MetadataStart = br.ReadInt32();
-            result.HeadStart = br.ReadInt32();
-            result.BodyStart = br.ReadInt32();
-            result.ArchiveSize = br.ReadInt32();
+            result.EntryCount = br.ReadInt32();
+            result.IDBlockOffset = br.ReadInt32();
+			uint[] fileBlockOffsets = new uint[3];
+            fileBlockOffsets[0] = br.ReadUInt32();
+			fileBlockOffsets[1] = br.ReadUInt32();
+			fileBlockOffsets[2] = br.ReadUInt32();
             result.Flags = (Flags)br.ReadInt32();
 
 			// 8 Bytes Padding
 
-            //long dataOffset = result.HeadStart;
+            br.BaseStream.Position = result.IDBlockOffset;
 
-            br.BaseStream.Position = result.RSTOffset;
-
-            result.ResourceStringTable = br.ReadCStr();
-
-            br.BaseStream.Position = result.MetadataStart;
-
-            for (int i = 0; i < result.FileCount; i++)
+            for (int i = 0; i < result.EntryCount; i++)
             {
                 BundleEntry entry = new BundleEntry(result);
 
@@ -168,95 +171,75 @@ namespace BundleFormat
                 entry.Platform = result.Platform;
 
                 entry.ID = br.ReadUInt64();
-
                 entry.References = br.ReadUInt64();
-                int uncompressedHeaderSize = br.ReadInt32();
-                long uncompressedBodySize = br.ReadInt32();
-				long uncompressedThirdSize = br.ReadInt32();
-                entry.HeaderSize = br.ReadInt32();
-                entry.BodySize = br.ReadInt32();
-				entry.ThirdSize = br.ReadInt32();
 
-                entry.HeadOffset = br.ReadInt32();
-                entry.BodyOffset = br.ReadInt32();
-				entry.ThirdOffset = br.ReadInt32();
+				entry.EntryBlocks = new EntryBlock[3];
+				for (int j = 0; j < entry.EntryBlocks.Length; j++)
+				{
+					entry.EntryBlocks[j] = new EntryBlock();
+				}
+
+				uint[] blockUncompressedSizes = new uint[3];
+
+				for (int j = 0; j < entry.EntryBlocks.Length; j++)
+				{
+					uint uncompressedSize = br.ReadUInt32();
+					blockUncompressedSizes[j] = uncompressedSize & ~(0xFU << 28);
+					entry.EntryBlocks[j].UncompressedAlignment = (uint)(1 << ((int)uncompressedSize >> 28));
+				}
+
+				uint[] blockCompressedSizes = new uint[3];
+
+				for (int j = 0; j < entry.EntryBlocks.Length; j++)
+				{
+					blockCompressedSizes[j] = br.ReadUInt32();
+				}
+
+				for (int j = 0; j < entry.EntryBlocks.Length; j++)
+				{
+					uint blockOffset = br.ReadUInt32();
+					long lastAddr = br.BaseStream.Position;
+					br.BaseStream.Position = blockOffset + fileBlockOffsets[j];
+
+					EntryBlock block = entry.EntryBlocks[j];
+
+					bool compressed = result.Flags.HasFlag(Flags.Compressed);
+
+					uint readSize = compressed ? blockCompressedSizes[j] : blockUncompressedSizes[j];
+					if (readSize == 0)
+					{
+						block.Data = null;
+						br.BaseStream.Position = lastAddr;
+						continue;
+					}
+
+					block.Data = br.ReadBytes((int)readSize);
+					if (compressed)
+						block.Data = block.Data.Decompress((int)blockUncompressedSizes[j]);
+					br.BaseStream.Position = lastAddr;
+				}
+
 				entry.DependenciesListOffset = br.ReadInt32();
-                int fileType = br.ReadInt32();
-                entry.DependencyCount = br.ReadInt16();
+				entry.Type = (EntryType)br.ReadInt32();
+				entry.DependencyCount = br.ReadInt16();
 
-                br.BaseStream.Position += 2;
-
-                entry.UncompressedHeaderSize = uncompressedHeaderSize & 0x0FFFFFFF;
-                entry.UncompressedHeaderSizeCache = uncompressedHeaderSize >> 28;
-                entry.UncompressedBodySize = (int)(uncompressedBodySize & 0x0FFFFFFF);
-                entry.UncompressedBodySizeCache = (int)(uncompressedBodySize >> 28);
-
-                entry.Type = (EntryType)fileType;
-
-                // Header
-                long offset = br.BaseStream.Position;
-                br.BaseStream.Seek(result.HeadStart + entry.HeadOffset, SeekOrigin.Begin);
-
-                byte[] data = br.ReadBytes(entry.HeaderSize);
-
-                try
-                {
-                    entry.Unknown24 = br.ReadInt32();
-                }
-                catch (EndOfStreamException) { }
-                
-                entry.CompressedHeader = data;
-
-                entry.Header = data.Decompress(entry.UncompressedHeaderSize);
-                if (entry.Header == null || entry.Header.NoData())
-                {
-                    entry.DataCompressed = false;
-                    entry.Header = data;
-                }
-                else
-                {
-                    entry.DataCompressed = true;
-                }
-                br.BaseStream.Seek(offset, SeekOrigin.Begin);
-
-                // Body
-                if (entry.BodySize > 0 && result.BodyStart != 0)
-                {
-                    br.BaseStream.Seek(result.BodyStart + entry.BodyOffset, SeekOrigin.Begin);
-
-                    byte[] extra = br.ReadBytes((int)entry.BodySize);
-                    try
-                    {
-                        entry.Unknown25 = br.ReadInt32();
-                    }
-                    catch (EndOfStreamException) { }
-
-                    entry.CompressedBody = extra;
-
-                    entry.Body = extra.Decompress(entry.UncompressedBodySize);
-                    if (entry.Body == null || entry.Body.NoData())
-                    {
-                        entry.ExtraDataCompressed = false;
-                        entry.Body = extra;
-                    }
-                    else
-                    {
-                        entry.ExtraDataCompressed = true;
-                    }
-
-                    br.BaseStream.Seek(offset, SeekOrigin.Begin);
-                }
-                else
-                {
-                    entry.Body = null;
-                }
+                br.BaseStream.Position += 2; // Padding
 
                 entry.Dirty = false;
 
                 result.Entries.Add(entry);
             }
 
-            return result;
+			if (result.Flags.HasFlag(Flags.HasResourceStringTable))
+			{
+				br.BaseStream.Position = result.RSTOffset;
+
+				result.ResourceStringTable = br.ReadCStr();
+
+				// TODO: Parse resource string table XML
+			}
+
+			return result;
         }
 
         public static bool IsBundle(string path)

@@ -39,8 +39,9 @@ namespace BundleManager
             InitializeComponent();
 
             _instance = this;
+			LoadMaterials = true;
 
-            UpdateRecentFiles();
+			UpdateRecentFiles();
         }
 
         private void Clear()

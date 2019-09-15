@@ -65,7 +65,7 @@
             this.collada14ToolStripMenuItem,
             this.wavefrontOBJToolStripMenuItem});
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
             this.exportToolStripMenuItem.Text = "Export";
             // 
             // collada14ToolStripMenuItem
@@ -86,12 +86,12 @@
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(104, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(105, 6);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
             this.closeToolStripMenuItem.Text = "Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
@@ -100,6 +100,7 @@
             this.rndMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.rndMain.Location = new System.Drawing.Point(0, 24);
             this.rndMain.Name = "rndMain";
+            this.rndMain.Scene = null;
             this.rndMain.Size = new System.Drawing.Size(624, 417);
             this.rndMain.TabIndex = 2;
             // 
@@ -110,11 +111,12 @@
             this.ClientSize = new System.Drawing.Size(624, 441);
             this.Controls.Add(this.rndMain);
             this.Controls.Add(this.menuStrip1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ModelViewerForm";
+            this.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.Text = "Scene Viewer";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

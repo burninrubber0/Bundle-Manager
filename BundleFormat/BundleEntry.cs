@@ -13,9 +13,7 @@ namespace BundleFormat
 {
 	public class EntryBlock
 	{
-		//public uint UncompressedSize;
 		public uint UncompressedAlignment; // default depending on file type
-		//public uint CompressedSize;
 		public byte[] Data;
 	}
 
@@ -33,6 +31,12 @@ namespace BundleFormat
         }
     }
 
+	public struct DebugInfo
+	{
+		public string Name;
+		public string TypeName;
+	}
+
     public class BundleEntry
     {
         public BundleArchive Archive;
@@ -41,31 +45,12 @@ namespace BundleFormat
 
         public ulong ID;
         public ulong References;
-        //public int UncompressedHeaderSize;
-        //public int UncompressedHeaderSizeCache;
-        //public int UncompressedBodySize;
-        //public int UncompressedBodySizeCache;
-        //public int HeaderSize;
-        //public int BodySize;
-		//public int ThirdSize;
-		//public int HeadOffset;
-        //public int BodyOffset;
-		//public int ThirdOffset;
 		public int DependenciesListOffset;
         public short DependencyCount;
-        //public int Unknown24;
-        //public int Unknown25;
 
-        //public byte[] Header;
-        //public byte[] Body;
-
-        //public byte[] CompressedHeader;
-        //public byte[] CompressedBody;
+		public DebugInfo DebugInfo;
 
 		public EntryBlock[] EntryBlocks;
-
-		//public bool DataCompressed;
-		//public bool ExtraDataCompressed;
 
 		public bool HasHeader => HasSection(0);
         public bool HasBody => HasSection(1);
@@ -145,6 +130,9 @@ namespace BundleFormat
 
         public string DetectName()
         {
+			if (!string.IsNullOrWhiteSpace(DebugInfo.Name))
+				return DebugInfo.Name;
+
             string theName = "worldvault";
             ulong theID = Crc32.HashCrc32B(theName);
             if (theID == ID)

@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 using BundleUtilities;
 
 namespace BundleFormat
@@ -236,7 +238,27 @@ namespace BundleFormat
 
 				result.ResourceStringTable = br.ReadCStr();
 
-				// TODO: Parse resource string table XML
+				XmlDocument doc = new XmlDocument();
+				doc.LoadXml(result.ResourceStringTable);
+
+				XmlElement root = doc["ResourceStringTable"];
+				XmlNodeList resources = root.GetElementsByTagName("Resource");
+
+				foreach (XmlElement ele in resources)
+				{
+					if (!ulong.TryParse(ele.Attributes["id"].Value, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out ulong resourceID))
+						continue;
+
+					foreach (var entry in result.Entries)
+					{
+						if (entry.ID != resourceID)
+							continue;
+
+						entry.DebugInfo.Name = ele.Attributes["name"].Value;
+						entry.DebugInfo.TypeName = ele.Attributes["type"].Value;
+						break;
+					}
+				}
 			}
 
 			return result;

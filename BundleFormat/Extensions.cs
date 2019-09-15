@@ -148,6 +148,7 @@ namespace BundleFormat
 			
 			if (result.Flags.HasFlag(Flags.HasResourceStringTable))
 			{
+				// TODO: Rebuild RST from DebugInfo
 				self.WriteCStr(result.ResourceStringTable);
 
 				self.Align(16);

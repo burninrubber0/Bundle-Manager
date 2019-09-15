@@ -236,6 +236,7 @@ namespace BundleFormat
 			{
 				br.BaseStream.Position = result.RSTOffset;
 
+				// TODO: Store only the debug info and not the full string
 				result.ResourceStringTable = br.ReadCStr();
 
 				XmlDocument doc = new XmlDocument();

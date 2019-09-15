@@ -377,15 +377,7 @@ namespace BundleManager
 
         public void DoSaveBundle(LoadingDialog loader, string path)
         {
-            //if (CurrentArchive.Console)
-            //    ConvertToPC();
-            Stream s = File.Open(path, FileMode.Create);
-            BinaryWriter bw = new BinaryWriter(s);
-
-            bw.WriteBND2Archive(CurrentArchive);
-
-            bw.Flush();
-            bw.Close();
+			CurrentArchive.Write(path);
 
             loader.IsDone = true;
         }

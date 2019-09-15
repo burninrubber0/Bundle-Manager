@@ -265,7 +265,150 @@ namespace BundleFormat
 			return result;
         }
 
-        public static bool IsBundle(string path)
+		public void Write(string path)
+		{
+			//if (Console)
+			//    ConvertToPC();
+			Stream s = File.Open(path, FileMode.Create);
+			BinaryWriter bw = new BinaryWriter(s);
+
+			Write(bw);
+
+			bw.Flush();
+			bw.Close();
+		}
+
+		public void Write(BinaryWriter bw)
+		{
+			bw.Write(BundleArchive.Magic);
+			bw.Write(this.Version);
+			bw.Write((int)this.Platform);
+
+			long rstOffset = bw.BaseStream.Position;
+			bw.Write((int)0);
+
+			bw.Write(this.Entries.Count);
+
+			long idBlockOffsetPos = bw.BaseStream.Position;
+			bw.Write((int)0);
+
+			long[] fileBlockOffsetsPos = new long[3];
+
+			for (int i = 0; i < fileBlockOffsetsPos.Length; i++)
+			{
+				fileBlockOffsetsPos[i] = bw.BaseStream.Position;
+				bw.BaseStream.Position += 4;
+			}
+
+			bw.Write((int)this.Flags);
+
+			bw.Align(16);
+
+			long currentOffset = bw.BaseStream.Position;
+			bw.BaseStream.Position = rstOffset;
+			bw.Write((uint)currentOffset);
+			bw.BaseStream.Position = currentOffset;
+
+			if (this.Flags.HasFlag(Flags.HasResourceStringTable))
+			{
+				// TODO: Rebuild RST from DebugInfo
+				bw.WriteCStr(this.ResourceStringTable);
+
+				bw.Align(16);
+			}
+
+			// ID Block
+			currentOffset = bw.BaseStream.Position;
+			bw.Seek((int)idBlockOffsetPos, SeekOrigin.Begin);
+			bw.Write((int)currentOffset);
+			bw.Seek((int)currentOffset, SeekOrigin.Begin);
+
+			List<long[]> entryDataPointerPos = new List<long[]>();
+
+			List<byte[][]> compressedBlocks = new List<byte[][]>();
+
+			for (int i = 0; i < this.Entries.Count; i++)
+			{
+				BundleEntry entry = this.Entries[i];
+
+				compressedBlocks.Add(new byte[3][]);
+
+				bw.Write(entry.ID);
+				bw.Write(entry.References);
+
+				for (int j = 0; j < entry.EntryBlocks.Length; j++)
+				{
+					EntryBlock entryBlock = entry.EntryBlocks[j];
+					uint uncompressedSize = 0;
+					if (entryBlock.Data != null)
+						uncompressedSize = (uint)entryBlock.Data.Length;
+					//self.Write((entryBlock.UncompressedAlignment << 28) | uncompressedSize);
+					bw.Write((uint)(uncompressedSize | (BitScan.BitScanReverse(entryBlock.UncompressedAlignment) << 28)));
+				}
+
+				for (int j = 0; j < entry.EntryBlocks.Length; j++)
+				{
+					EntryBlock entryBlock = entry.EntryBlocks[j];
+					if (entryBlock.Data == null)
+						bw.Write((uint)0);
+					else
+					{
+						compressedBlocks[i][j] = entryBlock.Data.Compress();
+						bw.Write(compressedBlocks[i][j].Length);
+					}
+				}
+
+				entryDataPointerPos.Add(new long[3]);
+				for (int j = 0; j < entryDataPointerPos[i].Length; j++)
+				{
+					entryDataPointerPos[i][j] = bw.BaseStream.Position;
+					bw.BaseStream.Position += 4;
+				}
+
+				bw.Write(entry.DependenciesListOffset);
+				bw.Write((int)entry.Type);
+				bw.Write(entry.DependencyCount);
+
+				bw.BaseStream.Position += 2; // Padding
+			}
+
+			// Data Block
+			for (int i = 0; i < 3; i++)
+			{
+				long blockStart = bw.BaseStream.Position;
+				bw.BaseStream.Position = fileBlockOffsetsPos[i];
+				bw.Write((uint)blockStart);
+				bw.BaseStream.Position = blockStart;
+
+				for (int j = 0; j < this.Entries.Count; j++)
+				{
+					BundleEntry entry = this.Entries[j];
+					EntryBlock entryBlock = entry.EntryBlocks[i];
+					bool compressed = this.Flags.HasFlag(Flags.Compressed);
+					uint size = compressed ? (compressedBlocks[j][i] == null ? 0 : (uint)compressedBlocks[j][i].Length) : (uint)entryBlock.Data.Length;
+
+					if (size > 0)
+					{
+						long pos = bw.BaseStream.Position;
+						bw.BaseStream.Position = entryDataPointerPos[j][i];
+						bw.Write((uint)(pos - blockStart));
+						bw.BaseStream.Position = pos;
+
+						if (compressed)
+							bw.Write(compressedBlocks[j][i]);
+						else
+							bw.Write(entryBlock.Data);
+
+						bw.Align((i != 0 && j != this.Entries.Count - 1) ? (byte)0x80 : (byte)16);
+					}
+				}
+
+				if (i != 2)
+					bw.Align(0x80);
+			}
+		}
+
+		public static bool IsBundle(string path)
         {
             bool result;
 

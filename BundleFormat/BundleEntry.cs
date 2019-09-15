@@ -31,6 +31,12 @@ namespace BundleFormat
         }
     }
 
+	public struct Dependency
+	{
+		public ulong ID;
+		public uint EntryPointerOffset;
+	}
+
 	public struct DebugInfo
 	{
 		public string Name;
@@ -47,6 +53,7 @@ namespace BundleFormat
         public ulong References;
 		public int DependenciesListOffset;
         public short DependencyCount;
+		public List<Dependency> Dependencies;
 
 		public DebugInfo DebugInfo;
 
@@ -66,6 +73,7 @@ namespace BundleFormat
         public BundleEntry(BundleArchive archive)
         {
             Archive = archive;
+			Dependencies = new List<Dependency>();
         }
 
 		public bool HasSection(int section)
@@ -91,6 +99,33 @@ namespace BundleFormat
         public List<BundleDependency> GetDependencies()
         {
             List<BundleDependency> result = new List<BundleDependency>();
+
+			if (Dependencies.Count > 0)
+			{
+				for (int i = 0; i < Dependencies.Count; i++)
+				{
+					BundleDependency dependency = new BundleDependency();
+
+					dependency.EntryID = Dependencies[i].ID;
+					dependency.EntryPointerOffset = (int)Dependencies[i].EntryPointerOffset;
+
+					BundleEntry entry = null;
+
+					for (int j = 0; j < Archive.Entries.Count; j++)
+					{
+						if (Archive.Entries[j].ID != dependency.EntryID)
+							continue;
+
+						dependency.EntryIndex = j;
+						entry = Archive.Entries[j];
+					}
+
+					dependency.Entry = entry;
+
+					result.Add(dependency);
+				}
+				return result;
+			}
 
             MemoryStream ms = MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);

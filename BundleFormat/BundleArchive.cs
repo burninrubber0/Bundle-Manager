@@ -32,9 +32,11 @@ namespace BundleFormat
 
     public class BundleArchive
     {
-        public static readonly byte[] Magic = new byte[] { 0x62, 0x6E, 0x64, 0x32 };
+		public static readonly byte[] BND1Magic = new byte[] { 0x62, 0x6E, 0x64, 0x6C };
+        public static readonly byte[] BND2Magic = new byte[] { 0x62, 0x6E, 0x64, 0x32 };
 
-        public string Path;
+		public string Path;
+		public int BNDVersion;
 
         public int Version;
         public BundlePlatform Platform;
@@ -94,6 +96,31 @@ namespace BundleFormat
             return null;
         }
 
+		private void ProcessRST(string rst)
+		{
+			XmlDocument doc = new XmlDocument();
+			doc.LoadXml(rst);
+
+			XmlElement root = doc["ResourceStringTable"];
+			XmlNodeList resources = root.GetElementsByTagName("Resource");
+
+			foreach (XmlElement ele in resources)
+			{
+				if (!ulong.TryParse(ele.Attributes["id"].Value, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out ulong resourceID))
+					continue;
+
+				foreach (var entry in Entries)
+				{
+					if (entry.ID != resourceID)
+						continue;
+
+					entry.DebugInfo.Name = ele.Attributes["name"].Value;
+					entry.DebugInfo.TypeName = ele.Attributes["type"].Value;
+					break;
+				}
+			}
+		}
+
         public static BundleArchive Read(string path)
         {
             using (Stream s = File.OpenRead(path))
@@ -128,49 +155,287 @@ namespace BundleFormat
             }
         }
 
-        public static BundleArchive Read(BinaryReader2 br)
+		public static BundleArchive Read(BinaryReader2 br)
+		{
+			int type;
+			byte[] bytes = br.ReadBytes(4);
+			if (bytes.Matches(BND1Magic))
+				type = 1;
+			else if (bytes.Matches(BND2Magic))
+				type = 2;
+			else
+				return null;
+
+			BundleArchive result = new BundleArchive();
+			result.BNDVersion = type;
+
+			switch (type)
+			{
+				case 1:
+					if (!result.ReadBND1(br))
+						return null;
+					break;
+				case 2:
+					if (!result.ReadBND2(br))
+						return null;
+					break;
+			}
+
+			br.Close();
+
+			return result;
+		}
+
+		private bool ReadBND1(BinaryReader2 br)
+		{
+			br.BigEndian = true;
+
+			// Version number?
+			br.ReadUInt32();
+
+			uint entryCount = br.ReadUInt32();
+
+			uint[] dataBlockSizes = new uint[5];
+			for (int i = 0; i < dataBlockSizes.Length; i++)
+			{
+				dataBlockSizes[i] = br.ReadUInt32();
+				br.BaseStream.Position += 4; // Padding
+			}
+
+			br.BaseStream.Position += 0x14; // Unknown Data
+
+			uint idListOffset = br.ReadUInt32();
+			uint idTableOffset = br.ReadUInt32();
+
+			br.ReadUInt32(); // dependency block
+			br.ReadUInt32(); // start of data block
+
+			Platform = BundlePlatform.X360; // Xbox only for now
+			br.ReadUInt32(); // might be platform (2 being X360)
+
+			uint compressed = br.ReadUInt32();
+			if (compressed != 0)
+				Flags = Flags.Compressed; // TODO
+			else
+				Flags = 0;
+
+			br.ReadUInt32(); // unknown purpose sometimes the same as entryCount
+
+			uint uncompressedInfoOffset = br.ReadUInt32();
+
+			br.ReadUInt32(); // main memory alignment
+			br.ReadUInt32(); // graphics memory alignment
+
+			Entries.Clear();
+
+			br.BaseStream.Position = idListOffset;
+
+			List<ulong> resourceIds = new List<ulong>();
+			for (int i = 0; i < entryCount; i++)
+				resourceIds.Add(br.ReadUInt64());
+
+			br.BaseStream.Position = idTableOffset;
+
+			foreach (ulong resourceId in resourceIds)
+			{
+				BundleEntry entry = new BundleEntry(this);
+				entry.EntryBlocks = new EntryBlock[3];
+				entry.ID = resourceId;
+
+				br.ReadUInt32(); // unknown mem stuff
+
+				entry.DependenciesListOffset = br.ReadInt32();
+				entry.Type = (EntryType)br.ReadUInt32();
+
+				uint[] sizes = new uint[2];
+
+				if (compressed != 0)
+				{
+					sizes[0] = br.ReadUInt32();
+					br.ReadUInt32(); // Alignment value, should be 1
+					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
+					br.ReadUInt32(); // Alignment value, should be 1
+					sizes[1] = br.ReadUInt32();
+					br.ReadUInt32(); // Alignment value, should be 1
+					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
+					br.ReadUInt32(); // Alignment value, should be 1
+					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
+					br.ReadUInt32(); // Alignment value, should be 1
+				} else
+				{
+					sizes[0] = br.ReadUInt32();
+					entry.EntryBlocks[0] = new EntryBlock();
+					entry.EntryBlocks[0].UncompressedAlignment = br.ReadUInt32();
+					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
+					br.ReadUInt32(); // Alignment value
+					sizes[1] = br.ReadUInt32();
+					entry.EntryBlocks[1] = new EntryBlock();
+					entry.EntryBlocks[1].UncompressedAlignment = br.ReadUInt32();
+					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
+					br.ReadUInt32(); // Alignment value
+					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
+					br.ReadUInt32(); // Alignment value
+				}
+
+				uint dataBlockStartOffset = 0;
+				for (int j = 0; j < dataBlockSizes.Length; j++)
+				{
+					if (j > 0)
+						dataBlockStartOffset += dataBlockSizes[j - 1];
+
+					uint readOffset = br.ReadUInt32() + dataBlockStartOffset;
+					br.ReadUInt32(); // 1
+
+					if (j != 0 && j != 2)
+						continue; // Not supporting blocks 2, 4 and 5 right now.
+
+					int mappedBlock = j;
+					if (j == 2)
+						mappedBlock = 1;
+
+					if (entry.EntryBlocks[mappedBlock] == null)
+						entry.EntryBlocks[mappedBlock] = new EntryBlock();
+					EntryBlock entryBlock = entry.EntryBlocks[mappedBlock];
+
+					uint readSize = sizes[mappedBlock];
+					if (readSize == 0)
+					{
+						entryBlock.Data = null;
+						continue;
+					}
+
+					long pos = br.BaseStream.Position;
+					br.BaseStream.Position = readOffset;
+
+					entryBlock.Data = br.ReadBytes((int)readSize);
+
+					br.BaseStream.Position = pos;
+				}
+
+				br.BaseStream.Position += 0x14; // unknown mem stuff
+
+				Entries.Add(entry);
+			}
+
+			if (compressed != 0)
+			{
+				br.BaseStream.Position = uncompressedInfoOffset;
+				for (int i = 0; i < Entries.Count; i++)
+				{
+					BundleEntry entry = Entries[i];
+
+					uint[] sizes = new uint[2];
+
+					sizes[0] = br.ReadUInt32();
+					entry.EntryBlocks[0].UncompressedAlignment = br.ReadUInt32();
+					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
+					br.ReadUInt32(); // Alignment value
+					sizes[1] = br.ReadUInt32();
+					entry.EntryBlocks[1].UncompressedAlignment = br.ReadUInt32();
+					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
+					br.ReadUInt32(); // Alignment value
+					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
+					br.ReadUInt32(); // Alignment value
+
+					for (int j = 0; j < 2; j++)
+					{
+						EntryBlock entryBlock = entry.EntryBlocks[j];
+						if (sizes[j] > 0)
+							entryBlock.Data = entryBlock.Data.Decompress((int)sizes[j]);
+					}
+				}
+			}
+
+			for (int i = 0; i < Entries.Count; i++)
+			{
+				BundleEntry entry = Entries[i];
+				uint depOffset = (uint)entry.DependenciesListOffset;
+				if (depOffset == 0)
+					continue;
+
+				br.BaseStream.Position = depOffset;
+
+				entry.DependencyCount = (short)br.ReadUInt32();
+				if (br.ReadUInt32() != 0)
+					return false;
+
+				for (int j = 0; j < entry.DependencyCount; j++)
+				{
+					Dependency dep = new Dependency();
+					dep.ID = br.ReadUInt64();
+					dep.EntryPointerOffset = br.ReadUInt32();
+
+					br.ReadUInt32(); // Skip
+
+					entry.Dependencies.Add(dep);
+				}
+			}
+
+			BundleEntry rst = GetEntryByID(0xC039284A);
+			if (rst == null)
+				return true;
+
+			BinaryReader2 br2 = new BinaryReader2(rst.MakeStream());
+			br2.BigEndian = false;
+
+			// TODO: Store only the debug info and not the full string
+			ResourceStringTable = br2.ReadLenString();
+
+			br2.Close();
+
+			// Cover Criterion's broken XML writer.
+			if (ResourceStringTable.StartsWith("</ResourceStringTable>"))
+				ResourceStringTable = ResourceStringTable.Remove(1, 1);
+			string badLine = "</ResourceStringTable>\n\t";
+			int index = ResourceStringTable.IndexOf(badLine);
+			if (index > -1)
+				ResourceStringTable = ResourceStringTable.Remove(index, badLine.Length);
+
+			ProcessRST(ResourceStringTable);
+
+			Entries.Remove(rst);
+
+			return true;
+		}
+
+		private bool ReadBND2(BinaryReader2 br)
         {
-            BundleArchive result = new BundleArchive();
-
-            if (!br.VerifyMagic(BundleArchive.Magic))
-                return null;
-
             br.BaseStream.Position += 4;
 
             int platform = br.ReadInt32();
             if (platform != 1)
                 platform = Util.ReverseBytes(platform);
-            result.Platform = (BundlePlatform) platform;
-            br.BigEndian = result.Console;
+            Platform = (BundlePlatform) platform;
+            br.BigEndian = Console;
 
             br.BaseStream.Position -= 8;
-            result.Version = br.ReadInt32();
-			if (result.Version != 2)
+            Version = br.ReadInt32();
+			if (Version != 2)
 			{
-				throw new ReadFailedError("Unsupported Bundle Version: " + result.Version);
+				throw new ReadFailedError("Unsupported Bundle Version: " + Version);
 			}
             br.BaseStream.Position += 4;
 
-            result.RSTOffset = br.ReadInt32();
-            result.EntryCount = br.ReadInt32();
-            result.IDBlockOffset = br.ReadInt32();
+            RSTOffset = br.ReadInt32();
+            EntryCount = br.ReadInt32();
+            IDBlockOffset = br.ReadInt32();
 			uint[] fileBlockOffsets = new uint[3];
             fileBlockOffsets[0] = br.ReadUInt32();
 			fileBlockOffsets[1] = br.ReadUInt32();
 			fileBlockOffsets[2] = br.ReadUInt32();
-            result.Flags = (Flags)br.ReadInt32();
+            Flags = (Flags)br.ReadInt32();
 
 			// 8 Bytes Padding
 
-            br.BaseStream.Position = result.IDBlockOffset;
+            br.BaseStream.Position = IDBlockOffset;
 
-            for (int i = 0; i < result.EntryCount; i++)
+            for (int i = 0; i < EntryCount; i++)
             {
-                BundleEntry entry = new BundleEntry(result);
+                BundleEntry entry = new BundleEntry(this);
 
                 entry.Index = i;
 
-                entry.Platform = result.Platform;
+                entry.Platform = Platform;
 
                 entry.ID = br.ReadUInt64();
                 entry.References = br.ReadUInt64();
@@ -205,7 +470,7 @@ namespace BundleFormat
 
 					EntryBlock block = entry.EntryBlocks[j];
 
-					bool compressed = result.Flags.HasFlag(Flags.Compressed);
+					bool compressed = Flags.HasFlag(Flags.Compressed);
 
 					uint readSize = compressed ? blockCompressedSizes[j] : blockUncompressedSizes[j];
 					if (readSize == 0)
@@ -229,40 +494,20 @@ namespace BundleFormat
 
                 entry.Dirty = false;
 
-                result.Entries.Add(entry);
+                Entries.Add(entry);
             }
 
-			if (result.Flags.HasFlag(Flags.HasResourceStringTable))
+			if (Flags.HasFlag(Flags.HasResourceStringTable))
 			{
-				br.BaseStream.Position = result.RSTOffset;
+				br.BaseStream.Position = RSTOffset;
 
 				// TODO: Store only the debug info and not the full string
-				result.ResourceStringTable = br.ReadCStr();
+				ResourceStringTable = br.ReadCStr();
 
-				XmlDocument doc = new XmlDocument();
-				doc.LoadXml(result.ResourceStringTable);
-
-				XmlElement root = doc["ResourceStringTable"];
-				XmlNodeList resources = root.GetElementsByTagName("Resource");
-
-				foreach (XmlElement ele in resources)
-				{
-					if (!ulong.TryParse(ele.Attributes["id"].Value, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out ulong resourceID))
-						continue;
-
-					foreach (var entry in result.Entries)
-					{
-						if (entry.ID != resourceID)
-							continue;
-
-						entry.DebugInfo.Name = ele.Attributes["name"].Value;
-						entry.DebugInfo.TypeName = ele.Attributes["type"].Value;
-						break;
-					}
-				}
+				ProcessRST(ResourceStringTable);
 			}
 
-			return result;
+			return true;
         }
 
 		public void Write(string path)
@@ -280,7 +525,7 @@ namespace BundleFormat
 
 		public void Write(BinaryWriter bw)
 		{
-			bw.Write(BundleArchive.Magic);
+			bw.Write(BundleArchive.BND2Magic);
 			bw.Write(this.Version);
 			bw.Write((int)this.Platform);
 
@@ -417,7 +662,7 @@ namespace BundleFormat
                 Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
                 BinaryReader2 br = new BinaryReader2(s);
 
-                result = br.VerifyMagic(Magic);
+                result = br.VerifyMagic(BND2Magic);
 
                 br.Close();
                 s.Close();
@@ -438,7 +683,7 @@ namespace BundleFormat
             Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
             BinaryReader2 br = new BinaryReader2(s);
 
-            if (!br.VerifyMagic(Magic))
+            if (!br.VerifyMagic(BND2Magic))
             {
                 br.Close();
                 s.Close();
@@ -480,7 +725,7 @@ namespace BundleFormat
             Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
             BinaryReader2 br = new BinaryReader2(s);
 
-            if (!br.VerifyMagic(Magic))
+            if (!br.VerifyMagic(BND2Magic))
             {
                 br.Close();
                 s.Close();
@@ -525,7 +770,7 @@ namespace BundleFormat
             Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
             BinaryReader2 br = new BinaryReader2(s);
 
-            if (!br.VerifyMagic(Magic))
+            if (!br.VerifyMagic(BND2Magic))
             {
                 timer.StopLog();
                 br.Close();

@@ -93,7 +93,7 @@ namespace BurnoutImage
 					dxt = DXTCompression.DXT1;
 				else if (compression == CompressionType.DXT5)
 					dxt = DXTCompression.DXT5;
-				data = ImageUtil.CompressImage(newImage/*, width, height*/, dxt);
+				data = ImageUtil.CompressImage(newImage, dxt);
 
 				MemoryStream msx = new MemoryStream();
 				BinaryWriter bw = new BinaryWriter(msx);

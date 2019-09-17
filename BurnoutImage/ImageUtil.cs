@@ -19,7 +19,7 @@ namespace BurnoutImage
             return CompressionTools.DecompressTexture(data, width, height, compression);
         }
 
-        public static byte[] CompressImage(/*byte[] rgba*/ Image image, /*int width, int height, */DXTCompression compression)
+        public static byte[] CompressImage(Image image, DXTCompression compression)
         {
             Bitmap bitmap = new Bitmap(image);
 

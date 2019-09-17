@@ -20,7 +20,10 @@ namespace PluginAPI
 		public static void Register(PluginCommand command)
 		{
 			if (IsRegistered(command.ID))
+			{
+				Console.WriteLine("WARN: Command " + command.ID.ToString() + " already registered!");
 				return;
+			}
 
 			_commands.Add(command.ID, command);
 		}

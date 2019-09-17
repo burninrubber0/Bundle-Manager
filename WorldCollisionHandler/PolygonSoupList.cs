@@ -17,7 +17,7 @@ using OpenTK.Graphics.OpenGL;
 using PluginAPI;
 using StandardExtension;
 
-namespace BaseHandlers
+namespace WorldCollisionHandler
 {
     public class PolygonSoupProperty
     {

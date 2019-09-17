@@ -13,7 +13,7 @@ using DebugHelper;
 using ModelViewer.SceneData;
 using PluginAPI;
 
-namespace BaseHandlers
+namespace WorldCollisionHandler
 {
     public partial class WorldColEditor : Form, IEntryEditor
     {

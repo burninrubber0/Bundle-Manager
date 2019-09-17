@@ -1,4 +1,4 @@
-﻿namespace BaseHandlers
+﻿namespace WorldCollisionHandler
 {
     partial class WorldColEditor
     {

@@ -197,7 +197,7 @@
       <Name>ModelViewer</Name>
     </ProjectReference>
     <ProjectReference Include="..\PluginAPI\PluginAPI.csproj">
-      <Project>{757F0204-F091-464D-AA42-FE8919FF73BB}</Project>
+      <Project>{757f0204-f091-464d-aa42-fe8919ff73bb}</Project>
       <Name>PluginAPI</Name>
     </ProjectReference>
     <ProjectReference Include="..\PluginSystem\PluginSystem.csproj">

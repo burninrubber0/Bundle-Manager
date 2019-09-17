@@ -16,7 +16,6 @@ namespace BaseHandlers
 	{
 		public override void Init()
 		{
-			EntryTypeRegistry.Register(EntryType.PolygonSoupListResourceType, new PolygonSoupList());
 			EntryTypeRegistry.Register(EntryType.TriggerResourceType, new TriggerData());
 			EntryTypeRegistry.Register(EntryType.StreetDataResourceType, new StreetData());
 			EntryTypeRegistry.Register(EntryType.ProgressionResourceType, new ProgressionData());
@@ -27,9 +26,6 @@ namespace BaseHandlers
 			EntryTypeRegistry.Register(EntryType.InstanceListResourceType, new InstanceList());
 			EntryTypeRegistry.Register(EntryType.GraphicsSpecResourceType, new GraphicsSpec());
 			EntryTypeRegistry.Register(EntryType.RwRenderableResourceType, new Renderable());
-
-			PluginCommandRegistry.Register("dump_all_collisions", "Dump All Collisions", DumpAllCollisions, IsWorldCol);
-			PluginCommandRegistry.Register("remove_wreck_surfaces", "Remove Wreck Surfaces", RemoveWreckSurfaces, IsWorldCol);
 		}
 
 		public override string GetID()
@@ -43,84 +39,6 @@ namespace BaseHandlers
 		}
 
 		#region Extra Tools
-
-		private bool IsWorldCol(BundleArchive archive)
-		{
-			for (int i = 0; i < archive.Entries.Count; i++)
-			{
-				BundleEntry entry = archive.Entries[i];
-
-				if (entry.Type == EntryType.PolygonSoupListResourceType)
-					return true;
-			}
-
-			return false;
-		}
-
-		private void DumpAllCollisions(IWin32Window window, BundleArchive archive)
-		{
-			if (archive == null)
-				return;
-
-			FolderBrowserDialog fbd = new FolderBrowserDialog();
-			DialogResult result = fbd.ShowDialog(window);
-			if (result == DialogResult.OK)
-			{
-				string path = fbd.SelectedPath;
-
-				for (int i = 0; ; i++)
-				{
-					string idListName = "trk_clil" + i;
-					string polyName = "trk_col_" + i;
-
-					ulong idListID = Crc32.HashCrc32B(idListName);
-					ulong polyID = Crc32.HashCrc32B(polyName);
-
-					BundleEntry entry = archive.GetEntryByID(idListID);
-					if (entry == null)
-						break;
-					Stream outFile = File.Open(path + "/" + idListName + ".bin", FileMode.Create, FileAccess.Write);
-					BinaryWriter bw = new BinaryWriter(outFile);
-					bw.Write(entry.EntryBlocks[0].Data);
-					bw.Flush();
-					bw.Close();
-					outFile.Close();
-
-					BundleEntry polyEntry = archive.GetEntryByID(polyID);
-					if (polyEntry == null)
-						break;
-					Stream outFilePoly = File.Open(path + "/" + polyName + ".bin", FileMode.Create, FileAccess.Write);
-					BinaryWriter bwPoly = new BinaryWriter(outFilePoly);
-					bwPoly.Write(polyEntry.EntryBlocks[0].Data);
-					bwPoly.Flush();
-					bwPoly.Close();
-					outFilePoly.Close();
-
-					PolygonSoupList poly = new PolygonSoupList();
-					poly.Read(polyEntry);
-					Scene scene = poly.MakeScene();
-					scene.ExportWavefrontObj(path + "/" + polyName + ".obj");
-				}
-
-				MessageBox.Show(window, "Done!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-			}
-		}
-
-		private void RemoveWreckSurfaces(IWin32Window window, BundleArchive archive)
-		{
-			for (int i = 0; i < archive.Entries.Count; i++)
-			{
-				BundleEntry entry = archive.Entries[i];
-
-				if (entry.Type == EntryType.PolygonSoupListResourceType)
-				{
-					PolygonSoupList list = new PolygonSoupList();
-					list.Read(entry);
-					list.RemoveWreckSurfaces();
-					list.Write(entry);
-				}
-			}
-		}
 
 		/*public void ConvertImagesFromPS3ToPC_old(IWin32Window window, BundleArchive archive)
 		{

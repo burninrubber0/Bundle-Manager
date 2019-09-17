@@ -14,7 +14,10 @@ namespace PluginAPI
 		public static void Register(EntryType type, IEntryData handler)
 		{
 			if (IsRegistered(type))
+			{
+				Console.WriteLine("WARN: Handler for " + type.ToString() + " already registered!");
 				return;
+			}
 			_handlers.Add(type, handler);
 		}
 

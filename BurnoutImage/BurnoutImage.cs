@@ -13,54 +13,17 @@ namespace BurnoutImage
 {
     public static class GameImage
     {
-        private static bool Matches(this byte[] self, byte[] other)
-        {
-            if (self == null || other == null)
-                return false;
-            if (self.Length != other.Length)
-                return false;
-
-            for (int i = 0; i < self.Length; i++)
-            {
-                if (self[i] != other[i])
-                    return false;
-            }
-
-            return true;
-        }
-
         public struct ImageInfo
         {
-            public readonly byte[] Data;
-            public readonly byte[] ExtraData;
+            public readonly byte[] Block0;
+            public readonly byte[] Block1;
 
-            public ImageInfo(byte[] Data, byte[] ExtraData)
+            public ImageInfo(byte[] block0, byte[] block1)
             {
-                this.Data = Data;
-                this.ExtraData = ExtraData;
+                this.Block0 = block0;
+                this.Block1 = block1;
             }
         }
-
-
-        /*Bitmap bitmap = new Bitmap(image);
-        int width = bitmap.Width;
-        int height = bitmap.Height;
-
-        MemoryStream mspixels = new MemoryStream();
-
-        for (int i = 0; i < height; i++)
-        {
-            for (int j = 0; j < width; j++)
-            {
-                Color pixel = bitmap.GetPixel(j, i);
-                mspixels.WriteByte(pixel.R);
-                mspixels.WriteByte(pixel.G);
-                mspixels.WriteByte(pixel.B);
-                mspixels.WriteByte(pixel.A);
-            }
-        }
-
-        byte[] rgba = mspixels.ToArray();*/
 
         public static ImageInfo SetImage(Image image, DXTCompression compression)
         {

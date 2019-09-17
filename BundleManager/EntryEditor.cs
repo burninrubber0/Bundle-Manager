@@ -904,7 +904,7 @@ namespace BundleManager
             public float X, Y, Z;
         }
 
-        private int GetVertexSize()
+        /*private int GetVertexSize()
         {
             List<int> vertexSizes = new List<int>();
             foreach (BundleEntry entry in Entry.Archive.Entries)
@@ -949,7 +949,7 @@ namespace BundleManager
             }
 
             return vertexSize;
-        }
+        }*/
 
         private void infoToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -996,7 +996,7 @@ namespace BundleManager
             MessageBox.Show(this, modelInfo, "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        private void exportObjToolStripMenuItem_Click(object sender, EventArgs e)
+        /*private void exportObjToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Entry.Type != EntryType.RwRenderableResourceType)
                 return;
@@ -1104,6 +1104,6 @@ namespace BundleManager
             {
                 MessageBox.Show(this, "Error: " + ex.Message + "\n\n" + ex.StackTrace, "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
+        }*/
     }
 }

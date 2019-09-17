@@ -33,8 +33,8 @@ namespace BaseHandlers
             {
                 ulong id = dependency.EntryID;
 
-                //DebugTimer t = DebugTimer.Start("LoadDep");
-                BundleEntry descEntry1 = entry.Archive.GetEntryByID(id);
+				//DebugTimer t = DebugTimer.Start("LoadDep");
+				BundleEntry descEntry1 = entry.Archive.GetEntryByID(id);
                 if (descEntry1 == null)
                 {
                     string file = BundleCache.GetFileByEntryID(id);
@@ -42,7 +42,7 @@ namespace BaseHandlers
                     {
                         BundleArchive archive = BundleArchive.Read(file);
                         descEntry1 = archive.GetEntryByID(id);
-                    }
+					}
                 }
                 //t.StopLog();
 

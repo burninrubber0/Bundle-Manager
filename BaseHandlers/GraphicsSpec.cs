@@ -81,7 +81,7 @@ namespace BaseHandlers
 
             foreach (uint instance in Instances)
             {
-                BundleEntry modelEntry = Entry.Archive.GetEntryByID(instance);
+				BundleEntry modelEntry = Entry.Archive.GetEntryByID(instance);
                 if (modelEntry == null)
                 {
                     string file = BundleCache.GetFileByEntryID(instance);

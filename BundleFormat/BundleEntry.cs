@@ -22,6 +22,9 @@ namespace BundleFormat
 		{
 			get
 			{
+				if (RawData == null)
+					return null;
+
 				if (Compressed)
 					return RawData.Decompress((int)UncompressedSize);
 
@@ -68,11 +71,18 @@ namespace BundleFormat
 		public string TypeName;
 	}
 
+	/*public struct BundleReference
+	{
+		public string Path;
+		public uint EntryCount;
+	}*/
+
     public class BundleEntry
     {
-        public BundleArchive Archive;
+		public BundleArchive Archive;
+		//public BundleReference Archive;
 
-        public int Index;
+		public int Index;
 
         public ulong ID;
         public ulong References;
@@ -97,7 +107,10 @@ namespace BundleFormat
 
         public BundleEntry(BundleArchive archive)
         {
-            Archive = archive;
+			Archive = archive;
+			/*Archive = new BundleReference();
+			Archive.Path = archive.Path;
+			Archive.EntryCount = (uint)archive.Entries.Count;*/
 			Dependencies = new List<Dependency>();
         }
 
@@ -136,6 +149,15 @@ namespace BundleFormat
 
 					BundleEntry entry = null;
 
+					/*string file = BundleCache.GetFileByEntryID(dependency.EntryID);
+					if (!string.IsNullOrEmpty(file))
+					{
+						BundleArchive archive = BundleArchive.Read(file, dependency.EntryID);
+						entry = archive.GetEntryByID(dependency.EntryID);
+					}*/
+					//}
+
+					// TODO
 					for (int j = 0; j < Archive.Entries.Count; j++)
 					{
 						if (Archive.Entries[j].ID != dependency.EntryID)
@@ -168,7 +190,15 @@ namespace BundleFormat
 
                 BundleEntry entry = null;
 
-                for (int j = 0; j < Archive.Entries.Count; j++)
+				/*string file = BundleCache.GetFileByEntryID(bundleDependency.EntryID);
+				if (!string.IsNullOrEmpty(file))
+				{
+					BundleArchive archive = BundleArchive.Read(file, bundleDependency.EntryID);
+					entry = archive.GetEntryByID(bundleDependency.EntryID);
+				}*/
+
+				// TODO
+				for (int j = 0; j < Archive.Entries.Count; j++)
                 {
                     if (Archive.Entries[j].ID != bundleDependency.EntryID)
                         continue;
@@ -180,7 +210,7 @@ namespace BundleFormat
                 bundleDependency.Entry = entry;
 
                 result.Add(bundleDependency);
-            }
+			}
 
             br.Close();
             ms.Close();
@@ -300,7 +330,7 @@ namespace BundleFormat
             }
 
             // WorldCol Names
-            for (int i = 0; i < Archive.Entries.Count; i++)
+            for (int i = 0; i < Archive.EntryCount; i++)
             {
                 string name = "trk_col_" + i;
                 ulong newID = Crc32.HashCrc32B(name);

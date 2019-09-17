@@ -236,13 +236,18 @@ namespace BaseHandlers
                     }
                 }
 
-                mesh.Vertices = new List<VertexData>();
+				if (attributeToUse.Size == 0)
+				{
+					break;
+				}
+
+				mesh.Vertices = new List<VertexData>();
                 br.BaseStream.Position = VertexBlockAddress + mesh.VertexOffsetCount * attributeToUse.Size + attributeToUse.Offset;
-                while (br.BaseStream.Position + attributeToUse.Size < br.BaseStream.Length) // Really, this should not be done like this.
+				while (br.BaseStream.Position + attributeToUse.Size < br.BaseStream.Length) // Really, this should not be done like this.
                 {
                     mesh.Vertices.Add(ReadVertex(br, attributeToUse));
                 }
-            }
+			}
         }
 
 		private void Clear()
@@ -414,7 +419,7 @@ namespace BaseHandlers
 
                 if (LoadMaterials)
                 {
-                    BundleEntry descEntry1 = entry.Archive.GetEntryByID(mesh.MaterialID);
+					BundleEntry descEntry1 = entry.Archive.GetEntryByID(mesh.MaterialID);
                     if (descEntry1 == null)
                     {
                         string file = BundleCache.GetFileByEntryID(mesh.MaterialID);
@@ -422,7 +427,7 @@ namespace BaseHandlers
                         {
                             BundleArchive archive = BundleArchive.Read(file);
                             descEntry1 = archive.GetEntryByID(mesh.MaterialID);
-                        }
+						}
                     }
 
                     if (descEntry1 != null)
@@ -433,7 +438,7 @@ namespace BaseHandlers
                 for (int j = 0; j < mesh.VertexDescriptions.Length; j++)
                 {
                     ulong vertexDescID = mesh.VertexDescriptionIDs[j];
-                    BundleEntry descEntry = entry.Archive.GetEntryByID(vertexDescID);
+					BundleEntry descEntry = entry.Archive.GetEntryByID(vertexDescID);
                     if (descEntry == null)
                     {
                         string file = BundleCache.GetFileByEntryID(vertexDescID);

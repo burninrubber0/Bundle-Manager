@@ -173,15 +173,15 @@ namespace BundleFormat
                 {
                     BinaryReader2 br = new BinaryReader2(s);
 
-                    BundleArchive result = Read(br);
-                    if (result == null)
+					BundleArchive result = new BundleArchive();
+					result.Path = path;
+
+					if (!result.Read(br))
                     {
                         br.Close();
 
                         return null;
                     }
-
-                    result.Path = path;
 
                     br.Close();
 
@@ -199,7 +199,7 @@ namespace BundleFormat
             }
         }
 
-		public static BundleArchive Read(BinaryReader2 br)
+		public bool Read(BinaryReader2 br)
 		{
 			int type;
 			byte[] bytes = br.ReadBytes(4);
@@ -208,26 +208,25 @@ namespace BundleFormat
 			else if (bytes.Matches(BND2Magic))
 				type = 2;
 			else
-				return null;
+				return false;
 
-			BundleArchive result = new BundleArchive();
-			result.BNDVersion = type;
+			BNDVersion = type;
 
 			switch (type)
 			{
 				case 1:
-					if (!result.ReadBND1(br))
-						return null;
+					if (!ReadBND1(br))
+						return false;
 					break;
 				case 2:
-					if (!result.ReadBND2(br))
-						return null;
+					if (!ReadBND2(br))
+						return false;
 					break;
 			}
 
 			br.Close();
 
-			return result;
+			return true;
 		}
 
 		private bool ReadBND1(BinaryReader2 br)
@@ -456,45 +455,46 @@ namespace BundleFormat
 		}
 
 		private bool ReadBND2(BinaryReader2 br)
-        {
-            br.BaseStream.Position += 4;
+		{
+			br.BaseStream.Position += 4;
 
-            int platform = br.ReadInt32();
-            if (platform != 1)
-                platform = Util.ReverseBytes(platform);
-            Platform = (BundlePlatform) platform;
-            br.BigEndian = Console;
+			int platform = br.ReadInt32();
+			if (platform != 1)
+				platform = Util.ReverseBytes(platform);
+			Platform = (BundlePlatform)platform;
+			br.BigEndian = Console;
 
-            br.BaseStream.Position -= 8;
-            Version = br.ReadInt32();
+			br.BaseStream.Position -= 8;
+			Version = br.ReadInt32();
 			if (Version != 2)
 			{
 				throw new ReadFailedError("Unsupported Bundle Version: " + Version);
 			}
-            br.BaseStream.Position += 4;
+			br.BaseStream.Position += 4;
 
-            RSTOffset = br.ReadInt32();
-            EntryCount = br.ReadInt32();
-            IDBlockOffset = br.ReadInt32();
+			RSTOffset = br.ReadInt32();
+			EntryCount = br.ReadInt32();
+			IDBlockOffset = br.ReadInt32();
 			uint[] fileBlockOffsets = new uint[3];
-            fileBlockOffsets[0] = br.ReadUInt32();
+			fileBlockOffsets[0] = br.ReadUInt32();
 			fileBlockOffsets[1] = br.ReadUInt32();
 			fileBlockOffsets[2] = br.ReadUInt32();
-            Flags = (Flags)br.ReadInt32();
+			Flags = (Flags)br.ReadInt32();
 
 			// 8 Bytes Padding
 
-            br.BaseStream.Position = IDBlockOffset;
+			br.BaseStream.Position = IDBlockOffset;
 
-            for (int i = 0; i < EntryCount; i++)
-            {
-                BundleEntry entry = new BundleEntry(this);
+			for (int i = 0; i < EntryCount; i++)
+			{
+				BundleEntry entry = new BundleEntry(this);
 
-                entry.Index = i;
+				entry.Index = i;
 
-                entry.Platform = Platform;
+				entry.Platform = Platform;
 
-                entry.ID = br.ReadUInt64();
+				entry.ID = br.ReadUInt64();
+
                 entry.References = br.ReadUInt64();
 
 				entry.EntryBlocks = new EntryBlock[3];
@@ -555,7 +555,7 @@ namespace BundleFormat
 
                 entry.Dirty = false;
 
-                Entries.Add(entry);
+				Entries.Add(entry);
             }
 
 			if (Flags.HasFlag(Flags.HasResourceStringTable))

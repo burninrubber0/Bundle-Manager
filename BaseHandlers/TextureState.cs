@@ -35,7 +35,7 @@ namespace BaseHandlers
                 }
                 else
                 {
-                    BundleEntry descEntry1 = entry.Archive.GetEntryByID(id);
+					BundleEntry descEntry1 = entry.Archive.GetEntryByID(id);
                     if (descEntry1 == null)
                     {
                         string file = BundleCache.GetFileByEntryID(id);

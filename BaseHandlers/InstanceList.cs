@@ -183,7 +183,7 @@ namespace BaseHandlers
                 }
                 else
                 {
-                    BundleEntry modelEntry = Entry.Archive.GetEntryByID(instance.ModelEntryID);
+					BundleEntry modelEntry = Entry.Archive.GetEntryByID(instance.ModelEntryID);
                     if (modelEntry == null)
                     {
                         string file = BundleCache.GetFileByEntryID(instance.ModelEntryID);

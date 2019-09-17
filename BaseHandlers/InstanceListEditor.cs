@@ -90,20 +90,20 @@ namespace BaseHandlers
 
 			string result;
 
-			BundleArchive archive = InstanceList.Entry.Archive;
-			bool external = !archive.ContainsEntry(id);
-			if (external)
+			//BundleArchive archive = InstanceList.Entry.Archive;
+			//bool external = !archive.ContainsEntry(id);
+			//if (external)
 				result = BundleCache.GetEntryNameByID(id);
-			else
-				result = archive.GetEntryNameByID(id);
+			//else
+			//	result = archive.GetEntryNameByID(id);
 
 			if (string.IsNullOrWhiteSpace(result))
 				result = "0x" + id.ToString("X8");
 			else
 				result = SimplifyModelName(result);
 
-			if (external)
-				result += " (External)";
+			//if (external)
+			//	result += " (External)";
 
 			_nameCache.Add(id, result);
 			return result;

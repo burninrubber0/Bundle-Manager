@@ -92,12 +92,6 @@
     <Compile Include="FileView.Designer.cs">
       <DependentUpon>FileView.cs</DependentUpon>
     </Compile>
-    <Compile Include="LoadingDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="LoadingDialog.Designer.cs">
-      <DependentUpon>LoadingDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -124,9 +118,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FileView.resx">
       <DependentUpon>FileView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="LoadingDialog.resx">
-      <DependentUpon>LoadingDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

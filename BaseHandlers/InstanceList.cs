@@ -58,7 +58,7 @@ namespace BaseHandlers
 
     public class InstanceList : IEntryData
     {
-		private Scene _scene;
+		//private Scene _scene;
 
         public BundleEntry Entry;
 
@@ -76,7 +76,7 @@ namespace BaseHandlers
 
 		private void Clear()
 		{
-			_scene = null;
+			//_scene = null;
 
 			Entry = default;
 			Unknown1 = default;
@@ -115,7 +115,7 @@ namespace BaseHandlers
             br.Close();
             ms.Close();
 
-			_scene = MakeScene(loader);
+			//_scene = MakeScene(loader);
 
 			return true;
         }
@@ -230,10 +230,14 @@ namespace BaseHandlers
 
 		public IEntryEditor GetEditor(BundleEntry entry)
 		{
-			ModelViewerForm viewer = new ModelViewerForm();
-			viewer.Renderer.Scene = _scene;
+			InstanceListEditor editor = new InstanceListEditor();
+			editor.InstanceList = this;
+			editor.Changed += () =>
+			{
+				Write(entry);
+			};
 
-			return viewer;
+			return editor;
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿namespace BundleManager
+﻿namespace BundleUtilities
 {
     partial class LoadingDialog
     {

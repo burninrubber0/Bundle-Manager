@@ -281,7 +281,7 @@ namespace BundleManager
                         }
                         if (!BundleCache.EntryInfos.ContainsKey(entryID))
                             BundleCache.EntryInfos.Add(entryID, info);
-                        BundleCache.Files.Add(entryID, i);
+						BundleCache.Files.Add(entryID, i);
                     }
 
                     if (cancel)

@@ -96,6 +96,50 @@ namespace BundleFormat
             return null;
         }
 
+		public string GetEntryNameByID(ulong id)
+		{
+			for (int i = 0; i < Entries.Count; i++)
+			{
+				BundleEntry entry = Entries[i];
+				if (entry.ID == id)
+					return entry.DetectName();
+			}
+			return null;
+		}
+
+		public bool ContainsEntry(ulong id)
+		{
+			return GetEntryByID(id) != null;
+		}
+
+		private static Dictionary<ulong, DebugInfo> GetDebugInfoFromRST(string rst)
+		{
+			XmlDocument doc = new XmlDocument();
+			doc.LoadXml(rst);
+
+			XmlElement root = doc["ResourceStringTable"];
+			XmlNodeList resources = root.GetElementsByTagName("Resource");
+
+			Dictionary<ulong, DebugInfo> debugInfo = new Dictionary<ulong, DebugInfo>();
+
+			foreach (XmlElement ele in resources)
+			{
+				if (ele.Name != "Resource")
+					continue;
+
+				if (!ulong.TryParse(ele.Attributes["id"].Value, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out ulong resourceID))
+					continue;
+
+				DebugInfo debug;
+				debug.Name = ele.Attributes["name"].Value;
+				debug.TypeName = ele.Attributes["type"].Value;
+
+				debugInfo.Add(resourceID, debug);
+			}
+
+			return debugInfo;
+		}
+
 		private void ProcessRST(string rst)
 		{
 			XmlDocument doc = new XmlDocument();
@@ -740,20 +784,41 @@ namespace BundleFormat
             BundlePlatform platform = (BundlePlatform)platformInt;
             br.BigEndian = platform == BundlePlatform.X360 || platform == BundlePlatform.PS3;
             
-            br.BaseStream.Position = 0x10;
+            br.BaseStream.Position = 0xC;
+			uint rstOffset = br.ReadUInt32();
             int fileCount = br.ReadInt32();
             int metaStart = br.ReadInt32();
 
-            br.BaseStream.Position = metaStart;
+			br.BaseStream.Position += 0xC;
+			Flags flags = (Flags)br.ReadInt32();
 
-            for (int i = 0; i < fileCount; i++)
+			Dictionary<ulong, DebugInfo> debugInfo = null;
+
+			if (flags.HasFlag(Flags.HasResourceStringTable))
+			{
+				br.BaseStream.Position = rstOffset;
+
+				// TODO: Store only the debug info and not the full string
+				string rst = br.ReadCStr();
+
+				debugInfo = GetDebugInfoFromRST(rst);
+			}
+
+			br.BaseStream.Position = metaStart;
+
+			for (int i = 0; i < fileCount; i++)
             {
                 uint id = br.ReadUInt32();
                 br.BaseStream.Position += 0x34;
                 EntryType type = (EntryType)br.ReadUInt32();
                 br.BaseStream.Position += 0x4;
 
-                result.Add(new EntryInfo(id, type, path));
+				DebugInfo debug = default;
+				
+				if (debugInfo != null && debugInfo.ContainsKey(id))
+					debug = debugInfo[id];
+
+                result.Add(new EntryInfo(id, type, path, debug));
             }
 
             br.Close();

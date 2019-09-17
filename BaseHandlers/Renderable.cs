@@ -402,9 +402,15 @@ namespace BaseHandlers
             br.Close();
             ms.Close();
             
+			loader?.SetStatus("Loading Meshes");
             for (int i = 0; i < Meshes.Count; i++)
             {
                 RenderableMesh mesh = Meshes[i];
+
+				int progress = (i + 1) * 100 / Meshes.Count;
+
+				loader?.SetStatus("Loading Meshes: " + (i + 1) + "/" + Meshes.Count);
+				loader?.SetProgress(progress);
 
                 if (LoadMaterials)
                 {
@@ -475,7 +481,7 @@ namespace BaseHandlers
 			return viewer;
 		}
 
-		public Scene MakeScene(ILoader loader)
+		public Scene MakeScene(ILoader loader = null)
 		{
 			Scene scene = new Scene();
 			SceneObject obj = new SceneObject(ID.ToString("X8"), Model);

@@ -58,6 +58,12 @@
     <Compile Include="GraphicsSpec.cs" />
     <Compile Include="IDList.cs" />
     <Compile Include="InstanceList.cs" />
+    <Compile Include="InstanceListEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InstanceListEditor.Designer.cs">
+      <DependentUpon>InstanceListEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="MaterialEntry.cs" />
     <Compile Include="ProgressionData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -105,6 +111,11 @@
     <None Include="app.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="InstanceListEditor.resx">
+      <DependentUpon>InstanceListEditor.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

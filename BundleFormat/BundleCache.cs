@@ -14,7 +14,7 @@ namespace BundleFormat
         public static Dictionary<ulong, int> Files = new Dictionary<ulong, int>();
         public static Dictionary<ulong, EntryInfo> EntryInfos = new Dictionary<ulong, EntryInfo>();
 
-        public static string GetFileByEntryID(ulong entryID)
+		public static string GetFileByEntryID(ulong entryID)
         {
             if (!Files.ContainsKey(entryID))
                 return null;
@@ -28,7 +28,19 @@ namespace BundleFormat
             return EntryInfos[entryID];
         }
 
-        public static string GetRelativePath(string path)
+		public static DebugInfo GetEntryDebugInfoByID(ulong entryID)
+		{
+			if (!EntryInfos.ContainsKey(entryID))
+				return default;
+			return EntryInfos[entryID].DebugInfo;
+		}
+
+		public static string GetEntryNameByID(ulong entryID)
+		{
+			return GetEntryDebugInfoByID(entryID).Name;
+		}
+
+		public static string GetRelativePath(string path)
         {
             string file = path.Replace('\\', '/').Replace(BundleCache.CurrentPath.Replace('\\', '/'), "");
 

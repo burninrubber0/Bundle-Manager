@@ -22,12 +22,14 @@ namespace BundleFormat
         public uint ID;
         public EntryType Type;
         public string Path;
+		public DebugInfo DebugInfo;
 
-        public EntryInfo(uint id, EntryType type, string path)
+        public EntryInfo(uint id, EntryType type, string path, DebugInfo debugInfo)
         {
             ID = id;
             Type = type;
             Path = path;
+			DebugInfo = debugInfo;
         }
     }
 

@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace BundleManager
+namespace BundleUtilities
 {
     public partial class LoadingDialog : Form, ILoader
     {

@@ -291,15 +291,21 @@ namespace BundleFormat
 				entry.DependenciesListOffset = br.ReadInt32();
 				entry.Type = (EntryType)br.ReadUInt32();
 
-				uint[] sizes = new uint[2];
+				//uint[] sizes = new uint[2];
 
 				if (compressed != 0)
 				{
-					sizes[0] = br.ReadUInt32();
+					//sizes[0] = br.ReadUInt32();
+					entry.EntryBlocks[0] = new EntryBlock();
+					entry.EntryBlocks[0].Compressed = true;
+					entry.EntryBlocks[0].CompressedSize = br.ReadUInt32();
 					br.ReadUInt32(); // Alignment value, should be 1
 					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
 					br.ReadUInt32(); // Alignment value, should be 1
-					sizes[1] = br.ReadUInt32();
+					//sizes[1] = br.ReadUInt32();
+					entry.EntryBlocks[1] = new EntryBlock();
+					entry.EntryBlocks[1].Compressed = true;
+					entry.EntryBlocks[1].CompressedSize = br.ReadUInt32();
 					br.ReadUInt32(); // Alignment value, should be 1
 					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
 					br.ReadUInt32(); // Alignment value, should be 1
@@ -307,13 +313,17 @@ namespace BundleFormat
 					br.ReadUInt32(); // Alignment value, should be 1
 				} else
 				{
-					sizes[0] = br.ReadUInt32();
+					//sizes[0] = br.ReadUInt32();
 					entry.EntryBlocks[0] = new EntryBlock();
+					entry.EntryBlocks[0].Compressed = false;
+					entry.EntryBlocks[0].UncompressedSize = br.ReadUInt32();
 					entry.EntryBlocks[0].UncompressedAlignment = br.ReadUInt32();
 					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
 					br.ReadUInt32(); // Alignment value
-					sizes[1] = br.ReadUInt32();
+					//sizes[1] = br.ReadUInt32();
 					entry.EntryBlocks[1] = new EntryBlock();
+					entry.EntryBlocks[1].Compressed = false;
+					entry.EntryBlocks[1].UncompressedSize = br.ReadUInt32();
 					entry.EntryBlocks[1].UncompressedAlignment = br.ReadUInt32();
 					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
 					br.ReadUInt32(); // Alignment value
@@ -341,17 +351,18 @@ namespace BundleFormat
 						entry.EntryBlocks[mappedBlock] = new EntryBlock();
 					EntryBlock entryBlock = entry.EntryBlocks[mappedBlock];
 
-					uint readSize = sizes[mappedBlock];
+					//uint readSize = sizes[mappedBlock];
+					uint readSize = compressed != 0 ? entryBlock.CompressedSize : entryBlock.UncompressedSize;
 					if (readSize == 0)
 					{
-						entryBlock.Data = null;
+						entryBlock.RawData = null;
 						continue;
 					}
 
 					long pos = br.BaseStream.Position;
 					br.BaseStream.Position = readOffset;
 
-					entryBlock.Data = br.ReadBytes((int)readSize);
+					entryBlock.RawData = br.ReadBytes((int)readSize);
 
 					br.BaseStream.Position = pos;
 				}
@@ -368,25 +379,27 @@ namespace BundleFormat
 				{
 					BundleEntry entry = Entries[i];
 
-					uint[] sizes = new uint[2];
+					//uint[] sizes = new uint[2];
 
-					sizes[0] = br.ReadUInt32();
+					//sizes[0] = br.ReadUInt32();
+					entry.EntryBlocks[0].UncompressedSize = br.ReadUInt32();
 					entry.EntryBlocks[0].UncompressedAlignment = br.ReadUInt32();
 					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
 					br.ReadUInt32(); // Alignment value
-					sizes[1] = br.ReadUInt32();
+					//sizes[1] = br.ReadUInt32();
+					entry.EntryBlocks[1].UncompressedSize = br.ReadUInt32();
 					entry.EntryBlocks[1].UncompressedAlignment = br.ReadUInt32();
 					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
 					br.ReadUInt32(); // Alignment value
 					br.ReadUInt32(); // other blocks. Maybe used but I'm ignoring it.
 					br.ReadUInt32(); // Alignment value
 
-					for (int j = 0; j < 2; j++)
-					{
-						EntryBlock entryBlock = entry.EntryBlocks[j];
-						if (sizes[j] > 0)
-							entryBlock.Data = entryBlock.Data.Decompress((int)sizes[j]);
-					}
+					//for (int j = 0; j < 2; j++)
+					//{
+					//	EntryBlock entryBlock = entry.EntryBlocks[j];
+					//	if (sizes[j] > 0)
+					//		entryBlock.Data = entryBlock.Data.Decompress((int)sizes[j]);
+					//}
 				}
 			}
 
@@ -488,22 +501,25 @@ namespace BundleFormat
 				for (int j = 0; j < entry.EntryBlocks.Length; j++)
 				{
 					entry.EntryBlocks[j] = new EntryBlock();
+					entry.EntryBlocks[j].Compressed = Flags.HasFlag(Flags.Compressed);
 				}
 
-				uint[] blockUncompressedSizes = new uint[3];
+				//uint[] blockUncompressedSizes = new uint[3];
 
 				for (int j = 0; j < entry.EntryBlocks.Length; j++)
 				{
 					uint uncompressedSize = br.ReadUInt32();
-					blockUncompressedSizes[j] = uncompressedSize & ~(0xFU << 28);
+					//blockUncompressedSizes[j] = uncompressedSize & ~(0xFU << 28);
+					entry.EntryBlocks[j].UncompressedSize = uncompressedSize & ~(0xFU << 28);
 					entry.EntryBlocks[j].UncompressedAlignment = (uint)(1 << ((int)uncompressedSize >> 28));
 				}
 
-				uint[] blockCompressedSizes = new uint[3];
+				//uint[] blockCompressedSizes = new uint[3];
 
 				for (int j = 0; j < entry.EntryBlocks.Length; j++)
 				{
-					blockCompressedSizes[j] = br.ReadUInt32();
+					//blockCompressedSizes[j] = br.ReadUInt32();
+					entry.EntryBlocks[j].CompressedSize = br.ReadUInt32();
 				}
 
 				for (int j = 0; j < entry.EntryBlocks.Length; j++)
@@ -516,17 +532,18 @@ namespace BundleFormat
 
 					bool compressed = Flags.HasFlag(Flags.Compressed);
 
-					uint readSize = compressed ? blockCompressedSizes[j] : blockUncompressedSizes[j];
+					//uint readSize = compressed ? blockCompressedSizes[j] : blockUncompressedSizes[j];
+					uint readSize = compressed ? entry.EntryBlocks[j].CompressedSize : entry.EntryBlocks[j].UncompressedSize;
 					if (readSize == 0)
 					{
-						block.Data = null;
+						block.RawData = null;
 						br.BaseStream.Position = lastAddr;
 						continue;
 					}
 
-					block.Data = br.ReadBytes((int)readSize);
-					if (compressed)
-						block.Data = block.Data.Decompress((int)blockUncompressedSizes[j]);
+					block.RawData = br.ReadBytes((int)readSize);
+					//if (compressed)
+					//	block.Data = block.Data.Decompress((int)blockUncompressedSizes[j]);
 					br.BaseStream.Position = lastAddr;
 				}
 

@@ -13,8 +13,31 @@ namespace BundleFormat
 {
 	public class EntryBlock
 	{
+		public bool Compressed;
+		public uint CompressedSize;
+		public uint UncompressedSize;
 		public uint UncompressedAlignment; // default depending on file type
-		public byte[] Data;
+		public byte[] RawData;
+		public byte[] Data
+		{
+			get
+			{
+				if (Compressed)
+					return RawData.Decompress((int)UncompressedSize);
+
+				return RawData;
+			}
+			set
+			{
+				if (Compressed)
+					RawData = value.Compress();
+				else
+					RawData = value;
+
+				UncompressedSize = (uint)value.Length;
+				CompressedSize = (uint)RawData.Length;
+			}
+		}
 	}
 
     public class EntryInfo

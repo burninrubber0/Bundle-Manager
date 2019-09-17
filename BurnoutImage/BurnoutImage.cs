@@ -11,168 +11,126 @@ using BundleUtilities;
 
 namespace BurnoutImage
 {
-    public static class GameImage
+	public struct ImageInfo
+	{
+		public readonly byte[] Header;
+		public readonly byte[] Data;
+
+		public ImageInfo(byte[] header, byte[] data)
+		{
+			this.Header = header;
+			this.Data = data;
+		}
+	}
+
+	public class ImageHeader
+	{
+		public readonly CompressionType CompressionType;
+		public readonly int Width, Height;
+
+		public ImageHeader(CompressionType compression, int width, int height)
+		{
+			CompressionType = compression;
+			Width = width;
+			Height = height;
+		}
+	}
+
+	public static class GameImage
     {
-        public struct ImageInfo
+        public static ImageInfo SetImage(Image newImage, CompressionType compression)
         {
-            public readonly byte[] Block0;
-            public readonly byte[] Block1;
+            int width = newImage.Width;
+            int height = newImage.Height;
+			byte[] header = null;
+			byte[] data = null;
 
-            public ImageInfo(byte[] block0, byte[] block1)
-            {
-                this.Block0 = block0;
-                this.Block1 = block1;
-            }
+			if (compression == CompressionType.BGRA)
+			{
+				Bitmap image = new Bitmap(newImage);
+				MemoryStream mspixels = new MemoryStream();
+
+				for (int i = 0; i < height; i++)
+				{
+					for (int j = 0; j < width; j++)
+					{
+						Color pixel = image.GetPixel(j, i);
+						mspixels.WriteByte(pixel.B);
+						mspixels.WriteByte(pixel.G);
+						mspixels.WriteByte(pixel.R);
+						mspixels.WriteByte(pixel.A);
+					}
+				}
+
+				data = mspixels.ToArray();
+
+				MemoryStream msx = new MemoryStream();
+				BinaryWriter bw = new BinaryWriter(msx);
+
+				bw.Write((int)0);
+				bw.Write((int)0);
+				bw.Write((int)0);
+				bw.Write((int)1);
+
+				bw.Write((int)0x15);
+				bw.Write((short)width);
+				bw.Write((short)height);
+
+				bw.Write((int)0x15);
+				bw.Write((int)0);
+
+				bw.Flush();
+
+				header = msx.ToArray();
+
+				bw.Close();
+			}
+			else
+			{
+
+				DXTCompression dxt = DXTCompression.DXT1;
+				if (compression == CompressionType.DXT3)
+					dxt = DXTCompression.DXT1;
+				else if (compression == CompressionType.DXT5)
+					dxt = DXTCompression.DXT5;
+				data = ImageUtil.CompressImage(newImage/*, width, height*/, dxt);
+
+				MemoryStream msx = new MemoryStream();
+				BinaryWriter bw = new BinaryWriter(msx);
+
+				bw.Write((int)0);
+				bw.Write((int)0);
+				bw.Write((int)0);
+				bw.Write((int)1);
+
+				bw.Write(Encoding.ASCII.GetBytes(compression.ToString()));
+				bw.Write((short)width);
+				bw.Write((short)height);
+				bw.Write((int)0x15);
+				bw.Write((int)0);
+
+				bw.Flush();
+
+				header = msx.ToArray();
+
+				bw.Close();
+			}
+
+            return new ImageInfo(header, data);
         }
 
-        public static ImageInfo SetImage(Image image, DXTCompression compression)
-        {
-            int width = image.Width;
-            int height = image.Height;
-            
-            byte[] ExtraData = ImageUtil.CompressImage(image/*, width, height*/, compression);
-
-            MemoryStream msx = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(msx);
-
-            bw.Write((int)0);
-            bw.Write((int)0);
-            bw.Write((int)0);
-            bw.Write((int)1);
-
-            bw.Write(Encoding.ASCII.GetBytes(compression.ToString()));
-            bw.Write((short)width);
-            bw.Write((short)height);
-            bw.Write((int)0x15);
-            bw.Write((int)0);
-
-            bw.Flush();
-
-            byte[] Data = msx.ToArray();
-
-            bw.Close();
-
-            return new ImageInfo(Data, ExtraData);
-        }
-
-        public static Image GetImagePC(byte[] data, byte[] extraData)
-        {
-            if (extraData != null && data.Length == 32)
-            {
-                try
-                {
-                    MemoryStream ms = new MemoryStream(data);
-                    BinaryReader br = new BinaryReader(ms);
-                    br.BaseStream.Seek(0x10, SeekOrigin.Begin);
-                    CompressionType type = CompressionType.UNKNOWN;
-                    byte[] compression = br.ReadBytes(4);
-                    string compressionString = Encoding.ASCII.GetString(compression);
-                    if (compression.Matches(new byte[] { 0x15, 0x00, 0x00, 0x00 }))
-                    {
-                        type = CompressionType.BGRA;
-                    }
-                    else if (compression.Matches(new byte[] { 0xFF, 0x00, 0x00, 0x00 }))
-                    {
-                        type = CompressionType.ARGB;
-                    }
-                    else if (compressionString.StartsWith("DXT"))
-                    {
-                        switch (compressionString[3])
-                        {
-                            case '1':
-                                type = CompressionType.DXT1;
-                                break;
-                            case '3':
-                                type = CompressionType.DXT3;
-                                break;
-                            case '5':
-                                type = CompressionType.DXT5;
-                                break;
-                        }
-                    }
-
-                    int width = br.ReadInt16();
-                    int height = br.ReadInt16();
-                    br.Close();
-
-                    byte[] pixels = extraData;
-
-                    //DebugTimer t = DebugTimer.Start("Decompress[" + width + "x" + height + "]");
-                    if (type == CompressionType.DXT1)
-                    {
-                        pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT1);
-                    }
-                    else if (type == CompressionType.DXT3)
-                    {
-                        pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT3);
-                    }
-                    else if (type == CompressionType.DXT5)
-                    {
-                        pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT5);
-                    }
-                    //t.StopLog();
-
-                    DirectBitmap bitmap = new DirectBitmap(width, height);
-
-                    int index = 0;
-                    for (int y = 0; y < height; y++)
-                    {
-                        for (int x = 0; x < width; x++)
-                        {
-                            //DebugTimer t = DebugTimer.Start("Pixel[" + width + "x" + height + "]");
-                            byte red;
-                            byte green;
-                            byte blue;
-                            byte alpha;
-                            if (type == CompressionType.BGRA)
-                            {
-                                blue = pixels[index + 0];
-                                green = pixels[index + 1];
-                                red = pixels[index + 2];
-                                alpha = pixels[index + 3];
-                            }
-                            else
-                            {
-                                alpha = pixels[index + 0];
-                                red = pixels[index + 1];
-                                green = pixels[index + 2];
-                                blue = pixels[index + 3];
-                            }
-
-                            Color color = Color.FromArgb(alpha, red, green, blue);
-							bitmap.Bits[x + y * width] = color.ToArgb();
-							//bitmap.SetPixel(j, i, color);
-							index += 4;
-                            //t.StopLog();
-                        }
-                    }
-                    return bitmap.Bitmap;
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-	    public static Image GetImage(byte[] data, byte[] extraData)
-	    {
-		    try
+		public static ImageHeader GetImageHeader(byte[] data)
+		{
+			try
 			{
 				MemoryStream ms = new MemoryStream(data);
-			    BinaryReader br = new BinaryReader(ms);
-			    br.BaseStream.Seek(8, SeekOrigin.Begin);
-			    uint unk1 = br.ReadUInt32();
-			    uint unk2 = br.ReadUInt32();
-			    //if ((unk1 == 7 && unk2 == 0) || (unk1 == 0 && unk2 == 7))
+				BinaryReader br = new BinaryReader(ms);
 				if (data.Length == 0x40 || data.Length == 0x30)
-			    {
+				{
 					// Remaster
-					//DebugTimer t3 = DebugTimer.Start("Checking Header");
+					br.BaseStream.Seek(8, SeekOrigin.Begin);
+					uint unk1 = br.ReadUInt32();
+					uint unk2 = br.ReadUInt32();
 
 					br.BaseStream.Seek(0x1C, SeekOrigin.Begin);
 
@@ -191,10 +149,10 @@ namespace BurnoutImage
 					{
 						type = CompressionType.ARGB;
 					}
-					else if (compression.Matches(new byte[] {0x47, 0x00, 0x00, 0x00}))
-				    {
-					    type = CompressionType.DXT1;
-				    }
+					else if (compression.Matches(new byte[] { 0x47, 0x00, 0x00, 0x00 }))
+					{
+						type = CompressionType.DXT1;
+					}
 					else if (compression.Matches(new byte[] { 0x4A, 0x00, 0x00, 0x00 }))
 					{
 						type = CompressionType.DXT3;
@@ -210,76 +168,113 @@ namespace BurnoutImage
 					int height = br.ReadInt16();
 					br.Close();
 
-					byte[] pixels = extraData;
-					//t3.StopLog();
-
-					//DebugTimer t2 = DebugTimer.Start("Decompress[" + width + "x" + height + "]");
-					if (type == CompressionType.DXT1)
+					return new ImageHeader(type, width, height);
+				}
+				else
+				{
+					// OLD PC
+					br.BaseStream.Seek(0x10, SeekOrigin.Begin);
+					CompressionType type = CompressionType.UNKNOWN;
+					byte[] compression = br.ReadBytes(4);
+					string compressionString = Encoding.ASCII.GetString(compression);
+					if (compression.Matches(new byte[] { 0x15, 0x00, 0x00, 0x00 }))
 					{
-						pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT1);
+						type = CompressionType.BGRA;
 					}
-					else if (type == CompressionType.DXT3)
+					else if (compression.Matches(new byte[] { 0xFF, 0x00, 0x00, 0x00 }))
 					{
-						pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT3);
+						type = CompressionType.ARGB;
 					}
-					else if (type == CompressionType.DXT5)
+					else if (compressionString.StartsWith("DXT"))
 					{
-						pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT5);
-					}
-					//t2.StopLog();
-
-					DirectBitmap bitmap = new DirectBitmap(width, height);
-
-					//DebugTimer t = DebugTimer.Start("Copying Pixels[" + width + "x" + height + "]");
-					int index = 0;
-					for (int y = 0; y < height; y++)
-					{
-						for (int x = 0; x < width; x++)
+						switch (compressionString[3])
 						{
-							//DebugTimer t = DebugTimer.Start("Pixel[" + width + "x" + height + "]");
-							byte red;
-							byte green;
-							byte blue;
-							byte alpha;
-							if (type == CompressionType.BGRA)
-							{
-								blue = pixels[index + 0];
-								green = pixels[index + 1];
-								red = pixels[index + 2];
-								alpha = pixels[index + 3];
-							}
-							else if (type == CompressionType.RGBA)
-							{
-								red = pixels[index + 0];
-								green = pixels[index + 1];
-								blue = pixels[index + 2];
-								alpha = pixels[index + 3];
-							} else 
-							{
-								alpha = pixels[index + 0];
-								red = pixels[index + 1];
-								green = pixels[index + 2];
-								blue = pixels[index + 3];
-							}
-
-							Color color = Color.FromArgb(alpha, red, green, blue);
-							bitmap.Bits[x + y * width] = color.ToArgb();
-							index += 4;
-							//t.StopLog();
+							case '1':
+								type = CompressionType.DXT1;
+								break;
+							case '3':
+								type = CompressionType.DXT3;
+								break;
+							case '5':
+								type = CompressionType.DXT5;
+								break;
 						}
 					}
-					//t.StopLog();
-					return bitmap.Bitmap;
-				}
-			    else// if (unk1 == 0 && unk2 == 1)
-			    {
-				    // OLD PC
+
+					int width = br.ReadInt16();
+					int height = br.ReadInt16();
 					br.Close();
 
-				    return GetImagePC(data, extraData);
-			    }
+					return new ImageHeader(type, width, height);
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message + "\r\n" + ex.StackTrace);
+			}
 
-			    return null;
+			return null;
+		}
+
+	    public static Image GetImage(byte[] data, byte[] extraData)
+	    {
+		    try
+			{
+				ImageHeader header = GetImageHeader(data);
+				byte[] pixels = extraData;
+
+				if (header.CompressionType == CompressionType.DXT1)
+				{
+					pixels = ImageUtil.DecompressImage(pixels, header.Width, header.Height, DXTCompression.DXT1);
+				}
+				else if (header.CompressionType == CompressionType.DXT3)
+				{
+					pixels = ImageUtil.DecompressImage(pixels, header.Width, header.Height, DXTCompression.DXT3);
+				}
+				else if (header.CompressionType == CompressionType.DXT5)
+				{
+					pixels = ImageUtil.DecompressImage(pixels, header.Width, header.Height, DXTCompression.DXT5);
+				}
+
+				DirectBitmap bitmap = new DirectBitmap(header.Width, header.Height);
+
+				int index = 0;
+				for (int y = 0; y < header.Height; y++)
+				{
+					for (int x = 0; x < header.Width; x++)
+					{
+						byte red;
+						byte green;
+						byte blue;
+						byte alpha;
+						if (header.CompressionType == CompressionType.BGRA)
+						{
+							blue = pixels[index + 0];
+							green = pixels[index + 1];
+							red = pixels[index + 2];
+							alpha = pixels[index + 3];
+						}
+						else if (header.CompressionType == CompressionType.RGBA)
+						{
+							red = pixels[index + 0];
+							green = pixels[index + 1];
+							blue = pixels[index + 2];
+							alpha = pixels[index + 3];
+						} else 
+						{
+							alpha = pixels[index + 0];
+							red = pixels[index + 1];
+							green = pixels[index + 2];
+							blue = pixels[index + 3];
+						}
+
+						Color color = Color.FromArgb(alpha, red, green, blue);
+						bitmap.Bits[x + y * header.Width] = color.ToArgb();
+						index += 4;
+					}
+				}
+
+				return bitmap.Bitmap;
 		    }
 		    catch (Exception ex)
 		    {
@@ -380,16 +375,16 @@ namespace BurnoutImage
                 return null;
             }
         }
+	}
 
-        public enum CompressionType
-        {
-            RGBA,
-            ARGB,
-            BGRA,
-            DXT1,
-            DXT3,
-            DXT5,
-            UNKNOWN
-        }
-    }
+	public enum CompressionType
+	{
+		RGBA,
+		ARGB,
+		BGRA,
+		DXT1,
+		DXT3,
+		DXT5,
+		UNKNOWN
+	}
 }

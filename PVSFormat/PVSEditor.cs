@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 using BundleFormat;
+using BundleUtilities;
 using DebugHelper;
 using PluginAPI;
 
@@ -10,7 +11,7 @@ namespace PVSFormat
     {
         private PVS _currentPVS;
 
-		public Image GameMap
+		public Texture GameMap
 		{
 			get => pvsMain.GameMap;
 			set => pvsMain.GameMap = value;

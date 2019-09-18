@@ -13,7 +13,7 @@ namespace BaseHandlers
 {
     public class TextureState
     {
-        public Image Texture;
+        public Texture Texture;
 
         public TextureState()
         {

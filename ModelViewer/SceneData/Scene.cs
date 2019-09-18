@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using BundleUtilities;
 using OpenTK;
 
 namespace ModelViewer.SceneData
@@ -124,7 +125,7 @@ namespace ModelViewer.SceneData
                 string materialRelativePathName = materialDir + materialFileName;
                 string materialPathName = materialDirPath + materialFileName;
 
-                Image image = material.DiffuseMap;
+                Texture image = material.DiffuseMap;
 
                 float r = material.Color.R / 255.0f;
                 float g = material.Color.G / 255.0f;

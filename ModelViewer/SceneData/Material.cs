@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BundleUtilities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -11,13 +12,13 @@ namespace ModelViewer.SceneData
     public class Material
     {
         public string Name;
-        public Image DiffuseMap { get; set; }
-        public Image NormalMap { get; set; }
-        public Image SpecularMap { get; set; }
+        public Texture DiffuseMap { get; set; }
+        public Texture NormalMap { get; set; }
+        public Texture SpecularMap { get; set; }
 
         public Color Color { get; set; }
 
-        public Material(string name, Color color, Image diffuse = null, Image normal = null, Image specular = null)
+        public Material(string name, Color color, Texture diffuse = null, Texture normal = null, Texture specular = null)
         {
             Name = name;
             Color = color;

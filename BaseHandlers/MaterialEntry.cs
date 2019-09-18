@@ -14,9 +14,9 @@ namespace BaseHandlers
     {
         public List<TextureState> TextureStates;
 
-        public Image DiffuseMap { get; set; }
-        public Image NormalMap { get; set; }
-        public Image SpecularMap { get; set; }
+        public Texture DiffuseMap { get; set; }
+        public Texture NormalMap { get; set; }
+        public Texture SpecularMap { get; set; }
         public Color Color { get; set; }
 
         public MaterialEntry()

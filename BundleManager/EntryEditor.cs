@@ -680,10 +680,11 @@ namespace BundleManager
             }
             else if (_entry.Type == EntryType.RasterResourceType)
             {
+				Texture texture;
                 if (_entry.Console)
-                    Image = GameImage.GetImagePS3(_entry.EntryBlocks[0].Data, _entry.EntryBlocks[1].Data);
+					texture = GameImage.GetImagePS3(_entry.EntryBlocks[0].Data, _entry.EntryBlocks[1].Data);
 				else
-                    Image = GameImage.GetImage(_entry.EntryBlocks[0].Data, _entry.EntryBlocks[1].Data);
+					texture = GameImage.GetImage(_entry.EntryBlocks[0].Data, _entry.EntryBlocks[1].Data);
 
                 ImageVisible = Image != null;
 

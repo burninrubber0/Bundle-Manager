@@ -216,7 +216,7 @@ namespace BurnoutImage
 			return null;
 		}
 
-	    public static Image GetImage(byte[] data, byte[] extraData)
+	    public static Texture GetImage(byte[] data, byte[] extraData)
 	    {
 		    try
 			{
@@ -236,7 +236,9 @@ namespace BurnoutImage
 					pixels = ImageUtil.DecompressImage(pixels, header.Width, header.Height, DXTCompression.DXT5);
 				}
 
-				DirectBitmap bitmap = new DirectBitmap(header.Width, header.Height);
+				//DirectBitmap bitmap = new DirectBitmap(header.Width, header.Height);
+
+				byte[] imageData = new byte[header.Width * header.Height * 4];
 
 				int index = 0;
 				for (int y = 0; y < header.Height; y++)
@@ -268,13 +270,19 @@ namespace BurnoutImage
 							blue = pixels[index + 3];
 						}
 
-						Color color = Color.FromArgb(alpha, red, green, blue);
-						bitmap.Bits[x + y * header.Width] = color.ToArgb();
+						//Color color = Color.FromArgb(alpha, red, green, blue);
+						//bitmap.Bits[x + y * header.Width] = color.ToArgb();
+						imageData[(x + y * header.Width) + 3] = alpha;
+						imageData[(x + y * header.Width) + 2] = red;
+						imageData[(x + y * header.Width) + 1] = green;
+						imageData[(x + y * header.Width) + 0] = blue;
 						index += 4;
 					}
 				}
 
-				return bitmap.Bitmap;
+				//return bitmap.Bitmap;
+
+				return new Texture(imageData, header.Width, header.Height);
 		    }
 		    catch (Exception ex)
 		    {
@@ -283,7 +291,7 @@ namespace BurnoutImage
 		    }
 	    }
 
-	    public static Image GetImagePS3(byte[] data, byte[] extraData)
+	    public static Texture GetImagePS3(byte[] data, byte[] extraData)
         {
             if (extraData != null && data.Length == 48)
             {
@@ -328,9 +336,10 @@ namespace BurnoutImage
                         pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT5);
                     }
 
-                    DirectBitmap bitmap = new DirectBitmap(width, height);
+					//DirectBitmap bitmap = new DirectBitmap(width, height);
+					byte[] imageData = new byte[width * height * 4];
 
-                    int index = 0;
+					int index = 0;
                     for (int y = 0; y < height; y++)
                     {
                         for (int x = 0; x < width; x++)
@@ -355,16 +364,21 @@ namespace BurnoutImage
                                 blue = pixels[index + 3];
                             }
 
-                            Color color = Color.FromArgb(alpha, red, green, blue);
-							bitmap.Bits[x + y * width] = color.ToArgb();
-                            bitmap.SetPixel(x, y, color);
-                            index += 4;
+							//Color color = Color.FromArgb(alpha, red, green, blue);
+							//bitmap.Bits[x + y * width] = color.ToArgb();
+							//bitmap.SetPixel(x, y, color);
+							imageData[(x + y * width) + 0] = alpha;
+							imageData[(x + y * width) + 1] = red;
+							imageData[(x + y * width) + 2] = green;
+							imageData[(x + y * width) + 3] = blue;
+							index += 4;
                         }
                     }
-                    
-                    return bitmap.Bitmap;
 
-                }
+					//return bitmap.Bitmap;
+
+					return new Texture(imageData, width, height);
+				}
                 catch
                 {
                     return null;

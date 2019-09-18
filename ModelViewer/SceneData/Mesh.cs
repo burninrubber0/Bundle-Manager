@@ -274,16 +274,16 @@ namespace ModelViewer.SceneData
 
 					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Bgra,
 						PixelType.UnsignedByte, IntPtr.Zero);
-					Bitmap bitmap = new Bitmap(Material.DiffuseMap);
-					BitmapData data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
-						System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+					//Bitmap bitmap = new Bitmap(Material.DiffuseMap);
+					//BitmapData data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
+					//	System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
 					GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, width, height, PixelFormat.Bgra,
-						PixelType.UnsignedByte, data.Scan0);
+						PixelType.UnsignedByte, Material.DiffuseMap.Data);
 
-					bitmap.UnlockBits(data);
+					//bitmap.UnlockBits(data);
 
-					bitmap.Dispose();
+					//bitmap.Dispose();
 
 					GL.BindTexture(TextureTarget.Texture2D, 0);
 

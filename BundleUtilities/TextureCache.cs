@@ -9,22 +9,23 @@ namespace BundleUtilities
 {
 	public static class TextureCache
 	{
-		private static readonly Dictionary<ulong, Image> _cachedTextures = new Dictionary<ulong, Image>();
+		private static readonly Dictionary<ulong, Texture> _cachedTextures = new Dictionary<ulong, Texture>();
 
 		public static void ResetCache()
 		{
-			foreach (ulong key in _cachedTextures.Keys)
+			/*foreach (ulong key in _cachedTextures.Keys)
 			{
-				Image img = _cachedTextures[key];
+				Texture img = _cachedTextures[key];
 				img.Dispose();
-			}
+			}*/
+			_cachedTextures.Clear();
+
 			GC.Collect();
 			GC.WaitForPendingFinalizers();
 			GC.Collect();
-			_cachedTextures.Clear();
 		}
 
-		public static void AddToCache(ulong id, Image image)
+		public static void AddToCache(ulong id, Texture image)
 		{
 			_cachedTextures[id] = image;
 		}
@@ -34,7 +35,7 @@ namespace BundleUtilities
 			return _cachedTextures.ContainsKey(key);
 		}
 
-		public static Image GetTexture(ulong key)
+		public static Texture GetTexture(ulong key)
 		{
 			return _cachedTextures[key];
 		}

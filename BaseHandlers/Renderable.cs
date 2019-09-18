@@ -109,9 +109,9 @@ namespace BaseHandlers
                 if (rMesh.Material != null)
                 {
                     Color color = rMesh.Material.Color;
-                    Image diffuse = rMesh.Material.DiffuseMap;
-                    Image normal = rMesh.Material.NormalMap;
-                    Image specular = rMesh.Material.SpecularMap;
+					Texture diffuse = rMesh.Material.DiffuseMap;
+					Texture normal = rMesh.Material.NormalMap;
+					Texture specular = rMesh.Material.SpecularMap;
 
                     mesh.Material = new Material(rMesh.MaterialID.ToString("X8"), color, diffuse, normal, specular);
                 }

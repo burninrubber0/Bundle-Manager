@@ -58,6 +58,7 @@
       <DependentUpon>LoadingDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="ReadFailedError.cs" />
+    <Compile Include="Texture.cs" />
     <Compile Include="TextureCache.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

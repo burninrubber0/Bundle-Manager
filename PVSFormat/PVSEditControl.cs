@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BundleUtilities;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace PVSFormat
 			}
 		}
 
-		public Image GameMap;
+		public Texture GameMap;
 
 		protected const float Multiplier = 0.1f;
 
@@ -189,7 +190,8 @@ namespace PVSFormat
 
 			RectangleF rect = new RectangleF(x, y, width, height);
 
-			g.DrawImage(GameMap, rect);
+			// TODO: g.DrawTexture
+			//g.DrawImage(GameMap, rect);
 		}
 
 		protected void DrawPVS(Graphics g)

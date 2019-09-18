@@ -75,7 +75,7 @@ namespace PVSFormat
 
     public class PVS : IEntryData
     {
-		private Image _gameMap;
+		private Texture _gameMap;
 
 		public uint PointsPtr;
 		public uint ZonePtr;
@@ -227,7 +227,7 @@ namespace PVSFormat
 			return pvsForm;
 		}
 
-		private Image GetGameMap(BundleArchive archive)
+		private Texture GetGameMap(BundleArchive archive)
 		{
 			ulong id = 0x9F55039D;
 			BundleEntry descEntry1 = archive.GetEntryByID(id);
@@ -250,7 +250,7 @@ namespace PVSFormat
 					descEntry1 = archive2.GetEntryByID(id);
 			}
 
-			Image image = null;
+			Texture image = null;
 
 			if (descEntry1 != null && descEntry1.Type == EntryType.RasterResourceType)
 			{

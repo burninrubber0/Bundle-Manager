@@ -13,11 +13,14 @@ namespace BundleUtilities
 
 		public static void ResetCache()
 		{
-			foreach (uint key in _cachedTextures.Keys)
+			foreach (ulong key in _cachedTextures.Keys)
 			{
 				Image img = _cachedTextures[key];
 				img.Dispose();
 			}
+			GC.Collect();
+			GC.WaitForPendingFinalizers();
+			GC.Collect();
 			_cachedTextures.Clear();
 		}
 

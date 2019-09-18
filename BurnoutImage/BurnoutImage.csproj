@@ -54,7 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BurnoutImage.cs" />
+    <Compile Include="GameImage.cs" />
     <Compile Include="ClusterFit.cs" />
     <Compile Include="ColourFit.cs" />
     <Compile Include="ColourSet.cs" />

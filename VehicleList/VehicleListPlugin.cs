@@ -12,7 +12,7 @@ namespace VehicleList
 	{
 		public override void Init()
 		{
-			EntryTypeRegistry.Register(EntryType.VehicleListResourceType, new VehicleListData());
+			EntryTypeRegistry.Register(EntryType.VehicleList, new VehicleListData());
 		}
 
 		public override string GetID()

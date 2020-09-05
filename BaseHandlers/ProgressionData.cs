@@ -273,7 +273,7 @@ namespace BaseHandlers
 
 		public EntryType GetEntryType(BundleEntry entry)
 		{
-			return EntryType.ProgressionResourceType;
+			return EntryType.ProgressionData;
 		}
 
 		private void Clear()

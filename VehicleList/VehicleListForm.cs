@@ -50,30 +50,46 @@ namespace VehicleList
                 Vehicle vehicle = List.Entries[i];
 
                 string[] value = {
-                    vehicle.Index.ToString("D3"),
+                    vehicle.Index.ToString(),
                     //vehicle.ID.Encrypted.ToString("X16"),
                     vehicle.ID.Value,
-                    vehicle.CarBrand,
-                    vehicle.CarName,
+                    vehicle.ParentID.Value,
                     vehicle.WheelType,
+                    vehicle.CarName,
+                    vehicle.CarBrand,
+                    vehicle.DamageLimit.ToString(),
+                    //Convert.ToString((uint)vehicle.Flags, 2).PadLeft(18, '0'),
+                    vehicle.Flags.ToString(),
+                    vehicle.BoostLength.ToString(),
+                    vehicle.VehicleRank.ToString(),
+                    vehicle.BoostCapacity.ToString(),
+                    vehicle.DisplayStrength.ToString(),
+                    vehicle.AttribSysCollectionKey.ToString(),
+                    vehicle.ExhaustName.Value,
+                    vehicle.ExhaustID.ToString(),
+                    vehicle.EngineID.ToString(),
+                    vehicle.EngineName.Value,
+                    vehicle.ClassUnlockStreamHash.ToString(),
+                    vehicle.CarShutdownStreamID.ToString(),
+                    vehicle.CarReleasedStreamID.ToString(),
+                    vehicle.AIMusicHash.ToString(),
+                    vehicle.AIExhaustIndex.ToString(),
+                    vehicle.AIExhaustIndex2.ToString(),
+                    vehicle.AIExhaustIndex3.ToString(),
                     vehicle.Category.ToString(),
                     //Convert.ToString(vehicle.Category, 2).PadLeft(6, '0'),
-                    Convert.ToString(vehicle.Flags, 2).PadLeft(18, '0'),
+                    vehicle.VehicleType.ToString(),
                     vehicle.BoostType.ToString(),
-                    vehicle.MaxSpeedNoBoost.ToString("X2"),
-                    vehicle.MaxSpeedBoost.ToString("D3"),
-                    vehicle.NewUnknown.ToString(),
                     vehicle.FinishType.ToString(),
-                    vehicle.Color.ToString(),
+                    vehicle.MaxSpeedNoBoost.ToString(),
+                    vehicle.MaxSpeedBoost.ToString(),
+                    //vehicle.NewUnknown.ToString(),
                     vehicle.DisplaySpeed.ToString(),
                     vehicle.DisplayBoost.ToString(),
-                    vehicle.DisplayStrength.ToString(),
-                    vehicle.ExhauseID.Value,
-                    Util.GetEngineFilenameByID(vehicle.ExhauseID.Value),
-                    vehicle.GroupID.ToString(),
-                    vehicle.EngineID.Value,
-                    Util.GetEngineFilenameByID(vehicle.EngineID.Value),
-                    vehicle.GroupIDAlt.ToString()
+                    vehicle.Color.ToString(),
+                    vehicle.ColorType.ToString()
+                    //Util.GetEngineFilenameByID(vehicle.ExhaustName.Value),
+                    //Util.GetEngineFilenameByID(vehicle.EngineName.Value),
                     //vehicle.Unknown15.ToString(),
                     //vehicle.Unknown20.ToString(),
                     //vehicle.Unknown27.ToString()
@@ -136,6 +152,9 @@ namespace VehicleList
             Vehicle vehicle = new Vehicle();
             vehicle.Index = List.Entries.Count;
             vehicle.ID = new EncryptedString("");
+            vehicle.ParentID = new EncryptedString("");
+            vehicle.ExhaustName = new EncryptedString("");
+            vehicle.EngineName = new EncryptedString("");
 
             VehicleEditor editor = new VehicleEditor();
             editor.Vehicle = vehicle;

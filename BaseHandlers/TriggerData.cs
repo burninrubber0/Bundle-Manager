@@ -404,7 +404,7 @@ namespace BaseHandlers
 
 		public EntryType GetEntryType(BundleEntry entry)
 		{
-			return EntryType.TriggerResourceType;
+			return EntryType.TriggerData;
 		}
 
 		public bool Write(BundleEntry entry)

@@ -33,27 +33,39 @@
             this.addItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lstVehicles = new System.Windows.Forms.ListView();
             this.colIndex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colModel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colBrand = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colWheelType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colCategory = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colVehicleID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colParentID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colWheel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colVehicleName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colMfrName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colDamageLimit = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colFlags = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colBoost = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colMaxBoostlessSpeed = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colTopBoostSpeed = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colNewUnknown = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colFinish = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colColor = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colDisplaySpeed = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colDisplayBoost = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colDisplayStrength = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colBoostLength = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colVehicleRank = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colBoostCapacity = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colStrengthStat = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colAttribKey = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colExhaustName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colExhaustID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colExhaustFile = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colGroupID1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colEngineID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colEngineFile = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colGroupID2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colEngineName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colClassUnlockStr = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colCarWonStrID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colCarReleasedStrID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colAIMusicHash = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colAIExStr1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colAIExStr2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colAIExStr3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colCategory = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colVehicleType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colBoostType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colFinishType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colTopSpeed = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colTopSpeedBoost = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colTopSpeedStat = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colTopSpeedBoostStat = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colColor = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colColorPalette = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.stsMain = new System.Windows.Forms.StatusStrip();
             this.stlStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -93,30 +105,43 @@
             // 
             this.lstVehicles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colIndex,
-            this.colModel,
-            this.colBrand,
-            this.colName,
-            this.colWheelType,
-            this.colCategory,
+            this.colVehicleID,
+            this.colParentID,
+            this.colWheel,
+            this.colVehicleName,
+            this.colMfrName,
+            this.colDamageLimit,
             this.colFlags,
-            this.colBoost,
-            this.colMaxBoostlessSpeed,
-            this.colTopBoostSpeed,
-            this.colNewUnknown,
-            this.colFinish,
-            this.colColor,
-            this.colDisplaySpeed,
-            this.colDisplayBoost,
-            this.colDisplayStrength,
+            this.colBoostLength,
+            this.colVehicleRank,
+            this.colBoostCapacity,
+            this.colStrengthStat,
+            this.colAttribKey,
+            this.colExhaustName,
             this.colExhaustID,
-            this.colExhaustFile,
-            this.colGroupID1,
             this.colEngineID,
-            this.colEngineFile,
-            this.colGroupID2});
+            this.colEngineName,
+            this.colClassUnlockStr,
+            this.colCarWonStrID,
+            this.colCarReleasedStrID,
+            this.colAIMusicHash,
+            this.colAIExStr1,
+            this.colAIExStr2,
+            this.colAIExStr3,
+            this.colCategory,
+            this.colVehicleType,
+            this.colBoostType,
+            this.colFinishType,
+            this.colTopSpeed,
+            this.colTopSpeedBoost,
+            this.colTopSpeedStat,
+            this.colTopSpeedBoostStat,
+            this.colColor,
+            this.colColorPalette});
             this.lstVehicles.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstVehicles.FullRowSelect = true;
             this.lstVehicles.GridLines = true;
+            this.lstVehicles.HideSelection = false;
             this.lstVehicles.Location = new System.Drawing.Point(0, 49);
             this.lstVehicles.Name = "lstVehicles";
             this.lstVehicles.Size = new System.Drawing.Size(1079, 416);
@@ -131,102 +156,148 @@
             // 
             this.colIndex.Text = "Index";
             // 
-            // colModel
+            // colVehicleID
             // 
-            this.colModel.Text = "Model";
-            this.colModel.Width = 80;
+            this.colVehicleID.Text = "ID";
+            this.colVehicleID.Width = 80;
             // 
-            // colBrand
+            // colParentID
             // 
-            this.colBrand.Text = "Brand";
-            this.colBrand.Width = 100;
+            this.colParentID.Text = "Parent ID";
             // 
-            // colName
+            // colWheel
             // 
-            this.colName.Text = "Name";
-            this.colName.Width = 180;
+            this.colWheel.Text = "Wheel";
             // 
-            // colWheelType
+            // colVehicleName
             // 
-            this.colWheelType.Text = "Wheel Type";
-            this.colWheelType.Width = 160;
+            this.colVehicleName.Text = "Vehicle";
+            this.colVehicleName.Width = 180;
             // 
-            // colCategory
+            // colMfrName
             // 
-            this.colCategory.Text = "Category";
-            this.colCategory.Width = 80;
+            this.colMfrName.Text = "Manufacturer";
+            this.colMfrName.Width = 100;
+            // 
+            // colDamageLimit
+            // 
+            this.colDamageLimit.Text = "Damage Limit";
             // 
             // colFlags
             // 
             this.colFlags.Text = "Flags";
             this.colFlags.Width = 80;
             // 
-            // colBoost
+            // colBoostLength
             // 
-            this.colBoost.Text = "Boost";
-            this.colBoost.Width = 90;
+            this.colBoostLength.Text = "Boost Length";
             // 
-            // colMaxBoostlessSpeed
+            // colVehicleRank
             // 
-            this.colMaxBoostlessSpeed.Text = "Max Boostless Speed";
-            this.colMaxBoostlessSpeed.Width = 80;
+            this.colVehicleRank.Text = "Rank";
             // 
-            // colTopBoostSpeed
+            // colBoostCapacity
             // 
-            this.colTopBoostSpeed.Text = "Max Boost Speed";
+            this.colBoostCapacity.Text = "Boost Capacity";
             // 
-            // colNewUnknown
+            // colStrengthStat
             // 
-            this.colNewUnknown.Text = "New Unknown";
+            this.colStrengthStat.Text = "Strength Stat";
             // 
-            // colFinish
+            // colAttribKey
             // 
-            this.colFinish.Text = "Finish";
-            this.colFinish.Width = 80;
+            this.colAttribKey.Text = "AttribSys ID";
             // 
-            // colColor
+            // colExhaustName
             // 
-            this.colColor.Text = "Color";
-            // 
-            // colDisplaySpeed
-            // 
-            this.colDisplaySpeed.Text = "Display Speed";
-            // 
-            // colDisplayBoost
-            // 
-            this.colDisplayBoost.Text = "Display Boost";
-            // 
-            // colDisplayStrength
-            // 
-            this.colDisplayStrength.Text = "Display Strength";
+            this.colExhaustName.Text = "Exhaust Name";
+            this.colExhaustName.Width = 120;
             // 
             // colExhaustID
             // 
-            this.colExhaustID.Text = "Exhaust ID";
-            this.colExhaustID.Width = 120;
-            // 
-            // colExhaustFile
-            // 
-            this.colExhaustFile.Text = "Exhaust File";
-            // 
-            // colGroupID1
-            // 
-            this.colGroupID1.Text = "Group ID 1";
-            this.colGroupID1.Width = 80;
+            this.colExhaustID.Text = "Exhuast ID";
+            this.colExhaustID.Width = 80;
             // 
             // colEngineID
             // 
             this.colEngineID.Text = "Engine ID";
-            this.colEngineID.Width = 120;
+            this.colEngineID.Width = 80;
             // 
-            // colEngineFile
+            // colEngineName
             // 
-            this.colEngineFile.Text = "Engine File";
+            this.colEngineName.Text = "Engine Name";
+            this.colEngineName.Width = 120;
             // 
-            // colGroupID2
+            // colClassUnlockStr
             // 
-            this.colGroupID2.Text = "Group ID 2";
-            this.colGroupID2.Width = 80;
+            this.colClassUnlockStr.Text = "Class Unlock Stream ID";
+            // 
+            // colCarWonStrID
+            // 
+            this.colCarWonStrID.Text = "Car Won Stream ID";
+            // 
+            // colCarReleasedStrID
+            // 
+            this.colCarReleasedStrID.Text = "Car Released Stream ID";
+            // 
+            // colAIMusicHash
+            // 
+            this.colAIMusicHash.Text = "AI Music";
+            // 
+            // colAIExStr1
+            // 
+            this.colAIExStr1.Text = "AI Exhaust 1";
+            // 
+            // colAIExStr2
+            // 
+            this.colAIExStr2.Text = "AI Exhaust 2";
+            // 
+            // colAIExStr3
+            // 
+            this.colAIExStr3.Text = "AI Exhaust 3";
+            // 
+            // colCategory
+            // 
+            this.colCategory.Text = "Category";
+            this.colCategory.Width = 80;
+            // 
+            // colVehicleType
+            // 
+            this.colVehicleType.Text = "Vehicle Type";
+            // 
+            // colBoostType
+            // 
+            this.colBoostType.Text = "Boost Type";
+            this.colBoostType.Width = 90;
+            // 
+            // colFinishType
+            // 
+            this.colFinishType.Text = "Finish Type";
+            this.colFinishType.Width = 80;
+            // 
+            // colTopSpeed
+            // 
+            this.colTopSpeed.Text = "Top Speed";
+            // 
+            // colTopSpeedBoost
+            // 
+            this.colTopSpeedBoost.Text = "Top Boost Speed";
+            // 
+            // colTopSpeedStat
+            // 
+            this.colTopSpeedStat.Text = "Speed Stat";
+            // 
+            // colTopSpeedBoostStat
+            // 
+            this.colTopSpeedBoostStat.Text = "Boost Stat";
+            // 
+            // colColor
+            // 
+            this.colColor.Text = "Default Color";
+            // 
+            // colColorPalette
+            // 
+            this.colColorPalette.Text = "Default Color Type";
             // 
             // stsMain
             // 
@@ -291,33 +362,45 @@
         private System.Windows.Forms.MenuStrip mnuMain;
         private System.Windows.Forms.ListView lstVehicles;
         private System.Windows.Forms.ColumnHeader colIndex;
-        private System.Windows.Forms.ColumnHeader colName;
-        private System.Windows.Forms.ColumnHeader colBrand;
-        private System.Windows.Forms.ColumnHeader colWheelType;
+        private System.Windows.Forms.ColumnHeader colVehicleName;
+        private System.Windows.Forms.ColumnHeader colMfrName;
         private System.Windows.Forms.ColumnHeader colCategory;
         private System.Windows.Forms.ColumnHeader colFlags;
-        private System.Windows.Forms.ColumnHeader colGroupID1;
-        private System.Windows.Forms.ColumnHeader colGroupID2;
+        private System.Windows.Forms.ColumnHeader colExhaustID;
+        private System.Windows.Forms.ColumnHeader colEngineID;
         private System.Windows.Forms.StatusStrip stsMain;
-        private System.Windows.Forms.ColumnHeader colMaxBoostlessSpeed;
         private System.Windows.Forms.ToolStripStatusLabel stlStatusLabel;
-        private System.Windows.Forms.ColumnHeader colModel;
+        private System.Windows.Forms.ColumnHeader colVehicleID;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton tsbAddItem;
         private System.Windows.Forms.ToolStripMenuItem itemsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addItemToolStripMenuItem;
-        private System.Windows.Forms.ColumnHeader colExhaustID;
-        private System.Windows.Forms.ColumnHeader colEngineID;
-        private System.Windows.Forms.ColumnHeader colBoost;
-        private System.Windows.Forms.ColumnHeader colFinish;
-        private System.Windows.Forms.ColumnHeader colTopBoostSpeed;
-        private System.Windows.Forms.ColumnHeader colNewUnknown;
-        private System.Windows.Forms.ColumnHeader colExhaustFile;
-        private System.Windows.Forms.ColumnHeader colEngineFile;
+        private System.Windows.Forms.ColumnHeader colExhaustName;
+        private System.Windows.Forms.ColumnHeader colEngineName;
+        private System.Windows.Forms.ColumnHeader colBoostType;
+        private System.Windows.Forms.ColumnHeader colFinishType;
         private System.Windows.Forms.ColumnHeader colColor;
-        private System.Windows.Forms.ColumnHeader colDisplaySpeed;
-        private System.Windows.Forms.ColumnHeader colDisplayBoost;
-        private System.Windows.Forms.ColumnHeader colDisplayStrength;
+        private System.Windows.Forms.ColumnHeader colTopSpeedStat;
+        private System.Windows.Forms.ColumnHeader colTopSpeedBoostStat;
+        private System.Windows.Forms.ColumnHeader colStrengthStat;
+        private System.Windows.Forms.ColumnHeader colWheel;
+        private System.Windows.Forms.ColumnHeader colParentID;
+        private System.Windows.Forms.ColumnHeader colBoostLength;
+        private System.Windows.Forms.ColumnHeader colVehicleRank;
+        private System.Windows.Forms.ColumnHeader colBoostCapacity;
+        private System.Windows.Forms.ColumnHeader colAttribKey;
+        private System.Windows.Forms.ColumnHeader colClassUnlockStr;
+        private System.Windows.Forms.ColumnHeader colCarWonStrID;
+        private System.Windows.Forms.ColumnHeader colCarReleasedStrID;
+        private System.Windows.Forms.ColumnHeader colAIMusicHash;
+        private System.Windows.Forms.ColumnHeader colAIExStr1;
+        private System.Windows.Forms.ColumnHeader colAIExStr2;
+        private System.Windows.Forms.ColumnHeader colAIExStr3;
+        private System.Windows.Forms.ColumnHeader colVehicleType;
+        private System.Windows.Forms.ColumnHeader colTopSpeed;
+        private System.Windows.Forms.ColumnHeader colTopSpeedBoost;
+        private System.Windows.Forms.ColumnHeader colDamageLimit;
+        private System.Windows.Forms.ColumnHeader colColorPalette;
     }
 }
 

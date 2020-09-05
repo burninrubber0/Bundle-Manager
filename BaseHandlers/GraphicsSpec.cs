@@ -64,7 +64,7 @@ namespace BaseHandlers
 
 		public EntryType GetEntryType(BundleEntry entry)
 		{
-			return EntryType.GraphicsSpecResourceType;
+			return EntryType.GraphicsSpec;
 		}
 
 		public IEntryEditor GetEditor(BundleEntry entry)

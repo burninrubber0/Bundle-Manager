@@ -12,7 +12,7 @@ namespace LangEditor
 	{
 		public override void Init()
 		{
-			EntryTypeRegistry.Register(EntryType.LanguageResourceType, new Language());
+			EntryTypeRegistry.Register(EntryType.Language, new Language());
 		}
 
 		public override string GetID()

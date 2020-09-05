@@ -678,7 +678,7 @@ namespace BundleManager
             {
                 ImageVisible = false;
             }
-            else if (_entry.Type == EntryType.RasterResourceType)
+            else if (_entry.Type == EntryType.Texture)
             {
                 if (_entry.Console)
                     Image = GameImage.GetImagePS3(_entry.EntryBlocks[0].Data, _entry.EntryBlocks[1].Data);
@@ -953,7 +953,7 @@ namespace BundleManager
 
         private void infoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (Entry.Type != EntryType.RwRenderableResourceType)
+            if (Entry.Type != EntryType.Renderable)
                 return;
 
             string modelInfo = "";

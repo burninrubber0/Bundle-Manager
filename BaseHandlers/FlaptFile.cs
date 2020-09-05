@@ -432,7 +432,7 @@ namespace BaseHandlers
 
 		public EntryType GetEntryType(BundleEntry entry)
 		{
-			return EntryType.FlaptFileResourceType;
+			return EntryType.FlaptFile;
 		}
 
 		public IEntryEditor GetEditor(BundleEntry entry)

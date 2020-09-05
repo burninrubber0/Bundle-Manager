@@ -1,5 +1,6 @@
 ﻿using BundleUtilities;
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -39,165 +40,515 @@ namespace VehicleList
         {
             Text = "Edit Vehicle: " + Vehicle.Index;
 
-            //txtID.Text = Vehicle.ID.Value.ToString("X16");
-            txtID.Text = Vehicle.ID.Value;//Encoding.ASCII.GetString(Vehicle.ID.Decrypted);
-            txtBrand.Text = Vehicle.CarBrand;
-            txtName.Text = Vehicle.CarName;
+            txtIndex.Text = Vehicle.Index.ToString();
+            txtID.Text = Vehicle.ID.Value;
+            txtParentID.Text = Vehicle.ParentID.Value;
             txtWheels.Text = Vehicle.WheelType;
-            txtCategory.Text = Vehicle.Category.ToString();
-            txtFlags.Text = Convert.ToString(Vehicle.Flags, 2).PadLeft(18, '0');//Vehicle.Flags.ToString();
-            txtUnknown26.Text = Vehicle.MaxSpeedNoBoost.ToString("X2");
-            txtSortOrder.Text = Vehicle.MaxSpeedBoost.ToString("D3");
-            txtGroupID1.Text = Vehicle.GroupID.ToString();
-            txtGroupID2.Text = Vehicle.GroupIDAlt.ToString();
+            txtName.Text = Vehicle.CarName;
+            txtBrand.Text = Vehicle.CarBrand;
+            txtDamageLimit.Text = Vehicle.DamageLimit.ToString();
+            txtBoostLength.Text = Vehicle.BoostLength.ToString();
+            cboRank.SelectedIndex = (int)Vehicle.VehicleRank;
+            txtBoostCapacity.Text = Vehicle.BoostCapacity.ToString();
+            txtStrengthStat.Text = Vehicle.DisplayStrength.ToString();
+            txtAttribSysCollectionKey.Text = Vehicle.AttribSysCollectionKey.ToString();
+            txtExhaustName.Text = Vehicle.ExhaustName.Value;
+            txtExhaustID.Text = Vehicle.ExhaustID.ToString();
+            txtEngineID.Text = Vehicle.EngineID.ToString();
+            txtEngineName.Text = Vehicle.EngineName.Value;
+            cboClassUnlock.Text = Vehicle.ClassUnlockStreamHash.ToString(); // TODO: Selected index
+            txtCarWon.Text = Vehicle.CarShutdownStreamID.ToString();
+            txtCarReleased.Text = Vehicle.CarReleasedStreamID.ToString();
+            cboAIMusic.Text = Vehicle.AIMusicHash.ToString(); // TODO: Selected index
+            cboAIExhaust1.SelectedIndex = (int)Vehicle.AIExhaustIndex;
+            cboAIExhaust2.SelectedIndex = (int)Vehicle.AIExhaustIndex2;
+            cboAIExhaust3.SelectedIndex = (int)Vehicle.AIExhaustIndex3;
+            cboVehicleType.SelectedIndex = (int)Vehicle.VehicleType;
+            cboBoostType.SelectedIndex = (int)Vehicle.BoostType;
+            cboFinishType.SelectedIndex = (int)Vehicle.FinishType;
+            txtMaxSpeed.Text = Vehicle.MaxSpeedNoBoost.ToString();
+            txtMaxBoostSpeed.Text = Vehicle.MaxSpeedBoost.ToString();
+            txtSpeedStat.Text = Vehicle.DisplaySpeed.ToString();
+            txtBoostStat.Text = Vehicle.DisplayBoost.ToString();
+            txtColor.Text = Vehicle.Color.ToString();
+            cboColorType.SelectedIndex = (int)Vehicle.ColorType;
 
-            int boostType = (int) Vehicle.BoostType;
-            if (boostType == 19)
-                boostType = 5;
-            cboBoost.SelectedIndex = boostType;
-
-            cboLockByte.SelectedIndex = (int)Vehicle.FinishType;
-
-            txtEngineID1.Text = Vehicle.ExhauseID.Value;
-            txtEngineID2.Text = Vehicle.EngineID.Value;
-
-            txtDisplaySpeed.Text = Vehicle.DisplaySpeed.ToString();
-            txtDisplayBoost.Text = Vehicle.DisplayBoost.ToString();
-            txtDisplayStrength.Text = Vehicle.DisplayStrength.ToString();
+            // Flags
+            // Loop through all items
+            for (int i = 0; i < chlFlags.Items.Count; ++i)
+            {
+                // If the flag is set, check the item at this index
+                if ((((uint)Vehicle.Flags) & (1 << i)) == (1 << i))
+                {
+                    chlFlags.SetItemChecked(i, true);
+                }
+                else
+                {
+                    // Ensure nothing is checked incorrectly
+                    chlFlags.SetItemCheckState(i, CheckState.Unchecked);
+                }
+            }
+            // Category
+            for (int i = 0; i < chlCategory.Items.Count; ++i)
+            {
+                if ((((uint)Vehicle.Category) & (1 << i)) == (1 << i))
+                {
+                    chlCategory.SetItemChecked(i, true);
+                }
+                else
+                {
+                    chlCategory.SetItemCheckState(i, CheckState.Unchecked);
+                }
+            }
         }
 
         private Vehicle GetModifiedVehicle()
         {
             Vehicle result = new Vehicle(Vehicle);
 
-            /*long id;
-            if (long.TryParse(txtID.Text, NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo, out id))
-                result.ID.Value = id;
-            else
-                return null;*/
-
+            // Vehicle ID
             if (txtID.Text.Trim().Length == 0)
+            {
+                MessageBox.Show(this, "ID cannot be left blank.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
-            
-            try {
-                EncryptedString ID = new EncryptedString(txtID.Text);//Encoding.ASCII.GetBytes(txtID.Text), false);
+            }
+            try
+            {
+                EncryptedString ID = new EncryptedString(txtID.Text);
                 result.ID = ID;
-            } catch (ArgumentException e)
+            }
+            catch (ArgumentException e)
             {
                 MessageBox.Show(this, e.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
 
-            result.CarBrand = txtBrand.Text;
-            result.CarName = txtName.Text;
+            // Parent ID
+            try
+            {
+                EncryptedString ParentID = new EncryptedString(txtParentID.Text);
+                result.ParentID = ParentID;
+            }
+            catch (ArgumentException e)
+            {
+                MessageBox.Show(this, e.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Wheel name
             result.WheelType = txtWheels.Text;
-
-            if (result.CarBrand.Trim().Length == 0)
-                return null;
-            if (result.CarName.Trim().Length == 0)
-                return null;
             if (result.WheelType.Trim().Length == 0)
-                return null;
-
-            int cat;
-            if (int.TryParse(txtCategory.Text, out cat))
-                result.Category = cat;
-            else
-                return null;
-
-            /*int flags;
-            if (int.TryParse(txtFlags.Text, out flags))
-                result.Flags = flags;
-            else
-                return null;*/
-
-            try
             {
-                result.Flags = Convert.ToInt32(txtFlags.Text, 2);
-            }
-            catch
-            {
+                MessageBox.Show(this, "Wheel name cannot be left blank.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
 
-            byte u26;
-            if (byte.TryParse(txtUnknown26.Text, NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo, out u26))
-                result.MaxSpeedNoBoost = u26;
-            else
-                return null;
-
-            byte sortOrder;
-            if (byte.TryParse(txtSortOrder.Text, out sortOrder))
-                result.MaxSpeedBoost = sortOrder;
-            else
-                return null;
-
-            long group1;
-            if (long.TryParse(txtGroupID1.Text, out group1))
-                result.GroupID = group1;
-            else
-                return null;
-
-            long group2;
-            if (long.TryParse(txtGroupID2.Text, out group2))
-                result.GroupIDAlt = group2;
-            else
-                return null;
-
-            int selectedBoostIndex = cboBoost.SelectedIndex;
-            if (selectedBoostIndex == 5)
-                selectedBoostIndex = 19;
-
-            BoostType boostType = (BoostType)selectedBoostIndex;
-            result.BoostType = boostType;
-
-            result.FinishType = (FinishType)cboLockByte.SelectedIndex;
-
-            if (txtEngineID1.Text.Trim().Length == 0)
-                return null;
-
-            try
+            // Vehicle name
+            result.CarName = txtName.Text;
+            if (result.CarName.Trim().Length == 0)
             {
-                EncryptedString OtherID1 = new EncryptedString(txtEngineID1.Text);
-                result.ExhauseID = OtherID1;
-            }
-            catch (ArgumentException e)
-            {
-                MessageBox.Show(this, e.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(this, "Car name cannot be left blank.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
 
-            if (txtEngineID2.Text.Trim().Length == 0)
-                return null;
-
-            try
+            // Manufacturer name
+            result.CarBrand = txtBrand.Text;
+            if (result.CarBrand.Trim().Length == 0)
             {
-                EncryptedString OtherID2 = new EncryptedString(txtEngineID2.Text);
-                result.EngineID = OtherID2;
-            }
-            catch (ArgumentException e)
-            {
-                MessageBox.Show(this, e.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(this, "Manufacturer cannot be left blank.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
 
-            byte displaySpeed;
-            if (byte.TryParse(txtDisplaySpeed.Text, out displaySpeed))
-                result.DisplaySpeed = displaySpeed;
+            // Damage limit
+            float damageLimit;
+            if (float.TryParse(txtDamageLimit.Text, out damageLimit))
+            {
+                result.DamageLimit = damageLimit;
+            }
             else
+            {
+                MessageBox.Show(this, "Damage limit is invalid.\nEnsure the value is a decimal number.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
+            }
 
-            byte displayBoost;
-            if (byte.TryParse(txtDisplayBoost.Text, out displayBoost))
-                result.DisplayBoost = displayBoost;
+            // Flags
+            // TODO: Introduce some sort of check to make sure flags are valid
+            // Write flags based on whether CheckedListBox fields are checked
+            uint flags = 0;
+            for (int i = 0; i < chlFlags.Items.Count; ++i)
+            {
+                if ((int)chlFlags.GetItemCheckState(i) == 1)
+                {
+                    flags += (uint)(1 << i);
+                }
+            }
+            result.Flags = (Flags)flags;
+
+            // Boost length
+            byte boostLength;
+            if (byte.TryParse(txtBoostLength.Text, out boostLength))
+            {
+                result.BoostLength = boostLength;
+            }
             else
+            {
+                MessageBox.Show(this, "Boost length is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
+            }
 
+            // Rank
+            byte rank;
+            if (byte.TryParse(cboRank.SelectedIndex.ToString(), out rank))
+            {
+                result.VehicleRank = (VehicleRank)rank;
+            }
+            else
+            {
+                MessageBox.Show(this, "Rank is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Boost capacity
+            byte boostCapacity;
+            if (byte.TryParse(txtBoostCapacity.Text, out boostCapacity))
+            {
+                result.BoostCapacity = boostCapacity;
+            }
+            else
+            {
+                MessageBox.Show(this, "Boost capacity is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Strength stat
             byte displayStrength;
-            if (byte.TryParse(txtDisplayStrength.Text, out displayStrength))
+            if (byte.TryParse(txtStrengthStat.Text, out displayStrength))
+            {
                 result.DisplayStrength = displayStrength;
+            }
             else
+            {
+                MessageBox.Show(this, "Strength stat is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
+            }
+
+            // AttribSys ID
+            long attribsysId;
+            if (long.TryParse(txtAttribSysCollectionKey.Text, out attribsysId))
+            {
+                result.AttribSysCollectionKey = attribsysId;
+            }
+            else
+            {
+                MessageBox.Show(this, "AttribSys ID is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Exhaust name
+            if (txtExhaustName.Text.Trim().Length == 0)
+            {
+                MessageBox.Show(this, "Exhaust name cannot be left blank.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+            try
+            {
+                EncryptedString OtherID1 = new EncryptedString(txtExhaustName.Text);
+                result.ExhaustName = OtherID1;
+            }
+            catch (ArgumentException e)
+            {
+                MessageBox.Show(this, e.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Exhaust ID
+            long group1;
+            if (long.TryParse(txtExhaustID.Text, out group1))
+            {
+                result.ExhaustID = group1;
+            }
+            else
+            {
+                MessageBox.Show(this, "Exhaust ID is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Engine ID
+            long group2;
+            if (long.TryParse(txtEngineID.Text, out group2))
+            {
+                result.EngineID = group2;
+            }
+            else
+            {
+                MessageBox.Show(this, "Engine ID is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Engine name
+            if (txtEngineName.Text.Trim().Length == 0)
+            {
+                MessageBox.Show(this, "Engine name cannot be left blank.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+            try
+            {
+                EncryptedString OtherID2 = new EncryptedString(txtEngineName.Text);
+                result.EngineName = OtherID2;
+            }
+            catch (ArgumentException e)
+            {
+                MessageBox.Show(this, e.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Class unlock stream hash
+            uint classUnlock;
+            if (uint.TryParse(cboClassUnlock.SelectedIndex.ToString(), out classUnlock))
+            {
+                switch (classUnlock)
+                {
+                    case 0:
+                        classUnlock = 0x0470A5BF;
+                        break;
+                    case 1:
+                        classUnlock = 0x48346FEF;
+                        break;
+                    case 2:
+                        classUnlock = 0x817B91D9;
+                        break;
+                    case 3:
+                        classUnlock = 0xA3E2D8C9;
+                        break;
+                    case 4:
+                        classUnlock = 0xB3845465;
+                        break;
+                    case 5:
+                        classUnlock = 0xEBE39AE9;
+                        break;
+                }
+                result.ClassUnlockStreamHash = (ClassUnlock)classUnlock;
+            }
+            else
+            {
+                MessageBox.Show(this, "Please select a class unlock stream option.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Car won stream ID
+            long carWon;
+            if (long.TryParse(txtCarWon.Text, out carWon))
+            {
+                result.CarShutdownStreamID = carWon;
+            }
+            else
+            {
+                MessageBox.Show(this, "Car won voiceover stream ID is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Car released stream ID
+            long carReleased;
+            if (long.TryParse(txtCarReleased.Text, out carReleased))
+            {
+                result.CarReleasedStreamID = carReleased;
+            }
+            else
+            {
+                MessageBox.Show(this, "Car released voiceover stream ID is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // AI music loop stream hash
+            uint aiMusic;
+            if (uint.TryParse(cboAIMusic.SelectedIndex.ToString(), out aiMusic))
+            {
+                switch (aiMusic)
+                {
+                    case 0:
+                        aiMusic = 0;
+                        break;
+                    case 1:
+                        aiMusic = 0xA9813C9D;
+                        break;
+                    case 2:
+                        aiMusic = 0xCB72AEA7;
+                        break;
+                    case 3:
+                        aiMusic = 0x284D944B;
+                        break;
+                    case 4:
+                        aiMusic = 0xD95C2309;
+                        break;
+                    case 5:
+                        aiMusic = 0x8A1A90E9;
+                        break;
+                    case 6:
+                        aiMusic = 0xB12A34DD;
+                        break;
+                }
+                result.AIMusicHash = (AIMusic)aiMusic;
+            }
+            else
+            {
+                MessageBox.Show(this, "Please select an AI music loop option.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // AI exhuast index
+            byte aiEx1;
+            if (byte.TryParse(cboAIExhaust1.SelectedIndex.ToString(), out aiEx1))
+            {
+                result.AIExhaustIndex = (AIExhaustIndex)aiEx1;
+            }
+            else
+            {
+                MessageBox.Show(this, "Please select an AI exhaust option.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // AI exhuast index 2
+            byte aiEx2;
+            if (byte.TryParse(cboAIExhaust2.SelectedIndex.ToString(), out aiEx2))
+            {
+                result.AIExhaustIndex2 = (AIExhaustIndex)aiEx2;
+            }
+            else
+            {
+                MessageBox.Show(this, "Please select an AI exhuast 2 option.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // AI exhuast index 3
+            byte aiEx3;
+            if (byte.TryParse(cboAIExhaust3.SelectedIndex.ToString(), out aiEx3))
+            {
+                result.AIExhaustIndex3 = (AIExhaustIndex)aiEx3;
+            }
+            else
+            {
+                MessageBox.Show(this, "Please select an AI exhuast 3 option.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Vehicle category
+            uint cat = 0;
+            for (int i = 0; i < chlCategory.Items.Count; ++i)
+            {
+                if ((int)chlCategory.GetItemCheckState(i) == 1)
+                {
+                    cat += (uint)(1 << i);
+                }
+            }
+            result.Category = (VehicleCategory)cat;
+
+            // Vehicle type
+            int vehType;
+            if (int.TryParse(cboVehicleType.SelectedIndex.ToString(), out vehType))
+            {
+                result.VehicleType = (VehicleType)vehType;
+            }
+            else
+            {
+                MessageBox.Show(this, "Please select a vehicle type.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Boost type
+            byte boostType;
+            if (byte.TryParse(cboBoostType.SelectedIndex.ToString(), out boostType))
+            {
+                result.BoostType = (BoostType)boostType;
+            }
+            else
+            {
+                MessageBox.Show(this, "Please select a boost type.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Finish type
+            byte finishType;
+            if (byte.TryParse(cboFinishType.SelectedIndex.ToString(), out finishType))
+            {
+                result.FinishType = (FinishType)cboFinishType.SelectedIndex;
+            }
+            else
+            {
+                MessageBox.Show(this, "Please select a finish type.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Max speed
+            byte maxSpeed;
+            if (byte.TryParse(txtMaxSpeed.Text, out maxSpeed))
+            {
+                result.MaxSpeedNoBoost = maxSpeed;
+            }
+            else
+            {
+                MessageBox.Show(this, "Max speed is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Max boost speed
+            byte maxBoostSpeed;
+            if (byte.TryParse(txtMaxBoostSpeed.Text, out maxBoostSpeed))
+            {
+                result.MaxSpeedBoost = maxBoostSpeed;
+            }
+            else
+            {
+                MessageBox.Show(this, "Max boost speed is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Speed stat
+            byte displaySpeed;
+            if (byte.TryParse(txtSpeedStat.Text, out displaySpeed))
+            {
+                result.DisplaySpeed = displaySpeed;
+            }
+            else
+            {
+                MessageBox.Show(this, "Speed stat is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Boost stat
+            byte displayBoost;
+            if (byte.TryParse(txtBoostStat.Text, out displayBoost))
+            {
+                result.DisplayBoost = displayBoost;
+            }
+            else
+            {
+                MessageBox.Show(this, "Boost stat is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Color index
+            byte color;
+            if (byte.TryParse(txtColor.Text, out color))
+            {
+                result.Color = color;
+            }
+            else
+            {
+                MessageBox.Show(this, "Color index is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            // Color type
+            byte colorType;
+            if (byte.TryParse(cboColorType.SelectedIndex.ToString(), out colorType))
+            {
+                result.ColorType = (ColorType)colorType;
+            }
+            else
+            {
+                MessageBox.Show(this, "Please select a color type.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
 
             return result;
         }
@@ -212,12 +563,10 @@ namespace VehicleList
             Vehicle retVehicle = GetModifiedVehicle();
             if (retVehicle == null)
             {
-                MessageBox.Show(this, "Some values are invalid!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (OnDone != null)
-                OnDone(retVehicle);
+            OnDone?.Invoke(retVehicle);
 
             Close();
         }

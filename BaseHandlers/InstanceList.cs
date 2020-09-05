@@ -225,7 +225,7 @@ namespace BaseHandlers
 
 		public EntryType GetEntryType(BundleEntry entry)
 		{
-			return EntryType.InstanceListResourceType;
+			return EntryType.InstanceList;
 		}
 
 		public IEntryEditor GetEditor(BundleEntry entry)

@@ -475,7 +475,7 @@ namespace BaseHandlers
 
 		public EntryType GetEntryType(BundleEntry entry)
 		{
-			return EntryType.RwRenderableResourceType;
+			return EntryType.Renderable;
 		}
 
 		public IEntryEditor GetEditor(BundleEntry entry)

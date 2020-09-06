@@ -16,16 +16,16 @@ namespace BaseHandlers
 	{
 		public override void Init()
 		{
-			EntryTypeRegistry.Register(EntryType.TriggerResourceType, new TriggerData());
-			EntryTypeRegistry.Register(EntryType.StreetDataResourceType, new StreetData());
-			EntryTypeRegistry.Register(EntryType.ProgressionResourceType, new ProgressionData());
-			EntryTypeRegistry.Register(EntryType.IDList, new IDList());
-			EntryTypeRegistry.Register(EntryType.TrafficDataResourceType, new Traffic());
-			EntryTypeRegistry.Register(EntryType.FlaptFileResourceType, new FlaptFile());
+			EntryTypeRegistry.Register(EntryType.TriggerData, new TriggerData());
+			EntryTypeRegistry.Register(EntryType.StreetData, new StreetData());
+			EntryTypeRegistry.Register(EntryType.ProgressionData, new ProgressionData());
+			EntryTypeRegistry.Register(EntryType.EntryList, new IDList());
+			EntryTypeRegistry.Register(EntryType.TrafficData, new Traffic());
+			EntryTypeRegistry.Register(EntryType.FlaptFile, new FlaptFile());
 			//EntryTypeRegistry.Register(EntryType.AptDataHeaderType, new AptData());
-			EntryTypeRegistry.Register(EntryType.InstanceListResourceType, new InstanceList());
-			EntryTypeRegistry.Register(EntryType.GraphicsSpecResourceType, new GraphicsSpec());
-			EntryTypeRegistry.Register(EntryType.RwRenderableResourceType, new Renderable());
+			EntryTypeRegistry.Register(EntryType.InstanceList, new InstanceList());
+			EntryTypeRegistry.Register(EntryType.GraphicsSpec, new GraphicsSpec());
+			EntryTypeRegistry.Register(EntryType.Renderable, new Renderable());
 		}
 
 		public override string GetID()

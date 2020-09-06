@@ -366,7 +366,7 @@ namespace VaultFormat
 
 		public EntryType GetEntryType(BundleEntry entry)
 		{
-			return EntryType.AttribSysVaultResourceType;
+			return EntryType.AttribSysVault;
 		}
 
 		public IEntryEditor GetEditor(BundleEntry entry)

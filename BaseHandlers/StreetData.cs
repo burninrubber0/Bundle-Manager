@@ -397,7 +397,7 @@ namespace BaseHandlers
 
 		public EntryType GetEntryType(BundleEntry entry)
 		{
-			return EntryType.StreetDataResourceType;
+			return EntryType.StreetData;
 		}
 
 		public IEntryEditor GetEditor(BundleEntry entry)

@@ -121,7 +121,7 @@ namespace LangEditor
 
 		public EntryType GetEntryType(BundleEntry entry)
 		{
-			return EntryType.LanguageResourceType;
+			return EntryType.Language;
 		}
 
 		public IEntryEditor GetEditor(BundleEntry entry)

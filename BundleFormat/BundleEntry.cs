@@ -349,169 +349,169 @@ namespace BundleFormat
         {
             switch (Type)
             {
-                case EntryType.RasterResourceType:
+                case EntryType.Texture:
                     return Color.Orange;
-                case EntryType.MaterialResourceType:
+                case EntryType.Material:
                     return Color.DeepPink;
-                case EntryType.TextFileResourceType:
+                case EntryType.TextFile:
                     break;
-                case EntryType.RwVertexDescResourceType:
+                case EntryType.VertexDescriptor:
                     break;
-                case EntryType.RwRenderableResourceType:
+                case EntryType.Renderable:
                     return Color.Aquamarine;
-                case EntryType.unknown_file_type_00D:
+                case EntryType.MaterialTechnique:
                     break;
-                case EntryType.RwTextureStateResourceType:
+                case EntryType.TextureState:
                     break;
-                case EntryType.MaterialStateResourceType:
+                case EntryType.MaterialState:
                     break;
-                case EntryType.RwShaderProgramBufferResourceType:
+                case EntryType.ShaderProgramBuffer:
                     break;
-                case EntryType.RwShaderParameterResourceType:
+                case EntryType.ShaderParameter:
                     break;
-                case EntryType.RwDebugResourceType:
+                case EntryType.Debug:
                     break;
-                case EntryType.KdTreeResourceType:
+                case EntryType.KdTree:
                     break;
-                case EntryType.SnrResourceType:
+                case EntryType.Snr:
                     break;
-                case EntryType.AttribSysSchemaResourceType:
+                case EntryType.AttribSysSchema:
                     break;
-                case EntryType.AttribSysVaultResourceType:
+                case EntryType.AttribSysVault:
                     break;
-                case EntryType.AptDataHeaderType:
+                case EntryType.AptData:
                     break;
-                case EntryType.GuiPopupResourceType:
+                case EntryType.Popup:
                     break;
-                case EntryType.FontResourceType:
+                case EntryType.Font:
                     break;
-                case EntryType.LuaCodeResourceType:
+                case EntryType.LuaCode:
                     break;
-                case EntryType.InstanceListResourceType:
+                case EntryType.InstanceList:
                     return Color.BlueViolet;
-                case EntryType.IDList:
+                case EntryType.EntryList:
                     return Color.Tomato;
-                case EntryType.LanguageResourceType:
+                case EntryType.Language:
                     break;
-                case EntryType.SatNavTileResourceType:
+                case EntryType.SatNavTile:
                     break;
-                case EntryType.SatNavTileDirectoryResourceType:
+                case EntryType.SatNavTileDirectory:
                     break;
-                case EntryType.ModelResourceType:
+                case EntryType.Model:
                     return Color.Blue;
-                case EntryType.RwColourCubeResourceType:
+                case EntryType.ColourCube:
                     break;
-                case EntryType.HudMessageResourceType:
+                case EntryType.HudMessage:
                     break;
-                case EntryType.HudMessageListResourceType:
+                case EntryType.HudMessageList:
                     break;
-                case EntryType.unknown_file_type_02E:
+                case EntryType.HudMessageSequence:
                     break;
-                case EntryType.unknown_file_type_02F:
+                case EntryType.HudMessageSequenceDictionary:
                     break;
-                case EntryType.WorldPainter2DResourceType:
+                case EntryType.WorldPainter2D:
                     break;
-                case EntryType.PFXHookBundleResourceType:
+                case EntryType.PFXHookBundle:
                     break;
-                case EntryType.ShaderResourceType:
+                case EntryType.ShaderTechnique:
                     break;
-                case EntryType.ICETakeDictionaryResourceType:
+                case EntryType.ICETakeDictionary:
                     break;
-                case EntryType.VideoDataResourceType:
+                case EntryType.VideoData:
                     break;
-                case EntryType.PolygonSoupListResourceType:
+                case EntryType.PolygonSoupList:
                     return Color.Goldenrod;
-                case EntryType.CommsToolListDefinitionResourceType:
+                case EntryType.CommsToolListDefinition:
                     break;
-                case EntryType.CommsToolListResourceType:
+                case EntryType.CommsToolList:
                     break;
-                case EntryType.AnimationCollectionResourceType:
+                case EntryType.AnimationCollection:
                     break;
-                case EntryType.RegistryResourceType:
+                case EntryType.Registry:
                     break;
-                case EntryType.GenericRwacWaveContentResourceType:
+                case EntryType.GenericRwacWaveContent:
                     break;
-                case EntryType.GinsuWaveContentResourceType:
+                case EntryType.GinsuWaveContent:
                     break;
-                case EntryType.AemsBankResourceType:
+                case EntryType.AemsBank:
                     break;
-                case EntryType.CsisResourceType:
+                case EntryType.Csis:
                     break;
-                case EntryType.NicotineResourceType:
+                case EntryType.Nicotine:
                     break;
-                case EntryType.SplicerResourceType:
+                case EntryType.Splicer:
                     break;
-                case EntryType.GenericRwacReverbIRContentResourceType:
+                case EntryType.GenericRwacReverbIRContent:
                     break;
-                case EntryType.SnapshotDataResourceType:
+                case EntryType.SnapshotData:
                     break;
-                case EntryType.ZoneListResourceType:
+                case EntryType.ZoneList:
                     break;
-                case EntryType.LoopModelResourceType:
+                case EntryType.LoopModel:
                     break;
-                case EntryType.AISectionsResourceType:
+                case EntryType.AISections:
                     break;
-                case EntryType.TrafficDataResourceType:
+                case EntryType.TrafficData:
                     break;
-                case EntryType.TriggerResourceType:
+                case EntryType.TriggerData:
                     break;
-                case EntryType.VehicleListResourceType:
+                case EntryType.VehicleList:
                     break;
-                case EntryType.GraphicsSpecResourceType:
+                case EntryType.GraphicsSpec:
                     return Color.SeaGreen;
-                case EntryType.ParticleDescriptionCollectionResourceType:
+                case EntryType.ParticleDescriptionCollection:
                     break;
-                case EntryType.WheelListResourceType:
+                case EntryType.WheelList:
                     break;
-                case EntryType.WheelGraphicsSpecResourceType:
+                case EntryType.WheelGraphicsSpec:
                     break;
-                case EntryType.TextureNameMapResourceType:
+                case EntryType.TextureNameMap:
                     break;
-                case EntryType.ProgressionResourceType:
+                case EntryType.ProgressionData:
                     break;
-                case EntryType.PropPhysicsResourceType:
+                case EntryType.PropPhysics:
                     break;
-                case EntryType.PropGraphicsListResourceType:
+                case EntryType.PropGraphicsList:
                     break;
-                case EntryType.PropInstanceDataResourceType:
+                case EntryType.PropInstanceData:
                     break;
-                case EntryType.BrnEnvironmentKeyframeResourceType:
+                case EntryType.BrnEnvironmentKeyframe:
                     break;
-                case EntryType.BrnEnvironmentTimeLineResourceType:
+                case EntryType.BrnEnvironmentTimeLine:
                     break;
-                case EntryType.BrnEnvironmentDictionaryResourceType:
+                case EntryType.BrnEnvironmentDictionary:
                     break;
-                case EntryType.GraphicsStubResourceType:
+                case EntryType.GraphicsStub:
                     break;
-                case EntryType.StaticSoundMapResourceType:
+                case EntryType.StaticSoundMap:
                     break;
-                case EntryType.StreetDataResourceType:
+                case EntryType.StreetData:
                     break;
-                case EntryType.BrnVFXMeshCollectionResourceType:
+                case EntryType.VFXMeshCollection:
                     break;
-                case EntryType.MassiveLookupTableResourceType:
+                case EntryType.MassiveLookupTable:
                     break;
-                case EntryType.VFXPropCollectionResourceType:
+                case EntryType.VFXPropCollection:
                     break;
-                case EntryType.StreamedDeformationSpecResourceType:
+                case EntryType.StreamedDeformation:
                     break;
-                case EntryType.ParticleDescriptionResourceType:
+                case EntryType.ParticleDescription:
                     break;
-                case EntryType.PlayerCarColoursResourceType:
+                case EntryType.PlayerCarColours:
                     break;
-                case EntryType.ChallengeListResourceType:
+                case EntryType.ChallengeList:
                     break;
-                case EntryType.FlaptFileResourceType:
+                case EntryType.FlaptFile:
                     break;
-                case EntryType.ProfileUpgradeResourceType:
+                case EntryType.ProfileUpgrade:
                     break;
-                case EntryType.VehicleAnimationResourceType:
+                case EntryType.VehicleAnimation:
                     break;
-                case EntryType.BodypartRemappingResourceType:
+                case EntryType.BodypartRemapData:
                     break;
-                case EntryType.LUAListResourceType:
+                case EntryType.LUAList:
                     break;
-                case EntryType.LUAScriptResourceType:
+                case EntryType.LUAScript:
                     break;
             }
             return Color.Transparent;

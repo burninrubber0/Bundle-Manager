@@ -706,7 +706,7 @@ namespace WorldCollisionHandler
 
 		public EntryType GetEntryType(BundleEntry entry)
 		{
-			return EntryType.PolygonSoupListResourceType;
+			return EntryType.PolygonSoupList;
 		}
 
 		public IEntryEditor GetEditor(BundleEntry entry)

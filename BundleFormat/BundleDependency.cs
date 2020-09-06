@@ -34,7 +34,7 @@ namespace BundleFormat
                 }
             }
 
-            if (Entry != null && Entry.Type == EntryType.RwVertexDescResourceType)
+            if (Entry != null && Entry.Type == EntryType.VertexDescriptor)
             {
                 VertexDesc desc = VertexDesc.Read(Entry);
                 value = ", Attribute Count: " + desc.AttributeCount.ToString("D2");

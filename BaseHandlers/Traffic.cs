@@ -58,7 +58,7 @@ namespace BaseHandlers
 
 		public EntryType GetEntryType(BundleEntry entry)
 		{
-			return EntryType.TrafficDataResourceType;
+			return EntryType.TrafficData;
 		}
 
 		private void Clear()

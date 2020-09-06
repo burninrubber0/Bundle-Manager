@@ -12,7 +12,7 @@ namespace PVSFormat
 	{
 		public override void Init()
 		{
-			EntryTypeRegistry.Register(EntryType.ZoneListResourceType, new PVS());
+			EntryTypeRegistry.Register(EntryType.ZoneList, new PVS());
 		}
 
 		public override string GetID()

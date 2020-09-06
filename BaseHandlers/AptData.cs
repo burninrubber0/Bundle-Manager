@@ -802,7 +802,7 @@ namespace BaseHandlers
 
 		public EntryType GetEntryType(BundleEntry entry)
 		{
-			return EntryType.AptDataHeaderType;
+			return EntryType.AptData;
 		}
 
 		public IEntryEditor GetEditor(BundleEntry entry)

@@ -458,7 +458,7 @@ namespace BundleManager
             List<string> referenceList = new List<string>();
             foreach (BundleEntry entry in archive.Entries)
             {
-                if (entry.Type != EntryType.RwTextureStateResourceType)
+                if (entry.Type != EntryType.TextureState)
                     continue;
 
                 List<BundleDependency> dependencies = entry.GetDependencies();

@@ -47,31 +47,6 @@ namespace VehicleList
             txtName.Text = Vehicle.CarName;
             txtBrand.Text = Vehicle.CarBrand;
             txtDamageLimit.Text = Vehicle.DamageLimit.ToString();
-            txtBoostLength.Text = Vehicle.BoostLength.ToString();
-            cboRank.SelectedIndex = (int)Vehicle.VehicleRank;
-            txtBoostCapacity.Text = Vehicle.BoostCapacity.ToString();
-            txtStrengthStat.Text = Vehicle.DisplayStrength.ToString();
-            txtAttribSysCollectionKey.Text = Vehicle.AttribSysCollectionKey.ToString();
-            txtExhaustName.Text = Vehicle.ExhaustName.Value;
-            txtExhaustID.Text = Vehicle.ExhaustID.ToString();
-            txtEngineID.Text = Vehicle.EngineID.ToString();
-            txtEngineName.Text = Vehicle.EngineName.Value;
-            cboClassUnlock.Text = Vehicle.ClassUnlockStreamHash.ToString(); // TODO: Selected index
-            txtCarWon.Text = Vehicle.CarShutdownStreamID.ToString();
-            txtCarReleased.Text = Vehicle.CarReleasedStreamID.ToString();
-            cboAIMusic.Text = Vehicle.AIMusicHash.ToString(); // TODO: Selected index
-            cboAIExhaust1.SelectedIndex = (int)Vehicle.AIExhaustIndex;
-            cboAIExhaust2.SelectedIndex = (int)Vehicle.AIExhaustIndex2;
-            cboAIExhaust3.SelectedIndex = (int)Vehicle.AIExhaustIndex3;
-            cboVehicleType.SelectedIndex = (int)Vehicle.VehicleType;
-            cboBoostType.SelectedIndex = (int)Vehicle.BoostType;
-            cboFinishType.SelectedIndex = (int)Vehicle.FinishType;
-            txtMaxSpeed.Text = Vehicle.MaxSpeedNoBoost.ToString();
-            txtMaxBoostSpeed.Text = Vehicle.MaxSpeedBoost.ToString();
-            txtSpeedStat.Text = Vehicle.DisplaySpeed.ToString();
-            txtBoostStat.Text = Vehicle.DisplayBoost.ToString();
-            txtColor.Text = Vehicle.Color.ToString();
-            cboColorType.SelectedIndex = (int)Vehicle.ColorType;
 
             // Flags
             // Loop through all items
@@ -88,6 +63,76 @@ namespace VehicleList
                     chlFlags.SetItemCheckState(i, CheckState.Unchecked);
                 }
             }
+
+            txtBoostLength.Text = Vehicle.BoostLength.ToString();
+            cboRank.SelectedIndex = (int)Vehicle.VehicleRank;
+            txtBoostCapacity.Text = Vehicle.BoostCapacity.ToString();
+            txtStrengthStat.Text = Vehicle.DisplayStrength.ToString();
+            txtAttribSysCollectionKey.Text = Vehicle.AttribSysCollectionKey.ToString();
+            txtExhaustName.Text = Vehicle.ExhaustName.Value;
+            txtExhaustID.Text = Vehicle.ExhaustID.ToString();
+            txtEngineID.Text = Vehicle.EngineID.ToString();
+            txtEngineName.Text = Vehicle.EngineName.Value;
+
+            // Class Unlock Stream Hash
+            uint classUnlockHash = (uint)Vehicle.ClassUnlockStreamHash;
+            // Set the selected index based on hash
+            switch (classUnlockHash)
+            {
+                case 0x0470A5BF:
+                    cboClassUnlock.SelectedIndex = 0;
+                    break;
+                case 0x48346FEF:
+                    cboClassUnlock.SelectedIndex = 1;
+                    break;
+                case 0x817B91D9:
+                    cboClassUnlock.SelectedIndex = 2;
+                    break;
+                case 0xA3E2D8C9:
+                    cboClassUnlock.SelectedIndex = 3;
+                    break;
+                case 0xB3845465:
+                    cboClassUnlock.SelectedIndex = 4;
+                    break;
+                case 0xEBE39AE9:
+                    cboClassUnlock.SelectedIndex = 5;
+                    break;
+            }
+
+            txtCarWon.Text = Vehicle.CarShutdownStreamID.ToString();
+            txtCarReleased.Text = Vehicle.CarReleasedStreamID.ToString();
+
+            //AI Music Hash
+            uint aiMusicHash = (uint)Vehicle.AIMusicHash;
+            switch (aiMusicHash)
+            {
+                case 0:
+                    cboAIMusic.SelectedIndex = 0;
+                    break;
+                case 0xA9813C9D:
+                    cboAIMusic.SelectedIndex = 1;
+                    break;
+                case 0xCB72AEA7:
+                    cboAIMusic.SelectedIndex = 2;
+                    break;
+                case 0x284D944B:
+                    cboAIMusic.SelectedIndex = 3;
+                    break;
+                case 0xD95C2309:
+                    cboAIMusic.SelectedIndex = 4;
+                    break;
+                case 0x8A1A90E9:
+                    cboAIMusic.SelectedIndex = 5;
+                    break;
+                case 0xB12A34DD:
+                    cboAIMusic.SelectedIndex = 6;
+                    break;
+            }
+
+            cboAIExhaust1.SelectedIndex = (int)Vehicle.AIExhaustIndex;
+            cboAIExhaust2.SelectedIndex = (int)Vehicle.AIExhaustIndex2;
+            cboAIExhaust3.SelectedIndex = (int)Vehicle.AIExhaustIndex3;
+
             // Category
             for (int i = 0; i < chlCategory.Items.Count; ++i)
             {
@@ -100,6 +145,16 @@ namespace VehicleList
                     chlCategory.SetItemCheckState(i, CheckState.Unchecked);
                 }
             }
+
+            cboVehicleType.SelectedIndex = (int)Vehicle.VehicleType;
+            cboBoostType.SelectedIndex = (int)Vehicle.BoostType;
+            cboFinishType.SelectedIndex = (int)Vehicle.FinishType;
+            txtMaxSpeed.Text = Vehicle.MaxSpeedNoBoost.ToString();
+            txtMaxBoostSpeed.Text = Vehicle.MaxSpeedBoost.ToString();
+            txtSpeedStat.Text = Vehicle.DisplaySpeed.ToString();
+            txtBoostStat.Text = Vehicle.DisplayBoost.ToString();
+            txtColor.Text = Vehicle.Color.ToString();
+            cboColorType.SelectedIndex = (int)Vehicle.ColorType;
         }
 
         private Vehicle GetModifiedVehicle()
@@ -172,17 +227,25 @@ namespace VehicleList
             }
 
             // Flags
-            // TODO: Introduce some sort of check to make sure flags are valid
-            // Write flags based on whether CheckedListBox fields are checked
-            uint flags = 0;
-            for (int i = 0; i < chlFlags.Items.Count; ++i)
+            // Ensure only valid flags are used
+            if ((uint)Vehicle.Flags < 0x4000000)
             {
-                if ((int)chlFlags.GetItemCheckState(i) == 1)
+                // Write flags based on whether CheckedListBox fields are checked
+                uint flags = 0;
+                for (int i = 0; i < chlFlags.Items.Count; ++i)
                 {
-                    flags += (uint)(1 << i);
+                    if ((int)chlFlags.GetItemCheckState(i) == 1)
+                    {
+                        flags += (uint)(1 << i);
+                    }
                 }
+                result.Flags = (Flags)flags;
             }
-            result.Flags = (Flags)flags;
+            else
+            {
+                MessageBox.Show(this, "Invalid flags used.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
 
             // Boost length
             byte boostLength;
@@ -432,15 +495,23 @@ namespace VehicleList
             }
 
             // Vehicle category
-            uint cat = 0;
-            for (int i = 0; i < chlCategory.Items.Count; ++i)
+            if ((uint)Vehicle.Category < 0x100)
             {
-                if ((int)chlCategory.GetItemCheckState(i) == 1)
+                uint cat = 0;
+                for (int i = 0; i < chlCategory.Items.Count; ++i)
                 {
-                    cat += (uint)(1 << i);
+                    if ((int)chlCategory.GetItemCheckState(i) == 1)
+                    {
+                        cat += (uint)(1 << i);
+                    }
                 }
+                result.Category = (VehicleCategory)cat;
             }
-            result.Category = (VehicleCategory)cat;
+            else
+            {
+                MessageBox.Show(this, "Invalid category selected.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
 
             // Vehicle type
             int vehType;

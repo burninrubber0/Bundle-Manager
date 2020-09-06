@@ -264,6 +264,7 @@ namespace VehicleList
             // 
             this.chlFlags.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.chlFlags.CheckOnClick = true;
             this.chlFlags.Items.AddRange(new object[] {
             "Is Race Vehicle",
             "Can Check Traffic",
@@ -634,6 +635,7 @@ namespace VehicleList
             // 
             this.chlCategory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.chlCategory.CheckOnClick = true;
             this.chlCategory.Items.AddRange(new object[] {
             "Paradise Cars",
             "Paradise Bikes",

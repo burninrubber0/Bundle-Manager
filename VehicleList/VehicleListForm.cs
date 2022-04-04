@@ -127,6 +127,24 @@ namespace VehicleList
             editor.ShowDialog(this);
         }
 
+        private void CopyItem()
+        {
+            if (List == null || lstVehicles.SelectedItems.Count > 1
+                || lstVehicles.SelectedIndices.Count <= 0)
+                return;
+
+            int index;
+            if (!int.TryParse(lstVehicles.SelectedItems[0].Text, out index))
+                return;
+            Vehicle vehicle = new Vehicle(List.Entries[index]);
+            vehicle.Index = List.Entries.Count;
+
+            VehicleEditor editor = new VehicleEditor();
+            editor.Vehicle = vehicle;
+            editor.OnDone += Editor_OnDone1;
+            editor.ShowDialog(this);
+        }
+
         private void Editor_OnDone1(Vehicle vehicle)
         {
             List.Entries.Add(vehicle);
@@ -149,6 +167,7 @@ namespace VehicleList
         private void lstVehicles_SelectedIndexChanged(object sender, EventArgs e)
         {
             stlStatusLabel.Text = lstVehicles.SelectedItems.Count + " Item(s) Selected";
+            tsbCopyItem.Enabled = true;
         }
 
         private void lstVehicles_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -236,6 +255,16 @@ namespace VehicleList
         private void tsbAddItem_Click(object sender, EventArgs e)
         {
             AddItem();
+        }
+
+        private void copyItemToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CopyItem();
+        }
+
+        private void tsbCopyItem_Click(object sender, EventArgs e)
+        {
+            CopyItem();
         }
     }
 }

@@ -30,7 +30,6 @@
         {
             this.mnuMain = new System.Windows.Forms.MenuStrip();
             this.itemsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.addItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lstVehicles = new System.Windows.Forms.ListView();
             this.colIndex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colVehicleID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -70,6 +69,9 @@
             this.stlStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.tsbAddItem = new System.Windows.Forms.ToolStripButton();
+            this.tsbCopyItem = new System.Windows.Forms.ToolStripButton();
+            this.addItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuMain.SuspendLayout();
             this.stsMain.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -88,18 +90,11 @@
             // itemsToolStripMenuItem
             // 
             this.itemsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addItemToolStripMenuItem});
+            this.addItemToolStripMenuItem,
+            this.copyItemToolStripMenuItem});
             this.itemsToolStripMenuItem.Name = "itemsToolStripMenuItem";
             this.itemsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.itemsToolStripMenuItem.Text = "Items";
-            // 
-            // addItemToolStripMenuItem
-            // 
-            this.addItemToolStripMenuItem.Image = global::VehicleList.Properties.Resources.AddTableHS;
-            this.addItemToolStripMenuItem.Name = "addItemToolStripMenuItem";
-            this.addItemToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
-            this.addItemToolStripMenuItem.Text = "Add Item";
-            this.addItemToolStripMenuItem.Click += new System.EventHandler(this.addItemToolStripMenuItem_Click);
             // 
             // lstVehicles
             // 
@@ -317,7 +312,8 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsbAddItem});
+            this.tsbAddItem,
+            this.tsbCopyItem});
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1079, 25);
@@ -333,6 +329,33 @@
             this.tsbAddItem.Size = new System.Drawing.Size(23, 22);
             this.tsbAddItem.Text = "Add Item";
             this.tsbAddItem.Click += new System.EventHandler(this.tsbAddItem_Click);
+            // 
+            // tsbCopyItem
+            // 
+            this.tsbCopyItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsbCopyItem.Enabled = false;
+            this.tsbCopyItem.Image = global::VehicleList.Properties.Resources.CopyHS;
+            this.tsbCopyItem.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbCopyItem.Name = "tsbCopyItem";
+            this.tsbCopyItem.Size = new System.Drawing.Size(23, 22);
+            this.tsbCopyItem.Text = "Copy Item";
+            this.tsbCopyItem.Click += new System.EventHandler(this.tsbCopyItem_Click);
+            // 
+            // addItemToolStripMenuItem
+            // 
+            this.addItemToolStripMenuItem.Image = global::VehicleList.Properties.Resources.AddTableHS;
+            this.addItemToolStripMenuItem.Name = "addItemToolStripMenuItem";
+            this.addItemToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
+            this.addItemToolStripMenuItem.Text = "Add Item";
+            this.addItemToolStripMenuItem.Click += new System.EventHandler(this.addItemToolStripMenuItem_Click);
+            // 
+            // copyItemToolStripMenuItem
+            // 
+            this.copyItemToolStripMenuItem.Image = global::VehicleList.Properties.Resources.CopyHS;
+            this.copyItemToolStripMenuItem.Name = "copyItemToolStripMenuItem";
+            this.copyItemToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.copyItemToolStripMenuItem.Text = "Copy Item";
+            this.copyItemToolStripMenuItem.Click += new System.EventHandler(this.copyItemToolStripMenuItem_Click);
             // 
             // VehicleListForm
             // 
@@ -401,6 +424,8 @@
         private System.Windows.Forms.ColumnHeader colTopSpeedBoost;
         private System.Windows.Forms.ColumnHeader colDamageLimit;
         private System.Windows.Forms.ColumnHeader colColorPalette;
+        private System.Windows.Forms.ToolStripButton tsbCopyItem;
+        private System.Windows.Forms.ToolStripMenuItem copyItemToolStripMenuItem;
     }
 }
 

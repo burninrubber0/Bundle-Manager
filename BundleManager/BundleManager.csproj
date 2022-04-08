@@ -179,6 +179,10 @@
       <Project>{a56b769d-941f-4b1e-9905-f5a981fa6ead}</Project>
       <Name>IconLibrary</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LangEditor\LangEditor.csproj">
+      <Project>{20E7A1C4-AFCD-4B8A-8AEF-06B0C27E72B7}</Project>
+      <Name>LangEditor</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MathLib\MathLib.csproj">
       <Project>{e9e7ffa3-84ae-42af-bfe3-c50d2b034c28}</Project>
       <Name>MathLib</Name>

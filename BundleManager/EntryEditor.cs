@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using BundleFormat;
 using BundleUtilities;
 using BurnoutImage;
+using LangEditor;
 
 namespace BundleManager
 {

@@ -55,6 +55,8 @@ namespace BundleManager
             }
         }
 
+
+
         public bool ForceHex
         {
             get;
@@ -866,6 +868,18 @@ namespace BundleManager
             sfd.Filter = "Binary Files|*.bin";
             sfd.FileOk += Sfd_FileOk2;
             sfd.ShowDialog(this);
+        }
+
+        private void editId_Click(object sender, EventArgs e)
+        {
+            string value = InputDialog.ShowInput(this, "Please enter the value to hash.");
+            if (value == null)
+                return;
+            ulong result = Crc32.HashCrc32B(value.ToLower());
+            _entry.Dirty = true;
+            Entry.ID = result;
+            Task.Run(() => UpdateDisplay());
+            MessageBox.Show(this, "The new hashed value is: " + result.ToString("X8"), "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void Sfd_FileOk2(object sender, CancelEventArgs e)

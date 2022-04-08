@@ -103,10 +103,10 @@ namespace LangEditor
 
             int paddingCount = (int)(entry.EntryBlocks[0].Data.Length - bw.BaseStream.Position);
 
-            string padding = "";
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < paddingCount; i++)
-                padding += "A";
-            bw.WriteCStr(padding);
+                sb.Append("A");
+            bw.WriteCStr(sb.ToString());
 
             bw.Flush();
             byte[] data = ms.ToArray();
@@ -116,7 +116,7 @@ namespace LangEditor
             entry.EntryBlocks[0].Data = data;
             entry.Dirty = true;
 
-			return true;
+            return true;
         }
 
 		public EntryType GetEntryType(BundleEntry entry)
@@ -131,7 +131,7 @@ namespace LangEditor
 			edit.Changed += () =>
 			{
 				edit.Lang.Write(entry);
-			};
+            };
 
 			return edit;
 		}

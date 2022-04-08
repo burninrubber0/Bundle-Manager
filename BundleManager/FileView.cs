@@ -12,18 +12,18 @@ namespace BundleManager
     {
         private static FileView _instance;
 
-		private static bool _loadMaterials;
-        public static bool LoadMaterials {
-			get => _loadMaterials;
-			set
-			{
-				_loadMaterials = value;
-				Config.LoadMaterials = _loadMaterials;
-			}
-		}
+        private static bool _loadMaterials;
+        public static bool LoadMaterials
+        {
+            get => _loadMaterials;
+            set
+            {
+                _loadMaterials = value;
+                Config.LoadMaterials = _loadMaterials;
+            }
+        }
 
         private bool AlwaysIgnore => ignoreIDConflictsToolStripMenuItem.CheckState == CheckState.Checked;
-
         private string _currentPath
         {
             get => BundleCache.CurrentPath;
@@ -39,9 +39,9 @@ namespace BundleManager
             InitializeComponent();
 
             _instance = this;
-			LoadMaterials = true;
+            LoadMaterials = true;
 
-			UpdateRecentFiles();
+            UpdateRecentFiles();
         }
 
         private void Clear()
@@ -66,7 +66,7 @@ namespace BundleManager
 
                 if (fileToolStripMenuItem.DropDownItems[index] is ToolStripSeparator)
                     break;
-                        
+
                 fileToolStripMenuItem.DropDownItems.RemoveAt(index);
             }
 
@@ -87,7 +87,7 @@ namespace BundleManager
 
                     ToolStripItem item = new ToolStripMenuItem(path);
                     item.Click += (sender, args) => Open(path);
-                            
+
                     fileToolStripMenuItem.DropDownItems.Insert(index + i, item);
                 }
             }
@@ -199,33 +199,13 @@ namespace BundleManager
             BundleCache.Files.Clear();
             BundleCache.Paths.Clear();
             BundleCache.EntryInfos.Clear();
-
             string[] files = Directory.GetFiles(_currentPath, "*.*", SearchOption.AllDirectories);
-            
+
             Dictionary<string, bool> fileTypes = new Dictionary<string, bool>();
-
-            string cachePath = _currentPath + "/files.bmcache";
-            if (File.Exists(cachePath))
-            {
-                string[] lines = File.ReadAllLines(cachePath);
-                foreach (string line in lines)
-                {
-                    string[] data = line.Split('|');
-                    if (data.Length < 2)
-                        continue;
-
-                    if (File.Exists(data[0]))
-                        fileTypes.Add(data[0], data[1] == "bundle");
-                }
-            }
-
-            int i = 0;
             int index = 0;
-            bool ignoreAllConflicts = false;
             foreach (string file in files)
             {
                 index++;
-
                 try
                 {
                     if (!fileTypes.ContainsKey(file))
@@ -235,63 +215,14 @@ namespace BundleManager
 
                         if (!isBundle)
                             continue;
-                    } else if (!fileTypes[file])
+                    }
+                    else if (!fileTypes[file])
                     {
                         continue;
                     }
-                    
+
                     int progress = index * 100 / files.Length;
-                    loader.SetStatus("Loading(" + progress.ToString("D2") + "%): " + Path.GetFileName(file));
                     loader.SetProgress(progress);
-                    
-                    string fixedPath = file.Replace('\\', '/');
-                    string fixedCurrentPath = _currentPath.Replace('\\', '/');
-
-                    fixedPath = fixedPath.Replace(fixedCurrentPath, "");
-
-                    if (fixedPath.StartsWith("/"))
-                        fixedPath = fixedPath.Substring(1);
-
-                    string[] itemData = new string[]
-                    {
-                        fixedPath
-                    };
-
-                    bool cancel = false;
-
-                    List<EntryInfo> entryIDs = BundleArchive.GetEntryInfos(file, false);
-                    foreach (EntryInfo info in entryIDs)
-                    {
-                        uint entryID = info.ID;
-                        if (BundleCache.Files.ContainsKey(entryID))
-                        {
-                            if (ignoreAllConflicts)
-                                continue;
-                            int index1 = BundleCache.Files[entryID];
-                            string otherFile = BundleCache.Paths[index1];
-                            ConflictChoice choice = ResolveConflict(entryID, file, otherFile);
-                            if (choice.Cancel)
-                            {
-                                cancel = true;
-                                break;
-                            }
-                            if (choice.IgnoreAll)
-                                ignoreAllConflicts = true;
-                            continue;
-                        }
-                        if (!BundleCache.EntryInfos.ContainsKey(entryID))
-                            BundleCache.EntryInfos.Add(entryID, info);
-						BundleCache.Files.Add(entryID, i);
-                    }
-
-                    if (cancel)
-                    {
-                        BundleCache.Files.Clear();
-                        BundleCache.Paths.Clear();
-                        BundleCache.EntryInfos.Clear();
-                        lstMain.Items.Clear();
-                        break;
-                    }
                     BundleCache.Paths.Add(file);
                 }
                 catch (ThreadAbortException)
@@ -303,24 +234,6 @@ namespace BundleManager
                     _currentPath = null;
                     break;
                 }
-                i++;
-            }
-
-            try
-            {
-                Stream s = File.Open(cachePath, FileMode.Create, FileAccess.Write);
-                StreamWriter sw = new StreamWriter(s);
-
-                foreach (string key in fileTypes.Keys)
-                    sw.WriteLine(key + "|" + (fileTypes[key] ? "bundle" : "other"));
-
-                sw.Flush();
-                sw.Close();
-                s.Close();
-            }
-            catch (IOException ex)
-            {
-                Invoke(new Action(() => MessageBox.Show(this, "Failed to cache file types:\n" + ex.Message + "\n" + ex.StackTrace)));
             }
         }
 
@@ -353,11 +266,36 @@ namespace BundleManager
         private void OpenBundle(int index)
         {
             string file = BundleCache.Paths[index];
-
+            List<EntryInfo> entryIDs = BundleArchive.GetEntryInfos(file, false);
+            bool ignoreAllConflicts = false;
+            foreach (EntryInfo info in entryIDs)
+            {
+                uint entryID = info.ID;
+                if (BundleCache.Files.ContainsKey(entryID))
+                {
+                    if (ignoreAllConflicts)
+                        continue;
+                    int index1 = BundleCache.Files[entryID];
+                    string otherFile = BundleCache.Paths[index1];
+                    ConflictChoice choice = ResolveConflict(entryID, file, otherFile);
+                    if (choice.Cancel)
+                    {
+                        break;
+                    }
+                    if (choice.IgnoreAll)
+                        ignoreAllConflicts = true;
+                    continue;
+                }
+                
+                if (!BundleCache.EntryInfos.ContainsKey(entryID))
+                {
+                    BundleCache.EntryInfos.Add(entryID, info);
+                    BundleCache.Files.Add(entryID, index);
+                }
+            }
             MainForm form = new MainForm();
             form.SubForm = true;
             form.Open(file);
-
             form.ShowDialog(this);
         }
 
@@ -402,57 +340,6 @@ namespace BundleManager
             }
         }
 
-        /*private void testToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "Text Files|*.txt";
-            DialogResult result = sfd.ShowDialog(this);
-
-            if (result == DialogResult.OK)
-            {
-                List<string> referenceList = new List<string>();
-
-                string[] files = Directory.GetFiles(_currentPath, "*.*", SearchOption.AllDirectories);
-
-                int i = 0;
-                foreach (string file in files)
-                {
-                    if (!BundleArchive.IsBundle(file))
-                        continue;
-
-                    string fixedPath = file.Replace('\\', '/');
-                    string fixedCurrentPath = _currentPath.Replace('\\', '/');
-
-                    fixedPath = fixedPath.Replace(fixedCurrentPath, "");
-
-                    if (fixedPath.StartsWith("/"))
-                        fixedPath = fixedPath.Substring(1);
-
-                    string[] itemData = new string[]
-                    {
-                        fixedPath
-                    };
-
-                    BundleArchive archive = BundleArchive.Read(file, _console);
-                    referenceList.AddRange(ScanTest(archive));
-
-                    i++;
-                }
-
-                Stream s = File.Open(sfd.FileName, FileMode.Create);
-                StreamWriter sw = new StreamWriter(s);
-
-                foreach (string reference in referenceList)
-                {
-                    sw.WriteLine(reference);
-                }
-
-                sw.Flush();
-                sw.Close();
-                s.Close();
-            }
-        }*/
-
         private List<string> ScanTest(BundleArchive archive)
         {
             List<string> referenceList = new List<string>();
@@ -488,7 +375,7 @@ namespace BundleManager
             else
                 loadMaterialsToolStripMenuItem.CheckState = CheckState.Checked;
 
-			LoadMaterials = loadMaterialsToolStripMenuItem.CheckState == CheckState.Checked;
+            LoadMaterials = loadMaterialsToolStripMenuItem.CheckState == CheckState.Checked;
         }
 
         private void dumpInfoToolStripMenuItem_Click(object sender, EventArgs e)

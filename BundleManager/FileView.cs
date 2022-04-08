@@ -200,25 +200,12 @@ namespace BundleManager
             BundleCache.Paths.Clear();
             BundleCache.EntryInfos.Clear();
             string[] files = Directory.GetFiles(_currentPath, "*.*", SearchOption.AllDirectories);
-            {
-                string[] lines = File.ReadAllLines(cachePath);
-                foreach (string line in lines)
-                {
-                    string[] data = line.Split('|');
-                        continue;
 
-                    if (File.Exists(data[0]))
-                        fileTypes.Add(data[0], data[1] == "bundle");
-                }
-            }
-
-            int i = 0;
+            Dictionary<string, bool> fileTypes = new Dictionary<string, bool>();
             int index = 0;
-            bool ignoreAllConflicts = false;
             foreach (string file in files)
             {
                 index++;
-
                 try
                 {
                     if (!fileTypes.ContainsKey(file))
@@ -228,7 +215,6 @@ namespace BundleManager
 
                         if (!isBundle)
                             continue;
-                    } else if (!fileTypes[file])
                     }
                     else if (!fileTypes[file])
                     {

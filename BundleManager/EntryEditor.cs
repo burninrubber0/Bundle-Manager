@@ -883,6 +883,16 @@ namespace BundleManager
             MessageBox.Show(this, "The new hashed value is: " + result.ToString("X8"), "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        private void calcLookup8_Click(object sender, EventArgs e)
+        {
+            string value = InputDialog.ShowInput(this, "Please enter the value to get the lookup 8.");
+            if (value == null)
+                return;
+            ulong result = Utilities.calcLookup8(value);
+            Task.Run(() => UpdateDisplay());
+            MessageBox.Show(this, "The lookup 8 hashed value is: " + result.ToString("X8") , "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         private void Sfd_FileOk2(object sender, CancelEventArgs e)
         {
             SaveFileDialog sfd = (SaveFileDialog)sender;

@@ -57,6 +57,7 @@
     <Compile Include="LoadingDialog.Designer.cs">
       <DependentUpon>LoadingDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="lookup8.cs" />
     <Compile Include="ReadFailedError.cs" />
     <Compile Include="TextureCache.cs" />
     <Compile Include="Utilities.cs" />

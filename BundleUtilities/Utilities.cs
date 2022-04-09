@@ -12,6 +12,14 @@ namespace BundleUtilities
 {
     public static class Utilities
     {
+        public static ulong calcLookup8(string text) {
+            byte[] message = Encoding.ASCII.GetBytes(text);
+            var hashValue = Lookup8.Hash(message, (ulong)message.Length, 0xABCDEF0011223344);
+
+            return Lookup8.litteEndian(hashValue);
+        }
+
+
         public static bool IsValidPath(string path)
         {
             return !string.IsNullOrEmpty(path);

@@ -42,6 +42,7 @@ namespace BundleManager
 			this.mnuBar = new System.Windows.Forms.MenuStrip();
 			this.editStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.editHashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.calcLookupHashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.binaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.importHeaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exportHeaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -175,7 +176,7 @@ namespace BundleManager
 			//editStripMenuItem
 			// 
 			this.editStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.editHashToolStripMenuItem});
+			this.editHashToolStripMenuItem, this.calcLookupHashToolStripMenuItem});
 			this.editStripMenuItem.Name = "editStripMenuItem";
 			this.editStripMenuItem.Size = new System.Drawing.Size(52, 20);
 			this.editStripMenuItem.Text = "Edit";
@@ -186,6 +187,13 @@ namespace BundleManager
 			this.editHashToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
 			this.editHashToolStripMenuItem.Text = "Edit ID";
 			this.editHashToolStripMenuItem.Click += new System.EventHandler(this.editId_Click);
+			// 
+			// editHashToolStripMenuItem
+			// 
+			this.calcLookupHashToolStripMenuItem.Name = "calcLookupHashToolStripMenuItem";
+			this.calcLookupHashToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+			this.calcLookupHashToolStripMenuItem.Text = "Calc Lookup8 Hash";
+			this.calcLookupHashToolStripMenuItem.Click += new System.EventHandler(this.calcLookup8_Click);
 			// 
 			// binaryToolStripMenuItem
 			// 
@@ -325,6 +333,7 @@ namespace BundleManager
         private System.Windows.Forms.MenuStrip mnuBar;
 		private System.Windows.Forms.ToolStripMenuItem editStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem editHashToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem calcLookupHashToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem binaryToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem importHeaderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportHeaderToolStripMenuItem;

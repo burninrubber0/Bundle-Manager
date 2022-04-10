@@ -139,45 +139,45 @@ namespace BaseHandlers
             CharacterRefStrings = new List<StringPointer>();
         }
 
-		private void Clear()
-		{
-			FileSize = default;
-			SecondsPerFrame = default;
-			Section1RecordCount = default;
-			Section1Offset = default;
-			ImageIDCount = default;
-			ImageIDListOffset = default;
-			GeometryVerticesCount = default;
-			GeometryVerticesOffset = default;
-			TextStyleCount = default;
-			TextStyleListOffset = default;
-			Section5And6RecordCount = default;
-			Section5Offset = default;
-			Section6Offset = default;
-			EventBindsCount = default;
-			EventBindsOffset = default;
-			TextStringsCount = default;
-			TextStringsOffset = default;
-			DependencyRefStringsCount = default;
-			DependencyRefStringsOffset = default;
-			CharacterRefStringsCount = default;
-			CharacterRefStringsOffset = default;
+        private void Clear()
+        {
+            FileSize = default;
+            SecondsPerFrame = default;
+            Section1RecordCount = default;
+            Section1Offset = default;
+            ImageIDCount = default;
+            ImageIDListOffset = default;
+            GeometryVerticesCount = default;
+            GeometryVerticesOffset = default;
+            TextStyleCount = default;
+            TextStyleListOffset = default;
+            Section5And6RecordCount = default;
+            Section5Offset = default;
+            Section6Offset = default;
+            EventBindsCount = default;
+            EventBindsOffset = default;
+            TextStringsCount = default;
+            TextStringsOffset = default;
+            DependencyRefStringsCount = default;
+            DependencyRefStringsOffset = default;
+            CharacterRefStringsCount = default;
+            CharacterRefStringsOffset = default;
 
-			Section1Entries.Clear();
-			ImageIDs.Clear();
-			GeometryVertices.Clear();
-			TextStyleEntries.Clear();
-			Section5Entries.Clear();
-			Section6Entries.Clear();
-			EventBinds.Clear();
-			TextStrings.Clear();
-			DependencyRefStrings.Clear();
-			CharacterRefStrings.Clear();
-		}
+            Section1Entries.Clear();
+            ImageIDs.Clear();
+            GeometryVertices.Clear();
+            TextStyleEntries.Clear();
+            Section5Entries.Clear();
+            Section6Entries.Clear();
+            EventBinds.Clear();
+            TextStrings.Clear();
+            DependencyRefStrings.Clear();
+            CharacterRefStrings.Clear();
+        }
 
         public bool Read(BundleEntry entry, ILoader loader = null)
         {
-			Clear();
+            Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -426,18 +426,18 @@ namespace BaseHandlers
 
         public bool Write(BundleEntry entry)
         {
-			// TODO
-			return true;
+            // TODO
+            return true;
         }
 
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.FlaptFile;
-		}
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.FlaptFile;
+        }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			return null;
-		}
-	}
+        public IEntryEditor GetEditor(BundleEntry entry)
+        {
+            return null;
+        }
+    }
 }

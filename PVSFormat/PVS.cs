@@ -17,21 +17,21 @@ namespace PVSFormat
         public float X;
         public float Y;
         public int Padding1; // Padding???
-		public int Padding2; // Padding???
+        public int Padding2; // Padding???
 
-		public override string ToString()
+        public override string ToString()
         {
             return "X: " + X + ", Y: " + Y + ", Padding1: " + Padding1 + ", Padding2: " + Padding2;
         }
     }
 
-	public enum NeighbourFlags
-	{
-		E_RENDERFLAG_NONE = 0x0,
-		E_NEIGHBOURFLAG_RENDER = 0x1,
-		E_NEIGHBOURFLAG_IMMEDIATE = 0x2,
-		E_NEIGHBOURFLAG_RENDER_IMMEDIATE = 0x3,
-	}
+    public enum NeighbourFlags
+    {
+        E_RENDERFLAG_NONE = 0x0,
+        E_NEIGHBOURFLAG_RENDER = 0x1,
+        E_NEIGHBOURFLAG_IMMEDIATE = 0x2,
+        E_NEIGHBOURFLAG_RENDER_IMMEDIATE = 0x3,
+    }
 
     public struct ZoneNeighbour
     {
@@ -39,9 +39,9 @@ namespace PVSFormat
         public uint NeighborPtr;
         public NeighbourFlags Flags;
         public int Padding1; // Padding???
-		public int Padding2; // Padding???
+        public int Padding2; // Padding???
 
-		public override string ToString()
+        public override string ToString()
         {
             return "NeighborIndex: " + NeighborIndex + ", Type: " + Flags + ", Unk1: " + Padding1 + ", Unk2: " + Padding2;
         }
@@ -55,16 +55,16 @@ namespace PVSFormat
         public uint UnsafeNeighboursPtr;
         public uint Unknown;
         public long ZoneID;
-		public short ZoneType;
-		public short NumPoints;
+        public short ZoneType;
+        public short NumPoints;
         public short NumSafeNeighbours;
         public short NumUnsafeNeighbours;
         public int Flags;
         public int Padding1; // Padding???
-		public int Padding2; // Padding???
-		public int Padding3; // Padding???
+        public int Padding2; // Padding???
+        public int Padding3; // Padding???
 
-		public List<ZonePoint> Points;
+        public List<ZonePoint> Points;
         public List<ZoneNeighbour> UnsafeNeighbours;
 
         public override string ToString()
@@ -75,54 +75,54 @@ namespace PVSFormat
 
     public class PVS : IEntryData
     {
-		private Image _gameMap;
+        private Image _gameMap;
 
-		public uint PointsPtr;
-		public uint ZonePtr;
-		public uint ZonePointStart1;
-		public uint ZonePointStart2;
-		public uint ZonePointCount;
-		public uint TotalZones;
+        public uint PointsPtr;
+        public uint ZonePtr;
+        public uint ZonePointStart1;
+        public uint ZonePointStart2;
+        public uint ZonePointCount;
+        public uint TotalZones;
         public uint TotalPoints;
-		public uint Padding; // Padding???
-		public List<PVSZone> Zones;
+        public uint Padding; // Padding???
+        public List<PVSZone> Zones;
 
         public PVS()
         {
             Zones = new List<PVSZone>();
         }
 
-		private void Clear()
-		{
-			PointsPtr = default;
-			ZonePtr = default;
-			ZonePointStart1 = default;
-			ZonePointStart2 = default;
-			ZonePointCount = default;
-			TotalZones = default;
-			TotalPoints = default;
+        private void Clear()
+        {
+            PointsPtr = default;
+            ZonePtr = default;
+            ZonePointStart1 = default;
+            ZonePointStart2 = default;
+            ZonePointCount = default;
+            TotalZones = default;
+            TotalPoints = default;
 
-			Zones.Clear();
-		}
+            Zones.Clear();
+        }
 
         public bool Read(BundleEntry entry, ILoader loader)
         {
-			Clear();
+            Clear();
 
             Stream s = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(s);
             br.BigEndian = entry.Console;
 
-			PointsPtr = br.ReadUInt32();
-			ZonePtr = br.ReadUInt32();
+            PointsPtr = br.ReadUInt32();
+            ZonePtr = br.ReadUInt32();
 
-			ZonePointStart1 = br.ReadUInt32();
-			ZonePointStart2 = br.ReadUInt32();
+            ZonePointStart1 = br.ReadUInt32();
+            ZonePointStart2 = br.ReadUInt32();
 
-			ZonePointCount = br.ReadUInt32();
-			TotalZones = br.ReadUInt32();
+            ZonePointCount = br.ReadUInt32();
+            TotalZones = br.ReadUInt32();
             TotalPoints = br.ReadUInt32();
-			Padding = br.ReadUInt32();
+            Padding = br.ReadUInt32();
 
             for (uint i = 0; i < ZonePointCount; i++)
             {
@@ -134,13 +134,13 @@ namespace PVSFormat
                 pvsEntry.UnsafeNeighboursPtr = br.ReadUInt32();
                 pvsEntry.Unknown = br.ReadUInt32();
                 pvsEntry.ZoneID = br.ReadInt64();
-				pvsEntry.ZoneType = br.ReadInt16();
-				pvsEntry.NumPoints = br.ReadInt16();
-				pvsEntry.NumSafeNeighbours = br.ReadInt16();
+                pvsEntry.ZoneType = br.ReadInt16();
+                pvsEntry.NumPoints = br.ReadInt16();
+                pvsEntry.NumSafeNeighbours = br.ReadInt16();
                 pvsEntry.NumUnsafeNeighbours = br.ReadInt16();
                 pvsEntry.Flags = br.ReadInt32();
                 pvsEntry.Padding1 = br.ReadInt32();
-				pvsEntry.Padding2 = br.ReadInt32();
+                pvsEntry.Padding2 = br.ReadInt32();
                 pvsEntry.Padding3 = br.ReadInt32();
 
                 long pos = br.BaseStream.Position;
@@ -203,66 +203,66 @@ namespace PVSFormat
             br.Close();
             s.Close();
 
-			_gameMap = GetGameMap(entry.Archive);
+            _gameMap = GetGameMap(entry.Archive);
 
             return true;
         }
 
-		public bool Write(BundleEntry entry)
+        public bool Write(BundleEntry entry)
         {
             return true;
         }
 
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.ZoneList;
-		}
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.ZoneList;
+        }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			PVSEditor pvsForm = new PVSEditor();
-			pvsForm.GameMap = _gameMap;
-			pvsForm.Open(this);
+        public IEntryEditor GetEditor(BundleEntry entry)
+        {
+            PVSEditor pvsForm = new PVSEditor();
+            pvsForm.GameMap = _gameMap;
+            pvsForm.Open(this);
 
-			return pvsForm;
-		}
+            return pvsForm;
+        }
 
-		private Image GetGameMap(BundleArchive archive)
-		{
-			ulong id = 0x9F55039D;
-			BundleEntry descEntry1 = archive.GetEntryByID(id);
-			if (descEntry1 == null)
-			{
-				string file = BundleCache.GetFileByEntryID(id);
-				if (!string.IsNullOrEmpty(file))
-				{
-					BundleArchive archive2 = BundleArchive.Read(file);
-					if (archive2 != null)
-						descEntry1 = archive2.GetEntryByID(id);
-				}
-			}
+        private Image GetGameMap(BundleArchive archive)
+        {
+            ulong id = 0x9F55039D;
+            BundleEntry descEntry1 = archive.GetEntryByID(id);
+            if (descEntry1 == null)
+            {
+                string file = BundleCache.GetFileByEntryID(id);
+                if (!string.IsNullOrEmpty(file))
+                {
+                    BundleArchive archive2 = BundleArchive.Read(file);
+                    if (archive2 != null)
+                        descEntry1 = archive2.GetEntryByID(id);
+                }
+            }
 
-			if (descEntry1 == null)
-			{
-				string path = Path.GetDirectoryName(archive.Path) + Path.DirectorySeparatorChar + "GUITEXTURES.BIN";
-				BundleArchive archive2 = BundleArchive.Read(path);
-				if (archive2 != null)
-					descEntry1 = archive2.GetEntryByID(id);
-			}
+            if (descEntry1 == null)
+            {
+                string path = Path.GetDirectoryName(archive.Path) + Path.DirectorySeparatorChar + "GUITEXTURES.BIN";
+                BundleArchive archive2 = BundleArchive.Read(path);
+                if (archive2 != null)
+                    descEntry1 = archive2.GetEntryByID(id);
+            }
 
-			Image image = null;
+            Image image = null;
 
-			if (descEntry1 != null && descEntry1.Type == EntryType.Texture)
-			{
-				if (archive.Console)
-					image = GameImage.GetImagePS3(descEntry1.EntryBlocks[0].Data, descEntry1.EntryBlocks[1].Data);
-				else
-					image = GameImage.GetImage(descEntry1.EntryBlocks[0].Data, descEntry1.EntryBlocks[1].Data);
+            if (descEntry1 != null && descEntry1.Type == EntryType.Texture)
+            {
+                if (archive.Console)
+                    image = GameImage.GetImagePS3(descEntry1.EntryBlocks[0].Data, descEntry1.EntryBlocks[1].Data);
+                else
+                    image = GameImage.GetImage(descEntry1.EntryBlocks[0].Data, descEntry1.EntryBlocks[1].Data);
 
-				if (image != null)
-					TextureCache.AddToCache(id, image);
-			}
-			return image;
-		}
-	}
+                if (image != null)
+                    TextureCache.AddToCache(id, image);
+            }
+            return image;
+        }
+    }
 }

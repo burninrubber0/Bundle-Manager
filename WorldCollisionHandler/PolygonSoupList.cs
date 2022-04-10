@@ -23,12 +23,12 @@ namespace WorldCollisionHandler
     {
         public uint UnknownProperty;
         public byte[] Indices;
-		public byte[] UnknownBytes;
+        public byte[] UnknownBytes;
 
-		public PolygonSoupProperty()
+        public PolygonSoupProperty()
         {
             Indices = new byte[4];
-			UnknownBytes = new byte[4];
+            UnknownBytes = new byte[4];
         }
 
         public PolygonSoupProperty Copy()
@@ -57,12 +57,12 @@ namespace WorldCollisionHandler
             for (int i = 0; i < result.Indices.Length; i++)
             {
                 result.Indices[i] = br.ReadByte();
-			}
+            }
 
-			for (int i = 0; i < result.UnknownBytes.Length; i++)
-			{
-				result.UnknownBytes[i] = br.ReadByte();
-			}
+            for (int i = 0; i < result.UnknownBytes.Length; i++)
+            {
+                result.UnknownBytes[i] = br.ReadByte();
+            }
 
             return result;
         }
@@ -114,11 +114,11 @@ namespace WorldCollisionHandler
         public BoxF Box;
         public int Terminator;
 
-		public PolygonSoupBoundingBox(BoxF box, int terminator)
-		{
-			Box = box;
-			Terminator = terminator;
-		}
+        public PolygonSoupBoundingBox(BoxF box, int terminator)
+        {
+            Box = box;
+            Terminator = terminator;
+        }
 
         public override string ToString()
         {
@@ -175,15 +175,15 @@ namespace WorldCollisionHandler
         }
 
         public void Write(BinaryWriter bw)
-		{
-			long chunkStartPtr = bw.BaseStream.Position;
-			bw.Write(Position);
+        {
+            long chunkStartPtr = bw.BaseStream.Position;
+            bw.Write(Position);
             bw.Write(Scale);
             long propListStartPtr = bw.BaseStream.Position;
             bw.Write((uint) 0);
             long pointListStartPtr = bw.BaseStream.Position;
             bw.Write((uint) 0);
-			long lengthPtr = bw.BaseStream.Position;
+            long lengthPtr = bw.BaseStream.Position;
             bw.Write((ushort) 0);
             bw.Write((byte)PropertyList.Count);
             bw.Write(QuadCount);
@@ -211,12 +211,12 @@ namespace WorldCollisionHandler
             {
                 PropertyList[i].Write(bw);
             }
-			cPos = bw.BaseStream.Position;
-			bw.BaseStream.Position = lengthPtr;
-			bw.Write((short)(bw.BaseStream.Length - chunkStartPtr));
-			bw.BaseStream.Position = cPos;
+            cPos = bw.BaseStream.Position;
+            bw.BaseStream.Position = lengthPtr;
+            bw.Write((short)(bw.BaseStream.Length - chunkStartPtr));
+            bw.BaseStream.Position = cPos;
 
-		}
+        }
 
         public Mesh BuildMesh(Vector3I pos, float scale)
         {
@@ -390,7 +390,7 @@ namespace WorldCollisionHandler
 
             // Clear existing data
             Chunks.Clear();
-			BoundingBoxes.Clear();
+            BoundingBoxes.Clear();
 
             // Global vertices list to calculate the bounding box
             List<Vector3> vertices = new List<Vector3>();
@@ -489,236 +489,236 @@ namespace WorldCollisionHandler
             Max = MathUtils.MaxBounds(vertices.ToArray());
         }
 
-		private void Clear()
-		{
-			Min = default;
-			Unknown4 = default;
-			Max = default;
-			Unknown8 = default;
-			BoundingBoxes.Clear();
-			Chunks.Clear();
-		}
+        private void Clear()
+        {
+            Min = default;
+            Unknown4 = default;
+            Max = default;
+            Unknown8 = default;
+            BoundingBoxes.Clear();
+            Chunks.Clear();
+        }
 
-		public bool Read(BundleEntry entry, ILoader loader = null)
-		{
-			Clear();
+        public bool Read(BundleEntry entry, ILoader loader = null)
+        {
+            Clear();
 
-			MemoryStream ms = entry.MakeStream();
-			BinaryReader2 br = new BinaryReader2(ms);
-			br.BigEndian = entry.Console;
+            MemoryStream ms = entry.MakeStream();
+            BinaryReader2 br = new BinaryReader2(ms);
+            br.BigEndian = entry.Console;
 
-			Min = br.ReadVector3F();
-			Unknown4 = br.ReadInt32();
-			Max = br.ReadVector3F();
-			Unknown8 = br.ReadInt32();
-			uint chunkPointerStart = br.ReadUInt32();
-			uint boxListStart = br.ReadUInt32();
-			int chunkCount = br.ReadInt32();
-			br.ReadUInt32(); // FileSize
+            Min = br.ReadVector3F();
+            Unknown4 = br.ReadInt32();
+            Max = br.ReadVector3F();
+            Unknown8 = br.ReadInt32();
+            uint chunkPointerStart = br.ReadUInt32();
+            uint boxListStart = br.ReadUInt32();
+            int chunkCount = br.ReadInt32();
+            br.ReadUInt32(); // FileSize
 
-			List<uint> chunkPointers = new List<uint>();
+            List<uint> chunkPointers = new List<uint>();
 
-			// No Data
-			if (chunkCount == 0)
-			{
-				br.Close();
-				ms.Close();
-				return true;
-			}
+            // No Data
+            if (chunkCount == 0)
+            {
+                br.Close();
+                ms.Close();
+                return true;
+            }
 
-			br.BaseStream.Position = chunkPointerStart;
+            br.BaseStream.Position = chunkPointerStart;
 
-			for (int i = 0; i < chunkCount; i++)
-			{
-				chunkPointers.Add(br.ReadUInt32());
-			}
+            for (int i = 0; i < chunkCount; i++)
+            {
+                chunkPointers.Add(br.ReadUInt32());
+            }
 
-			for (int i = 0; i < chunkCount; i++)
-			{
-				// Read Vertically
+            for (int i = 0; i < chunkCount; i++)
+            {
+                // Read Vertically
 
-				long pos = boxListStart + 0x70 * (i / 4) + 4 * (i % 4);
+                long pos = boxListStart + 0x70 * (i / 4) + 4 * (i % 4);
 
-				BoxF boundingBox = new BoxF();
-				br.BaseStream.Position = pos;
-				float minX = br.ReadSingle();
-				br.BaseStream.Position += 12;
-				float minY = br.ReadSingle();
-				br.BaseStream.Position += 12;
-				float minZ = br.ReadSingle();
+                BoxF boundingBox = new BoxF();
+                br.BaseStream.Position = pos;
+                float minX = br.ReadSingle();
+                br.BaseStream.Position += 12;
+                float minY = br.ReadSingle();
+                br.BaseStream.Position += 12;
+                float minZ = br.ReadSingle();
 
-				boundingBox.Min = new Vector3(minX, minY, minZ);
+                boundingBox.Min = new Vector3(minX, minY, minZ);
 
-				br.BaseStream.Position += 12;
-				float maxX = br.ReadSingle();
-				br.BaseStream.Position += 12;
-				float maxY = br.ReadSingle();
-				br.BaseStream.Position += 12;
-				float maxZ = br.ReadSingle();
-				br.BaseStream.Position += 12;
+                br.BaseStream.Position += 12;
+                float maxX = br.ReadSingle();
+                br.BaseStream.Position += 12;
+                float maxY = br.ReadSingle();
+                br.BaseStream.Position += 12;
+                float maxZ = br.ReadSingle();
+                br.BaseStream.Position += 12;
 
-				boundingBox.Max = new Vector3(maxX, maxY, maxZ);
+                boundingBox.Max = new Vector3(maxX, maxY, maxZ);
 
-				PolygonSoupBoundingBox box = new PolygonSoupBoundingBox(boundingBox, br.ReadInt32());
+                PolygonSoupBoundingBox box = new PolygonSoupBoundingBox(boundingBox, br.ReadInt32());
 
-				BoundingBoxes.Add(box);
-			}
+                BoundingBoxes.Add(box);
+            }
 
-			for (int i = 0; i < chunkPointers.Count; i++)
-			{
-				br.BaseStream.Position = chunkPointers[i];
+            for (int i = 0; i < chunkPointers.Count; i++)
+            {
+                br.BaseStream.Position = chunkPointers[i];
 
-				Chunks.Add(PolygonSoupChunk.Read(br));
-			}
+                Chunks.Add(PolygonSoupChunk.Read(br));
+            }
 
-			br.Close();
-			ms.Close();
+            br.Close();
+            ms.Close();
 
-			return true;
-		}
+            return true;
+        }
 
-		public bool Write(BundleEntry entry)
-		{
-			MemoryStream ms = new MemoryStream();
-			BinaryWriter bw = new BinaryWriter(ms);
+        public bool Write(BundleEntry entry)
+        {
+            MemoryStream ms = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(ms);
 
-			bw.Write(Min);
-			bw.Write(Unknown4);
-			bw.Write(Max);
-			bw.Write(Unknown8);
-			long chunkPointerStartPos = bw.BaseStream.Position;
-			bw.Write((uint)0);
-			long boxListStartPos = bw.BaseStream.Position;
-			bw.Write((uint)0);
-			bw.Write(Chunks.Count);
-			long fileSizePos = bw.BaseStream.Position;
-			bw.Write((uint)0);
+            bw.Write(Min);
+            bw.Write(Unknown4);
+            bw.Write(Max);
+            bw.Write(Unknown8);
+            long chunkPointerStartPos = bw.BaseStream.Position;
+            bw.Write((uint)0);
+            long boxListStartPos = bw.BaseStream.Position;
+            bw.Write((uint)0);
+            bw.Write(Chunks.Count);
+            long fileSizePos = bw.BaseStream.Position;
+            bw.Write((uint)0);
 
-			uint[] chunkPointers = new uint[Chunks.Count];
+            uint[] chunkPointers = new uint[Chunks.Count];
 
-			// No Data
-			if (Chunks.Count == 0)
-			{
-				bw.Flush();
-				byte[] data2 = ms.ToArray();
-				bw.Close();
-				ms.Close();
+            // No Data
+            if (Chunks.Count == 0)
+            {
+                bw.Flush();
+                byte[] data2 = ms.ToArray();
+                bw.Close();
+                ms.Close();
 
-				entry.EntryBlocks[0].Data = data2;
-				entry.Dirty = true;
-				return true;
-			}
+                entry.EntryBlocks[0].Data = data2;
+                entry.Dirty = true;
+                return true;
+            }
 
-			long cPos = bw.BaseStream.Position;
-			uint chunkPointerStart = (uint)bw.BaseStream.Position;
-			bw.BaseStream.Position = chunkPointerStartPos;
-			bw.Write((uint)cPos);
-			bw.BaseStream.Position = cPos;
+            long cPos = bw.BaseStream.Position;
+            uint chunkPointerStart = (uint)bw.BaseStream.Position;
+            bw.BaseStream.Position = chunkPointerStartPos;
+            bw.Write((uint)cPos);
+            bw.BaseStream.Position = cPos;
 
-			for (int i = 0; i < Chunks.Count; i++)
-			{
-				bw.Write((uint)0);
-			}
+            for (int i = 0; i < Chunks.Count; i++)
+            {
+                bw.Write((uint)0);
+            }
 
-			bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
-			cPos = bw.BaseStream.Position;
-			uint boxListStart = (uint)bw.BaseStream.Position;
-			bw.BaseStream.Position = boxListStartPos;
-			bw.Write((uint)cPos);
+            bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
+            cPos = bw.BaseStream.Position;
+            uint boxListStart = (uint)bw.BaseStream.Position;
+            bw.BaseStream.Position = boxListStartPos;
+            bw.Write((uint)cPos);
 
-			for (int i = 0; i < Chunks.Count; i++)
-			{
-				// Write Vertically
+            for (int i = 0; i < Chunks.Count; i++)
+            {
+                // Write Vertically
 
-				long pos = boxListStart + 0x70 * (i / 4) + 4 * (i % 4);
+                long pos = boxListStart + 0x70 * (i / 4) + 4 * (i % 4);
 
-				PolygonSoupBoundingBox box = BoundingBoxes[i];
+                PolygonSoupBoundingBox box = BoundingBoxes[i];
 
-				bw.BaseStream.Position = pos;
-				bw.Write(box.Box.Min.X);
-				bw.BaseStream.Position += 12;
-				bw.Write(box.Box.Min.Y);
-				bw.BaseStream.Position += 12;
-				bw.Write(box.Box.Min.Z);
+                bw.BaseStream.Position = pos;
+                bw.Write(box.Box.Min.X);
+                bw.BaseStream.Position += 12;
+                bw.Write(box.Box.Min.Y);
+                bw.BaseStream.Position += 12;
+                bw.Write(box.Box.Min.Z);
 
-				bw.BaseStream.Position += 12;
-				bw.Write(box.Box.Max.X);
-				bw.BaseStream.Position += 12;
-				bw.Write(box.Box.Max.Y);
-				bw.BaseStream.Position += 12;
-				bw.Write(box.Box.Max.Z);
+                bw.BaseStream.Position += 12;
+                bw.Write(box.Box.Max.X);
+                bw.BaseStream.Position += 12;
+                bw.Write(box.Box.Max.Y);
+                bw.BaseStream.Position += 12;
+                bw.Write(box.Box.Max.Z);
 
-				bw.BaseStream.Position += 12;
-				bw.Write(box.Terminator);
-			}
+                bw.BaseStream.Position += 12;
+                bw.Write(box.Terminator);
+            }
 
-			bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
+            bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16));
 
-			if (Chunks.Count > 0)
-			{
-				bw.BaseStream.Position = (128 * ((bw.BaseStream.Position + 127) / 128));
+            if (Chunks.Count > 0)
+            {
+                bw.BaseStream.Position = (128 * ((bw.BaseStream.Position + 127) / 128));
 
-				for (int i = 0; i < Chunks.Count / 4; i++)
-				{
-					if ((i % 8) % 3 == 0)
-					{
-						bw.BaseStream.Position += 256;
-					}
-					else
-					{
-						bw.BaseStream.Position += 384;
-					}
-				}
-			}
+                for (int i = 0; i < Chunks.Count / 4; i++)
+                {
+                    if ((i % 8) % 3 == 0)
+                    {
+                        bw.BaseStream.Position += 256;
+                    }
+                    else
+                    {
+                        bw.BaseStream.Position += 384;
+                    }
+                }
+            }
 
-			for (int i = 0; i < chunkPointers.Length; i++)
-			{
-				bw.BaseStream.Position = (128 * ((bw.BaseStream.Position + 127) / 128));
+            for (int i = 0; i < chunkPointers.Length; i++)
+            {
+                bw.BaseStream.Position = (128 * ((bw.BaseStream.Position + 127) / 128));
 
-				chunkPointers[i] = (uint)bw.BaseStream.Position;
+                chunkPointers[i] = (uint)bw.BaseStream.Position;
 
-				Chunks[i].Write(bw);
-			}
+                Chunks[i].Write(bw);
+            }
 
-			bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16)) + 0x5F;
-			bw.Write((byte)0);
+            bw.BaseStream.Position = (16 * ((bw.BaseStream.Position + 15) / 16)) + 0x5F;
+            bw.Write((byte)0);
 
-			cPos = bw.BaseStream.Position;
-			bw.BaseStream.Position = fileSizePos;
-			bw.Write((uint)cPos);
+            cPos = bw.BaseStream.Position;
+            bw.BaseStream.Position = fileSizePos;
+            bw.Write((uint)cPos);
 
-			bw.BaseStream.Position = chunkPointerStart;
-			for (int i = 0; i < Chunks.Count; i++)
-			{
-				bw.Write(chunkPointers[i]);
-			}
+            bw.BaseStream.Position = chunkPointerStart;
+            for (int i = 0; i < Chunks.Count; i++)
+            {
+                bw.Write(chunkPointers[i]);
+            }
 
-			bw.Flush();
-			byte[] data = ms.ToArray();
-			bw.Close();
-			ms.Close();
+            bw.Flush();
+            byte[] data = ms.ToArray();
+            bw.Close();
+            ms.Close();
 
-			entry.EntryBlocks[0].Data = data;
-			entry.Dirty = true;
+            entry.EntryBlocks[0].Data = data;
+            entry.Dirty = true;
 
-			return true;
-		}
+            return true;
+        }
 
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.PolygonSoupList;
-		}
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.PolygonSoupList;
+        }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			WorldColEditor editor = new WorldColEditor();
-			editor.Poly = this;
-			editor.Changed += () =>
-			{
-				Write(entry);
-			};
+        public IEntryEditor GetEditor(BundleEntry entry)
+        {
+            WorldColEditor editor = new WorldColEditor();
+            editor.Poly = this;
+            editor.Changed += () =>
+            {
+                Write(entry);
+            };
 
-			return editor;
-		}
-	}
+            return editor;
+        }
+    }
 }

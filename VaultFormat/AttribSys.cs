@@ -301,28 +301,28 @@ namespace VaultFormat
             }
         }
 
-		private void Clear()
-		{
-			VersionHash = default;
-			DepHash1 = default;
-			DepHash2 = default;
-			DepNop = default;
+        private void Clear()
+        {
+            VersionHash = default;
+            DepHash1 = default;
+            DepHash2 = default;
+            DepNop = default;
 
-			StrUnknown1 = default;
+            StrUnknown1 = default;
 
-			PtrN = default;
+            PtrN = default;
 
-			Data = default;
+            Data = default;
 
-			Dependencies.Clear();
-			NestedChunks.Clear();
-			DataChunks.Clear();
-			Strings.Clear();
-		}
+            Dependencies.Clear();
+            NestedChunks.Clear();
+            DataChunks.Clear();
+            Strings.Clear();
+        }
 
         public bool Read(BundleEntry entry, ILoader loader = null)
         {
-			Clear();
+            Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -359,19 +359,19 @@ namespace VaultFormat
             return true;
         }
 
-		public bool Write(BundleEntry entry)
-		{
-			return true;
-		}
+        public bool Write(BundleEntry entry)
+        {
+            return true;
+        }
 
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.AttribSysVault;
-		}
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.AttribSysVault;
+        }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			return null;
-		}
-	}
+        public IEntryEditor GetEditor(BundleEntry entry)
+        {
+            return null;
+        }
+    }
 }

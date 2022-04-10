@@ -16,7 +16,7 @@ namespace ModelViewer
 {
     public partial class ModelViewerForm : Form, IEntryEditor
     {
-		public SceneRenderControl Renderer => rndMain;
+        public SceneRenderControl Renderer => rndMain;
 
         public ModelViewerForm()
         {

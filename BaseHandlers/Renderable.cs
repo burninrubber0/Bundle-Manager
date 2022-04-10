@@ -58,9 +58,9 @@ namespace BaseHandlers
     {
         public static bool LoadMaterials => Config.LoadMaterials;
 
-		private Scene _scene;
+        private Scene _scene;
 
-		public float Unknown1;
+        public float Unknown1;
         public float Unknown2;
         public float Unknown3;
         public float Unknown4;
@@ -236,59 +236,59 @@ namespace BaseHandlers
                     }
                 }
 
-				if (attributeToUse.Size == 0)
-				{
-					break;
-				}
+                if (attributeToUse.Size == 0)
+                {
+                    break;
+                }
 
-				mesh.Vertices = new List<VertexData>();
+                mesh.Vertices = new List<VertexData>();
                 br.BaseStream.Position = VertexBlockAddress + mesh.VertexOffsetCount * attributeToUse.Size + attributeToUse.Offset;
-				while (br.BaseStream.Position + attributeToUse.Size < br.BaseStream.Length) // Really, this should not be done like this.
+                while (br.BaseStream.Position + attributeToUse.Size < br.BaseStream.Length) // Really, this should not be done like this.
                 {
                     mesh.Vertices.Add(ReadVertex(br, attributeToUse));
                 }
-			}
+            }
         }
 
-		private void Clear()
-		{
-			_scene = null;
+        private void Clear()
+        {
+            _scene = null;
 
-			Unknown1 = default;
-			Unknown2 = default;
-			Unknown3 = default;
-			Unknown4 = default;
-			Unknown5 = default;
-			MeshCount = default;
+            Unknown1 = default;
+            Unknown2 = default;
+            Unknown3 = default;
+            Unknown4 = default;
+            Unknown5 = default;
+            MeshCount = default;
 
-			StartOffset = default;
-			Unknown8 = default;
-			Unknown9 = default;
-			Unknown10 = default;
-			Unknown10_1 = default;
-			UnknownOffset = default;
-			Unknown12 = default;
-			Unknown13 = default;
+            StartOffset = default;
+            Unknown8 = default;
+            Unknown9 = default;
+            Unknown10 = default;
+            Unknown10_1 = default;
+            UnknownOffset = default;
+            Unknown12 = default;
+            Unknown13 = default;
 
-			NumIndices = default;
-			Unknown15 = default;
-			Unknown16 = default;
-			Unknown17 = default;
-			VertexBlockAddress = default;
-			Unknown18 = default;
-			VertexBlockSize = default;
+            NumIndices = default;
+            Unknown15 = default;
+            Unknown16 = default;
+            Unknown17 = default;
+            VertexBlockAddress = default;
+            Unknown18 = default;
+            VertexBlockSize = default;
 
-			ID = default;
-			Model = default;
+            ID = default;
+            Model = default;
 
-			MeshVertexOffsets.Clear();
-			Meshes.Clear();
-			Indices.Clear();
-		}
+            MeshVertexOffsets.Clear();
+            Meshes.Clear();
+            Indices.Clear();
+        }
 
         public bool Read(BundleEntry entry, ILoader loader)
         {
-			Clear();
+            Clear();
 
             List<BundleDependency> dependencies = entry.GetDependencies();
 
@@ -407,19 +407,19 @@ namespace BaseHandlers
             br.Close();
             ms.Close();
             
-			loader?.SetStatus("Loading Meshes");
+            loader?.SetStatus("Loading Meshes");
             for (int i = 0; i < Meshes.Count; i++)
             {
                 RenderableMesh mesh = Meshes[i];
 
-				int progress = (i + 1) * 100 / Meshes.Count;
+                int progress = (i + 1) * 100 / Meshes.Count;
 
-				loader?.SetStatus("Loading Meshes: " + (i + 1) + "/" + Meshes.Count);
-				loader?.SetProgress(progress);
+                loader?.SetStatus("Loading Meshes: " + (i + 1) + "/" + Meshes.Count);
+                loader?.SetProgress(progress);
 
                 if (LoadMaterials)
                 {
-					BundleEntry descEntry1 = entry.Archive.GetEntryByID(mesh.MaterialID);
+                    BundleEntry descEntry1 = entry.Archive.GetEntryByID(mesh.MaterialID);
                     if (descEntry1 == null)
                     {
                         string file = BundleCache.GetFileByEntryID(mesh.MaterialID);
@@ -427,7 +427,7 @@ namespace BaseHandlers
                         {
                             BundleArchive archive = BundleArchive.Read(file);
                             descEntry1 = archive.GetEntryByID(mesh.MaterialID);
-						}
+                        }
                     }
 
                     if (descEntry1 != null)
@@ -438,7 +438,7 @@ namespace BaseHandlers
                 for (int j = 0; j < mesh.VertexDescriptions.Length; j++)
                 {
                     ulong vertexDescID = mesh.VertexDescriptionIDs[j];
-					BundleEntry descEntry = entry.Archive.GetEntryByID(vertexDescID);
+                    BundleEntry descEntry = entry.Archive.GetEntryByID(vertexDescID);
                     if (descEntry == null)
                     {
                         string file = BundleCache.GetFileByEntryID(vertexDescID);
@@ -463,36 +463,36 @@ namespace BaseHandlers
 
             BuildModel();
 
-			_scene = MakeScene(loader);
+            _scene = MakeScene(loader);
 
-			return true;
+            return true;
         }
 
-		public bool Write(BundleEntry entry)
-		{
-			return true;
-		}
+        public bool Write(BundleEntry entry)
+        {
+            return true;
+        }
 
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.Renderable;
-		}
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.Renderable;
+        }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			ModelViewerForm viewer = new ModelViewerForm();
-			viewer.Renderer.Scene = _scene;
+        public IEntryEditor GetEditor(BundleEntry entry)
+        {
+            ModelViewerForm viewer = new ModelViewerForm();
+            viewer.Renderer.Scene = _scene;
 
-			return viewer;
-		}
+            return viewer;
+        }
 
-		public Scene MakeScene(ILoader loader = null)
-		{
-			Scene scene = new Scene();
-			SceneObject obj = new SceneObject(ID.ToString("X8"), Model);
-			scene.AddObject(obj);
+        public Scene MakeScene(ILoader loader = null)
+        {
+            Scene scene = new Scene();
+            SceneObject obj = new SceneObject(ID.ToString("X8"), Model);
+            scene.AddObject(obj);
 
-			return scene;
-		}
-	}
+            return scene;
+        }
+    }
 }

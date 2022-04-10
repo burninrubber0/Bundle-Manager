@@ -35,7 +35,7 @@ namespace BaseHandlers
                 }
                 else
                 {
-					BundleEntry descEntry1 = entry.Archive.GetEntryByID(id);
+                    BundleEntry descEntry1 = entry.Archive.GetEntryByID(id);
                     if (descEntry1 == null)
                     {
                         string file = BundleCache.GetFileByEntryID(id);
@@ -51,11 +51,11 @@ namespace BaseHandlers
                     {
                         if (entry.Console)
                             result.Texture = GameImage.GetImagePS3(descEntry1.EntryBlocks[0].Data, descEntry1.EntryBlocks[1].Data);
-						else
+                        else
                             result.Texture = GameImage.GetImage(descEntry1.EntryBlocks[0].Data, descEntry1.EntryBlocks[1].Data);
 
-						if (result.Texture != null)
-							TextureCache.AddToCache(id, result.Texture);
+                        if (result.Texture != null)
+                            TextureCache.AddToCache(id, result.Texture);
 
                         break;
                     }

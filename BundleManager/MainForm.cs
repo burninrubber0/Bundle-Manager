@@ -20,9 +20,9 @@ namespace BundleManager
 {
     public partial class MainForm : Form
     {
-		#region Variables and Properties
+        #region Variables and Properties
 
-		private bool _subForm;
+        private bool _subForm;
         public bool SubForm
         {
             get { return _subForm; }
@@ -137,13 +137,13 @@ namespace BundleManager
 
         public bool _console => CurrentArchive.Console;
 
-		public bool ForceOnlySpecificEntry = false;
+        public bool ForceOnlySpecificEntry = false;
 
-		private Thread _openSaveThread;
+        private Thread _openSaveThread;
 
-		#endregion
+        #endregion
 
-		public MainForm()
+        public MainForm()
         {
             InitializeComponent();
 
@@ -155,7 +155,7 @@ namespace BundleManager
         {
             lstEntries.Items.Clear();
 
-			UpdatePluginMenu();
+            UpdatePluginMenu();
 
             if (CurrentArchive == null)
             {
@@ -193,50 +193,50 @@ namespace BundleManager
             lstEntries.EndUpdate();
         }
 
-		private void UpdatePluginMenu()
-		{
-			int index = toolsToolStripMenuItem.DropDownItems.IndexOf(pluginToolsSeparatorItem) + 1;
+        private void UpdatePluginMenu()
+        {
+            int index = toolsToolStripMenuItem.DropDownItems.IndexOf(pluginToolsSeparatorItem) + 1;
 
-			while(true)
-			{
-				if (index >= toolsToolStripMenuItem.DropDownItems.Count)
-					break;
+            while(true)
+            {
+                if (index >= toolsToolStripMenuItem.DropDownItems.Count)
+                    break;
 
-				if (toolsToolStripMenuItem.DropDownItems[index] is ToolStripSeparator)
-					break;
+                if (toolsToolStripMenuItem.DropDownItems[index] is ToolStripSeparator)
+                    break;
 
-				toolsToolStripMenuItem.DropDownItems.RemoveAt(index);
-			}
+                toolsToolStripMenuItem.DropDownItems.RemoveAt(index);
+            }
 
-			PluginCommand[] commands = PluginCommandRegistry.Commands;
+            PluginCommand[] commands = PluginCommandRegistry.Commands;
 
-			if (commands.Length == 0)
-			{
-				ToolStripItem item = new ToolStripMenuItem("No Plugin Commands");
-				item.Enabled = false;
+            if (commands.Length == 0)
+            {
+                ToolStripItem item = new ToolStripMenuItem("No Plugin Commands");
+                item.Enabled = false;
 
-				toolsToolStripMenuItem.DropDownItems.Insert(index, item);
-			}
-			else
-			{
-				for (int i = 0; i < commands.Length; i++)
-				{
-					PluginCommand command = commands[i];
+                toolsToolStripMenuItem.DropDownItems.Insert(index, item);
+            }
+            else
+            {
+                for (int i = 0; i < commands.Length; i++)
+                {
+                    PluginCommand command = commands[i];
 
-					ToolStripItem item = new ToolStripMenuItem(command.Text);
-					if (CurrentArchive == null)
-						item.Enabled = false;
-					else if (command.CheckConditions == null)
-						item.Enabled = true;
-					else
-						item.Enabled = command.CheckConditions(CurrentArchive);
+                    ToolStripItem item = new ToolStripMenuItem(command.Text);
+                    if (CurrentArchive == null)
+                        item.Enabled = false;
+                    else if (command.CheckConditions == null)
+                        item.Enabled = true;
+                    else
+                        item.Enabled = command.CheckConditions(CurrentArchive);
 
-					item.Click += (sender, args) => command.Use(this, CurrentArchive);
+                    item.Click += (sender, args) => command.Use(this, CurrentArchive);
 
-					toolsToolStripMenuItem.DropDownItems.Insert(index + i, item);
-				}
-			}
-		}
+                    toolsToolStripMenuItem.DropDownItems.Insert(index + i, item);
+                }
+            }
+        }
 
         private void DoNew()
         {
@@ -377,7 +377,7 @@ namespace BundleManager
 
         public void DoSaveBundle(LoadingDialog loader, string path)
         {
-			CurrentArchive.Write(path);
+            CurrentArchive.Write(path);
 
             loader.IsDone = true;
         }
@@ -410,86 +410,86 @@ namespace BundleManager
             if (!int.TryParse(lstEntries.SelectedItems[0].Text, out index))
                 return;
 
-			EditEntry(index, forceHex);
+            EditEntry(index, forceHex);
         }
 
-		public void EditEntry(int index, bool forceHex = false)
-		{
-			BundleEntry entry = GetEntry(index);
+        public void EditEntry(int index, bool forceHex = false)
+        {
+            BundleEntry entry = GetEntry(index);
 
-			if (EntryTypeRegistry.IsRegistered(entry.Type) && !forceHex)
-			{
-				IEntryData data = EntryTypeRegistry.GetHandler(entry.Type);
+            if (EntryTypeRegistry.IsRegistered(entry.Type) && !forceHex)
+            {
+                IEntryData data = EntryTypeRegistry.GetHandler(entry.Type);
 
-				TextureCache.ResetCache();
-				LoadingDialog loader = new LoadingDialog();
-				loader.Status = "Loading: " + entry.ID.ToString("X8");
+                TextureCache.ResetCache();
+                LoadingDialog loader = new LoadingDialog();
+                loader.Status = "Loading: " + entry.ID.ToString("X8");
 
-				Thread loadInstanceThread = null;
-				bool failure = false;
+                Thread loadInstanceThread = null;
+                bool failure = false;
 
-				loader.Done += (cancelled, value) =>
-				{
-					if (cancelled)
-						loadInstanceThread?.Abort();
-					else
-					{
-						if (failure)
-						{
-							MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
-								MessageBoxIcon.Error);
-						}
-						else
-						{
-							loader.Hide();
+                loader.Done += (cancelled, value) =>
+                {
+                    if (cancelled)
+                        loadInstanceThread?.Abort();
+                    else
+                    {
+                        if (failure)
+                        {
+                            MessageBox.Show(this, "Failed to load Entry", "Error", MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                        }
+                        else
+                        {
+                            loader.Hide();
 
-							IEntryEditor editor = data.GetEditor(entry);
-							if (editor != null)
-								editor.ShowDialog(this);
-							else
-								DebugUtil.ShowDebug(this, data);
-							if (ForceOnlySpecificEntry)
-								Environment.Exit(0);
-						}
-					}
-					TextureCache.ResetCache();
-				};
+                            IEntryEditor editor = data.GetEditor(entry);
+                            if (editor != null)
+                                editor.ShowDialog(this);
+                            else
+                                DebugUtil.ShowDebug(this, data);
+                            if (ForceOnlySpecificEntry)
+                                Environment.Exit(0);
+                        }
+                    }
+                    TextureCache.ResetCache();
+                };
 
-				loadInstanceThread = new Thread(() =>
-				{
-					try
-					{
-						try
-						{
-							failure = !data.Read(entry, loader);
-						}
-						catch (ReadFailedError ex)
-						{
-							MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-							failure = true;
+                loadInstanceThread = new Thread(() =>
+                {
+                    try
+                    {
+                        try
+                        {
+                            failure = !data.Read(entry, loader);
+                        }
+                        catch (ReadFailedError ex)
+                        {
+                            MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            failure = true;
 
-							throw;
-						}
-					}
-					catch (Exception)
-					{
-						MessageBox.Show("Failed to load Entry", "Error", MessageBoxButtons.OK,
-							MessageBoxIcon.Error);
-						failure = true;
-					}
-					loader.IsDone = true;
-				});
-				loadInstanceThread.Start();
-				loader.ShowDialog(this);
-			}
-			else
-			{
-				EntryEditor editor = new EntryEditor();
-				editor.ForceHex = forceHex;
-				Task.Run(() => openEditor(editor, index));
-				editor.ShowDialog(this);
-			}
-		}
+                            throw;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Failed to load Entry", "Error", MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                        failure = true;
+                    }
+                    loader.IsDone = true;
+                });
+                loadInstanceThread.Start();
+                loader.ShowDialog(this);
+            }
+            else
+            {
+                EntryEditor editor = new EntryEditor();
+                editor.ForceHex = forceHex;
+                Task.Run(() => openEditor(editor, index));
+                editor.ShowDialog(this);
+            }
+        }
 
 
         public void openEditor(EntryEditor editor, int index)
@@ -497,9 +497,9 @@ namespace BundleManager
             editor.Entry = GetEntry(index);
         }
 
-		#region Event Handlers
+        #region Event Handlers
 
-		private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DoNew();
         }
@@ -567,7 +567,7 @@ namespace BundleManager
 
         private void tsbSwitchMode_Click(object sender, EventArgs e)
         {
-			SwitchMode();
+            SwitchMode();
         }
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -577,151 +577,151 @@ namespace BundleManager
 
         private void lstEntries_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-			SortColumn(e.Column);
-		}
+            SortColumn(e.Column);
+        }
 
         private void searchForEntryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Search();
         }
 
-		#endregion
+        #endregion
 
-		#region Utility
+        #region Utility
 
-		private bool CheckSave()
-		{
-			if (CurrentArchive == null)
-			{
-				return true;
-			}
-			else if (CurrentArchive.Dirty)
-			{
-				DialogResult result = MessageBox.Show(this, "There are unsaved changes!\nWould you like to save?",
-					"Save", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
-				if (result == DialogResult.Yes)
-				{
-					return Save();
-				}
-				else if (result == DialogResult.No)
-				{
-					CurrentArchive = null;
-					CurrentFileName = null;
-					UpdateDisplay();
-					return true;
-				}
-				else
-				{
-					return false;
-				}
+        private bool CheckSave()
+        {
+            if (CurrentArchive == null)
+            {
+                return true;
+            }
+            else if (CurrentArchive.Dirty)
+            {
+                DialogResult result = MessageBox.Show(this, "There are unsaved changes!\nWould you like to save?",
+                    "Save", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                if (result == DialogResult.Yes)
+                {
+                    return Save();
+                }
+                else if (result == DialogResult.No)
+                {
+                    CurrentArchive = null;
+                    CurrentFileName = null;
+                    UpdateDisplay();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
 
-			}
-			else
-			{
-				return true;
-			}
-		}
+            }
+            else
+            {
+                return true;
+            }
+        }
 
-		private void Search()
-		{
-			if (CurrentArchive == null)
-				return;
+        private void Search()
+        {
+            if (CurrentArchive == null)
+                return;
 
-			SearchDialog search = new SearchDialog();
-			search.Search += id =>
-			{
-				BundleEntry entry = CurrentArchive.GetEntryByID(id);
-				if (entry == null)
-				{
-					MessageBox.Show(this, "Entry not found!", "Information", MessageBoxButtons.OK,
-						MessageBoxIcon.Information);
-					return;
-				}
+            SearchDialog search = new SearchDialog();
+            search.Search += id =>
+            {
+                BundleEntry entry = CurrentArchive.GetEntryByID(id);
+                if (entry == null)
+                {
+                    MessageBox.Show(this, "Entry not found!", "Information", MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                    return;
+                }
 
-				string indexText = CurrentArchive.Entries.IndexOf(entry).ToString("D3");
-				int listIndex = -1;
-				for (int i = 0; i < lstEntries.Items.Count; i++)
-				{
-					ListViewItem item = lstEntries.Items[i];
-					if (item.Text == indexText)
-					{
-						listIndex = i;
-						break;
-					}
-				}
+                string indexText = CurrentArchive.Entries.IndexOf(entry).ToString("D3");
+                int listIndex = -1;
+                for (int i = 0; i < lstEntries.Items.Count; i++)
+                {
+                    ListViewItem item = lstEntries.Items[i];
+                    if (item.Text == indexText)
+                    {
+                        listIndex = i;
+                        break;
+                    }
+                }
 
-				lstEntries.SelectedIndices.Clear();
-				lstEntries.SelectedIndices.Add(listIndex);
-				lstEntries.EnsureVisible(listIndex);
-			};
-			search.ShowDialog(this);
-		}
+                lstEntries.SelectedIndices.Clear();
+                lstEntries.SelectedIndices.Add(listIndex);
+                lstEntries.EnsureVisible(listIndex);
+            };
+            search.ShowDialog(this);
+        }
 
-		private void SwitchMode()
-		{
-			if (!CheckSave())
-				return;
+        private void SwitchMode()
+        {
+            if (!CheckSave())
+                return;
 
-			CurrentArchive = null;
-			CurrentFileName = null;
+            CurrentArchive = null;
+            CurrentFileName = null;
 
-			Hide();
-			Program.folderModeForm.Show();
-		}
+            Hide();
+            Program.folderModeForm.Show();
+        }
 
-		private void SortColumn(int column)
-		{
-			EntrySorter sorter;
+        private void SortColumn(int column)
+        {
+            EntrySorter sorter;
 
-			if (lstEntries.ListViewItemSorter is EntrySorter)
-			{
-				// every other time
-				sorter = lstEntries.ListViewItemSorter as EntrySorter;
-				sorter.Column = column;
-			}
-			else
-			{
-				// first time
-				sorter = new EntrySorter(column);
-				lstEntries.ListViewItemSorter = sorter;
-			}
-			// if you're clicking the same column already being sorted
-			//if (sorter.Column == column)
-			//{
-			// change the direction state from true to false or vice-versa
-			sorter.Swap();
-			// bop-it
-			lstEntries.Sort();
-			//}
-		}
+            if (lstEntries.ListViewItemSorter is EntrySorter)
+            {
+                // every other time
+                sorter = lstEntries.ListViewItemSorter as EntrySorter;
+                sorter.Column = column;
+            }
+            else
+            {
+                // first time
+                sorter = new EntrySorter(column);
+                lstEntries.ListViewItemSorter = sorter;
+            }
+            // if you're clicking the same column already being sorted
+            //if (sorter.Column == column)
+            //{
+            // change the direction state from true to false or vice-versa
+            sorter.Swap();
+            // bop-it
+            lstEntries.Sort();
+            //}
+        }
 
-		private class EntrySorter : IComparer
-		{
-			public int Column;
-			public bool Direction;
+        private class EntrySorter : IComparer
+        {
+            public int Column;
+            public bool Direction;
 
-			public EntrySorter(int column)
-			{
-				this.Column = column;
-				this.Direction = false;
-			}
+            public EntrySorter(int column)
+            {
+                this.Column = column;
+                this.Direction = false;
+            }
 
-			public int Compare(object x, object y)
-			{
-				ListViewItem itemX = (ListViewItem)x;
-				ListViewItem itemY = (ListViewItem)y;
+            public int Compare(object x, object y)
+            {
+                ListViewItem itemX = (ListViewItem)x;
+                ListViewItem itemY = (ListViewItem)y;
 
-				if (Column > itemX?.SubItems.Count || Column > itemY?.SubItems.Count)
-				{
-					if (this.Direction)
-						return -1;
-					return 1;
-				}
+                if (Column > itemX?.SubItems.Count || Column > itemY?.SubItems.Count)
+                {
+                    if (this.Direction)
+                        return -1;
+                    return 1;
+                }
 
-				string iX = itemX?.SubItems[Column].Text;
-				string iY = itemY?.SubItems[Column].Text;
+                string iX = itemX?.SubItems[Column].Text;
+                string iY = itemY?.SubItems[Column].Text;
 
-				/*
+                /*
                 if (int.TryParse(iX, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var iXint))
                 {
                     if (int.TryParse(iY, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var iYint))
@@ -732,21 +732,21 @@ namespace BundleManager
                         return val2;
                     }
                 }
-				*/
+                */
 
-				int val = Math.Sign(string.Compare(iX, iY, StringComparison.CurrentCultureIgnoreCase));
-				if (this.Direction)
-					return val * -1;
-				return val;
+                int val = Math.Sign(string.Compare(iX, iY, StringComparison.CurrentCultureIgnoreCase));
+                if (this.Direction)
+                    return val * -1;
+                return val;
 
-			}
+            }
 
-			public void Swap()
-			{
-				this.Direction = !this.Direction;
-			}
-		}
+            public void Swap()
+            {
+                this.Direction = !this.Direction;
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

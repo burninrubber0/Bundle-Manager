@@ -706,19 +706,19 @@ namespace BaseHandlers
             Constants = new List<AptConst>();
         }
 
-		private void Clear()
-		{
-			Component1Name = default;
-			Component2Name = default;
+        private void Clear()
+        {
+            Component1Name = default;
+            Component2Name = default;
 
-			RootMovie = default;
+            RootMovie = default;
 
-			Constants.Clear();
-		}
+            Constants.Clear();
+        }
 
         public bool Read(BundleEntry entry, ILoader loader = null)
         {
-			Clear();
+            Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -735,7 +735,7 @@ namespace BaseHandlers
             for (int i = 0; i < numPadding; i++)
                 br.ReadByte();*/
 
-			br.BaseStream.Position = componentName1Ptr;
+            br.BaseStream.Position = componentName1Ptr;
             Component1Name = br.ReadCStr();
             br.BaseStream.Position = componentName2Ptr;
             Component2Name = br.ReadCStr();
@@ -797,17 +797,17 @@ namespace BaseHandlers
             entry.EntryBlocks[0].Data = data;
             entry.Dirty = true;
 
-			return true;
+            return true;
         }
 
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.AptData;
-		}
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.AptData;
+        }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			return null;
-		}
-	}
+        public IEntryEditor GetEditor(BundleEntry entry)
+        {
+            return null;
+        }
+    }
 }

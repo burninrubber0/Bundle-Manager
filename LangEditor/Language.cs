@@ -21,17 +21,17 @@ namespace LangEditor
             Data = new Dictionary<uint, string>();
         }
 
-		private void Clear()
-		{
-			Unknown1 = default;
-			Unknown2 = default;
+        private void Clear()
+        {
+            Unknown1 = default;
+            Unknown2 = default;
 
-			Data.Clear();
-		}
+            Data.Clear();
+        }
 
         public bool Read(BundleEntry entry, ILoader loader = null)
         {
-			Clear();
+            Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -119,24 +119,24 @@ namespace LangEditor
             return true;
         }
 
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.Language;
-		}
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.Language;
+        }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			LangEdit edit = new LangEdit();
-			edit.Lang = this;
-			edit.Changed += () =>
-			{
-				edit.Lang.Write(entry);
+        public IEntryEditor GetEditor(BundleEntry entry)
+        {
+            LangEdit edit = new LangEdit();
+            edit.Lang = this;
+            edit.Changed += () =>
+            {
+                edit.Lang.Write(entry);
             };
 
-			return edit;
-		}
+            return edit;
+        }
 
-		public static uint HashID(string id)
+        public static uint HashID(string id)
         {
             /*uint result = 0xFFFFFFFF;
             for (int i = 0; i < id.Length; i++)
@@ -167,5 +167,5 @@ namespace LangEditor
 
             return hash;
         }
-	}
+    }
 }

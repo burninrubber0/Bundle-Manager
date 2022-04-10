@@ -266,24 +266,24 @@ namespace BaseHandlers
             PlayerOpponentsDataEntries = new List<PlayerOpponentsData>();
         }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			return null;
-		}
-
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.ProgressionData;
-		}
-
-		private void Clear()
-		{
-
-		}
-
-		public bool Read(BundleEntry entry, ILoader loader = null)
+        public IEntryEditor GetEditor(BundleEntry entry)
         {
-			Clear();
+            return null;
+        }
+
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.ProgressionData;
+        }
+
+        private void Clear()
+        {
+
+        }
+
+        public bool Read(BundleEntry entry, ILoader loader = null)
+        {
+            Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -615,7 +615,7 @@ namespace BaseHandlers
             entry.EntryBlocks[0].Data = data;
             entry.Dirty = true;
 
-			return true;
+            return true;
         }
     }
 }

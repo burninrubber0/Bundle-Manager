@@ -154,51 +154,51 @@ namespace BaseHandlers
             TriggerOffsets = new List<uint>();
         }
 
-		private void Clear()
-		{
-			FormatRevision = default;
-			FileSize = default;
-			Unknown0C = default;
-			Unknown10 = default;
-			DevSpawnPositionX = default;
-			DevSpawnPositionY = default;
-			DevSpawnPositionZ = default;
-			DevSpawnUnknownHash = default;
-			DevSpawnRotationX = default;
-			DevSpawnRotationY = default;
-			DevSpawnRotationZ = default;
-			DevSpawnUnknownFloat = default;
-			LandmarkTriggersOffset = default;
-			LandmarkTriggersCount = default;
-			LandmarkNonFinishLineCount = default;
-			BlackspotTriggersOffset = default;
-			BlackspotTriggersCount = default;
-			GenericRegionTriggersOffset = default;
-			GenericRegionTriggersCount = default;
-			Section4Offset = default;
-			Section4Count = default;
-			VFXBoxRegionOffset = default;
-			VFXBoxRegionCount = default;
-			StartPositionsOffset = default;
-			StartPositionsCount = default;
-			RoamingLocationsOffset = default;
-			RoamingLocationsCount = default;
-			SpawnLocationsOffset = default;
-			SpawnLocationsCount = default;
-			TriggerOffsetListOffset = default;
-			TriggerOffsetListCount = default;
+        private void Clear()
+        {
+            FormatRevision = default;
+            FileSize = default;
+            Unknown0C = default;
+            Unknown10 = default;
+            DevSpawnPositionX = default;
+            DevSpawnPositionY = default;
+            DevSpawnPositionZ = default;
+            DevSpawnUnknownHash = default;
+            DevSpawnRotationX = default;
+            DevSpawnRotationY = default;
+            DevSpawnRotationZ = default;
+            DevSpawnUnknownFloat = default;
+            LandmarkTriggersOffset = default;
+            LandmarkTriggersCount = default;
+            LandmarkNonFinishLineCount = default;
+            BlackspotTriggersOffset = default;
+            BlackspotTriggersCount = default;
+            GenericRegionTriggersOffset = default;
+            GenericRegionTriggersCount = default;
+            Section4Offset = default;
+            Section4Count = default;
+            VFXBoxRegionOffset = default;
+            VFXBoxRegionCount = default;
+            StartPositionsOffset = default;
+            StartPositionsCount = default;
+            RoamingLocationsOffset = default;
+            RoamingLocationsCount = default;
+            SpawnLocationsOffset = default;
+            SpawnLocationsCount = default;
+            TriggerOffsetListOffset = default;
+            TriggerOffsetListCount = default;
 
-			LandmarkTriggers.Clear();
-			GenericRegionTriggers.Clear();
-			Section4Entries.Clear();
-			RoamingLocationEntries.Clear();
-			SpawnLocationEntries.Clear();
-			TriggerOffsets.Clear();
-		}
+            LandmarkTriggers.Clear();
+            GenericRegionTriggers.Clear();
+            Section4Entries.Clear();
+            RoamingLocationEntries.Clear();
+            SpawnLocationEntries.Clear();
+            TriggerOffsets.Clear();
+        }
 
         public bool Read(BundleEntry entry, ILoader loader = null)
         {
-			Clear();
+            Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -394,20 +394,20 @@ namespace BaseHandlers
             br.Close();
             ms.Close();
 
-			return true;
+            return true;
         }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			return null;
-		}
+        public IEntryEditor GetEditor(BundleEntry entry)
+        {
+            return null;
+        }
 
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.TriggerData;
-		}
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.TriggerData;
+        }
 
-		public bool Write(BundleEntry entry)
+        public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
@@ -578,7 +578,7 @@ namespace BaseHandlers
             entry.EntryBlocks[0].Data = data;
             entry.Dirty = true;
 
-			return true;
+            return true;
         }
-	}
+    }
 }

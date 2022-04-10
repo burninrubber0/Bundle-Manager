@@ -51,56 +51,56 @@ namespace BaseHandlers
             UnknownShorts = new List<short>();
         }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			return null;
-		}
-
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.TrafficData;
-		}
-
-		private void Clear()
-		{
-			Unknown1 = default;
-			Unknown2 = default;
-			FileSize = default;
-			TrackCount = default;
-			Unknown3 = default;
-			PointerOffset = default;
-			Unknown4 = default;
-			Unknown5 = default;
-			Unknown6 = default;
-			Unknown7 = default;
-			Unknown8 = default;
-			Unknown9 = default;
-			Unknown10 = default;
-			Section1Offset = default;
-			Section2Offset = default;
-			Section3Offset = default;
-			Section4Offset = default;
-			Section5Offset = default;
-			Section6Offset = default;
-			Section7Offset = default;
-			Section8Offset = default;
-			Unknown11 = default;
-			Unknown12 = default;
-			Unknown13 = default;
-			UnknownOffset1 = default;
-			UnknownOffset2 = default;
-			UnknownOffset3 = default;
-			UnknownOffset4 = default;
-			UnknownOffset5 = default;
-			Unknown14 = default;
-			Unknown15 = default;
-
-			UnknownShorts.Clear();
-		}
-
-		public bool Read(BundleEntry entry, ILoader loader = null)
+        public IEntryEditor GetEditor(BundleEntry entry)
         {
-			Clear();
+            return null;
+        }
+
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.TrafficData;
+        }
+
+        private void Clear()
+        {
+            Unknown1 = default;
+            Unknown2 = default;
+            FileSize = default;
+            TrackCount = default;
+            Unknown3 = default;
+            PointerOffset = default;
+            Unknown4 = default;
+            Unknown5 = default;
+            Unknown6 = default;
+            Unknown7 = default;
+            Unknown8 = default;
+            Unknown9 = default;
+            Unknown10 = default;
+            Section1Offset = default;
+            Section2Offset = default;
+            Section3Offset = default;
+            Section4Offset = default;
+            Section5Offset = default;
+            Section6Offset = default;
+            Section7Offset = default;
+            Section8Offset = default;
+            Unknown11 = default;
+            Unknown12 = default;
+            Unknown13 = default;
+            UnknownOffset1 = default;
+            UnknownOffset2 = default;
+            UnknownOffset3 = default;
+            UnknownOffset4 = default;
+            UnknownOffset5 = default;
+            Unknown14 = default;
+            Unknown15 = default;
+
+            UnknownShorts.Clear();
+        }
+
+        public bool Read(BundleEntry entry, ILoader loader = null)
+        {
+            Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -151,7 +151,7 @@ namespace BaseHandlers
 
         public bool Write(BundleEntry entry)
         {
-			return true;
+            return true;
         }
     }
 }

@@ -11,94 +11,94 @@ using Microsoft.SqlServer.Server;
 
 namespace BundleFormat
 {
-	public class EntryBlock
-	{
-		public bool Compressed;
-		public uint CompressedSize;
-		public uint UncompressedSize;
-		public uint UncompressedAlignment; // default depending on file type
-		public byte[] RawData;
-		public byte[] Data
-		{
-			get
-			{
-				if (RawData == null)
-					return null;
+    public class EntryBlock
+    {
+        public bool Compressed;
+        public uint CompressedSize;
+        public uint UncompressedSize;
+        public uint UncompressedAlignment; // default depending on file type
+        public byte[] RawData;
+        public byte[] Data
+        {
+            get
+            {
+                if (RawData == null)
+                    return null;
 
-				if (Compressed)
-					return RawData.Decompress((int)UncompressedSize);
+                if (Compressed)
+                    return RawData.Decompress((int)UncompressedSize);
 
-				return RawData;
-			}
-			set
-			{
-				if (Compressed)
-					RawData = value.Compress();
-				else
-					RawData = value;
+                return RawData;
+            }
+            set
+            {
+                if (Compressed)
+                    RawData = value.Compress();
+                else
+                    RawData = value;
 
-				UncompressedSize = (uint)value.Length;
-				CompressedSize = (uint)RawData.Length;
-			}
-		}
-	}
+                UncompressedSize = (uint)value.Length;
+                CompressedSize = (uint)RawData.Length;
+            }
+        }
+    }
 
     public class EntryInfo
     {
         public uint ID;
         public EntryType Type;
         public string Path;
-		public DebugInfo DebugInfo;
+        public DebugInfo DebugInfo;
 
         public EntryInfo(uint id, EntryType type, string path, DebugInfo debugInfo)
         {
             ID = id;
             Type = type;
             Path = path;
-			DebugInfo = debugInfo;
+            DebugInfo = debugInfo;
         }
     }
 
-	public struct Dependency
-	{
-		public ulong ID;
-		public uint EntryPointerOffset;
-	}
+    public struct Dependency
+    {
+        public ulong ID;
+        public uint EntryPointerOffset;
+    }
 
-	public struct DebugInfo
-	{
-		public string Name;
-		public string TypeName;
-	}
+    public struct DebugInfo
+    {
+        public string Name;
+        public string TypeName;
+    }
 
-	/*public struct BundleReference
-	{
-		public string Path;
-		public uint EntryCount;
-	}*/
+    /*public struct BundleReference
+    {
+        public string Path;
+        public uint EntryCount;
+    }*/
 
     public class BundleEntry
     {
-		public BundleArchive Archive;
-		//public BundleReference Archive;
+        public BundleArchive Archive;
+        //public BundleReference Archive;
 
-		public int Index;
+        public int Index;
 
         public ulong ID;
         public ulong References;
-		public int DependenciesListOffset;
+        public int DependenciesListOffset;
         public short DependencyCount;
-		public List<Dependency> Dependencies;
+        public List<Dependency> Dependencies;
 
-		public DebugInfo DebugInfo;
+        public DebugInfo DebugInfo;
 
-		public EntryBlock[] EntryBlocks;
+        public EntryBlock[] EntryBlocks;
 
-		public bool HasHeader => HasSection(0);
+        public bool HasHeader => HasSection(0);
         public bool HasBody => HasSection(1);
-		public bool HasThird => HasSection(2);
+        public bool HasThird => HasSection(2);
 
-		public EntryType Type;
+        public EntryType Type;
 
         public BundlePlatform Platform;
         public bool Console => Platform == BundlePlatform.X360 || Platform == BundlePlatform.PS3;
@@ -107,27 +107,27 @@ namespace BundleFormat
 
         public BundleEntry(BundleArchive archive)
         {
-			Archive = archive;
-			/*Archive = new BundleReference();
-			Archive.Path = archive.Path;
-			Archive.EntryCount = (uint)archive.Entries.Count;*/
-			Dependencies = new List<Dependency>();
+            Archive = archive;
+            /*Archive = new BundleReference();
+            Archive.Path = archive.Path;
+            Archive.EntryCount = (uint)archive.Entries.Count;*/
+            Dependencies = new List<Dependency>();
         }
 
-		public bool HasSection(int section)
-		{
-			return EntryBlocks != null &&
-				   section < EntryBlocks.Length &&
-				   section >= 0 &&
-				   EntryBlocks[section] != null &&
-				   EntryBlocks[section].Data != null &&
-				   EntryBlocks[section].Data.Length > 0;
-		}
+        public bool HasSection(int section)
+        {
+            return EntryBlocks != null &&
+                   section < EntryBlocks.Length &&
+                   section >= 0 &&
+                   EntryBlocks[section] != null &&
+                   EntryBlocks[section].Data != null &&
+                   EntryBlocks[section].Data.Length > 0;
+        }
 
         public MemoryStream MakeStream(bool body = false)
         {
-			if (EntryBlocks == null)
-				return null;
+            if (EntryBlocks == null)
+                return null;
 
             if (body)
                 return new MemoryStream(EntryBlocks[1].Data);
@@ -138,41 +138,41 @@ namespace BundleFormat
         {
             List<BundleDependency> result = new List<BundleDependency>();
 
-			if (Dependencies.Count > 0)
-			{
-				for (int i = 0; i < Dependencies.Count; i++)
-				{
-					BundleDependency dependency = new BundleDependency();
+            if (Dependencies.Count > 0)
+            {
+                for (int i = 0; i < Dependencies.Count; i++)
+                {
+                    BundleDependency dependency = new BundleDependency();
 
-					dependency.EntryID = Dependencies[i].ID;
-					dependency.EntryPointerOffset = (int)Dependencies[i].EntryPointerOffset;
+                    dependency.EntryID = Dependencies[i].ID;
+                    dependency.EntryPointerOffset = (int)Dependencies[i].EntryPointerOffset;
 
-					BundleEntry entry = null;
+                    BundleEntry entry = null;
 
-					/*string file = BundleCache.GetFileByEntryID(dependency.EntryID);
-					if (!string.IsNullOrEmpty(file))
-					{
-						BundleArchive archive = BundleArchive.Read(file, dependency.EntryID);
-						entry = archive.GetEntryByID(dependency.EntryID);
-					}*/
-					//}
+                    /*string file = BundleCache.GetFileByEntryID(dependency.EntryID);
+                    if (!string.IsNullOrEmpty(file))
+                    {
+                        BundleArchive archive = BundleArchive.Read(file, dependency.EntryID);
+                        entry = archive.GetEntryByID(dependency.EntryID);
+                    }*/
+                    //}
 
-					// TODO
-					for (int j = 0; j < Archive.Entries.Count; j++)
-					{
-						if (Archive.Entries[j].ID != dependency.EntryID)
-							continue;
+                    // TODO
+                    for (int j = 0; j < Archive.Entries.Count; j++)
+                    {
+                        if (Archive.Entries[j].ID != dependency.EntryID)
+                            continue;
 
-						dependency.EntryIndex = j;
-						entry = Archive.Entries[j];
-					}
+                        dependency.EntryIndex = j;
+                        entry = Archive.Entries[j];
+                    }
 
-					dependency.Entry = entry;
+                    dependency.Entry = entry;
 
-					result.Add(dependency);
-				}
-				return result;
-			}
+                    result.Add(dependency);
+                }
+                return result;
+            }
 
             MemoryStream ms = MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -190,15 +190,15 @@ namespace BundleFormat
 
                 BundleEntry entry = null;
 
-				/*string file = BundleCache.GetFileByEntryID(bundleDependency.EntryID);
-				if (!string.IsNullOrEmpty(file))
-				{
-					BundleArchive archive = BundleArchive.Read(file, bundleDependency.EntryID);
-					entry = archive.GetEntryByID(bundleDependency.EntryID);
-				}*/
+                /*string file = BundleCache.GetFileByEntryID(bundleDependency.EntryID);
+                if (!string.IsNullOrEmpty(file))
+                {
+                    BundleArchive archive = BundleArchive.Read(file, bundleDependency.EntryID);
+                    entry = archive.GetEntryByID(bundleDependency.EntryID);
+                }*/
 
-				// TODO
-				for (int j = 0; j < Archive.Entries.Count; j++)
+                // TODO
+                for (int j = 0; j < Archive.Entries.Count; j++)
                 {
                     if (Archive.Entries[j].ID != bundleDependency.EntryID)
                         continue;
@@ -210,7 +210,7 @@ namespace BundleFormat
                 bundleDependency.Entry = entry;
 
                 result.Add(bundleDependency);
-			}
+            }
 
             br.Close();
             ms.Close();
@@ -220,8 +220,8 @@ namespace BundleFormat
 
         public string DetectName()
         {
-			if (!string.IsNullOrWhiteSpace(DebugInfo.Name))
-				return DebugInfo.Name;
+            if (!string.IsNullOrWhiteSpace(DebugInfo.Name))
+                return DebugInfo.Name;
 
             string theName = "worldvault";
             ulong theID = Crc32.HashCrc32B(theName);

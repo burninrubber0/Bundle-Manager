@@ -890,7 +890,7 @@ namespace BundleManager
                 return;
             ulong result = Utilities.calcLookup8(value);
             Task.Run(() => UpdateDisplay());
-            MessageBox.Show(this, "The lookup 8 hashed value is: " + result.ToString("X8") , "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(this, "The lookup 8 hashed value is: " + result.ToString("X16") , "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void Sfd_FileOk2(object sender, CancelEventArgs e)

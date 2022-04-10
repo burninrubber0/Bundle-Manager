@@ -19,6 +19,7 @@ namespace VaultFormat
 
     public class DataChunk
     {
+        public string ClassName;
         public ulong CollectionHash;
         public ulong ClassHash;
         public byte[] Unknown1; // always 0?
@@ -30,6 +31,63 @@ namespace VaultFormat
         public byte[] Unknown3; // always 0?
         public ulong[] ParameterTypeHashes;
         public DataItem[] Items;
+
+
+        public void SetClassName()
+        {
+            if (ClassHash == 0x52B81656F3ADF675)
+            {
+                this.ClassName = "burnoutcarasset";
+            }
+            if (ClassHash == 0xF850281CA54C9B92)
+            {
+                this.ClassName = "physicsvehicleengineattribs";
+            }
+            if (ClassHash == 0x3F9370FCF8D767AC)
+            {
+                this.ClassName = "physicsvehicledriftattribs";
+            }
+            if (ClassHash == 0xDF956BC0568F138C)
+            {
+                this.ClassName = "physicsvehiclecollisionattribs";
+            }
+            if (ClassHash == 0x4297B5841F5231CF)
+            {
+                this.ClassName = "physicsvehiclesuspensionattribs";
+            }
+            if (ClassHash == 0x43462C59212A23CC)
+            {
+                this.ClassName = "physicsvehiclesteeringattribs";
+            }
+            if (ClassHash == 0xE9EDA3B8C4EA3C84)
+            {
+                this.ClassName = "cameraexternalbehaviour";
+            }
+            if (ClassHash == 0xF79C545E141DFFA6)
+            {
+                this.ClassName = "physicsvehiclebaseattribs";
+            }
+            if (ClassHash == 0xF0FF4DFD660F5A54)
+            {
+                this.ClassName = "burnoutcargraphicsasset";
+            }
+            if (ClassHash == 0xF3E3F8EF855F4F99)
+            {
+                this.ClassName = "camerabumperbehaviour";
+            }
+            if (ClassHash == 0xEADE7049AF7AB31E)
+            {
+                this.ClassName = "physicsvehicleboostattribs";
+            }
+            if (ClassHash == 0x966121397B502EED)
+            {
+                this.ClassName = "physicsvehiclehandling";
+            }
+            if (ClassHash == 0x7F161D94482CB3BF)
+            {
+                this.ClassName = "vehicleengine";
+            }
+        }
     }
 
     public class DataItem
@@ -71,14 +129,6 @@ namespace VaultFormat
         public PtrChunk PtrN;
 
         public byte[] Data;
-        /*public List<float> FloatBlock1;
-        public List<ulong> HashBlock1;
-        public List<float> FloatBlock2;
-        public List<int> IntBlock;
-        public List<short> ShortBlock;
-        public List<ulong> HashBlock2;
-        public byte[] BytesUnknown;
-        public List<float> FloatBlock3;*/
 
         public AttribSys()
         {
@@ -86,13 +136,6 @@ namespace VaultFormat
             NestedChunks = new List<NestedChunk>();
             DataChunks = new List<DataChunk>();
             Strings = new List<string>();
-            /*FloatBlock1 = new List<float>();
-            HashBlock1 = new List<ulong>();
-            FloatBlock2 = new List<float>();
-            IntBlock = new List<int>();
-            ShortBlock = new List<short>();
-            HashBlock2 = new List<ulong>();
-            FloatBlock3 = new List<float>();*/
         }
 
         private void ReadChunk(ILoader loader, BinaryReader br)
@@ -100,7 +143,7 @@ namespace VaultFormat
             long initialPos = br.BaseStream.Position;
             string fourcc = Encoding.ASCII.GetString(BitConverter.GetBytes(br.ReadInt32()).Flip());
             int size = br.ReadInt32();
-
+            Console.WriteLine(fourcc);
             switch (fourcc)
             {
                 case "Vers":
@@ -144,6 +187,7 @@ namespace VaultFormat
                             DataChunk dataChunk = new DataChunk();
                             dataChunk.CollectionHash = br.ReadUInt64();
                             dataChunk.ClassHash = br.ReadUInt64();
+                            dataChunk.SetClassName();
                             dataChunk.Unknown1 = br.ReadBytes(8);
                             dataChunk.ItemCount = br.ReadInt32();
                             dataChunk.Unknown2 = br.ReadInt32();
@@ -213,25 +257,12 @@ namespace VaultFormat
                     }
 
                     break;
-                /*case "StrE": // In Binary Section??
-                    String1 = br.ReadCString();
-                    String2 = br.ReadCString();
-                    ExhastID = br.ReadCString();
-                    String4 = br.ReadCString();
-                    break;*/
                 default:
                     throw new ReadFailedError("Unknown Chunk: " + fourcc);
             }
 
             br.BaseStream.Position = initialPos + size;
 
-            /*long pos = br.BaseStream.Position;
-
-            if (pos % 16 != 0)
-            {
-                pos += pos % 16;
-                br.BaseStream.Position = pos;
-            }*/
         }
 
         private void ReadVlt(ILoader loader, BinaryReader br)
@@ -242,58 +273,22 @@ namespace VaultFormat
             }
         }
 
-        private void ReadBin(ILoader loader, BinaryReader br)
+
+        private void ReadBin(ILoader loader, BinaryReader2 br)
         {
             try
             {
                 long initialPos = br.BaseStream.Position;
                 string fourcc = Encoding.ASCII.GetString(br.ReadBytes(4).Flip());
-                int size = br.ReadInt32();
-
+                // StrE
+                int size = br.ReadInt32(); // Size of Strings Array
                 while (br.BaseStream.Position < initialPos + size)
                     Strings.Add(br.ReadCStr());
                 Strings = Strings.AsEnumerable().Reverse().SkipWhile(str => str.Length == 0).Reverse().ToList();
-
                 br.BaseStream.Position = initialPos + size;
 
                 int dataSize = (int)(br.BaseStream.Length - br.BaseStream.Position);
                 Data = br.ReadBytes(dataSize);
-                /*for (int i = 0; i < 108; i++)
-                {
-                    FloatBlock1.Add(br.ReadSingle());
-                }
-
-                for (int i = 0; i < 24; i++)
-                {
-                    HashBlock1.Add(br.ReadUInt64());
-                }
-
-                for (int i = 0; i < 26; i++)
-                {
-                    FloatBlock2.Add(br.ReadSingle());
-                }
-
-                for (int i = 0; i < 3; i++)
-                {
-                    IntBlock.Add(br.ReadInt32());
-                }
-
-                for (int i = 0; i < 10; i++)
-                {
-                    ShortBlock.Add(br.ReadInt16());
-                }
-
-                for (int i = 0; i < 67; i++)
-                {
-                    HashBlock2.Add(br.ReadUInt64());
-                }
-
-                BytesUnknown = br.ReadBytes(4);
-
-                for (int i = 0; i < 103; i++)
-                {
-                    FloatBlock3.Add(br.ReadSingle());
-                }*/
             }
             catch (IOException ex)
             {
@@ -301,28 +296,28 @@ namespace VaultFormat
             }
         }
 
-		private void Clear()
-		{
-			VersionHash = default;
-			DepHash1 = default;
-			DepHash2 = default;
-			DepNop = default;
+        private void Clear()
+        {
+            VersionHash = default;
+            DepHash1 = default;
+            DepHash2 = default;
+            DepNop = default;
 
-			StrUnknown1 = default;
+            StrUnknown1 = default;
 
-			PtrN = default;
+            PtrN = default;
 
-			Data = default;
+            Data = default;
 
-			Dependencies.Clear();
-			NestedChunks.Clear();
-			DataChunks.Clear();
-			Strings.Clear();
-		}
+            Dependencies.Clear();
+            NestedChunks.Clear();
+            DataChunks.Clear();
+            Strings.Clear();
+        }
 
         public bool Read(BundleEntry entry, ILoader loader = null)
         {
-			Clear();
+            Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -359,19 +354,20 @@ namespace VaultFormat
             return true;
         }
 
-		public bool Write(BundleEntry entry)
-		{
-			return true;
-		}
+        public bool Write(BundleEntry entry)
+        {
+            return true;
+        }
 
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.AttribSysVault;
-		}
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.AttribSysVault;
+        }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			return null;
-		}
-	}
+        public IEntryEditor GetEditor(BundleEntry entry)
+        {
+            // To-Do: Create new Editor based on  something
+            return null;
+        }
+    }
 }

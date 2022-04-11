@@ -11,10 +11,10 @@ using PluginAPI;
 namespace BaseHandlers
 {
     public class GraphicsSpec : IEntryData
-	{
-		private Scene _scene;
+    {
+        private Scene _scene;
 
-		public BundleEntry Entry;
+        public BundleEntry Entry;
 
         public int Unknown1;
         public List<ulong> Instances;
@@ -26,22 +26,22 @@ namespace BaseHandlers
             Instances = new List<ulong>();
         }
 
-		private void Clear()
-		{
-			_scene = null;
+        private void Clear()
+        {
+            _scene = null;
 
-			Entry = default;
+            Entry = default;
 
-			Unknown1 = default;
-			Unknown2 = default;
-			Unknown3 = default;
+            Unknown1 = default;
+            Unknown2 = default;
+            Unknown3 = default;
 
-			Instances.Clear();
-		}
+            Instances.Clear();
+        }
 
         public bool Read(BundleEntry entry, ILoader loader)
         {
-			Clear();
+            Clear();
 
             Entry = entry;
 
@@ -50,38 +50,38 @@ namespace BaseHandlers
             for (int i = 0; i < entry.GetDependencies().Count; i++)
             {
                 Instances.Add(entry.GetDependencies()[i].EntryID);
-			}
+            }
 
-			_scene = MakeScene(loader);
+            _scene = MakeScene(loader);
 
-			return true;
-		}
+            return true;
+        }
 
-		public bool Write(BundleEntry entry)
-		{
-			return true;
-		}
+        public bool Write(BundleEntry entry)
+        {
+            return true;
+        }
 
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.GraphicsSpec;
-		}
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.GraphicsSpec;
+        }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			ModelViewerForm viewer = new ModelViewerForm();
-			viewer.Renderer.Scene = _scene;
+        public IEntryEditor GetEditor(BundleEntry entry)
+        {
+            ModelViewerForm viewer = new ModelViewerForm();
+            viewer.Renderer.Scene = _scene;
 
-			return viewer;
-		}
+            return viewer;
+        }
 
-		public Scene MakeScene(ILoader loader)
+        public Scene MakeScene(ILoader loader)
         {
             Scene scene = new Scene();
 
             foreach (uint instance in Instances)
             {
-				BundleEntry modelEntry = Entry.Archive.GetEntryByID(instance);
+                BundleEntry modelEntry = Entry.Archive.GetEntryByID(instance);
                 if (modelEntry == null)
                 {
                     string file = BundleCache.GetFileByEntryID(instance);
@@ -95,8 +95,8 @@ namespace BaseHandlers
                 if (modelEntry != null)
                 {
                     BundleEntry renderableEntry = modelEntry.GetDependencies()[0].Entry;
-					Renderable renderable = new Renderable();
-					renderable.Read(renderableEntry, null); // TODO: Null Loader
+                    Renderable renderable = new Renderable();
+                    renderable.Read(renderableEntry, null); // TODO: Null Loader
                     SceneObject sceneObject = new SceneObject(instance.ToString("X8"), renderable.Model);
                     //sceneObject.Transform = instance.Transform;
 
@@ -106,5 +106,5 @@ namespace BaseHandlers
 
             return scene;
         }
-	}
+    }
 }

@@ -22,16 +22,16 @@ namespace VehicleList
         public delegate void OnEdit();
         public event OnEdit Edit;
 
-		private VehicleListData _list;
+        private VehicleListData _list;
         public VehicleListData List
-		{
-			get => _list;
-			set
-			{
-				_list = value;
-				UpdateDisplay();
-			}
-		}
+        {
+            get => _list;
+            set
+            {
+                _list = value;
+                UpdateDisplay();
+            }
+        }
 
         public VehicleListForm()
         {

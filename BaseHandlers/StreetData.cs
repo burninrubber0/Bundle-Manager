@@ -123,31 +123,31 @@ namespace BaseHandlers
             StreetSection5s = new List<StreetSection5>();
         }
 
-		private void Clear()
-		{
-			Unknown1 = default;
-			FileSize = default;
-			Unknown3 = default;
-			Section2Offset = default;
-			StreetOffset = default;
-			RoadRuleOffset = default;
-			Section1Count = default;
-			RoadRuleCount = default;
-			StreetCount = default;
-			Unknown9 = default;
-			Unknown10 = default;
-			Unknown11 = default;
+        private void Clear()
+        {
+            Unknown1 = default;
+            FileSize = default;
+            Unknown3 = default;
+            Section2Offset = default;
+            StreetOffset = default;
+            RoadRuleOffset = default;
+            Section1Count = default;
+            RoadRuleCount = default;
+            StreetCount = default;
+            Unknown9 = default;
+            Unknown10 = default;
+            Unknown11 = default;
 
-			StreetSection1s.Clear();
-			StreetSection2s.Clear();
-			StreetInfos.Clear();
-			RoadRuleInfos.Clear();
-			StreetSection5s.Clear();
-		}
+            StreetSection1s.Clear();
+            StreetSection2s.Clear();
+            StreetInfos.Clear();
+            RoadRuleInfos.Clear();
+            StreetSection5s.Clear();
+        }
 
         public bool Read(BundleEntry entry, ILoader loader = null)
         {
-			Clear();
+            Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -392,17 +392,17 @@ namespace BaseHandlers
             entry.EntryBlocks[0].Data = data;
             entry.Dirty = true;
 
-			return true;
+            return true;
         }
 
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.StreetData;
-		}
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.StreetData;
+        }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			return null;
-		}
-	}
+        public IEntryEditor GetEditor(BundleEntry entry)
+        {
+            return null;
+        }
+    }
 }

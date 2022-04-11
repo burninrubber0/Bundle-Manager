@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace BundleUtilities
 {
-	public static class Config
-	{
-		public static bool LoadMaterials;
-	}
+    public static class Config
+    {
+        public static bool LoadMaterials;
+    }
 }

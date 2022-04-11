@@ -685,7 +685,7 @@ namespace BundleManager
             {
                 if (_entry.Console)
                     Image = GameImage.GetImagePS3(_entry.EntryBlocks[0].Data, _entry.EntryBlocks[1].Data);
-				else
+                else
                     Image = GameImage.GetImage(_entry.EntryBlocks[0].Data, _entry.EntryBlocks[1].Data);
 
                 ImageVisible = Image != null;
@@ -700,7 +700,7 @@ namespace BundleManager
 
             if (TabsVisible)
             {
-				DataHex = _entry.EntryBlocks[0].Data;//.AsString();
+                DataHex = _entry.EntryBlocks[0].Data;//.AsString();
                 ExtraDataHex = _entry.EntryBlocks[1].Data;//.AsString();
             }
 
@@ -770,11 +770,11 @@ namespace BundleManager
             ImageMenuVisible = false;
             BinaryMenuVisible = false;
 
-			ImageHeader header = GameImage.GetImageHeader(_entry.EntryBlocks[0].Data);
+            ImageHeader header = GameImage.GetImageHeader(_entry.EntryBlocks[0].Data);
 
             ImageInfo info = GameImage.SetImage(newImage, header.CompressionType);
 
-			Entry.EntryBlocks[0].Data = info.Header;
+            Entry.EntryBlocks[0].Data = info.Header;
             Entry.EntryBlocks[1].Data = info.Data;
 
             ImageVisible = false;

@@ -57,20 +57,20 @@ namespace BundleUtilities
         {
             StringBuilder sb = new StringBuilder();
 
-			try
-			{
-				while (true)
-				{
-					char c = (char)self.ReadByte();
-					if (c == '\0')
-						break;
-					sb.Append(c);
-				}
-			}
-			catch (EndOfStreamException)
-			{
-				// Ignore
-			}
+            try
+            {
+                while (true)
+                {
+                    char c = (char)self.ReadByte();
+                    if (c == '\0')
+                        break;
+                    sb.Append(c);
+                }
+            }
+            catch (EndOfStreamException)
+            {
+                // Ignore
+            }
 
             return sb.ToString();
         }

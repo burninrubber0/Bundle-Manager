@@ -104,15 +104,15 @@ namespace BundleFormat
             return false;
         }
 
-		public static void Align(this BinaryWriter self, byte alignment)
-		{
-			self.BaseStream.Position = alignment * ((self.BaseStream.Position + (alignment - 1)) / alignment);
-			self.BaseStream.Position--;
-			self.Write((byte)0);
+        public static void Align(this BinaryWriter self, byte alignment)
+        {
+            self.BaseStream.Position = alignment * ((self.BaseStream.Position + (alignment - 1)) / alignment);
+            self.BaseStream.Position--;
+            self.Write((byte)0);
 
-			/*long currentOffset = self.BaseStream.Position;
-			for (int i = 0; i < (alignment - (currentOffset % alignment)); i++)
-				self.Write((byte)0);*/
-		}
+            /*long currentOffset = self.BaseStream.Position;
+            for (int i = 0; i < (alignment - (currentOffset % alignment)); i++)
+                self.Write((byte)0);*/
+        }
     }
 }

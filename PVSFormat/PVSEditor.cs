@@ -10,11 +10,11 @@ namespace PVSFormat
     {
         private PVS _currentPVS;
 
-		public Image GameMap
-		{
-			get => pvsMain.GameMap;
-			set => pvsMain.GameMap = value;
-		}
+        public Image GameMap
+        {
+            get => pvsMain.GameMap;
+            set => pvsMain.GameMap = value;
+        }
 
         public PVSEditor()
         {
@@ -23,8 +23,8 @@ namespace PVSFormat
 
         public void UpdateDisplay()
         {
-			//dbgMain.SelectedObject = _currentPVS;
-			pvsMain.PVS = _currentPVS;
+            //dbgMain.SelectedObject = _currentPVS;
+            pvsMain.PVS = _currentPVS;
         }
 
         public void Open(PVS pvs)
@@ -34,9 +34,9 @@ namespace PVSFormat
             UpdateDisplay();
         }
 
-		private void DebugToolStripMenuItem_Click(object sender, System.EventArgs e)
-		{
-			DebugUtil.ShowDebug(_currentPVS);
-		}
-	}
+        private void DebugToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            DebugUtil.ShowDebug(_currentPVS);
+        }
+    }
 }

@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace PluginAPI
 {
-	public interface IEntryData
-	{
-		bool Read(BundleEntry entry, ILoader loader = null);
+    public interface IEntryData
+    {
+        bool Read(BundleEntry entry, ILoader loader = null);
 
-		bool Write(BundleEntry entry);
+        bool Write(BundleEntry entry);
 
-		EntryType GetEntryType(BundleEntry entry);
+        EntryType GetEntryType(BundleEntry entry);
 
-		IEntryEditor GetEditor(BundleEntry entry);
-	}
+        IEntryEditor GetEditor(BundleEntry entry);
+    }
 }

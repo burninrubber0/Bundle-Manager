@@ -58,7 +58,7 @@ namespace BaseHandlers
 
     public class InstanceList : IEntryData
     {
-		//private Scene _scene;
+        //private Scene _scene;
 
         public BundleEntry Entry;
 
@@ -74,21 +74,21 @@ namespace BaseHandlers
             Instances = new List<ModelInstance>();
         }
 
-		private void Clear()
-		{
-			//_scene = null;
+        private void Clear()
+        {
+            //_scene = null;
 
-			Entry = default;
-			Unknown1 = default;
-			Unknown2 = default;
-			Unknown3 = default;
+            Entry = default;
+            Unknown1 = default;
+            Unknown2 = default;
+            Unknown3 = default;
 
-			Instances.Clear();
-		}
+            Instances.Clear();
+        }
 
         public bool Read(BundleEntry entry, ILoader loader = null)
         {
-			Clear();
+            Clear();
 
             Entry = entry;
 
@@ -115,9 +115,9 @@ namespace BaseHandlers
             br.Close();
             ms.Close();
 
-			//_scene = MakeScene(loader);
+            //_scene = MakeScene(loader);
 
-			return true;
+            return true;
         }
 
         public bool Write(BundleEntry entry)
@@ -147,7 +147,7 @@ namespace BaseHandlers
             entry.EntryBlocks[0].Data = data;
             entry.Dirty = true;
 
-			return true;
+            return true;
         }
 
         public Scene MakeScene(ILoader loader = null)
@@ -169,10 +169,10 @@ namespace BaseHandlers
                 //DebugTimer t = DebugTimer.Start("ModelInstance[" + index + "/" + Instances.Count + "]");
                 index++;
 
-				if (!InRange(instance))
-					continue;
+                if (!InRange(instance))
+                    continue;
 
-				if (models.ContainsKey(instance.ModelEntryID))
+                if (models.ContainsKey(instance.ModelEntryID))
                 {
                     Renderable renderable = models[instance.ModelEntryID];
                     SceneObject sceneObject = new SceneObject(instance.ModelEntryID.ToString("X8"), renderable.Model);
@@ -183,7 +183,7 @@ namespace BaseHandlers
                 }
                 else
                 {
-					BundleEntry modelEntry = Entry.Archive.GetEntryByID(instance.ModelEntryID);
+                    BundleEntry modelEntry = Entry.Archive.GetEntryByID(instance.ModelEntryID);
                     if (modelEntry == null)
                     {
                         string file = BundleCache.GetFileByEntryID(instance.ModelEntryID);
@@ -197,8 +197,8 @@ namespace BaseHandlers
                     if (modelEntry != null)
                     {
                         BundleEntry renderableEntry = modelEntry.GetDependencies()[0].Entry;
-						Renderable renderable = new Renderable();
-						renderable.Read(renderableEntry, null); // TODO: Null Loader
+                        Renderable renderable = new Renderable();
+                        renderable.Read(renderableEntry, null); // TODO: Null Loader
                         models.Add(instance.ModelEntryID, renderable);
                         SceneObject sceneObject =
                             new SceneObject(instance.ModelEntryID.ToString("X8"), renderable.Model);
@@ -218,26 +218,26 @@ namespace BaseHandlers
             return scene;
         }
 
-		private bool InRange(ModelInstance instance)
-		{
-			return true;
-		}
+        private bool InRange(ModelInstance instance)
+        {
+            return true;
+        }
 
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.InstanceList;
-		}
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.InstanceList;
+        }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			InstanceListEditor editor = new InstanceListEditor();
-			editor.InstanceList = this;
-			editor.Changed += () =>
-			{
-				Write(entry);
-			};
+        public IEntryEditor GetEditor(BundleEntry entry)
+        {
+            InstanceListEditor editor = new InstanceListEditor();
+            editor.InstanceList = this;
+            editor.Changed += () =>
+            {
+                Write(entry);
+            };
 
-			return editor;
-		}
-	}
+            return editor;
+        }
+    }
 }

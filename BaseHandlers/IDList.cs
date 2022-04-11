@@ -25,30 +25,30 @@ namespace BaseHandlers
             
         }
 
-		public IEntryEditor GetEditor(BundleEntry entry)
-		{
-			return null;
-		}
-
-		public EntryType GetEntryType(BundleEntry entry)
-		{
-			return EntryType.EntryList;
-		}
-
-		private void Clear()
-		{
-			ReferenceEntryIDOffset = default;
-			Unknown2 = default;
-			Unknown3 = default;
-			Unknown4 = default;
-			ReferenceEntryID = default;
-			Unknown6 = default;
-			Unknown7 = default;
-		}
-
-		public bool Read(BundleEntry entry, ILoader loader = null)
+        public IEntryEditor GetEditor(BundleEntry entry)
         {
-			Clear();
+            return null;
+        }
+
+        public EntryType GetEntryType(BundleEntry entry)
+        {
+            return EntryType.EntryList;
+        }
+
+        private void Clear()
+        {
+            ReferenceEntryIDOffset = default;
+            Unknown2 = default;
+            Unknown3 = default;
+            Unknown4 = default;
+            ReferenceEntryID = default;
+            Unknown6 = default;
+            Unknown7 = default;
+        }
+
+        public bool Read(BundleEntry entry, ILoader loader = null)
+        {
+            Clear();
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
@@ -65,7 +65,7 @@ namespace BaseHandlers
             br.Close();
             ms.Close();
 
-			return true;
+            return true;
         }
 
         public bool Write(BundleEntry entry)
@@ -91,7 +91,7 @@ namespace BaseHandlers
             entry.EntryBlocks[0].Data = data;
             entry.Dirty = true;
 
-			return true;
+            return true;
         }
     }
 }

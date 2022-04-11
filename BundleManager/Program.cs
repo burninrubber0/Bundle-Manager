@@ -22,7 +22,7 @@ namespace BundleManager
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-			PluginLoader.LoadPlugins();
+            PluginLoader.LoadPlugins();
 
             fileModeForm = new MainForm();
             folderModeForm = new FileView();
@@ -56,15 +56,15 @@ namespace BundleManager
                     else
                     {
                         fileModeForm.Open(path);
-						if (args.Length >= 2)
-						{
-							string indexString = args[1];
-							if (int.TryParse(indexString, out int index))
-							{
-								fileModeForm.ForceOnlySpecificEntry = true;
-								fileModeForm.EditEntry(index);
-							}
-						}
+                        if (args.Length >= 2)
+                        {
+                            string indexString = args[1];
+                            if (int.TryParse(indexString, out int index))
+                            {
+                                fileModeForm.ForceOnlySpecificEntry = true;
+                                fileModeForm.EditEntry(index);
+                            }
+                        }
                         Application.Run(fileModeForm);
                     }
                 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -103,7 +103,6 @@ namespace BundleUtilities
         public static string ReadLenString(this BinaryReader self, int size)
         {
             string result = "";
-
             bool readNull = false;
             for (int i = 0; i < size; i++)
             {
@@ -142,6 +141,18 @@ namespace BundleUtilities
                 self.Write((byte)value[i]);
             }
             self.Write((byte) 0);
+        }
+        // Add padding: Has to be divisible by 16, else add padding
+        public static void WritePadding(this BinaryWriter self)
+        {
+            long currentLength = self.BaseStream.Length;
+            if (currentLength % 16 != 0)
+            {
+                for (int i = 0; i < 16 - currentLength % 16; i++)
+                {
+                    self.Write((byte)0);
+                }
+            };
         }
 
         /// <summary>

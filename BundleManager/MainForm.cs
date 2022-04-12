@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -400,7 +400,7 @@ namespace BundleManager
             }
         }
 
-        public void EditSelectedEntry(bool forceHex = false)
+        public void EditSelectedEntry(bool forceHex = false, bool forceDebug = false)
         {
             int count = lstEntries.SelectedIndices.Count;
             if (count <= 0)
@@ -410,10 +410,10 @@ namespace BundleManager
             if (!int.TryParse(lstEntries.SelectedItems[0].Text, out index))
                 return;
 
-            EditEntry(index, forceHex);
+            EditEntry(index, forceHex, forceDebug);
         }
 
-        public void EditEntry(int index, bool forceHex = false)
+        public void EditEntry(int index, bool forceHex = false, bool forceDebug = false)
         {
             BundleEntry entry = GetEntry(index);
 
@@ -442,7 +442,9 @@ namespace BundleManager
                         else
                         {
                             loader.Hide();
-
+                            if (forceDebug) {
+                                DebugUtil.ShowDebug(this, data);
+                            }
                             IEntryEditor editor = data.GetEditor(entry);
                             if (editor != null)
                                 editor.ShowDialog(this);
@@ -484,6 +486,10 @@ namespace BundleManager
             }
             else
             {
+                if (forceDebug)
+                {
+                    DebugUtil.ShowDebug(this);
+                }
                 EntryEditor editor = new EntryEditor();
                 editor.ForceHex = forceHex;
                 Task.Run(() => openEditor(editor, index));
@@ -552,6 +558,11 @@ namespace BundleManager
         private void viewDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
             EditSelectedEntry(true);
+        }
+
+        private void viewDebugMenuStripMenuItem_Click(object sender, EventArgs e)
+        {
+            EditSelectedEntry(false, true);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace BundleUtilities
 {
@@ -77,10 +77,5 @@ namespace BundleUtilities
             c -= a; c -= b; c ^= (b >> 22);
         }
 
-        public static ulong litteEndian(ulong value) {
-            byte[] bytes = BitConverter.GetBytes(value);
-            Array.Reverse(bytes);
-            return BitConverter.ToUInt64(bytes, 0);
-        }
     }
 }

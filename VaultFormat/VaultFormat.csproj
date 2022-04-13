@@ -33,6 +33,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,6 +45,13 @@
   <ItemGroup>
     <Compile Include="AttribSys.cs" />
     <Compile Include="AttribSysPlugin.cs" />
+    <Compile Include="AttribSysVaultForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AttribSysVaultForm.Designer.cs">
+      <DependentUpon>AttribSysVaultForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AttribSysVaultPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -54,10 +63,19 @@
       <Project>{34471573-f236-4a7c-abd9-c1fe4686b37e}</Project>
       <Name>BundleUtilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LangEditor\LangEditor.csproj">
+      <Project>{20e7a1c4-afcd-4b8a-8aef-06b0c27e72b7}</Project>
+      <Name>LangEditor</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PluginAPI\PluginAPI.csproj">
       <Project>{757F0204-F091-464D-AA42-FE8919FF73BB}</Project>
       <Name>PluginAPI</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AttribSysVaultForm.resx">
+      <DependentUpon>AttribSysVaultForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

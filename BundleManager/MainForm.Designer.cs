@@ -1,4 +1,4 @@
-﻿namespace BundleManager
+namespace BundleManager
 {
     partial class MainForm
     {
@@ -62,6 +62,7 @@
             this.previewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.viewDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewDebugMenuStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pluginToolsSeparatorItem = new System.Windows.Forms.ToolStripSeparator();
             this.mnuMain.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -306,7 +307,7 @@
             this.mnuLst.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.previewToolStripMenuItem,
             this.toolStripMenuItem4,
-            this.viewDataToolStripMenuItem});
+            this.viewDataToolStripMenuItem, this.viewDebugMenuStripMenuItem});
             this.mnuLst.Name = "mnuLst";
             this.mnuLst.Size = new System.Drawing.Size(141, 54);
             // 
@@ -329,6 +330,14 @@
             this.viewDataToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.viewDataToolStripMenuItem.Text = "View Header";
             this.viewDataToolStripMenuItem.Click += new System.EventHandler(this.viewDataToolStripMenuItem_Click);
+            // 
+            // viewDebugMenuStripMenuItem
+            // 
+            this.viewDebugMenuStripMenuItem.Name = "viewDebugMenuStripMenuItem";
+            this.viewDebugMenuStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.viewDebugMenuStripMenuItem.Text = "View Debug Menu";
+            this.viewDebugMenuStripMenuItem.Click += new System.EventHandler(this.viewDebugMenuStripMenuItem_Click);
+
             // 
             // pluginToolsSeparatorItem
             // 
@@ -383,7 +392,8 @@
         private System.Windows.Forms.ToolStripMenuItem previewToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader colType;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
-        private System.Windows.Forms.ToolStripMenuItem viewDataToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem viewDataToolStripMenuItem;        
+        private System.Windows.Forms.ToolStripMenuItem viewDebugMenuStripMenuItem;
         private System.Windows.Forms.ColumnHeader colID;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripButton tsbSwitchMode;

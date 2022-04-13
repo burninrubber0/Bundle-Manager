@@ -486,10 +486,6 @@ namespace BundleManager
             }
             else
             {
-                if (forceDebug)
-                {
-                    DebugUtil.ShowDebug(this);
-                }
                 EntryEditor editor = new EntryEditor();
                 editor.ForceHex = forceHex;
                 Task.Run(() => openEditor(editor, index));

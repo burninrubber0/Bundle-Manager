@@ -16,7 +16,7 @@ namespace BundleUtilities
             byte[] message = Encoding.ASCII.GetBytes(text);
             var hashValue = Lookup8.Hash(message, (ulong)message.Length, 0xABCDEF0011223344);
 
-            return Lookup8.litteEndian(hashValue);
+            return hashValue;
         }
 
 

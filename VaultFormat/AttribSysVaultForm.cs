@@ -46,8 +46,8 @@ namespace VaultFormat
 
                 string[] value = {
                     chunk.ClassName,
-                    chunk.ClassHash.ToString("X8"),
-                    chunk.CollectionHash.ToString("X8"),
+                    chunk.ClassHash.ToString("X16"),
+                    chunk.CollectionHash.ToString("X16"),
                 };
                 lstDataChunks.Items.Add(new ListViewItem(value));
             }
@@ -110,11 +110,6 @@ namespace VaultFormat
             {
                 this.Direction = !this.Direction;
             }
-        }
-
-        private void lstVehicles_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void changeCollectionHashToolStripMenuItem_Click(object sender, EventArgs e)

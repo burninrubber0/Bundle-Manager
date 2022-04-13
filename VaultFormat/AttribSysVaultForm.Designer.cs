@@ -120,7 +120,6 @@ namespace VaultFormat
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "AttribSysVaultForm";
             this.Text = "AttribSysVault Editor";
-            this.Load += new System.EventHandler(this.AttribSysVaultForm_Load);
             this.menu.ResumeLayout(false);
             this.menu.PerformLayout();
             this.contextMenu.ResumeLayout(false);

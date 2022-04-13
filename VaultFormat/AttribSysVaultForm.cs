@@ -56,10 +56,6 @@ namespace VaultFormat
             lstDataChunks.Sort();
         }
 
-        private void AttribSysVaultForm_Load(object sender, EventArgs e)
-        {
-
-        }
         private class AttribSysVaultSorter : IComparer
         {
             public readonly int Column;

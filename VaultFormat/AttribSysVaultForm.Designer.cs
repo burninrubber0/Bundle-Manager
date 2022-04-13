@@ -78,7 +78,6 @@ namespace VaultFormat
             this.lstDataChunks.TabIndex = 4;
             this.lstDataChunks.UseCompatibleStateImageBehavior = false;
             this.lstDataChunks.View = System.Windows.Forms.View.Details;
-            this.lstDataChunks.SelectedIndexChanged += new System.EventHandler(this.lstVehicles_SelectedIndexChanged);
             // 
             // colClassName
             // 

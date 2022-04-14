@@ -44,6 +44,7 @@ namespace VaultFormat
             // 
             // menu
             // 
+            this.menu.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.menu.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem1});
@@ -78,6 +79,7 @@ namespace VaultFormat
             this.lstDataChunks.TabIndex = 4;
             this.lstDataChunks.UseCompatibleStateImageBehavior = false;
             this.lstDataChunks.View = System.Windows.Forms.View.Details;
+            this.lstDataChunks.SelectedIndexChanged += new System.EventHandler(this.lstDataChunks_SelectedIndexChanged);
             // 
             // colClassName
             // 
@@ -100,7 +102,7 @@ namespace VaultFormat
             this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.changeCollectionHashToolStripMenuItem});
             this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(268, 69);
+            this.contextMenu.Size = new System.Drawing.Size(268, 36);
             // 
             // changeCollectionHashToolStripMenuItem
             // 

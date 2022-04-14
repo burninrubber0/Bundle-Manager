@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -128,7 +128,7 @@ namespace WorldCollisionHandler
 
     public class PolygonSoupChunk
     {
-        public Vector3I Position;
+        public MathLib.Vector3I Position;
         public float Scale;
         public byte QuadCount;
         public byte Unknown10;
@@ -218,7 +218,7 @@ namespace WorldCollisionHandler
 
         }
 
-        public Mesh BuildMesh(Vector3I pos, float scale)
+        public Mesh BuildMesh(MathLib.Vector3I pos, float scale)
         {
             Mesh mesh = new Mesh();
             mesh.Faces = new List<MeshFace>();
@@ -324,7 +324,7 @@ namespace WorldCollisionHandler
             {
                 string id = index.ToString();
 
-                Vector3I pos = chunk.Position;
+                MathLib.Vector3I pos = chunk.Position;
                 float scale = chunk.Scale;
                 Model model = new Model(chunk.BuildMesh(pos, scale));
                 SceneObject sceneObject = new SceneObject(id, model);
@@ -475,7 +475,7 @@ namespace WorldCollisionHandler
                 chunk.Scale = scale;
 
                 // Set the position and apply scale
-                chunk.Position = new Vector3I(position / scale);
+                chunk.Position = new MathLib.Vector3I(position / scale);
 
                 // Add the chunk
                 Chunks.Add(chunk);

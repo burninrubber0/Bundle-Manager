@@ -52,7 +52,10 @@
       <DependentUpon>AttribSysVaultForm.cs</DependentUpon>
     </Compile>
     <Compile Include="AttribSysVaultPlugin.cs" />
+    <Compile Include="IAttribute.cs" />
+    <Compile Include="Physicsvehicleengineattribs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnimplementedAttribs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BundleFormat\BundleFormat.csproj">

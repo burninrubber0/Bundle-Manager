@@ -55,24 +55,23 @@ namespace BundleUtilities
 
         public static string ReadCStr(this BinaryReader self)
         {
-            StringBuilder sb = new StringBuilder();
+            List<byte> bytes = new List<byte>();
 
             try
             {
                 while (true)
                 {
-                    char c = (char)self.ReadByte();
+                    byte c = self.ReadByte();
                     if (c == '\0')
                         break;
-                    sb.Append(c);
+                    bytes.Add(c);
                 }
             }
             catch (EndOfStreamException)
             {
                 // Ignore
             }
-
-            return sb.ToString();
+            return Encoding.UTF8.GetString(bytes.ToArray());
         }
 
         public static byte[] Flip(this byte[] self)
@@ -136,12 +135,14 @@ namespace BundleUtilities
 
         public static void WriteCStr(this BinaryWriter self, string value)
         {
-            for (int i = 0; i < value.Length; i++)
+            byte[] bytes = Encoding.UTF8.GetBytes(value);
+            for (int i = 0; i < bytes.Length; i++)
             {
-                self.Write((byte)value[i]);
+                self.Write(bytes[i]);
             }
             self.Write((byte) 0);
         }
+
         // Add padding: Has to be divisible by 16, else add padding
         public static void WritePadding(this BinaryWriter self)
         {

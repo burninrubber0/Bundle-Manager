@@ -33,7 +33,7 @@ namespace VaultFormat
         public DataItem[] Items;
 
 
-        public void SetClassName()
+        public IAttribute GetAttributeEntity(SizeAndPositionInformation chunk, AttributeHeader dataChunk)
         {
             if (ClassHash == 0x2e3b1dc7d248445e)
                 this.ClassName = "physicsvehiclebodyrollattribs";
@@ -44,10 +44,12 @@ namespace VaultFormat
             if (ClassHash == 0xF850281CA54C9B92)
             {
                 this.ClassName = "physicsvehicleengineattribs";
+                return new Physicsvehicleengineattribs(chunk, dataChunk);
             }
             if (ClassHash == 0x3F9370FCF8D767AC)
             {
                 this.ClassName = "physicsvehicledriftattribs";
+                return new Physicsvehicledriftattribs(chunk, dataChunk);
             }
             if (ClassHash == 0xDF956BC0568F138C)
             {
@@ -89,6 +91,7 @@ namespace VaultFormat
             {
                 this.ClassName = "vehicleengine";
             }
+            return new UnimplementedAttribs(chunk, dataChunk);
         }
     }
 
@@ -186,7 +189,6 @@ namespace VaultFormat
                             AttributeHeader dataChunk = new AttributeHeader();
                             dataChunk.CollectionHash = br.ReadUInt64();
                             dataChunk.ClassHash = br.ReadUInt64();
-                            dataChunk.SetClassName();
                             dataChunk.Unknown1 = br.ReadBytes(8);
                             dataChunk.ItemCount = br.ReadInt32();
                             dataChunk.Unknown2 = br.ReadInt32();
@@ -209,15 +211,9 @@ namespace VaultFormat
                                 item.Unknown2 = br.ReadInt16();
                                 dataChunk.Items[j] = item;
                             }
-                            // To-Do: There should be a way to make this more generic
-                            if (dataChunk.ClassName == "physicsvehicleengineattribs")
-                            {
-                                Attributes.Add(new Physicsvehicleengineattribs(chunk, dataChunk));
-                            }
-                            else
-                            {
-                                Attributes.Add(new UnimplementedAttribs(chunk, dataChunk));
-                            }
+                            Attributes.Add(dataChunk.GetAttributeEntity(chunk, dataChunk));
+
+                            
                         }
                         else
                         {
@@ -273,7 +269,8 @@ namespace VaultFormat
 
                 int dataSize = (int)(br.BaseStream.Length - br.BaseStream.Position);
                 Console.WriteLine(dataSize);
-                foreach(IAttribute attribute in Attributes) {
+                foreach (IAttribute attribute in Attributes)
+                {
                     attribute.Read(loader, br);
                 }
                 Console.WriteLine(Attributes.Sum(attribute => attribute.getDataSize()));
@@ -402,7 +399,7 @@ namespace VaultFormat
             List<byte[]> bytes = new List<byte[]>();
             bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("ExpN")));
             bytes.Add(BitConverter.GetBytes(16));
-            bytes.Add(BitConverter.GetBytes((UInt64) Attributes.Select(x => x.getInfo()).Count()));
+            bytes.Add(BitConverter.GetBytes((UInt64)Attributes.Select(x => x.getInfo()).Count()));
             foreach (SizeAndPositionInformation chunk in Attributes.Select(x => x.getInfo()))
             {
                 bytes.Add(BitConverter.GetBytes(chunk.Hash));

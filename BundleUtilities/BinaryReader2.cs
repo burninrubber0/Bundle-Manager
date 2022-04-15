@@ -135,6 +135,16 @@ namespace BundleUtilities
             return BitConverter.ToDouble(data, 0);
         }
 
+        public void SkipPadding()
+        {
+            long currentLength = base.BaseStream.Position;
+            if (currentLength % 16 != 0)
+            {
+                base.BaseStream.Position = base.BaseStream.Position + currentLength % 16;
+            };
+        }
+
+
         public Vector3I ReadVector3I()
         {
             float x = base.ReadSingle();

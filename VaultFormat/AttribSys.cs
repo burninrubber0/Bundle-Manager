@@ -17,6 +17,7 @@ namespace VaultFormat
         public int DataChunkPosition;
     }
 
+
     public class AttributeHeader
     {
         public string ClassName;
@@ -59,6 +60,7 @@ namespace VaultFormat
             if (ClassHash == 0x4297B5841F5231CF)
             {
                 this.ClassName = "physicsvehiclesuspensionattribs";
+                return new Physicsvehiclesuspensionattribs(chunk, dataChunk);
             }
             if (ClassHash == 0x43462C59212A23CC)
             {
@@ -214,7 +216,7 @@ namespace VaultFormat
                             }
                             Attributes.Add(dataChunk.GetAttributeEntity(chunk, dataChunk));
 
-                            
+
                         }
                         else
                         {

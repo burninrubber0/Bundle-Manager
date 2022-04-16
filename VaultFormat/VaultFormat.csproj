@@ -53,6 +53,7 @@
     </Compile>
     <Compile Include="AttribSysVaultPlugin.cs" />
     <Compile Include="IAttribute.cs" />
+    <Compile Include="Physicsvehiclecollisionattribs.cs" />
     <Compile Include="Physicsvehicledriftattribs.cs" />
     <Compile Include="Physicsvehicleengineattribs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

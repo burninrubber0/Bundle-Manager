@@ -142,13 +142,14 @@ namespace BundleUtilities
             }
             self.Write((byte) 0);
         }
+
         // Add padding: Has to be divisible by 16, else add padding
         public static void WritePadding(this BinaryWriter self)
         {
             long currentLength = self.BaseStream.Length;
             if (currentLength % 16 != 0)
             {
-                for (int i = 0; i < 16 - currentLength % 16; i++)
+                for (int i = 0; i < (16 - currentLength % 16); i++)
                 {
                     self.Write((byte)0);
                 }

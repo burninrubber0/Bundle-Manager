@@ -57,19 +57,7 @@ namespace VaultFormat
             bytes.Add(BitConverter.GetBytes(EngineLowEndTorqueFactor));
             bytes.Add(BitConverter.GetBytes(EngineBraking));
             bytes.Add(BitConverter.GetBytes(Differential));
-            Console.WriteLine(bytes.SelectMany(i => i).Count());
-            return addPadding(bytes);
-        }
-        private int addPadding(List<byte[]> bytes)
-        {
-            if (bytes.SelectMany(i => i).Count() % 16 == 0)
-            {
-                return bytes.SelectMany(i => i).Count();
-            }
-            else
-            {
-                return ((bytes.SelectMany(i => i).Count() / 16) * 16) + 16;
-            }
+            return CountingUtilities.AddPadding(bytes);
         }
 
         public void Write(BinaryWriter wr)

@@ -92,19 +92,7 @@ namespace VaultFormat
             bytes.Add(BitConverter.GetBytes(BrakingDriftScaleFactor));
             bytes.Add(BitConverter.GetBytes(BaseCounterSteeringDriftScaleFactor));
             Console.WriteLine(bytes.SelectMany(i => i).Count());
-            return addPadding(bytes);
-        }
-
-        private int addPadding(List<byte[]> bytes)
-        {
-            if (bytes.SelectMany(i => i).Count() % 16 == 0)
-            {
-                return bytes.SelectMany(i => i).Count();
-            }
-            else
-            {
-                return ((bytes.SelectMany(i => i).Count() / 16) * 16) + 16;
-            }
+            return CountingUtilities.AddPadding(bytes);
         }
 
         public AttributeHeader getHeader()

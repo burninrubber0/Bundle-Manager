@@ -6,6 +6,7 @@ using BundleUtilities;
 
 namespace VaultFormat
 {
+    // To-Do: This is class is weird, because it's not divisible by 16 but has no padding...
     public class Physicsvehiclesuspensionattribs : IAttribute
     {
         public AttributeHeader header;
@@ -47,20 +48,7 @@ namespace VaultFormat
             bytes.Add(BitConverter.GetBytes(FrontHeight));
             bytes.Add(BitConverter.GetBytes(DownwardMovement));
             bytes.Add(BitConverter.GetBytes(Dampening));
-            Console.WriteLine(bytes.SelectMany(i => i).Count());
-            return addPadding(bytes);
-        }
-
-        private int addPadding(List<byte[]> bytes)
-        {
-            if (bytes.SelectMany(i => i).Count() % 16 == 0)
-            {
-                return bytes.SelectMany(i => i).Count();
-            }
-            else
-            {
-                return ((bytes.SelectMany(i => i).Count() / 16) * 16) + 16;
-            }
+            return bytes.Count;
         }
 
 

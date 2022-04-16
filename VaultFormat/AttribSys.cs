@@ -9,6 +9,20 @@ using PluginAPI;
 
 namespace VaultFormat
 {
+    public class CountingUtilities {
+        public static int AddPadding(List<byte[]> bytes)
+        {
+            if (bytes.SelectMany(i => i).Count() % 16 == 0)
+            {
+                return bytes.SelectMany(i => i).Count();
+            }
+            else
+            {
+                return bytes.SelectMany(i => i).Count() + (16 - (bytes.SelectMany(i => i).Count() % 16));
+            }
+        }
+    }
+
     public class SizeAndPositionInformation
     {
         public ulong Hash;
@@ -65,6 +79,7 @@ namespace VaultFormat
             if (ClassHash == 0x43462C59212A23CC)
             {
                 this.ClassName = "physicsvehiclesteeringattribs";
+                return new Physicsvehiclesteeringattribs(chunk, dataChunk);
             }
             if (ClassHash == 0xE9EDA3B8C4EA3C84)
             {
@@ -587,7 +602,7 @@ namespace VaultFormat
 
             bw.Write(vltPos); //vltPos:
             bw.Write(vltSize); //vltSize
-            bw.Write(vltSize + vltPos);//bw.Write(binPos);
+            bw.Write(vltSize + vltPos);//binPos;
             bw.Write(Attributes.Sum(attribute => attribute.getDataSize()) + Data.Length + getSizeOfStrE()); // binSize
 
             WriteVlt(bw);

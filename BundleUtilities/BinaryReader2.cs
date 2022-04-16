@@ -140,7 +140,7 @@ namespace BundleUtilities
             long currentLength = base.BaseStream.Position;
             if (currentLength % 16 != 0)
             {
-                base.BaseStream.Position = base.BaseStream.Position + currentLength % 16;
+                base.BaseStream.Position = base.BaseStream.Position + ( 16 - currentLength % 16);
             };
         }
 

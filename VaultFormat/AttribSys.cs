@@ -230,8 +230,6 @@ namespace VaultFormat
                                 dataChunk.Items[j] = item;
                             }
                             Attributes.Add(dataChunk.GetAttributeEntity(chunk, dataChunk));
-
-
                         }
                         else
                         {

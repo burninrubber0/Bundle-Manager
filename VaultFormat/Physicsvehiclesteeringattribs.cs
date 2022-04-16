@@ -10,7 +10,6 @@ namespace VaultFormat
     {
         public AttributeHeader header { get; set; }
         public SizeAndPositionInformation info { get; set; }
-
         public float TimeForLock { get; set; }
         public float StraightReactionBias { get; set; }
         public float SpeedForMinAngle { get; set; }
@@ -31,6 +30,7 @@ namespace VaultFormat
             info = chunk;
         }
 
+
         public int getDataSize()
         {
             List<byte[]> bytes = new List<byte[]>();
@@ -48,6 +48,8 @@ namespace VaultFormat
             bytes.Add(BitConverter.GetBytes(AiPidCoefficientD));
             bytes.Add(BitConverter.GetBytes(AiMinLookAheadDistanceForDrift));
             bytes.Add(BitConverter.GetBytes(AiLookAheadTimeForDrift));
+            // Hack, because of weird padding of suspension attribs
+            bytes.AddRange(Physicsvehiclesuspensionattribs.getDefaultBytes());
             Console.WriteLine(bytes.SelectMany(i => i).Count());
             return CountingUtilities.AddPadding(bytes);
         }

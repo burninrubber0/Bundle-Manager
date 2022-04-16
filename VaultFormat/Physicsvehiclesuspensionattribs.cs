@@ -31,9 +31,30 @@ namespace VaultFormat
             this.info = chunk;
             this.header = dataChunk;
         }
+        // Hack, because of weird padding of suspension attribs
+        public static byte[][] getDefaultBytes() {
+            float value = 0;
+            List<byte[]> bytes = new List<byte[]>();
+            bytes.Add(BitConverter.GetBytes(value)); // UpwardMovement
+            bytes.Add(BitConverter.GetBytes(0)); // TimeToDampAfterLanding
+            bytes.Add(BitConverter.GetBytes(0)); // Strength
+            bytes.Add(BitConverter.GetBytes(0)); // etc
+            bytes.Add(BitConverter.GetBytes(0));
+            bytes.Add(BitConverter.GetBytes(0));
+            bytes.Add(BitConverter.GetBytes(0));
+            bytes.Add(BitConverter.GetBytes(0));
+            bytes.Add(BitConverter.GetBytes(0));
+            bytes.Add(BitConverter.GetBytes(0));
+            bytes.Add(BitConverter.GetBytes(0));
+            bytes.Add(BitConverter.GetBytes(0));
+            bytes.Add(BitConverter.GetBytes(0));
+            return bytes.ToArray();
+        }
 
         public int getDataSize()
         {
+            // Hack, because of weird padding of suspension attribs
+            /**
             List<byte[]> bytes = new List<byte[]>();
             bytes.Add(BitConverter.GetBytes(UpwardMovement));
             bytes.Add(BitConverter.GetBytes(TimeToDampAfterLanding));
@@ -48,7 +69,9 @@ namespace VaultFormat
             bytes.Add(BitConverter.GetBytes(FrontHeight));
             bytes.Add(BitConverter.GetBytes(DownwardMovement));
             bytes.Add(BitConverter.GetBytes(Dampening));
-            return bytes.Count;
+            return bytes.SelectMany(i => i).Count();
+            **/
+            return 0;
         }
 
 

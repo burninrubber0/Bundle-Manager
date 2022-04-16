@@ -9,8 +9,10 @@ namespace BundleUtilities
 {
     public class Vector3I
     {
-        public float X, Y, Z, S;
-
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
+        public float S { get; set; }
         public Vector3I(float x, float y, float z, float s)
         {
             X = x;
@@ -140,7 +142,7 @@ namespace BundleUtilities
             long currentLength = base.BaseStream.Position;
             if (currentLength % 16 != 0)
             {
-                base.BaseStream.Position = base.BaseStream.Position + ( 16 - currentLength % 16);
+                base.BaseStream.Position = base.BaseStream.Position + (16 - currentLength % 16);
             };
         }
 

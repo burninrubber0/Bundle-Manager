@@ -8,27 +8,27 @@ namespace VaultFormat
 {
     public class Physicsvehicleengineattribs : IAttribute
     {
-        public AttributeHeader header;
-        public SizeAndPositionInformation info;
+        public AttributeHeader header { get; set; }
+        public SizeAndPositionInformation info { get; set; }
 
-        public Vector3I TorqueScales2;
-        public Vector3I TorqueScales1;
-        public Vector3I GearUpRPMs2;
-        public Vector3I GearUpRPMs1;
-        public Vector3I GearRatios2;
-        public Vector3I GearRatios1;
-        public float TransmissionEfficiency;
-        public float TorqueFallOffRPM;
-        public float MaxTorque;
-        public float MaxRPM;
-        public float LSDMGearUpSpeed;
-        public float GearChangeTime;
-        public float FlyWheelInertia;
-        public float FlyWheelFriction;
-        public float EngineResistance;
-        public float EngineLowEndTorqueFactor;
-        public float EngineBraking;
-        public float Differential;
+        public Vector3I TorqueScales2 { get; set; }
+        public Vector3I TorqueScales1 { get; set; }
+        public Vector3I GearUpRPMs2 { get; set; }
+        public Vector3I GearUpRPMs1 { get; set; }
+        public Vector3I GearRatios2 { get; set; }
+        public Vector3I GearRatios1 { get; set; }
+        public float TransmissionEfficiency { get; set; }
+        public float TorqueFallOffRPM { get; set; }
+        public float MaxTorque { get; set; }
+        public float MaxRPM { get; set; }
+        public float LSDMGearUpSpeed { get; set; }
+        public float GearChangeTime { get; set; }
+        public float FlyWheelInertia { get; set; }
+        public float FlyWheelFriction { get; set; }
+        public float EngineResistance { get; set; }
+        public float EngineLowEndTorqueFactor { get; set; }
+        public float EngineBraking { get; set; }
+        public float Differential { get; set; }
 
         public Physicsvehicleengineattribs(SizeAndPositionInformation chunk, AttributeHeader dataChunk)
         {

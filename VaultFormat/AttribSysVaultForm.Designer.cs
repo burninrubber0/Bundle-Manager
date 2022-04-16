@@ -38,6 +38,7 @@ namespace VaultFormat
             this.colCollectionHash = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.changeCollectionHashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.propertyGrid2 = new System.Windows.Forms.PropertyGrid();
             this.menu.SuspendLayout();
             this.contextMenu.SuspendLayout();
             this.SuspendLayout();
@@ -50,8 +51,8 @@ namespace VaultFormat
             this.toolStripMenuItem1});
             this.menu.Location = new System.Drawing.Point(0, 0);
             this.menu.Name = "menu";
-            this.menu.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
-            this.menu.Size = new System.Drawing.Size(1313, 33);
+            this.menu.Padding = new System.Windows.Forms.Padding(3, 1, 0, 1);
+            this.menu.Size = new System.Drawing.Size(875, 31);
             this.menu.TabIndex = 1;
             this.menu.Text = "menuStrip1";
             // 
@@ -68,18 +69,17 @@ namespace VaultFormat
             this.colClassHash,
             this.colCollectionHash});
             this.lstDataChunks.ContextMenuStrip = this.contextMenu;
-            this.lstDataChunks.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lstDataChunks.Dock = System.Windows.Forms.DockStyle.Top;
             this.lstDataChunks.FullRowSelect = true;
             this.lstDataChunks.GridLines = true;
             this.lstDataChunks.HideSelection = false;
-            this.lstDataChunks.Location = new System.Drawing.Point(0, 33);
-            this.lstDataChunks.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.lstDataChunks.Location = new System.Drawing.Point(0, 31);
             this.lstDataChunks.Name = "lstDataChunks";
-            this.lstDataChunks.Size = new System.Drawing.Size(1313, 494);
+            this.lstDataChunks.Size = new System.Drawing.Size(875, 197);
             this.lstDataChunks.TabIndex = 4;
             this.lstDataChunks.UseCompatibleStateImageBehavior = false;
             this.lstDataChunks.View = System.Windows.Forms.View.Details;
-            this.lstDataChunks.SelectedIndexChanged += new System.EventHandler(this.lstDataChunks_SelectedIndexChanged);
+            this.lstDataChunks.DoubleClick += new System.EventHandler(this.lstDataChunks_DoubleClick);
             // 
             // colClassName
             // 
@@ -111,15 +111,24 @@ namespace VaultFormat
             this.changeCollectionHashToolStripMenuItem.Text = "Change CollectionHash";
             this.changeCollectionHashToolStripMenuItem.Click += new System.EventHandler(this.changeCollectionHashToolStripMenuItem_Click);
             // 
+            // propertyGrid2
+            // 
+            this.propertyGrid2.Location = new System.Drawing.Point(0, 225);
+            this.propertyGrid2.Name = "propertyGrid2";
+            this.propertyGrid2.Size = new System.Drawing.Size(875, 489);
+            this.propertyGrid2.TabIndex = 6;
+            this.propertyGrid2.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid2_PropertyValueChanged);
+            // 
             // AttribSysVaultForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1313, 527);
+            this.ClientSize = new System.Drawing.Size(875, 713);
+            this.Controls.Add(this.propertyGrid2);
             this.Controls.Add(this.lstDataChunks);
             this.Controls.Add(this.menu);
             this.MainMenuStrip = this.menu;
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.Name = "AttribSysVaultForm";
             this.Text = "AttribSysVault Editor";
             this.menu.ResumeLayout(false);
@@ -139,6 +148,7 @@ namespace VaultFormat
         private System.Windows.Forms.ColumnHeader colCollectionHash;
         private System.Windows.Forms.ContextMenuStrip contextMenu;
         private System.Windows.Forms.ToolStripMenuItem changeCollectionHashToolStripMenuItem;
+        private System.Windows.Forms.PropertyGrid propertyGrid2;
     }
 }
 

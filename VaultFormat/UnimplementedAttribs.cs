@@ -5,9 +5,9 @@ namespace VaultFormat
 {
     public class UnimplementedAttribs : IAttribute
     {
-        public AttributeHeader header;
-        public SizeAndPositionInformation info;
-        public byte[] data;
+        public AttributeHeader header { get; set; }
+        public SizeAndPositionInformation info { get; set; }
+        public byte[] data { get; set; }
 
         public UnimplementedAttribs(SizeAndPositionInformation chunk, AttributeHeader dataChunk)
         {

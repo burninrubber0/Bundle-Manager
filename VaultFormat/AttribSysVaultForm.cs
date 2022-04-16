@@ -115,16 +115,23 @@ namespace VaultFormat
                 return;
             ulong result = Utilities.calcLookup8(value);
             int index = AttribSys.Attributes.FindIndex(i => i.getHeader().ClassName == lstDataChunks.SelectedItems[0].Text);
-            //To-Do: This will probably not work!
             AttribSys.Attributes[index].getHeader().CollectionHash = result;
             MessageBox.Show(this, "The lookup 8 hashed value is: " + result.ToString("X16"), "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             EditEvent?.Invoke();
             UpdateDisplay();
         }
 
-        private void lstDataChunks_SelectedIndexChanged(object sender, EventArgs e)
+        private void lstDataChunks_DoubleClick(object sender, EventArgs e)
         {
+            Console.WriteLine(lstDataChunks.SelectedItems[0].Text);
+            int index = AttribSys.Attributes.FindIndex(i => i.getHeader().ClassName == lstDataChunks.SelectedItems[0].Text);
+            propertyGrid2.SelectedObject = AttribSys.Attributes[index];
+        }
 
+        private void propertyGrid2_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            EditEvent?.Invoke();
+            UpdateDisplay();
         }
     }
 

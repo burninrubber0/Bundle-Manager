@@ -6,11 +6,12 @@ using BundleUtilities;
 
 namespace VaultFormat
 {
-    public class Physicsvehiclecollisionattribs : IAttribute {
-        public AttributeHeader header;
-        public SizeAndPositionInformation info;
+    public class Physicsvehiclecollisionattribs : IAttribute
+    {
+        public AttributeHeader header { get; set; }
+        public SizeAndPositionInformation info { get; set; }
 
-        public Vector3I BodyBox;
+        public Vector3I BodyBox { get; set; }
         public Physicsvehiclecollisionattribs(SizeAndPositionInformation chunk, AttributeHeader dataChunk)
         {
             header = dataChunk;
@@ -23,7 +24,7 @@ namespace VaultFormat
             bytes.Add(BodyBox.toBytes());
             Console.WriteLine(bytes.SelectMany(i => i).Count());
             return CountingUtilities.AddPadding(bytes);
-        } 
+        }
 
         public AttributeHeader getHeader()
         {

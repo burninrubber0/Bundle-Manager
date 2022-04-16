@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,23 +8,23 @@ namespace VaultFormat
 {
     public class Physicsvehiclesteeringattribs : IAttribute
     {
-        public AttributeHeader header;
-        public SizeAndPositionInformation info;
+        public AttributeHeader header { get; set; }
+        public SizeAndPositionInformation info { get; set; }
 
-        public float TimeForLock;
-        public float StraightReactionBias;
-        public float SpeedForMinAngle;
-        public float SpeedForMaxAngle;
-        public float MinAngle;
-        public float MaxAngle;
-        public float AiPidCoefficientP;
-        public float AiPidCoefficientI;
-        public float AiPidCoefficientDriftP;
-        public float AiPidCoefficientDriftI;
-        public float AiPidCoefficientDriftD;
-        public float AiPidCoefficientD;
-        public float AiMinLookAheadDistanceForDrift;
-        public float AiLookAheadTimeForDrift;
+        public float TimeForLock { get; set; }
+        public float StraightReactionBias { get; set; }
+        public float SpeedForMinAngle { get; set; }
+        public float SpeedForMaxAngle { get; set; }
+        public float MinAngle { get; set; }
+        public float MaxAngle { get; set; }
+        public float AiPidCoefficientP { get; set; }
+        public float AiPidCoefficientI { get; set; }
+        public float AiPidCoefficientDriftP { get; set; }
+        public float AiPidCoefficientDriftI { get; set; }
+        public float AiPidCoefficientDriftD { get; set; }
+        public float AiPidCoefficientD { get; set; }
+        public float AiMinLookAheadDistanceForDrift { get; set; }
+        public float AiLookAheadTimeForDrift { get; set; }
         public Physicsvehiclesteeringattribs(SizeAndPositionInformation chunk, AttributeHeader dataChunk)
         {
             header = dataChunk;

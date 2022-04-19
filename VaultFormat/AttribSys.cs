@@ -9,7 +9,8 @@ using PluginAPI;
 
 namespace VaultFormat
 {
-    public class CountingUtilities {
+    public class CountingUtilities
+    {
         public static int AddPadding(List<byte[]> bytes)
         {
             if (bytes.SelectMany(i => i).Count() % 16 == 0)
@@ -30,7 +31,6 @@ namespace VaultFormat
         public int DataChunkSize;
         public int DataChunkPosition;
     }
-
 
     public class AttributeHeader
     {
@@ -104,6 +104,7 @@ namespace VaultFormat
             if (ClassHash == 0x966121397B502EED)
             {
                 this.ClassName = "physicsvehiclehandling";
+                return new Physicsvehiclehandling(chunk, dataChunk);
             }
             if (ClassHash == 0x7F161D94482CB3BF)
             {

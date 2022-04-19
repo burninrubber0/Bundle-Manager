@@ -56,9 +56,11 @@
     <Compile Include="Physicsvehiclecollisionattribs.cs" />
     <Compile Include="Physicsvehicledriftattribs.cs" />
     <Compile Include="Physicsvehicleengineattribs.cs" />
+    <Compile Include="Physicsvehiclehandling.cs" />
     <Compile Include="Physicsvehiclesteeringattribs.cs" />
     <Compile Include="Physicsvehiclesuspensionattribs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RefSpec.cs" />
     <Compile Include="UnimplementedAttribs.cs" />
   </ItemGroup>
   <ItemGroup>

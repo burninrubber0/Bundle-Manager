@@ -137,6 +137,10 @@ namespace BundleUtilities
             return BitConverter.ToDouble(data, 0);
         }
 
+        public void SkipUniquePadding(int numberOfBytes) {
+            base.BaseStream.Position = base.BaseStream.Position + numberOfBytes;
+        }
+
         public void SkipPadding()
         {
             long currentLength = base.BaseStream.Position;

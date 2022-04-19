@@ -12,7 +12,8 @@ namespace BundleUtilities
 {
     public static class Utilities
     {
-        public static ulong calcLookup8(string text) {
+        public static ulong calcLookup8(string text)
+        {
             byte[] message = Encoding.ASCII.GetBytes(text);
             var hashValue = Lookup8.Hash(message, (ulong)message.Length, 0xABCDEF0011223344);
 
@@ -140,7 +141,15 @@ namespace BundleUtilities
             {
                 self.Write((byte)value[i]);
             }
-            self.Write((byte) 0);
+            self.Write((byte)0);
+        }
+
+        public static void WriteUniquePadding(this BinaryWriter self, int numberOfPadding)
+        {
+            for (int i = 0; i < numberOfPadding; i++)
+            {
+                self.Write((byte)0);
+            }
         }
 
         // Add padding: Has to be divisible by 16, else add padding
@@ -169,7 +178,7 @@ namespace BundleUtilities
             if (forceHex && !s.StartsWith("0x"))
                 s = "0x" + s;
             TypeConverter converter = TypeDescriptor.GetConverter(typeof(T));
-            value = (T) converter.ConvertFromString(s);
+            value = (T)converter.ConvertFromString(s);
         }
     }
 }

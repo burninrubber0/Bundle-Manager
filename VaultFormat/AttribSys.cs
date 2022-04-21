@@ -96,10 +96,12 @@ namespace VaultFormat
             if (ClassHash == 0xF3E3F8EF855F4F99)
             {
                 this.ClassName = "camerabumperbehaviour";
+                return new Camerabumperbehaviour(chunk, dataChunk);
             }
             if (ClassHash == 0xEADE7049AF7AB31E)
             {
                 this.ClassName = "physicsvehicleboostattribs";
+                return new Physicsvehicleboostattribs(chunk, dataChunk);
             }
             if (ClassHash == 0x966121397B502EED)
             {

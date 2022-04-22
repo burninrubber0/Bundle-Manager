@@ -52,6 +52,7 @@
       <DependentUpon>AttribSysVaultForm.cs</DependentUpon>
     </Compile>
     <Compile Include="AttribSysVaultPlugin.cs" />
+    <Compile Include="Burnoutcarasset.cs" />
     <Compile Include="Burnoutcargraphicsasset.cs" />
     <Compile Include="Camerabumperbehaviour.cs" />
     <Compile Include="IAttribute.cs" />

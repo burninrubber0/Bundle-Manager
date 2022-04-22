@@ -22,6 +22,17 @@ namespace VaultFormat
                 return bytes.SelectMany(i => i).Count() + (16 - (bytes.SelectMany(i => i).Count() % 16));
             }
         }
+        public static int AddEightPadding(int value)
+        {
+            if (value % 8 == 0)
+            {
+                return value;
+            }
+            else
+            {
+                return value + (8 - (value % 8));
+            }
+        }
     }
 
     public class SizeAndPositionInformation
@@ -55,6 +66,7 @@ namespace VaultFormat
             if (ClassHash == 0x52B81656F3ADF675)
             {
                 this.ClassName = "burnoutcarasset";
+                return new Burnoutcarasset(chunk, dataChunk);
             }
             if (ClassHash == 0xF850281CA54C9B92)
             {
@@ -92,6 +104,7 @@ namespace VaultFormat
             if (ClassHash == 0xF0FF4DFD660F5A54)
             {
                 this.ClassName = "burnoutcargraphicsasset";
+                return new Burnoutcargraphicsasset(chunk, dataChunk);
             }
             if (ClassHash == 0xF3E3F8EF855F4F99)
             {
@@ -604,7 +617,7 @@ namespace VaultFormat
             bw.Write(vltPos); //vltPos:
             bw.Write(vltSize); //vltSize
             bw.Write(vltSize + vltPos);//binPos;
-            bw.Write(Attributes.Sum(attribute => attribute.getDataSize()) + Data.Length + getSizeOfStrE()); // binSize
+            bw.Write(CountingUtilities.AddEightPadding(Attributes.Sum(attribute => attribute.getDataSize()) + Data.Length + getSizeOfStrE())); // binSize
 
             WriteVlt(bw);
             WriteBin(bw);

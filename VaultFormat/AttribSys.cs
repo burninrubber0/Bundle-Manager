@@ -103,6 +103,7 @@ namespace VaultFormat
             if (ClassHash == 0xF79C545E141DFFA6)
             {
                 this.ClassName = "physicsvehiclebaseattribs";
+                return new Physicsvehiclebaseattribs(chunk, dataChunk);
             }
             if (ClassHash == 0xF0FF4DFD660F5A54)
             {

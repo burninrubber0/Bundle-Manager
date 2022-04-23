@@ -44,7 +44,7 @@ namespace VaultFormat
             bytes.Add(BitConverter.GetBytes(Size_Offences));
             bytes.Add(BitConverter.GetBytes(EncodedTypePad_Offences));
             Console.Write("Lenght:" + bytes.SelectMany(i => i).Count());
-            // 28 bytes trotzdem kein Padding...
+            // 28 bytes but not padding...
             return bytes.SelectMany(i => i).Count();
         }
 

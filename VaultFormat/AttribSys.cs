@@ -62,7 +62,10 @@ namespace VaultFormat
         public IAttribute GetAttributeEntity(SizeAndPositionInformation chunk, AttributeHeader dataChunk)
         {
             if (ClassHash == 0x2e3b1dc7d248445e)
+            {
                 this.ClassName = "physicsvehiclebodyrollattribs";
+                return new Physicsvehiclebodyrollattribs(chunk, dataChunk);
+            }
             if (ClassHash == 0x52B81656F3ADF675)
             {
                 this.ClassName = "burnoutcarasset";

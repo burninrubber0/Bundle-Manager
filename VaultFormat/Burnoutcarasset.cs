@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,14 +17,14 @@ namespace VaultFormat
         public RefSpec CarUnlockShot { get; set; }
         public RefSpec CameraExternalBehaviourAsset { get; set; }
         public RefSpec CameraBumperBehaviourAsset { get; set; }
-        public string VehicleID { get; set; } //See StrE	
+        public byte[] VehicleID;//See StrE	
         public long PhysicsAsset { get; set; }
         public long MasterSceneMayaBinaryFile { get; set; }
-        public string InGameName { get; set; } // See StrE
+        public byte[] InGameName;// See StrE
         public long GameplayAsset { get; set; }
-        public string ExhaustName { get; set; } //See StrE
+        public byte[] ExhaustName;//See StrE
         public long ExhaustEntityKey { get; set; }
-        public string EngineName { get; set; } //See StrE
+        public byte[] EngineName; //See StrE
         public long EngineEntityKey { get; set; }
         public long DefaultWheel { get; set; }
         public bool BuildThisVehicle { get; set; }
@@ -44,22 +44,22 @@ namespace VaultFormat
             foreach (RefSpec r in Offences)
             {
                 bytes.Add(r.ToBytes()); //RefSpec[12]
-            }
+            } // 288
             bytes.Add(SoundExhaustAsset.ToBytes());
             bytes.Add(SoundEngineAsset.ToBytes());
             bytes.Add(PhysicsVehicleHandlingAsset.ToBytes());
             bytes.Add(GraphicsAsset.ToBytes());
             bytes.Add(CarUnlockShot.ToBytes());
             bytes.Add(CameraExternalBehaviourAsset.ToBytes());
-            bytes.Add(CameraBumperBehaviourAsset.ToBytes());
-            bytes.Add(Encoding.UTF8.GetBytes(VehicleID));
+            bytes.Add(CameraBumperBehaviourAsset.ToBytes()); // 168 + 80 + 4
+            bytes.Add(VehicleID);
             bytes.Add(BitConverter.GetBytes(PhysicsAsset));
             bytes.Add(BitConverter.GetBytes(MasterSceneMayaBinaryFile));
-            bytes.Add(Encoding.UTF8.GetBytes(InGameName));
+            bytes.Add(InGameName);
             bytes.Add(BitConverter.GetBytes(GameplayAsset));
-            bytes.Add(Encoding.UTF8.GetBytes(ExhaustName));
+            bytes.Add(ExhaustName);
             bytes.Add(BitConverter.GetBytes(ExhaustEntityKey));
-            bytes.Add(Encoding.UTF8.GetBytes(EngineName));
+            bytes.Add(EngineName);
             bytes.Add(BitConverter.GetBytes(EngineEntityKey));
             bytes.Add(BitConverter.GetBytes(DefaultWheel));
             bytes.Add(BitConverter.GetBytes(BuildThisVehicle));
@@ -67,6 +67,7 @@ namespace VaultFormat
             Console.WriteLine("Before " + bytes.SelectMany(i => i).Count());
             int newValue = AddPadding(bytes).Count();
             Console.WriteLine("After " + newValue);
+            // Should be 540 is 514 -> probably the text tbh
             return newValue;
         }
 
@@ -104,14 +105,14 @@ namespace VaultFormat
             CarUnlockShot = new RefSpec(loader, br);
             CameraExternalBehaviourAsset = new RefSpec(loader, br);
             CameraBumperBehaviourAsset = new RefSpec(loader, br);
-            VehicleID = br.ReadCStr();
+            VehicleID = br.ReadBytes(8);
             PhysicsAsset = br.ReadInt64();
             MasterSceneMayaBinaryFile = br.ReadInt64();
-            InGameName = br.ReadCStr();
+            InGameName = br.ReadBytes(8);
             GameplayAsset = br.ReadInt64();
-            ExhaustName = br.ReadCStr();
+            ExhaustName = br.ReadBytes(8);
             ExhaustEntityKey = br.ReadInt64();
-            EngineName = br.ReadCStr();
+            EngineName = br.ReadBytes(8);
             EngineEntityKey = br.ReadInt64();
             DefaultWheel = br.ReadInt64();
             BuildThisVehicle = br.ReadBoolean();
@@ -131,14 +132,14 @@ namespace VaultFormat
             CarUnlockShot.Write(wr);
             CameraExternalBehaviourAsset.Write(wr);
             CameraBumperBehaviourAsset.Write(wr);
-            wr.WriteCStr(VehicleID);
+            wr.Write(VehicleID);
             wr.Write(PhysicsAsset);
             wr.Write(MasterSceneMayaBinaryFile);
-            wr.WriteCStr(InGameName);
+            wr.Write(InGameName);
             wr.Write(GameplayAsset);
-            wr.WriteCStr(ExhaustName); 
+            wr.Write(ExhaustName);
             wr.Write(ExhaustEntityKey);
-            wr.WriteCStr(EngineName); 
+            wr.Write(EngineName);
             wr.Write(EngineEntityKey);
             wr.Write(DefaultWheel);
             wr.Write(BuildThisVehicle);

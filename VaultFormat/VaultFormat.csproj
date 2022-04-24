@@ -55,6 +55,7 @@
     <Compile Include="Burnoutcarasset.cs" />
     <Compile Include="Burnoutcargraphicsasset.cs" />
     <Compile Include="Camerabumperbehaviour.cs" />
+    <Compile Include="Cameraexternalbehaviour.cs" />
     <Compile Include="IAttribute.cs" />
     <Compile Include="Physicsvehiclebaseattribs.cs" />
     <Compile Include="Physicsvehiclebodyrollattribs.cs" />

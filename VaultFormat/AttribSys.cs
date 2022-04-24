@@ -99,6 +99,7 @@ namespace VaultFormat
             if (ClassHash == 0xE9EDA3B8C4EA3C84)
             {
                 this.ClassName = "cameraexternalbehaviour";
+                return new Cameraexternalbehaviour(chunk, dataChunk);
             }
             if (ClassHash == 0xF79C545E141DFFA6)
             {

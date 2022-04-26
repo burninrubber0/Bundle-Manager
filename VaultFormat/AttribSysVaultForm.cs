@@ -40,14 +40,14 @@ namespace VaultFormat
             if (AttribSys == null)
                 return;
 
-            for (int i = 0; i < AttribSys.DataChunks.Count; i++)
+            for (int i = 0; i < AttribSys.Attributes.Count; i++)
             {
-                DataChunk chunk = AttribSys.DataChunks[i];
+                IAttribute chunk = AttribSys.Attributes[i];
 
                 string[] value = {
-                    chunk.ClassName,
-                    chunk.ClassHash.ToString("X16"),
-                    chunk.CollectionHash.ToString("X16"),
+                    chunk.getHeader().ClassName,
+                    chunk.getHeader().ClassHash.ToString("X16"),
+                    chunk.getHeader().CollectionHash.ToString("X16"),
                 };
                 lstDataChunks.Items.Add(new ListViewItem(value));
             }
@@ -114,12 +114,26 @@ namespace VaultFormat
             if (value == null)
                 return;
             ulong result = Utilities.calcLookup8(value);
-            int index = AttribSys.DataChunks.FindIndex(i => i.ClassName == lstDataChunks.SelectedItems[0].Text);
-            AttribSys.DataChunks[index].CollectionHash = result;
+            int index = AttribSys.Attributes.FindIndex(i => i.getHeader().ClassName == lstDataChunks.SelectedItems[0].Text);
+            AttribSys.Attributes[index].getHeader().CollectionHash = result;
             MessageBox.Show(this, "The lookup 8 hashed value is: " + result.ToString("X16"), "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             EditEvent?.Invoke();
             UpdateDisplay();
         }
+
+        private void lstDataChunks_DoubleClick(object sender, EventArgs e)
+        {
+            Console.WriteLine(lstDataChunks.SelectedItems[0].Text);
+            int index = AttribSys.Attributes.FindIndex(i => i.getHeader().ClassName == lstDataChunks.SelectedItems[0].Text);
+            propertyGrid2.SelectedObject = AttribSys.Attributes[index];
+        }
+
+        private void propertyGrid2_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            EditEvent?.Invoke();
+            UpdateDisplay();
+        }
+
     }
 
 }

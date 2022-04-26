@@ -9,7 +9,33 @@ using PluginAPI;
 
 namespace VaultFormat
 {
-    public class NestedChunk
+    public class CountingUtilities
+    {
+        public static int AddPadding(List<byte[]> bytes)
+        {
+            if (bytes.SelectMany(i => i).Count() % 16 == 0)
+            {
+                return bytes.SelectMany(i => i).Count();
+            }
+            else
+            {
+                return bytes.SelectMany(i => i).Count() + (16 - (bytes.SelectMany(i => i).Count() % 16));
+            }
+        }
+        public static int AddEightPadding(int value)
+        {
+            if (value % 8 == 0)
+            {
+                return value;
+            }
+            else
+            {
+                return value + (8 - (value % 8));
+            }
+        }
+    }
+
+    public class SizeAndPositionInformation
     {
         public ulong Hash;
         public ulong EntryTypeHash;
@@ -17,7 +43,7 @@ namespace VaultFormat
         public int DataChunkPosition;
     }
 
-    public class DataChunk
+    public class AttributeHeader
     {
         public string ClassName;
         public ulong CollectionHash;
@@ -33,62 +59,78 @@ namespace VaultFormat
         public DataItem[] Items;
 
 
-        public void SetClassName()
+        public IAttribute GetAttributeEntity(SizeAndPositionInformation chunk, AttributeHeader dataChunk)
         {
             if (ClassHash == 0x2e3b1dc7d248445e)
+            {
                 this.ClassName = "physicsvehiclebodyrollattribs";
+                return new Physicsvehiclebodyrollattribs(chunk, dataChunk);
+            }
             if (ClassHash == 0x52B81656F3ADF675)
             {
                 this.ClassName = "burnoutcarasset";
+                return new Burnoutcarasset(chunk, dataChunk);
             }
             if (ClassHash == 0xF850281CA54C9B92)
             {
                 this.ClassName = "physicsvehicleengineattribs";
+                return new Physicsvehicleengineattribs(chunk, dataChunk);
             }
             if (ClassHash == 0x3F9370FCF8D767AC)
             {
                 this.ClassName = "physicsvehicledriftattribs";
+                return new Physicsvehicledriftattribs(chunk, dataChunk);
             }
             if (ClassHash == 0xDF956BC0568F138C)
             {
                 this.ClassName = "physicsvehiclecollisionattribs";
+                return new Physicsvehiclecollisionattribs(chunk, dataChunk);
             }
             if (ClassHash == 0x4297B5841F5231CF)
             {
                 this.ClassName = "physicsvehiclesuspensionattribs";
+                return new Physicsvehiclesuspensionattribs(chunk, dataChunk);
             }
             if (ClassHash == 0x43462C59212A23CC)
             {
                 this.ClassName = "physicsvehiclesteeringattribs";
+                return new Physicsvehiclesteeringattribs(chunk, dataChunk);
             }
             if (ClassHash == 0xE9EDA3B8C4EA3C84)
             {
                 this.ClassName = "cameraexternalbehaviour";
+                return new Cameraexternalbehaviour(chunk, dataChunk);
             }
             if (ClassHash == 0xF79C545E141DFFA6)
             {
                 this.ClassName = "physicsvehiclebaseattribs";
+                return new Physicsvehiclebaseattribs(chunk, dataChunk);
             }
             if (ClassHash == 0xF0FF4DFD660F5A54)
             {
                 this.ClassName = "burnoutcargraphicsasset";
+                return new Burnoutcargraphicsasset(chunk, dataChunk);
             }
             if (ClassHash == 0xF3E3F8EF855F4F99)
             {
                 this.ClassName = "camerabumperbehaviour";
+                return new Camerabumperbehaviour(chunk, dataChunk);
             }
             if (ClassHash == 0xEADE7049AF7AB31E)
             {
                 this.ClassName = "physicsvehicleboostattribs";
+                return new Physicsvehicleboostattribs(chunk, dataChunk);
             }
             if (ClassHash == 0x966121397B502EED)
             {
                 this.ClassName = "physicsvehiclehandling";
+                return new Physicsvehiclehandling(chunk, dataChunk);
             }
             if (ClassHash == 0x7F161D94482CB3BF)
             {
                 this.ClassName = "vehicleengine";
             }
+            return new UnimplementedAttribs(chunk, dataChunk);
         }
     }
 
@@ -124,8 +166,7 @@ namespace VaultFormat
 
         public long StrUnknown1;
 
-        public List<NestedChunk> NestedChunks;
-        public List<DataChunk> DataChunks;
+        public List<IAttribute> Attributes;
 
         public List<string> Strings;
 
@@ -136,8 +177,7 @@ namespace VaultFormat
         public AttribSys()
         {
             Dependencies = new List<string>();
-            NestedChunks = new List<NestedChunk>();
-            DataChunks = new List<DataChunk>();
+            Attributes = new List<IAttribute>();
             Strings = new List<string>();
         }
 
@@ -162,7 +202,7 @@ namespace VaultFormat
                         string name = br.ReadLenString(sz);
                         Dependencies.Add(name);
                     }
-                    
+
                     break;
                 case "StrN":
                     StrUnknown1 = br.ReadInt64();
@@ -174,22 +214,20 @@ namespace VaultFormat
                     long nestedChunkCount = br.ReadInt64();
                     for (long i = 0; i < nestedChunkCount; i++)
                     {
-                        NestedChunk chunk = new NestedChunk();
+                        SizeAndPositionInformation chunk = new SizeAndPositionInformation();
                         chunk.Hash = br.ReadUInt64();
                         chunk.EntryTypeHash = br.ReadUInt64();
                         chunk.DataChunkSize = br.ReadInt32();
                         chunk.DataChunkPosition = br.ReadInt32();
-                        NestedChunks.Add(chunk);
 
                         long pos = br.BaseStream.Position;
                         br.BaseStream.Position = chunk.DataChunkPosition;
 
                         if (chunk.EntryTypeHash == 0xAD303B8F42B3307E)
                         {
-                            DataChunk dataChunk = new DataChunk();
+                            AttributeHeader dataChunk = new AttributeHeader();
                             dataChunk.CollectionHash = br.ReadUInt64();
                             dataChunk.ClassHash = br.ReadUInt64();
-                            dataChunk.SetClassName();
                             dataChunk.Unknown1 = br.ReadBytes(8);
                             dataChunk.ItemCount = br.ReadInt32();
                             dataChunk.Unknown2 = br.ReadInt32();
@@ -212,7 +250,7 @@ namespace VaultFormat
                                 item.Unknown2 = br.ReadInt16();
                                 dataChunk.Items[j] = item;
                             }
-                            DataChunks.Add(dataChunk);
+                            Attributes.Add(dataChunk.GetAttributeEntity(chunk, dataChunk));
                         }
                         else
                         {
@@ -239,7 +277,7 @@ namespace VaultFormat
                 default:
                     throw new ReadFailedError("Unknown Chunk: " + fourcc);
             }
-            
+
 
             br.BaseStream.Position = initialPos + size;
 
@@ -252,8 +290,6 @@ namespace VaultFormat
                 ReadChunk(loader, br);
             }
         }
-
-
 
         private void ReadBin(ILoader loader, BinaryReader2 br)
         {
@@ -269,7 +305,14 @@ namespace VaultFormat
                 br.BaseStream.Position = initialPos + size;
 
                 int dataSize = (int)(br.BaseStream.Length - br.BaseStream.Position);
-                Data = br.ReadBytes(dataSize);
+                Console.WriteLine(dataSize);
+                foreach (IAttribute attribute in Attributes)
+                {
+                    attribute.Read(loader, br);
+                }
+                Console.WriteLine(Attributes.Sum(attribute => attribute.getDataSize()));
+                // Read Data of Unimplemented types
+                Data = br.ReadBytes(dataSize - Attributes.Sum(attribute => attribute.getDataSize()));
 
             }
             catch (IOException ex)
@@ -289,6 +332,11 @@ namespace VaultFormat
                     wr.WriteCStr(String);
                 }
                 wr.WritePadding();
+                foreach (IAttribute attribute in Attributes)
+                {
+                    attribute.Write(wr);
+                }
+                // Write Data of Unimplemented types
                 wr.Write(Data);
                 wr.WritePadding();
             }
@@ -298,7 +346,8 @@ namespace VaultFormat
             }
         }
 
-        private int addPadding(List<byte[]> bytes) {
+        public int addPadding(List<byte[]> bytes)
+        {
             if (bytes.SelectMany(i => i).Count() % 16 == 0)
             {
                 return bytes.SelectMany(i => i).Count();
@@ -309,7 +358,8 @@ namespace VaultFormat
             }
         }
 
-        private int getSizeOfStrE() {
+        private int getSizeOfStrE()
+        {
             List<byte[]> bytes = new List<byte[]>();
             bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("StrE")));
             bytes.Add(BitConverter.GetBytes(16));
@@ -321,7 +371,8 @@ namespace VaultFormat
             return addPadding(bytes);
         }
 
-        private int getSizeOfVers() {
+        private int getSizeOfVers()
+        {
             List<byte[]> bytes = new List<byte[]>();
             bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("Vers")));
             bytes.Add(BitConverter.GetBytes(16));
@@ -341,7 +392,7 @@ namespace VaultFormat
             bytes.Add(BitConverter.GetBytes(Dependencies[0].Length + 1));
             foreach (string d in Dependencies)
             {
-                byte[] nullterminating = {(byte)0};
+                byte[] nullterminating = { (byte)0 };
                 bytes.Add(Encoding.ASCII.GetBytes(d).Concat(nullterminating).ToArray());
             }
             return addPadding(bytes);
@@ -351,7 +402,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>();
             bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("DatN")));
-            foreach (DataChunk dataChunk in DataChunks)
+            foreach (AttributeHeader dataChunk in Attributes.Select(x => x.getHeader()))
             {
                 bytes.Add(BitConverter.GetBytes(dataChunk.CollectionHash));
                 bytes.Add(BitConverter.GetBytes(dataChunk.ClassHash));
@@ -380,12 +431,13 @@ namespace VaultFormat
             return addPadding(bytes);
         }
 
-        private int getSizeOfExpN() {
+        private int getSizeOfExpN()
+        {
             List<byte[]> bytes = new List<byte[]>();
             bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("ExpN")));
             bytes.Add(BitConverter.GetBytes(16));
-            bytes.Add(BitConverter.GetBytes((UInt64)NestedChunks.Count));
-            foreach (NestedChunk chunk in NestedChunks)
+            bytes.Add(BitConverter.GetBytes((UInt64)Attributes.Select(x => x.getInfo()).Count()));
+            foreach (SizeAndPositionInformation chunk in Attributes.Select(x => x.getInfo()))
             {
                 bytes.Add(BitConverter.GetBytes(chunk.Hash));
                 bytes.Add(BitConverter.GetBytes(chunk.EntryTypeHash));
@@ -404,7 +456,8 @@ namespace VaultFormat
             return addPadding(bytes);
         }
 
-        private int getSizeOfPtrN() {
+        private int getSizeOfPtrN()
+        {
             List<byte[]> bytes = new List<byte[]>();
             bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("PtrN")));
             bytes.Add(BitConverter.GetBytes(16));
@@ -430,17 +483,18 @@ namespace VaultFormat
 
                 wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("DepN")));
                 wr.Write(getSizeOfDepN());
-                wr.Write((UInt64) Dependencies.Count());
+                wr.Write((UInt64)Dependencies.Count());
                 wr.Write(DepHash1);
                 wr.Write(DepHash2);
                 wr.Write(DepNop);
                 // Have to add null terminating byte to length
                 wr.Write(Dependencies[0].Length + 1);
-                foreach(string d in Dependencies) {
+                foreach (string d in Dependencies)
+                {
                     wr.WriteCStr(d);
                 }
                 wr.WritePadding();
-                
+
                 wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("StrN")));
                 wr.Write(getSizeOfStrN());
                 wr.Write(StrUnknown1);
@@ -448,7 +502,8 @@ namespace VaultFormat
 
                 wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("DatN")));
                 wr.Write(getSizeOfDatN());
-                foreach (DataChunk dataChunk in DataChunks) {
+                foreach (AttributeHeader dataChunk in Attributes.Select(x => x.getHeader()))
+                {
                     wr.Write(dataChunk.CollectionHash);
                     wr.Write(dataChunk.ClassHash);
                     wr.Write(dataChunk.Unknown1);
@@ -460,10 +515,11 @@ namespace VaultFormat
                     wr.Write(dataChunk.Unknown3);
                     for (int j = 0; j < dataChunk.ParameterCount; j++)
                         wr.Write(dataChunk.ParameterTypeHashes[j]);
-                    for (int j = 0; j < (dataChunk.ParametersToRead - dataChunk.ParameterCount); j++) { 
+                    for (int j = 0; j < (dataChunk.ParametersToRead - dataChunk.ParameterCount); j++)
+                    {
                         UInt64 zero = 0;
                         wr.Write(zero); // zero
-                     }
+                    }
                     foreach (DataItem item in dataChunk.Items)
                     {
                         wr.Write(item.Hash);
@@ -476,8 +532,8 @@ namespace VaultFormat
 
                 wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("ExpN")));
                 wr.Write(getSizeOfExpN());
-                wr.Write((UInt64)NestedChunks.Count);
-                foreach (NestedChunk chunk in NestedChunks)
+                wr.Write((UInt64)Attributes.Select(x => x.getInfo()).Count());
+                foreach (SizeAndPositionInformation chunk in Attributes.Select(x => x.getInfo()))
                 {
                     wr.Write(chunk.Hash);
                     wr.Write(chunk.EntryTypeHash);
@@ -488,7 +544,8 @@ namespace VaultFormat
 
                 wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("PtrN")));
                 wr.Write(getSizeOfPtrN());
-                foreach (PtrChunkData data in PtrN.allData) {
+                foreach (PtrChunkData data in PtrN.allData)
+                {
                     wr.Write(data.Ptr);
                     wr.Write(data.type);
                     wr.Write(data.flag);
@@ -508,16 +565,12 @@ namespace VaultFormat
             DepHash1 = default;
             DepHash2 = default;
             DepNop = default;
-
+            Attributes.Clear();
             StrUnknown1 = default;
 
             PtrN = default;
 
-            Data = default;
-
             Dependencies.Clear();
-            NestedChunks.Clear();
-            DataChunks.Clear();
             Strings.Clear();
         }
 
@@ -568,8 +621,8 @@ namespace VaultFormat
 
             bw.Write(vltPos); //vltPos:
             bw.Write(vltSize); //vltSize
-            bw.Write(vltSize + vltPos);//bw.Write(binPos);
-            bw.Write(Data.Length + getSizeOfStrE()); // binSize
+            bw.Write(vltSize + vltPos);//binPos;
+            bw.Write(CountingUtilities.AddEightPadding(Attributes.Sum(attribute => attribute.getDataSize()) + Data.Length + getSizeOfStrE())); // binSize
 
             WriteVlt(bw);
             WriteBin(bw);

@@ -51,8 +51,8 @@ namespace VaultFormat
             this.toolStripMenuItem1});
             this.menu.Location = new System.Drawing.Point(0, 0);
             this.menu.Name = "menu";
-            this.menu.Padding = new System.Windows.Forms.Padding(3, 1, 0, 1);
-            this.menu.Size = new System.Drawing.Size(875, 31);
+            this.menu.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
+            this.menu.Size = new System.Drawing.Size(1312, 33);
             this.menu.TabIndex = 1;
             this.menu.Text = "menuStrip1";
             // 
@@ -73,9 +73,10 @@ namespace VaultFormat
             this.lstDataChunks.FullRowSelect = true;
             this.lstDataChunks.GridLines = true;
             this.lstDataChunks.HideSelection = false;
-            this.lstDataChunks.Location = new System.Drawing.Point(0, 31);
+            this.lstDataChunks.Location = new System.Drawing.Point(0, 33);
+            this.lstDataChunks.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.lstDataChunks.Name = "lstDataChunks";
-            this.lstDataChunks.Size = new System.Drawing.Size(875, 197);
+            this.lstDataChunks.Size = new System.Drawing.Size(1312, 301);
             this.lstDataChunks.TabIndex = 4;
             this.lstDataChunks.UseCompatibleStateImageBehavior = false;
             this.lstDataChunks.View = System.Windows.Forms.View.Details;
@@ -113,22 +114,23 @@ namespace VaultFormat
             // 
             // propertyGrid2
             // 
-            this.propertyGrid2.Location = new System.Drawing.Point(0, 225);
+            this.propertyGrid2.Location = new System.Drawing.Point(0, 346);
+            this.propertyGrid2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.propertyGrid2.Name = "propertyGrid2";
-            this.propertyGrid2.Size = new System.Drawing.Size(875, 489);
+            this.propertyGrid2.Size = new System.Drawing.Size(1312, 752);
             this.propertyGrid2.TabIndex = 6;
             this.propertyGrid2.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid2_PropertyValueChanged);
             // 
             // AttribSysVaultForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(875, 713);
+            this.ClientSize = new System.Drawing.Size(1312, 1097);
             this.Controls.Add(this.propertyGrid2);
             this.Controls.Add(this.lstDataChunks);
             this.Controls.Add(this.menu);
             this.MainMenuStrip = this.menu;
-            this.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "AttribSysVaultForm";
             this.Text = "AttribSysVault Editor";
             this.menu.ResumeLayout(false);

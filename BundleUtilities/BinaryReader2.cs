@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace BundleUtilities
 {
+    [TypeConverter(typeof(ExpandableObjectConverter))]
     public class Vector3I
     {
         public float X { get; set; }

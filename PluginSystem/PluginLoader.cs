@@ -1,4 +1,4 @@
-﻿using PluginAPI;
+using PluginAPI;
 using PluginSystem.Util;
 using System;
 using System.Collections.Generic;
@@ -8,9 +8,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using BundleUtilities;
 
 namespace PluginSystem
 {
+    using System.IO;
+    using System.Reflection;
     public static class PluginLoader
     {
         private static readonly Dictionary<string, Plugin> _plugins = new Dictionary<string, Plugin>();
@@ -20,12 +23,7 @@ namespace PluginSystem
 
         private static void LogInfo(string message)
         {
-            if (Log == null)
-            {
-                Console.WriteLine(message);
-                //Debug.WriteLine(message);
-            }
-
+            new LogWriter(message);
             Log?.Invoke(message);
         }
 
@@ -60,7 +58,7 @@ namespace PluginSystem
 
             foreach (Assembly assembly in assemblies)
             {
-                //LogInfo("Scanning Assembly: " + assembly.GetName().Name);
+                LogInfo("Scanning Assembly: " + assembly.GetName().Name);
 
                 foreach (Type type in assembly.GetTypes())
                 {

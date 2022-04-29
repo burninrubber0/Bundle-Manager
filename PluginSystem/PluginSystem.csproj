@@ -46,6 +46,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BundleUtilities\BundleUtilities.csproj">
+      <Project>{34471573-f236-4a7c-abd9-c1fe4686b37e}</Project>
+      <Name>BundleUtilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PluginAPI\PluginAPI.csproj">
       <Project>{757F0204-F091-464D-AA42-FE8919FF73BB}</Project>
       <Name>PluginAPI</Name>

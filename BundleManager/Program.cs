@@ -1,4 +1,4 @@
-﻿using PluginSystem;
+using PluginSystem;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -7,6 +7,7 @@ using System.Windows.Forms;
 
 namespace BundleManager
 {
+
     public static class Program
     {
         public static MainForm fileModeForm;

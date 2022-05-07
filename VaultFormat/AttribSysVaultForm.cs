@@ -1,13 +1,10 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Forms;
 using PluginAPI;
 using BundleUtilities;
-using System.Threading.Tasks;
 using LangEditor;
-using BundleFormat;
 
 namespace VaultFormat
 {

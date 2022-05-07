@@ -3,27 +3,28 @@ using PluginAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using VaultFormat;
+using System.Windows.Forms;
 
-namespace VaultFormat
+namespace LuaList
 {
-    public class AttribsSysVaultPlugin : Plugin
+
+    public class LuaListPlugin : Plugin
     {
         public override void Init()
         {
-            EntryTypeRegistry.Register(EntryType.AttribSysVault, new AttribSys());
+            EntryTypeRegistry.Register(EntryType.LUAList, new LuaList());
         }
 
         public override string GetID()
         {
-            return "attribsysplugin";
+            return "lualistplugin";
         }
 
         public override string GetName()
         {
-            return "Attribsys Resource Handler";
+            return "Lua List Resource Handler";
         }
+        
     }
 }

@@ -3,7 +3,7 @@ namespace LuaList
 {
     partial class LuaListEditor
     {
-     
+
         private System.ComponentModel.IContainer components = null;
 
         protected override void Dispose(bool disposing)
@@ -23,13 +23,34 @@ namespace LuaList
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
+            this.SuspendLayout();
+            // 
+            // propertyGrid1
+            // 
+            this.propertyGrid1.Location = new System.Drawing.Point(-2, -4);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.Size = new System.Drawing.Size(802, 456);
+            this.propertyGrid1.TabIndex = 0;
+            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
+            // 
+            // LuaListEditor
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+            this.Controls.Add(this.propertyGrid1);
+            this.Name = "LuaListEditor";
+            this.Text = "Lua List Editor";
+            this.ResumeLayout(false);
+
+            this.Controls.Add(this.propertyGrid1);
+
         }
 
         #endregion
+
+        private System.Windows.Forms.PropertyGrid propertyGrid1;
     }
 }
 

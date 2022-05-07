@@ -1,3 +1,4 @@
+using System;
 using System.Windows.Forms;
 using PluginAPI;
 
@@ -15,18 +16,26 @@ namespace LuaList
             set
             {
                 _luaList = value;
-                UpdateDisplay();
+                UpdateComponent();
             }
         }
 
-        private void UpdateDisplay()
+        public void UpdateComponent()
         {
-          
+           
+            propertyGrid1.SelectedObject = LuaList;
         }
 
         public LuaListEditor()
         {
             InitializeComponent();
+            UpdateComponent();
         }
+
+        private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            EditEvent?.Invoke();
+        }
+
     }
 }

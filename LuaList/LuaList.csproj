@@ -58,6 +58,10 @@
     </Compile>
     <Compile Include="LuaListPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ULongHexTypeConverter.cs" />
+    <EmbeddedResource Include="LuaListEditor.resx">
+      <DependentUpon>LuaListEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

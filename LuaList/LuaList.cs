@@ -20,11 +20,14 @@ namespace LuaList
         public byte[] Unk0 { get; set; }    //0x10	0x4	Unk0* Script list Unk0 format	
         public byte[] typePointer { get; set; }//0x14	0x4	char[32] * *		Types		
         public byte[] variablePointer { get; set; } //0x18	0x4	char[32] * *		Variables		
+        [ReadOnly(true)]
         public int numScripts { get; set; }      //0x1C	0x4	uint32_t Num scripts		
         public int dataLength { get; set; }      //0x20	0x4	uint32_t Data length Not including padding to end
         public string listTitle { get; set; }   //0x24	0x80	char[128] List title		
-        public short numTypes { get; set; }     //0xA4	0x1	uint8_t Num types		
-        public short numVariables { get; set; } //0xA5	0x1	uint8_t Num variables
+        public byte numTypes { get; set; }     //0xA4	0x1	uint8_t Num types		
+        public byte numVariables { get; set; } //0xA5	0x1	uint8_t Num variables
+        public byte[] padding2 { get; set; } // 26 bytes long
+        public List<LuaListEntry> entries { get; set; }
         public byte[] unknownData { get; set; }
 
         public IEntryEditor GetEditor(BundleEntry entry)
@@ -72,11 +75,17 @@ namespace LuaList
             variablePointer = br.ReadBytes(4);
             numScripts = br.ReadInt32();
             dataLength = br.ReadInt32();
-            listTitle = new string(br.ReadChars(128));
-            numTypes = br.ReadInt16();
-            numVariables = br.ReadInt16();
+            listTitle = br.ReadLenString(128);
+            numTypes = br.ReadByte();
+            numVariables = br.ReadByte();
+            padding2 = br.ReadBytes(26);
 
-            unknownData = br.ReadBytes(dataLength - getLengthOfHeader());
+            entries = new List<LuaListEntry>();
+            for (int i = 0; i < numScripts; i++) {
+                LuaListEntry luaentry = new LuaListEntry();
+                luaentry.Read(loader, br);
+                entries.Add(luaentry);
+            }
 
             br.Close();
             ms.Close();
@@ -94,12 +103,16 @@ namespace LuaList
             bw.Write(Unk0);
             bw.Write(typePointer);
             bw.Write(variablePointer);
-            bw.Write(numScripts);
+            bw.Write(entries.Count);
             bw.Write(dataLength);
             bw.Write(listTitle.PadRight(128).Substring(0, 128).ToCharArray());
             bw.Write(numTypes);
             bw.Write(numVariables);
-            bw.Write(unknownData);
+            bw.Write(padding2);
+            foreach (LuaListEntry luaentry in entries)
+            {
+                luaentry.Write(bw);
+            }
             bw.Flush();
             byte[] data = ms.ToArray();
             bw.Close();

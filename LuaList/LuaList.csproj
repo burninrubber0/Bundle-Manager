@@ -56,6 +56,7 @@
     <Compile Include="LuaListEditor.Designer.cs">
       <DependentUpon>LuaListEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="LuaListEntry.cs" />
     <Compile Include="LuaListPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ULongHexTypeConverter.cs" />

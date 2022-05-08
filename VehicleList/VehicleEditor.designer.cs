@@ -105,7 +105,7 @@ namespace VehicleList
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(372, 785);
+            this.btnOk.Location = new System.Drawing.Point(291, 785);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 0;
@@ -117,7 +117,7 @@ namespace VehicleList
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(291, 785);
+            this.btnCancel.Location = new System.Drawing.Point(372, 785);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 1;
@@ -829,7 +829,7 @@ namespace VehicleList
             "Metallic",
             "Pearlescent",
             "Special",
-            "Unknown"});
+            "Party"});
             this.cboColorType.Location = new System.Drawing.Point(96, 762);
             this.cboColorType.Name = "cboColorType";
             this.cboColorType.Size = new System.Drawing.Size(358, 21);

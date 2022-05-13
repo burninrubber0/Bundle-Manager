@@ -1,4 +1,4 @@
-﻿using BundleFormat;
+using BundleFormat;
 using BundleUtilities;
 using PluginAPI;
 using System;
@@ -10,139 +10,139 @@ namespace BaseHandlers
 {
     public struct LandmarkTrigger
     {
-        public float PositionX;
-        public float PositionY;
-        public float PositionZ;
-        public float RotationX;
-        public float RotationY;
-        public float RotationZ;
-        public float SizeX;
-        public float SizeY;
-        public float SizeZ;
-        public int GameDBID;
-        public short GlobalIndex;
-        public byte Type; // Should be 0
-        public byte UnknownByte2B;
-        public uint UnknownOffset;
-        public byte UnknownByte30;
-        public byte LocalIndex;
-        public byte Subtype;
-        public byte UnknownByte33;
+        public float PositionX { get; set; }
+        public float PositionY { get; set; }
+        public float PositionZ { get; set; }
+        public float RotationX { get; set; }
+        public float RotationY { get; set; }
+        public float RotationZ { get; set; }
+        public float SizeX { get; set; }
+        public float SizeY { get; set; }
+        public float SizeZ { get; set; }
+        public int GameDBID { get; set; }
+        public short GlobalIndex { get; set; }
+        public byte Type { get; set; } // Should be 0
+        public byte UnknownByte2B { get; set; }
+        public uint UnknownOffset { get; set; }
+        public byte UnknownByte30 { get; set; }
+        public byte LocalIndex { get; set; }
+        public byte Subtype { get; set; }
+        public byte UnknownByte33 { get; set; }
 
         public override string ToString() => $"ID {GameDBID}";
     }
 
     public struct GenericRegionTrigger
     {
-        public float PositionX;
-        public float PositionY;
-        public float PositionZ;
-        public float RotationX;
-        public float RotationY;
-        public float RotationZ;
-        public float SizeX;
-        public float SizeY;
-        public float SizeZ;
-        public int GameDBID;
-        public short Index;
-        public byte Type; // Should be 2
-        public byte UnknownByte2B;
-        public int GameDBID2; // Only used for _some_ super jumps
-        public short UnknownShort30;
-        public short UnknownShort32;
-        public byte UnknownByte34;
-        public byte UnknownByte35;
-        public byte Subtype;
-        public byte UnknownByte37; // most, but not all, super jumps have this set (to 1)
+        public float PositionX { get; set; }
+        public float PositionY { get; set; }
+        public float PositionZ { get; set; }
+        public float RotationX { get; set; }
+        public float RotationY { get; set; }
+        public float RotationZ { get; set; }
+        public float SizeX { get; set; }
+        public float SizeY { get; set; }
+        public float SizeZ { get; set; }
+        public int GameDBID { get; set; }
+        public short Index { get; set; }
+        public byte Type { get; set; } // Should be 2
+        public byte UnknownByte2B { get; set; }
+        public int GameDBID2 { get; set; } // Only used for _some_ super jumps
+        public short UnknownShort30 { get; set; }
+        public short UnknownShort32 { get; set; }
+        public byte UnknownByte34 { get; set; }
+        public byte UnknownByte35 { get; set; }
+        public byte Subtype { get; set; }
+        public byte UnknownByte37 { get; set; } // most, but not all, super jumps have this set (to 1)
 
         public override string ToString() => $"ID {GameDBID}";
     }
 
     public struct TriggerSection4Entry
     {
-        public uint TriggerOffsetListOffset;
-        public int TriggerOffsetListCount;
-        public uint GameDBIDListOffset;
-        public int GameDBIDListCount;
+        public uint TriggerOffsetListOffset { get; set; }
+        public int TriggerOffsetListCount { get; set; }
+        public uint GameDBIDListOffset { get; set; }
+        public int GameDBIDListCount { get; set; }
 
-        public List<GenericRegionTrigger> Triggers;
-        public List<long> GameDBIDs;
+        public List<GenericRegionTrigger> Triggers { get; set; }
+        public List<long> GameDBIDs { get; set; }
     }
 
     public struct RoamingLocation
     {
-        public float PositionX;
-        public float PositionY;
-        public float PositionZ;
-        public uint UnknownHash;
-        public byte Subdistrict;
-        public byte UnknownByte11;
-        public byte UnknownByte12;
-        public byte UnknownByte13;
-        public int UnknownInt14;
-        public int UnknownInt18;
-        public int UnknownInt1C;
+        public float PositionX { get; set; }
+        public float PositionY { get; set; }
+        public float PositionZ { get; set; }
+        public uint UnknownHash { get; set; }
+        public byte Subdistrict { get; set; }
+        public byte UnknownByte11 { get; set; }
+        public byte UnknownByte12 { get; set; }
+        public byte UnknownByte13 { get; set; }
+        public int UnknownInt14 { get; set; }
+        public int UnknownInt18 { get; set; }
+        public int UnknownInt1C { get; set; }
     }
 
     public struct SpawnLocation
     {
-        public float PositionX;
-        public float PositionY;
-        public float PositionZ;
-        public uint UnknownHash;
-        public float RotationX;
-        public float RotationY;
-        public float RotationZ;
-        public float UnknownFloat1C;
-        public long JunkyardGameDBID;
-        public GenericRegionTrigger JunkyardTrigger;
-        public byte UnknownByte28;
-        public byte UnknownByte29;
-        public byte UnknownByte30;
-        public byte UnknownByte31;
-        public int UnknownInt32;
+        public float PositionX { get; set; }
+        public float PositionY { get; set; }
+        public float PositionZ { get; set; }
+        public uint UnknownHash { get; set; }
+        public float RotationX { get; set; }
+        public float RotationY { get; set; }
+        public float RotationZ { get; set; }
+        public float UnknownFloat1C { get; set; }
+        public long JunkyardGameDBID { get; set; }
+        public GenericRegionTrigger JunkyardTrigger { get; set; }
+        public byte UnknownByte28 { get; set; }
+        public byte UnknownByte29 { get; set; }
+        public byte UnknownByte30 { get; set; }
+        public byte UnknownByte31 { get; set; }
+        public int UnknownInt32 { get; set; }
     }
 
     public class TriggerData : IEntryData
     {
-        public int FormatRevision;
-        public uint FileSize;
-        public int Unknown0C;
-        public int Unknown10;
-        public float DevSpawnPositionX;
-        public float DevSpawnPositionY;
-        public float DevSpawnPositionZ;
-        public uint DevSpawnUnknownHash;
-        public float DevSpawnRotationX;
-        public float DevSpawnRotationY;
-        public float DevSpawnRotationZ;
-        public float DevSpawnUnknownFloat;
-        public uint LandmarkTriggersOffset;
-        public int LandmarkTriggersCount;
-        public int LandmarkNonFinishLineCount;
-        public uint BlackspotTriggersOffset;
-        public int BlackspotTriggersCount;
-        public uint GenericRegionTriggersOffset;
-        public int GenericRegionTriggersCount;
-        public uint Section4Offset;
-        public int Section4Count;
-        public uint VFXBoxRegionOffset;
-        public int VFXBoxRegionCount;
-        public uint StartPositionsOffset;
-        public int StartPositionsCount;
-        public uint RoamingLocationsOffset;
-        public int RoamingLocationsCount;
-        public uint SpawnLocationsOffset;
-        public int SpawnLocationsCount;
-        public uint TriggerOffsetListOffset;
-        public int TriggerOffsetListCount;
+        public int FormatRevision { get; set; }
+        public uint FileSize { get; set; }
+        public int Unknown0C { get; set; }
+        public int Unknown10 { get; set; }
+        public float DevSpawnPositionX { get; set; }
+        public float DevSpawnPositionY { get; set; }
+        public float DevSpawnPositionZ { get; set; }
+        public uint DevSpawnUnknownHash { get; set; }
+        public float DevSpawnRotationX { get; set; }
+        public float DevSpawnRotationY { get; set; }
+        public float DevSpawnRotationZ { get; set; }
+        public float DevSpawnUnknownFloat { get; set; }
+        public uint LandmarkTriggersOffset { get; set; }
+        public int LandmarkTriggersCount { get; set; }
+        public int LandmarkNonFinishLineCount { get; set; }
+        public uint BlackspotTriggersOffset { get; set; }
+        public int BlackspotTriggersCount { get; set; }
+        public uint GenericRegionTriggersOffset { get; set; }
+        public int GenericRegionTriggersCount { get; set; }
+        public uint Section4Offset { get; set; }
+        public int Section4Count { get; set; }
+        public uint VFXBoxRegionOffset { get; set; }
+        public int VFXBoxRegionCount { get; set; }
+        public uint StartPositionsOffset { get; set; }
+        public int StartPositionsCount { get; set; }
+        public uint RoamingLocationsOffset { get; set; }
+        public int RoamingLocationsCount { get; set; }
+        public uint SpawnLocationsOffset { get; set; }
+        public int SpawnLocationsCount { get; set; }
+        public uint TriggerOffsetListOffset { get; set; }
+        public int TriggerOffsetListCount { get; set; }
 
-        public List<LandmarkTrigger> LandmarkTriggers;
-        public SortedDictionary<uint, GenericRegionTrigger> GenericRegionTriggers;
-        public List<TriggerSection4Entry> Section4Entries;
-        public List<RoamingLocation> RoamingLocationEntries;
-        public List<SpawnLocation> SpawnLocationEntries;
-        public List<uint> TriggerOffsets;
+        public List<LandmarkTrigger> LandmarkTriggers { get; set; }
+        public SortedDictionary<uint, GenericRegionTrigger> GenericRegionTriggers { get; set; }
+        public List<TriggerSection4Entry> Section4Entries { get; set; }
+        public List<RoamingLocation> RoamingLocationEntries { get; set; }
+        public List<SpawnLocation> SpawnLocationEntries { get; set; }
+        public List<uint> TriggerOffsets { get; set; }
 
         public TriggerData()
         {
@@ -313,8 +313,28 @@ namespace BaseHandlers
                 section4Entry.Triggers = new List<GenericRegionTrigger>();
                 for (int j = 0; j < section4Entry.TriggerOffsetListCount; j++)
                 {
-                    uint offset = br.ReadUInt32();
-                    section4Entry.Triggers.Add(GenericRegionTriggers[offset]);
+                    GenericRegionTrigger region = new GenericRegionTrigger();
+                    region.PositionX = br.ReadSingle();
+                    region.PositionY = br.ReadSingle();
+                    region.PositionZ = br.ReadSingle();
+                    region.RotationX = br.ReadSingle();
+                    region.RotationY = br.ReadSingle();
+                    region.RotationZ = br.ReadSingle();
+                    region.SizeX = br.ReadSingle();
+                    region.SizeY = br.ReadSingle();
+                    region.SizeZ = br.ReadSingle();
+                    region.GameDBID = br.ReadInt32();
+                    region.Index = br.ReadInt16();
+                    region.Type  =  br.ReadByte();
+                    region.UnknownByte2B = br.ReadByte();
+                    region.GameDBID2 = br.ReadInt32();
+                    region.UnknownShort30 = br.ReadInt16();
+                    region.UnknownShort32 = br.ReadInt16();
+                    region.UnknownByte34 = br.ReadByte();
+                    region.UnknownByte35 = br.ReadByte();
+                    region.Subtype =  br.ReadByte();
+                    region.UnknownByte37 = br.ReadByte();
+                    section4Entry.Triggers.Add(region);
                 }
 
                 br.BaseStream.Position = section4Entry.GameDBIDListOffset;
@@ -399,7 +419,13 @@ namespace BaseHandlers
 
         public IEntryEditor GetEditor(BundleEntry entry)
         {
-            return null;
+            TriggerDataEditor triggerDataEditor = new TriggerDataEditor();
+            triggerDataEditor.trigger = this;
+            triggerDataEditor.EditEvent += () =>
+            {
+                Write(entry);
+            };
+            return triggerDataEditor;
         }
 
         public EntryType GetEntryType(BundleEntry entry)
@@ -506,7 +532,38 @@ namespace BaseHandlers
                 bw.Write(section4Entry.GameDBIDListOffset);
                 bw.Write(section4Entry.GameDBIDListCount);
 
-                // TODO: write list
+                long oldPosition = bw.BaseStream.Position;
+
+                bw.BaseStream.Position = section4Entry.TriggerOffsetListOffset;
+                foreach (GenericRegionTrigger trigger in section4Entry.Triggers)
+                {
+                    bw.Write(trigger.PositionX);
+                    bw.Write(trigger.PositionY);
+                    bw.Write(trigger.PositionZ);
+                    bw.Write(trigger.RotationX);
+                    bw.Write(trigger.RotationY);
+                    bw.Write(trigger.RotationZ);
+                    bw.Write(trigger.SizeX);
+                    bw.Write(trigger.SizeY);
+                    bw.Write(trigger.SizeZ);
+                    bw.Write(trigger.GameDBID);
+                    bw.Write(trigger.Index);
+                    bw.Write(trigger.Type); 
+                    bw.Write(trigger.UnknownByte2B);
+                    bw.Write(trigger.GameDBID2); 
+                    bw.Write(trigger.UnknownShort30);
+                    bw.Write(trigger.UnknownShort32);
+                    bw.Write(trigger.UnknownByte34);
+                    bw.Write(trigger.UnknownByte35);
+                    bw.Write(trigger.Subtype);
+                    bw.Write(trigger.UnknownByte37);
+                }
+                bw.BaseStream.Position = section4Entry.GameDBIDListOffset;
+                foreach(long id in section4Entry.GameDBIDs)
+                {
+                    bw.Write(id);
+                }
+                bw.BaseStream.Position = oldPosition;
             }
 
             bw.BaseStream.Position = RoamingLocationsOffset;
@@ -566,7 +623,7 @@ namespace BaseHandlers
 
             long paddingCount = 16 - (bw.BaseStream.Position % 16);
             for (int i = 0; i < paddingCount; i++)
-                bw.Write((byte) 0);
+                bw.Write((byte)0);
 
             bw.Flush();
 

@@ -55,6 +55,12 @@
     <Compile Include="AptData.cs" />
     <Compile Include="BasePlugin.cs" />
     <Compile Include="FlaptFile.cs" />
+    <Compile Include="TriggerDataEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TriggerDataEditor.Designer.cs">
+      <DependentUpon>TriggerDataEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="GraphicsSpec.cs" />
     <Compile Include="IDList.cs" />
     <Compile Include="InstanceList.cs" />

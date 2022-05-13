@@ -44,5 +44,9 @@ namespace BaseHandlers
         {
             EditEvent?.Invoke();
         }
+
+        private void propertyChanged() {
+            EditEvent?.Invoke();
+        }
     }
 }

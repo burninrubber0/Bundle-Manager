@@ -32,6 +32,7 @@ namespace BaseHandlers
             this.propertyGrid1.Size = new System.Drawing.Size(802, 456);
             this.propertyGrid1.TabIndex = 0;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
+            this.propertyGrid1.LostFocus += (sender, args) => this.propertyChanged();
             // 
             // LuaListEditor
             // 

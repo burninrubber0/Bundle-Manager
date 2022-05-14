@@ -54,7 +54,6 @@ namespace BaseHandlers
         public byte UnknownByte35 { get; set; }
         public byte Subtype { get; set; }
         public byte UnknownByte37 { get; set; } // most, but not all, super jumps have this set (to 1)
-
         public override string ToString() => $"ID {GameDBID}";
     }
 
@@ -138,7 +137,7 @@ namespace BaseHandlers
         public int TriggerOffsetListCount { get; set; }
 
         public List<LandmarkTrigger> LandmarkTriggers { get; set; }
-        public SortedDictionary<uint, GenericRegionTrigger> GenericRegionTriggers { get; set; }
+        public List<GenericRegionTrigger> GenericRegionTriggers { get; set; }
         public List<TriggerSection4Entry> Section4Entries { get; set; }
         public List<RoamingLocation> RoamingLocationEntries { get; set; }
         public List<SpawnLocation> SpawnLocationEntries { get; set; }
@@ -147,7 +146,7 @@ namespace BaseHandlers
         public TriggerData()
         {
             LandmarkTriggers = new List<LandmarkTrigger>();
-            GenericRegionTriggers = new SortedDictionary<uint, GenericRegionTrigger>();
+            GenericRegionTriggers = new List<GenericRegionTrigger>();
             Section4Entries = new List<TriggerSection4Entry>();
             RoamingLocationEntries = new List<RoamingLocation>();
             SpawnLocationEntries = new List<SpawnLocation>();
@@ -268,10 +267,7 @@ namespace BaseHandlers
 
             for (int i = 0; i < GenericRegionTriggersCount; i++)
             {
-                long startPosition = br.BaseStream.Position;
-
                 GenericRegionTrigger genericRegionTrigger = new GenericRegionTrigger();
-
                 genericRegionTrigger.PositionX = br.ReadSingle();
                 genericRegionTrigger.PositionY = br.ReadSingle();
                 genericRegionTrigger.PositionZ = br.ReadSingle();
@@ -293,7 +289,7 @@ namespace BaseHandlers
                 genericRegionTrigger.Subtype = br.ReadByte();
                 genericRegionTrigger.UnknownByte37 = br.ReadByte();
 
-                GenericRegionTriggers.Add((uint)startPosition, genericRegionTrigger);
+                GenericRegionTriggers.Add(genericRegionTrigger);
             }
 
             br.BaseStream.Position = Section4Offset;
@@ -391,7 +387,7 @@ namespace BaseHandlers
                 spawnLocation.UnknownByte31 = br.ReadByte();
                 spawnLocation.UnknownInt32 = br.ReadInt32();
 
-                foreach (GenericRegionTrigger trigger in GenericRegionTriggers.Values)
+                foreach (GenericRegionTrigger trigger in GenericRegionTriggers)
                 {
                     if (trigger.GameDBID == spawnLocation.JunkyardGameDBID)
                     {
@@ -499,7 +495,7 @@ namespace BaseHandlers
 
             bw.BaseStream.Position = GenericRegionTriggersOffset;
 
-            foreach (GenericRegionTrigger genericRegionTrigger in GenericRegionTriggers.Values)
+            foreach (GenericRegionTrigger genericRegionTrigger in GenericRegionTriggers)
             {
                 bw.Write(genericRegionTrigger.PositionX);
                 bw.Write(genericRegionTrigger.PositionY);

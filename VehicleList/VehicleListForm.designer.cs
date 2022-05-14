@@ -30,6 +30,8 @@
         {
             this.mnuMain = new System.Windows.Forms.MenuStrip();
             this.itemsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lstVehicles = new System.Windows.Forms.ListView();
             this.colIndex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colVehicleID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -70,8 +72,6 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.tsbAddItem = new System.Windows.Forms.ToolStripButton();
             this.tsbCopyItem = new System.Windows.Forms.ToolStripButton();
-            this.addItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.copyItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuMain.SuspendLayout();
             this.stsMain.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -95,6 +95,22 @@
             this.itemsToolStripMenuItem.Name = "itemsToolStripMenuItem";
             this.itemsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.itemsToolStripMenuItem.Text = "Items";
+            // 
+            // addItemToolStripMenuItem
+            // 
+            this.addItemToolStripMenuItem.Image = global::VehicleList.Properties.Resources.AddTableHS;
+            this.addItemToolStripMenuItem.Name = "addItemToolStripMenuItem";
+            this.addItemToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.addItemToolStripMenuItem.Text = "Add Item";
+            this.addItemToolStripMenuItem.Click += new System.EventHandler(this.addItemToolStripMenuItem_Click);
+            // 
+            // copyItemToolStripMenuItem
+            // 
+            this.copyItemToolStripMenuItem.Image = global::VehicleList.Properties.Resources.CopyHS;
+            this.copyItemToolStripMenuItem.Name = "copyItemToolStripMenuItem";
+            this.copyItemToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.copyItemToolStripMenuItem.Text = "Copy Item";
+            this.copyItemToolStripMenuItem.Click += new System.EventHandler(this.copyItemToolStripMenuItem_Click);
             // 
             // lstVehicles
             // 
@@ -210,7 +226,7 @@
             // 
             // colExhaustID
             // 
-            this.colExhaustID.Text = "Exhuast ID";
+            this.colExhaustID.Text = "Exhaust ID";
             this.colExhaustID.Width = 80;
             // 
             // colEngineID
@@ -340,22 +356,6 @@
             this.tsbCopyItem.Size = new System.Drawing.Size(23, 22);
             this.tsbCopyItem.Text = "Copy Item";
             this.tsbCopyItem.Click += new System.EventHandler(this.tsbCopyItem_Click);
-            // 
-            // addItemToolStripMenuItem
-            // 
-            this.addItemToolStripMenuItem.Image = global::VehicleList.Properties.Resources.AddTableHS;
-            this.addItemToolStripMenuItem.Name = "addItemToolStripMenuItem";
-            this.addItemToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
-            this.addItemToolStripMenuItem.Text = "Add Item";
-            this.addItemToolStripMenuItem.Click += new System.EventHandler(this.addItemToolStripMenuItem_Click);
-            // 
-            // copyItemToolStripMenuItem
-            // 
-            this.copyItemToolStripMenuItem.Image = global::VehicleList.Properties.Resources.CopyHS;
-            this.copyItemToolStripMenuItem.Name = "copyItemToolStripMenuItem";
-            this.copyItemToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.copyItemToolStripMenuItem.Text = "Copy Item";
-            this.copyItemToolStripMenuItem.Click += new System.EventHandler(this.copyItemToolStripMenuItem_Click);
             // 
             // VehicleListForm
             // 

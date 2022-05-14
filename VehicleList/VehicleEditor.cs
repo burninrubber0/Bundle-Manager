@@ -1,4 +1,4 @@
-﻿using BundleUtilities;
+using BundleUtilities;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -34,6 +34,13 @@ namespace VehicleList
         public VehicleEditor()
         {
             InitializeComponent();
+        }
+
+        private int maxIndex;
+        public VehicleEditor(int max)
+        {
+            InitializeComponent();
+            maxIndex = max;
         }
 
         private void UpdateDisplay()
@@ -161,6 +168,23 @@ namespace VehicleList
         {
             Vehicle result = new Vehicle(Vehicle);
 
+            // Index
+            int index;
+            if (int.TryParse(txtIndex.Text, out index))
+            {
+                if (index <= maxIndex)
+                    result.Index = index;
+                else
+                {
+                    MessageBox.Show(this, "Index out of bounds.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return null;
+                }
+            }
+            else
+            {
+                MessageBox.Show(this, "Index is invalid.\nEnsure the value is a decimal integer.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
             // Vehicle ID
             if (txtID.Text.Trim().Length == 0)
             {

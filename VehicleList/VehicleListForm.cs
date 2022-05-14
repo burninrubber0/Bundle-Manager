@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -104,7 +104,7 @@ namespace VehicleList
                 return;
             Vehicle vehicle = List.Entries[index];
 
-            VehicleEditor editor = new VehicleEditor();
+            VehicleEditor editor = new VehicleEditor(List.Entries.Count - 1);
             editor.Vehicle = vehicle;
             editor.OnDone += Editor_OnDone;
             editor.ShowDialog(this);
@@ -121,7 +121,7 @@ namespace VehicleList
             vehicle.ExhaustName = new EncryptedString("");
             vehicle.EngineName = new EncryptedString("");
 
-            VehicleEditor editor = new VehicleEditor();
+            VehicleEditor editor = new VehicleEditor(List.Entries.Count);
             editor.Vehicle = vehicle;
             editor.OnDone += Editor_OnDone1; ;
             editor.ShowDialog(this);
@@ -139,7 +139,7 @@ namespace VehicleList
             Vehicle vehicle = new Vehicle(List.Entries[index]);
             vehicle.Index = List.Entries.Count;
 
-            VehicleEditor editor = new VehicleEditor();
+            VehicleEditor editor = new VehicleEditor(List.Entries.Count);
             editor.Vehicle = vehicle;
             editor.OnDone += Editor_OnDone1;
             editor.ShowDialog(this);
@@ -147,13 +147,38 @@ namespace VehicleList
 
         private void Editor_OnDone1(Vehicle vehicle)
         {
-            List.Entries.Add(vehicle);
+            // Insert if not at end, else add
+            if (vehicle.Index != List.Entries.Count)
+            {
+                List.Entries.Insert(vehicle.Index, vehicle);
+
+                for (int i = 0; i < List.Entries.Count; ++i)
+                    List.Entries[i].Index = i;
+            }
+            else
+            {
+                List.Entries.Add(vehicle);
+            }
+
             Edit?.Invoke();
             UpdateDisplay();
         }
 
         private void Editor_OnDone(Vehicle vehicle)
         {
+            // If the index has changed, edit the list
+            int oldIndex = int.Parse(lstVehicles.SelectedItems[0].Text); // Tried in EditSelectedEntry()
+            if (oldIndex != vehicle.Index)
+            {
+                Vehicle old = List.Entries[oldIndex];
+                List.Entries.RemoveAt(oldIndex);
+                List.Entries.Insert(vehicle.Index, old);
+
+                for (int i = 0; i < List.Entries.Count; ++i)
+                    List.Entries[i].Index = i;
+            }
+
+            // Edit the vehicle
             List.Entries[vehicle.Index] = vehicle;
             Edit?.Invoke();
             UpdateDisplay();

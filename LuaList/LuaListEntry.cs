@@ -1,4 +1,4 @@
-﻿using BundleUtilities;
+using BundleUtilities;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,11 +15,16 @@ namespace LuaList
         public string Name { get; set; } = "";
         public string Goal { get; set; } = "";
         public string Description { get; set; } = "";
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public string unknown1 { get; set; } = "";
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public int unknown2 { get; set; } = 0;
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public int unknown3 { get; set; } = 0;
         public int Type { get; set; } = 0;
         public int Variables { get; set; } = 0;
+
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public byte[] padding { get; set; } = new byte[8];
 
         public int getDataSize() {

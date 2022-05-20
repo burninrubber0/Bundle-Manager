@@ -14,29 +14,29 @@ namespace LuaList
     public class LuaList : IEntryData
     {
         public int version { get; set; }    //0x0	0x4	int32_t Version number	1
-        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public byte[] padding { get; set; } //0x4	0x4			padding		
         [TypeConverter(typeof(ULongHexTypeConverter))]
         public ulong CgsId { get; set; }     //0x8	0x8	CgsID List ID Encoded
-        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public byte[] Unk0 { get; set; }    //0x10	0x4	Unk0* Script list Unk0 format	
-        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public byte[] typePointer { get; set; }//0x14	0x4	char[32] * *		Types	
-        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]	
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]	
         public byte[] variablePointer { get; set; } //0x18	0x4	char[32] * *		Variables
-        [ReadOnly(true), Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
+        [ReadOnly(true), Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public int numScripts { get; set; }      //0x1C	0x4	uint32_t Num scripts		
-        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public int dataLength { get; set; }      //0x20	0x4	uint32_t Data length Not including padding to end
         public string listTitle { get; set; }   //0x24	0x80	char[128] List title		
-        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public byte numTypes { get; set; }     //0xA4	0x1	uint8_t Num types		
-        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public byte numVariables { get; set; } //0xA5	0x1	uint8_t Num variables
-        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public byte[] padding2 { get; set; } // 26 bytes long
         public List<LuaListEntry> entries { get; set; }
-        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
+        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
         public byte[] unknownData { get; set; }
 
         public IEntryEditor GetEditor(BundleEntry entry)

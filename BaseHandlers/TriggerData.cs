@@ -3,11 +3,13 @@ using BundleUtilities;
 using PluginAPI;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
 namespace BaseHandlers
 {
+    //To-Do: Calculate Offsets and Counts to allow for adding new Triggers
     public struct LandmarkTrigger
     {
         public float PositionX { get; set; }
@@ -22,11 +24,15 @@ namespace BaseHandlers
         public int GameDBID { get; set; }
         public short GlobalIndex { get; set; }
         public byte Type { get; set; } // Should be 0
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte2B { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint UnknownOffset { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte30 { get; set; }
         public byte LocalIndex { get; set; }
         public byte Subtype { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte33 { get; set; }
 
         public override string ToString() => $"ID {GameDBID}";
@@ -46,22 +52,33 @@ namespace BaseHandlers
         public int GameDBID { get; set; }
         public short Index { get; set; }
         public byte Type { get; set; } // Should be 2
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte2B { get; set; }
         public int GameDBID2 { get; set; } // Only used for _some_ super jumps
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public short UnknownShort30 { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public short UnknownShort32 { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte34 { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte35 { get; set; }
         public byte Subtype { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte37 { get; set; } // most, but not all, super jumps have this set (to 1)
         public override string ToString() => $"ID {GameDBID}";
     }
 
     public struct TriggerSection4Entry
     {
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint TriggerOffsetListOffset { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int TriggerOffsetListCount { get; set; }
+
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint GameDBIDListOffset { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int GameDBIDListCount { get; set; }
 
         public List<GenericRegionTrigger> Triggers { get; set; }
@@ -73,13 +90,20 @@ namespace BaseHandlers
         public float PositionX { get; set; }
         public float PositionY { get; set; }
         public float PositionZ { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint UnknownHash { get; set; }
         public byte Subdistrict { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte11 { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte12 { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte13 { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int UnknownInt14 { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int UnknownInt18 { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int UnknownInt1C { get; set; }
     }
 
@@ -88,17 +112,24 @@ namespace BaseHandlers
         public float PositionX { get; set; }
         public float PositionY { get; set; }
         public float PositionZ { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint UnknownHash { get; set; }
         public float RotationX { get; set; }
         public float RotationY { get; set; }
         public float RotationZ { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public float UnknownFloat1C { get; set; }
         public long JunkyardGameDBID { get; set; }
         public GenericRegionTrigger JunkyardTrigger { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte28 { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte29 { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte30 { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public byte UnknownByte31 { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int UnknownInt32 { get; set; }
     }
 
@@ -106,34 +137,57 @@ namespace BaseHandlers
     {
         public int FormatRevision { get; set; }
         public uint FileSize { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int Unknown0C { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int Unknown10 { get; set; }
         public float DevSpawnPositionX { get; set; }
         public float DevSpawnPositionY { get; set; }
         public float DevSpawnPositionZ { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint DevSpawnUnknownHash { get; set; }
         public float DevSpawnRotationX { get; set; }
         public float DevSpawnRotationY { get; set; }
         public float DevSpawnRotationZ { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public float DevSpawnUnknownFloat { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint LandmarkTriggersOffset { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int LandmarkTriggersCount { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int LandmarkNonFinishLineCount { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint BlackspotTriggersOffset { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int BlackspotTriggersCount { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint GenericRegionTriggersOffset { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int GenericRegionTriggersCount { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint Section4Offset { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int Section4Count { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint VFXBoxRegionOffset { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int VFXBoxRegionCount { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint StartPositionsOffset { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int StartPositionsCount { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint RoamingLocationsOffset { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int RoamingLocationsCount { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint SpawnLocationsOffset { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int SpawnLocationsCount { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public uint TriggerOffsetListOffset { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public int TriggerOffsetListCount { get; set; }
 
         public List<LandmarkTrigger> LandmarkTriggers { get; set; }
@@ -141,6 +195,7 @@ namespace BaseHandlers
         public List<TriggerSection4Entry> Section4Entries { get; set; }
         public List<RoamingLocation> RoamingLocationEntries { get; set; }
         public List<SpawnLocation> SpawnLocationEntries { get; set; }
+        [Category("Undefined Datastructure"), Description("This is currently not implented and can be ignored")]
         public List<uint> TriggerOffsets { get; set; }
 
         public TriggerData()
@@ -321,14 +376,14 @@ namespace BaseHandlers
                     region.SizeZ = br.ReadSingle();
                     region.GameDBID = br.ReadInt32();
                     region.Index = br.ReadInt16();
-                    region.Type  =  br.ReadByte();
+                    region.Type = br.ReadByte();
                     region.UnknownByte2B = br.ReadByte();
                     region.GameDBID2 = br.ReadInt32();
                     region.UnknownShort30 = br.ReadInt16();
                     region.UnknownShort32 = br.ReadInt16();
                     region.UnknownByte34 = br.ReadByte();
                     region.UnknownByte35 = br.ReadByte();
-                    region.Subtype =  br.ReadByte();
+                    region.Subtype = br.ReadByte();
                     region.UnknownByte37 = br.ReadByte();
                     section4Entry.Triggers.Add(region);
                 }
@@ -544,9 +599,9 @@ namespace BaseHandlers
                     bw.Write(trigger.SizeZ);
                     bw.Write(trigger.GameDBID);
                     bw.Write(trigger.Index);
-                    bw.Write(trigger.Type); 
+                    bw.Write(trigger.Type);
                     bw.Write(trigger.UnknownByte2B);
-                    bw.Write(trigger.GameDBID2); 
+                    bw.Write(trigger.GameDBID2);
                     bw.Write(trigger.UnknownShort30);
                     bw.Write(trigger.UnknownShort32);
                     bw.Write(trigger.UnknownByte34);
@@ -555,7 +610,7 @@ namespace BaseHandlers
                     bw.Write(trigger.UnknownByte37);
                 }
                 bw.BaseStream.Position = section4Entry.GameDBIDListOffset;
-                foreach(long id in section4Entry.GameDBIDs)
+                foreach (long id in section4Entry.GameDBIDs)
                 {
                     bw.Write(id);
                 }

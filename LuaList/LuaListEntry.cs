@@ -30,10 +30,10 @@ namespace LuaList
         public int getDataSize() {
             List<byte[]> bytes = new List<byte[]>();
             bytes.Add(BitConverter.GetBytes(CgsId));
-            bytes.Add(Encoding.ASCII.GetBytes((Name.PadRight(128).Substring(0, 128).ToCharArray())));
-            bytes.Add(Encoding.ASCII.GetBytes((Goal.PadRight(128).Substring(0, 128).ToCharArray())));
-            bytes.Add(Encoding.ASCII.GetBytes((Description.PadRight(128).Substring(0, 128).ToCharArray())));
-            bytes.Add(Encoding.ASCII.GetBytes((unknown1.PadRight(128).Substring(0, 128).ToCharArray())));
+            bytes.Add(Encoding.ASCII.GetBytes((Name.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
+            bytes.Add(Encoding.ASCII.GetBytes((Goal.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
+            bytes.Add(Encoding.ASCII.GetBytes((Description.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
+            bytes.Add(Encoding.ASCII.GetBytes((unknown1.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
             bytes.Add(BitConverter.GetBytes(unknown2));
             bytes.Add(BitConverter.GetBytes(unknown3));
             bytes.Add(BitConverter.GetBytes(Type));
@@ -58,10 +58,10 @@ namespace LuaList
         public void Write(BinaryWriter wr)
         {
             wr.Write(CgsId);
-            wr.Write(Encoding.ASCII.GetBytes((Name.PadRight(128).Substring(0, 128).ToCharArray())));
-            wr.Write(Encoding.ASCII.GetBytes((Goal.PadRight(128).Substring(0, 128).ToCharArray())));
-            wr.Write(Encoding.ASCII.GetBytes((Description.PadRight(128).Substring(0, 128).ToCharArray())));
-            wr.Write(Encoding.ASCII.GetBytes((unknown1.PadRight(128).Substring(0, 128).ToCharArray())));
+            wr.Write(Encoding.ASCII.GetBytes((Name.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
+            wr.Write(Encoding.ASCII.GetBytes((Goal.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
+            wr.Write(Encoding.ASCII.GetBytes((Description.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
+            wr.Write(Encoding.ASCII.GetBytes((unknown1.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
             wr.Write(unknown2);
             wr.Write(unknown3);
             wr.Write(Type);

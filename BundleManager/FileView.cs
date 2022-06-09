@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -202,7 +202,25 @@ namespace BundleManager
             string[] files = Directory.GetFiles(_currentPath, "*.*", SearchOption.AllDirectories);
 
             Dictionary<string, bool> fileTypes = new Dictionary<string, bool>();
+
+            string cachePath = _currentPath + "/files.bmcache";
+            if (File.Exists(cachePath))
+            {
+                string[] lines = File.ReadAllLines(cachePath);
+                foreach (string line in lines)
+                {
+                    string[] data = line.Split('|');
+                    if (data.Length < 2)
+                        continue;
+
+                    if (File.Exists(data[0]))
+                        fileTypes.Add(data[0], data[1] == "bundle");
+                }
+            }
+
+            int i = 0;
             int index = 0;
+            bool ignoreAllConflicts = false;
             foreach (string file in files)
             {
                 index++;
@@ -222,7 +240,58 @@ namespace BundleManager
                     }
 
                     int progress = index * 100 / files.Length;
+                    loader.SetStatus("Loading(" + progress.ToString("D2") + "%): " + Path.GetFileName(file));
                     loader.SetProgress(progress);
+
+                    string fixedPath = file.Replace('\\', '/');
+                    string fixedCurrentPath = _currentPath.Replace('\\', '/');
+
+                    fixedPath = fixedPath.Replace(fixedCurrentPath, "");
+
+                    if (fixedPath.StartsWith("/"))
+                        fixedPath = fixedPath.Substring(1);
+
+                    string[] itemData = new string[]
+                    {
+                        fixedPath
+                    };
+
+                    bool cancel = false;
+
+                    List<EntryInfo> entryIDs = BundleArchive.GetEntryInfos(file, false);
+                    foreach (EntryInfo info in entryIDs)
+                    {
+                        uint entryID = info.ID;
+                        if (BundleCache.Files.ContainsKey(entryID))
+                        {
+                            if (ignoreAllConflicts)
+                                continue;
+                            int index1 = BundleCache.Files[entryID];
+                            string otherFile = BundleCache.Paths[index1];
+                            ConflictChoice choice = ResolveConflict(entryID, file, otherFile);
+                            if (choice.Cancel)
+                            {
+                                cancel = true;
+                                break;
+                            }
+                            if (choice.IgnoreAll)
+                                ignoreAllConflicts = true;
+                            continue;
+                        }
+                        if (!BundleCache.EntryInfos.ContainsKey(entryID))
+                            BundleCache.EntryInfos.Add(entryID, info);
+                        BundleCache.Files.Add(entryID, i);
+                    }
+
+                    if (cancel)
+                    {
+                        BundleCache.Files.Clear();
+                        BundleCache.Paths.Clear();
+                        BundleCache.EntryInfos.Clear();
+                        lstMain.Items.Clear();
+                        break;
+                    }
+
                     BundleCache.Paths.Add(file);
                 }
                 catch (ThreadAbortException)
@@ -234,6 +303,25 @@ namespace BundleManager
                     _currentPath = null;
                     break;
                 }
+
+                i++;
+            }
+
+            try
+            {
+                Stream s = File.Open(cachePath, FileMode.Create, FileAccess.Write);
+                StreamWriter sw = new StreamWriter(s);
+
+                foreach (string key in fileTypes.Keys)
+                    sw.WriteLine(key + "|" + (fileTypes[key] ? "bundle" : "other"));
+
+                sw.Flush();
+                sw.Close();
+                s.Close();
+            }
+            catch (IOException ex)
+            {
+                Invoke(new Action(() => MessageBox.Show(this, "Failed to cache file types:\n" + ex.Message + "\n" + ex.StackTrace)));
             }
         }
 
@@ -266,7 +354,7 @@ namespace BundleManager
         private void OpenBundle(int index)
         {
             string file = BundleCache.Paths[index];
-            List<EntryInfo> entryIDs = BundleArchive.GetEntryInfos(file, false);
+            /*List<EntryInfo> entryIDs = BundleArchive.GetEntryInfos(file, false);
             bool ignoreAllConflicts = false;
             foreach (EntryInfo info in entryIDs)
             {
@@ -292,7 +380,7 @@ namespace BundleManager
                     BundleCache.EntryInfos.Add(entryID, info);
                     BundleCache.Files.Add(entryID, index);
                 }
-            }
+            }*/
             MainForm form = new MainForm();
             form.SubForm = true;
             form.Open(file);

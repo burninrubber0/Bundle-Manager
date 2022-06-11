@@ -59,7 +59,7 @@
     <Compile Include="LuaListEntry.cs" />
     <Compile Include="LuaListPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ULongHexTypeConverter.cs" />
+    <Compile Include="EncryptedStringConverter.cs" />
     <EmbeddedResource Include="LuaListEditor.resx">
       <DependentUpon>LuaListEditor.cs</DependentUpon>
     </EmbeddedResource>
@@ -95,6 +95,10 @@
     <ProjectReference Include="..\PluginAPI\PluginAPI.csproj">
       <Project>{757f0204-f091-464d-aa42-fe8919ff73bb}</Project>
       <Name>PluginAPI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VehicleList\VehicleList.csproj">
+      <Project>{557FC08F-7ACD-44D7-AC1F-FB815A267A36}</Project>
+      <Name>VehicleList</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

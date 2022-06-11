@@ -46,6 +46,18 @@ namespace BundleUtilities
             }
         }
     }
+
+    public static class Util
+    {
+        // reverse byte order (64-bit)
+        public static UInt64 ReverseBytes(UInt64 value)
+        {
+            return (value & 0x00000000000000FFUL) << 56 | (value & 0x000000000000FF00UL) << 40 |
+                   (value & 0x0000000000FF0000UL) << 24 | (value & 0x00000000FF000000UL) << 8 |
+                   (value & 0x000000FF00000000UL) >> 8 | (value & 0x0000FF0000000000UL) >> 24 |
+                   (value & 0x00FF000000000000UL) >> 40 | (value & 0xFF00000000000000UL) >> 56;
+        }
+    }
     public static class Utilities
     {
         public static ulong calcLookup8(string text)
@@ -56,6 +68,20 @@ namespace BundleUtilities
             return hashValue;
         }
 
+        public static EncryptedString ReadEncryptedString(this BinaryReader self)
+        {
+            ulong value = self.ReadUInt64();
+            EncryptedString id = new EncryptedString(value);
+            return id;
+        }
+
+        public static void WriteEncryptedString(this BinaryWriter self, EncryptedString id, bool xbox = false)
+        {
+            ulong value = id.Encrypted;
+            if (xbox)
+                value = Util.ReverseBytes(value);
+            self.Write(value);
+        }
 
         public static bool IsValidPath(string path)
         {

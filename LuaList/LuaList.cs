@@ -13,8 +13,9 @@ namespace LuaList
     public class LuaList : IEntryData
     {
         public int version { get; set; }
-        [TypeConverter(typeof(ULongHexTypeConverter))]
-        public ulong CgsId { get; set; }
+
+        [TypeConverter(typeof(EncryptedStringConverter))]
+        public EncryptedString CgsId { get; set; }
 
         public int dataLength;
         public string listTitle { get; set; }
@@ -42,7 +43,7 @@ namespace LuaList
             List<byte[]> bytes = new List<byte[]>();
             bytes.Add(BitConverter.GetBytes(version));
             bytes.Add(new byte[4]);
-            bytes.Add(BitConverter.GetBytes(CgsId));
+            bytes.Add(BitConverter.GetBytes(CgsId.Encrypted));
             bytes.Add(BitConverter.GetBytes(192));
             bytes.Add(BitConverter.GetBytes(1231));
             bytes.Add(BitConverter.GetBytes(312312));
@@ -85,7 +86,7 @@ namespace LuaList
 
             version = br.ReadInt32(); //0x0	0x4	int32_t Version number	1
             br.ReadBytes(4); // 0x4	0x4			padding	
-            CgsId = br.ReadUInt64();  //0x8	0x8	CgsID List ID Encoded
+            CgsId = br.ReadEncryptedString();  //0x8	0x8	CgsID List ID Encoded
             var entriesPointer = br.ReadInt32(); //0x10	0x4	Unk0* Script list Unk0 format	
             var typePointer = br.ReadInt32(); //0x14	0x4	char[32] * *		Types
             var variablePointer = br.ReadInt32(); //0x18	0x4	char[32] * *		Variables
@@ -147,7 +148,7 @@ namespace LuaList
             BinaryWriter bw = new BinaryWriter(ms);
             bw.Write(version);
             bw.WriteUniquePadding(4);
-            bw.Write(CgsId);
+            bw.WriteEncryptedString(CgsId);
             bw.Write(getLengthOfHeader());
             bw.Write(getLengthOfHeader() + getLengthOfEntries());
             bw.Write(getLengthOfHeader() + getLengthOfEntries() + getLengthOfTypes());

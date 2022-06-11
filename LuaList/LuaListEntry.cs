@@ -10,8 +10,8 @@ namespace LuaList
 {
     public class LuaListEntry
     {
-        [TypeConverter(typeof(ULongHexTypeConverter))]
-        public ulong CgsId { get; set; }
+        [TypeConverter(typeof(EncryptedStringConverter))]
+        public EncryptedString CgsId { get; set; }
         public string Name { get; set; } = "";
         public string Goal { get; set; } = "";
         public string Description { get; set; } = "";
@@ -24,26 +24,23 @@ namespace LuaList
         public int Type { get; set; } = 0;
         public int Variables { get; set; } = 0;
 
-        [Category("Undefined Datastructure"), Description("This is currently not implemented and can be ignored")]
-        public byte[] padding { get; set; } = new byte[8];
-
         public int getDataSize() {
             List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(BitConverter.GetBytes(CgsId));
+            bytes.Add(BitConverter.GetBytes(CgsId.Encrypted));
             bytes.Add(Encoding.ASCII.GetBytes((Name.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
             bytes.Add(Encoding.ASCII.GetBytes((Goal.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
             bytes.Add(Encoding.ASCII.GetBytes((Description.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
             bytes.Add(Encoding.ASCII.GetBytes((unknown1.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
             bytes.Add(BitConverter.GetBytes(unknown2));
             bytes.Add(BitConverter.GetBytes(unknown3));
-            bytes.Add(BitConverter.GetBytes(Type));
-            bytes.Add(BitConverter.GetBytes(Variables));
-            bytes.Add(padding);
+            bytes.Add(BitConverter.GetBytes((int)Type));
+            bytes.Add(BitConverter.GetBytes((int)Variables));
+            bytes.Add(new byte[8]);
             return bytes.SelectMany(i => i).Count();
         }
 
         public void Read(ILoader loader, BinaryReader2 br) {
-            CgsId = br.ReadUInt64();
+            CgsId = br.ReadEncryptedString();
             Name = br.ReadLenString(128);
             Goal = br.ReadLenString(128);
             Description = br.ReadLenString(128);
@@ -52,12 +49,12 @@ namespace LuaList
             unknown3 = br.ReadInt32();
             Type = br.ReadInt32();
             Variables = br.ReadInt32();
-            padding = br.ReadBytes(8);
+            br.ReadBytes(8); // padding
         }
 
         public void Write(BinaryWriter wr)
         {
-            wr.Write(CgsId);
+            wr.WriteEncryptedString(CgsId);
             wr.Write(Encoding.ASCII.GetBytes((Name.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
             wr.Write(Encoding.ASCII.GetBytes((Goal.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
             wr.Write(Encoding.ASCII.GetBytes((Description.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
@@ -66,7 +63,7 @@ namespace LuaList
             wr.Write(unknown3);
             wr.Write(Type);
             wr.Write(Variables);
-            wr.Write(padding);
+            wr.WriteUniquePadding(8);
         }
     }
 }

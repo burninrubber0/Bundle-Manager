@@ -10,7 +10,7 @@ namespace LuaList
 
 
     // [1] define UInt32HexTypeConverter is-a TypeConverter
-    public class ULongHexTypeConverter : TypeConverter
+    public class EncryptedStringConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -38,9 +38,9 @@ namespace LuaList
 
         public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof(string) && value.GetType() == typeof(ulong))
+            if (destinationType == typeof(string) && value.GetType() == typeof(BundleUtilities.EncryptedString))
             {
-                return string.Format("0x{0:X8}", value);
+                return ((BundleUtilities.EncryptedString)value).Value;
             }
             else
             {
@@ -53,13 +53,7 @@ namespace LuaList
             if (value.GetType() == typeof(string))
             {
                 string input = (string)value;
-
-                if (input.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-                {
-                    input = input.Substring(2);
-                }
-
-                return ulong.Parse(input, System.Globalization.NumberStyles.HexNumber, culture);
+                return new BundleUtilities.EncryptedString(input);
             }
             else
             {

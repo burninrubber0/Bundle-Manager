@@ -23,7 +23,7 @@ namespace LuaList
     public class LuaListEntry
     {
         [TypeConverter(typeof(EncryptedStringConverter))]
-        public EncryptedString CgsId { get; set; }
+        public EncryptedString CgsId { get; set; } = new EncryptedString("SC_1000000");
         public string Name { get; set; } = "";
         public string Goal { get; set; } = "";
         public string Description { get; set; } = "";

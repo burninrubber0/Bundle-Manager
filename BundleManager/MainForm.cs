@@ -173,7 +173,6 @@ namespace BundleManager
             for (int i = 0; i < CurrentArchive.Entries.Count; i++)
             {
                 BundleEntry entry = CurrentArchive.Entries[i];
-                Color color = entry.GetColor();
                 string[] values = new string[]
                 {
                     i.ToString("d3"),
@@ -185,7 +184,7 @@ namespace BundleManager
                 };
 
                 ListViewItem item = new ListViewItem(values);
-                item.BackColor = color;
+                item.BackColor = entry.GetColor();
                 lstEntries.Items.Add(item);
             }
 

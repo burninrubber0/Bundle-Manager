@@ -1,4 +1,4 @@
-﻿using BundleFormat;
+using BundleFormat;
 using BundleUtilities;
 using PluginAPI;
 using System;
@@ -127,8 +127,6 @@ namespace VehicleList
 
     public class VehicleListData : IEntryData
     {
-        public int Unknown1;
-        public int Unknown2;
         public List<Vehicle> Entries;
 
         public VehicleListData()
@@ -155,8 +153,6 @@ namespace VehicleList
 
         private void Clear()
         {
-            Unknown1 = default;
-            Unknown2 = default;
             Entries.Clear();
         }
 
@@ -168,11 +164,8 @@ namespace VehicleList
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            int count = br.ReadInt32();
-            int startOff = br.ReadInt32();
-
-            Unknown1 = br.ReadInt32();
-            Unknown2 = br.ReadInt32();
+            long startOff = br.ReadInt64();
+            long count = br.ReadInt64();
 
             for (int i = 0; i < count; i++)
             {
@@ -237,11 +230,8 @@ namespace VehicleList
             bool console = entry.Console;
             // TODO: Implement Console Saving
 
-            bw.Write(console ? Util.ReverseBytes((int)Entries.Count) : (int)Entries.Count);
-            bw.Write(console ? Util.ReverseBytes((int)0x10) : (int)0x10);
-
-            bw.Write(console ? Util.ReverseBytes(Unknown1) : Unknown1);
-            bw.Write(console ? Util.ReverseBytes(Unknown2) : Unknown2);
+            bw.Write(console ? Util.ReverseBytes((long)0x10) : (long)0x10);
+            bw.Write(console ? Util.ReverseBytes((long)Entries.Count) : (long)Entries.Count);
 
             for (int i = 0; i < Entries.Count; i++)
             {

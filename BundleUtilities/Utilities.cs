@@ -187,7 +187,7 @@ namespace BundleUtilities
 
         public static string ReadCStringPtr(this BinaryReader self)
         {
-            uint ptr = self.ReadUInt32();
+            long ptr = self.ReadInt64();
             long pos = self.BaseStream.Position;
             self.BaseStream.Position = ptr;
             string result = self.ReadCStr();

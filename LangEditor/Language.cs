@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,9 +12,10 @@ namespace LangEditor
 {
     public class Language : IEntryData
     {
-        public int Unknown1;
+        public uint LanguageID;
+        public uint Size;
+        public ulong Entries;
         public Dictionary<uint, string> Data;
-        public int Unknown2;
 
         public Language()
         {
@@ -23,8 +24,9 @@ namespace LangEditor
 
         private void Clear()
         {
-            Unknown1 = default;
-            Unknown2 = default;
+            LanguageID = default;
+            Size = default;
+            Entries = default;
 
             Data.Clear();
         }
@@ -37,13 +39,16 @@ namespace LangEditor
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            Unknown1 = br.ReadInt32();
-            int count = br.ReadInt32();
-            Unknown2 = br.ReadInt32();
+            // Read header
+            LanguageID = br.ReadUInt32();
+            Size = br.ReadUInt32() - 1; // Exclude the padding string
+            Entries = br.ReadUInt64();
 
-            for (int i = 0; i < count - 1; i++)
+            // Read entries and data
+            for (int i = 0; i < Size; i++)
             {
                 uint id = br.ReadUInt32();
+                br.SkipUniquePadding(4);
                 string txt = br.ReadCStringPtr();
                 Data.Add(id, txt);
             }
@@ -61,48 +66,51 @@ namespace LangEditor
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
-            bw.Write(Unknown1);
+            // Write header
+            bw.Write(LanguageID);
             bw.Write(Data.Count + 1);
-            bw.Write(Unknown2);
-
-            long headPos = bw.BaseStream.Position;
+            bw.Write(Entries);
             
+            // Write entries
             foreach (uint id in Data.Keys)
             {
                 bw.Write(id);
-                bw.Write((uint) 0); // offset
+                bw.Write(0); // Padding
+                bw.Write((ulong)0); // Offset
             }
 
-            bw.Write((uint)0);
-            bw.Write((uint)0); // offset
+            // Write padding entry
+            bw.Write(0);
+            bw.Write(0); // Padding
+            bw.Write((ulong)0); // Offset
 
+            // Write data
             int index = 0;
             foreach (uint id in Data.Keys)
             {
-                long pos = bw.BaseStream.Position;
+                // Write offset
+                long stringStartPos = bw.BaseStream.Position;
+                bw.BaseStream.Position = (int)Entries + (index * 0x10) + 8;
+                bw.Write(stringStartPos);
 
-                // go back and write offset
-                bw.BaseStream.Position = headPos + (index * 8) + 4;
-                bw.Write((uint)pos);
-
-                bw.BaseStream.Position = pos;
+                // Write string
+                bw.BaseStream.Position = stringStartPos;
                 if (Data[id] == null)
                     bw.WriteCStr("");
                 else
                     bw.WriteCStr(Data[id]);
+
                 index++;
             }
 
-            long pos2 = bw.BaseStream.Position;
+            // Write padding offset
+            long paddingStartPos = bw.BaseStream.Position;
+            bw.BaseStream.Position = (int)Entries + (index * 0x10) + 8;
+            bw.Write(paddingStartPos);
 
-            // go back and write offset
-            bw.BaseStream.Position = headPos + (index * 8) + 4;
-            bw.Write((uint)pos2);
-
-            bw.BaseStream.Position = pos2;
-
+            // Write data
+            bw.BaseStream.Position = paddingStartPos;
             int paddingCount = (int)(entry.EntryBlocks[0].Data.Length - bw.BaseStream.Position);
-
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < paddingCount; i++)
                 sb.Append("A");

@@ -122,6 +122,9 @@
     <EmbeddedResource Include="InstanceListEditor.resx">
       <DependentUpon>InstanceListEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="TriggerDataEditor.resx">
+      <DependentUpon>TriggerDataEditor.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

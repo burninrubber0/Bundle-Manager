@@ -24,13 +24,16 @@ namespace BaseHandlers
             set
             {
                 _trigger = value;
+                Console.WriteLine(value.muSize);
+                Console.WriteLine(_trigger.muSize);
+                Console.WriteLine(trigger.muSize);
+                
                 UpdateComponent();
             }
         }
 
         public void UpdateComponent()
         {
-
             propertyGrid1.SelectedObject = trigger;
         }
 
@@ -48,5 +51,6 @@ namespace BaseHandlers
         private void propertyChanged() {
             EditEvent?.Invoke();
         }
+
     }
 }

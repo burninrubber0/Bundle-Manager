@@ -32,9 +32,8 @@ namespace BaseHandlers
             this.propertyGrid1.Size = new System.Drawing.Size(802, 456);
             this.propertyGrid1.TabIndex = 0;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
-            this.propertyGrid1.LostFocus += (sender, args) => this.propertyChanged();
             // 
-            // LuaListEditor
+            // TriggerDataEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -43,8 +42,6 @@ namespace BaseHandlers
             this.Name = "TriggerDataEditor";
             this.Text = "Trigger Data Editor";
             this.ResumeLayout(false);
-
-            this.Controls.Add(this.propertyGrid1);
 
         }
 

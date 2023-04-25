@@ -11,7 +11,7 @@ namespace BaseHandlers
 {
     public class CgsID
     {
-        private UInt64 m_id;
+        private UInt64 m_id = 0;
 
         public UInt64 ID
         {
@@ -56,9 +56,9 @@ namespace BaseHandlers
         E_TYPE_COUNT = 4
     }
 
-    public struct StartingGrid {
-        public Vector3I[] StartingPositions { get; set; }
-        public Vector3I[] StartingDirections { get; set; }
+    public class StartingGrid {
+        public Vector3I[] StartingPositions { get; set; } = new Vector3I[1];
+        public Vector3I[] StartingDirections { get; set; } = new Vector3I[1];
 
         public void Read(BinaryReader reader)
         {
@@ -103,15 +103,15 @@ namespace BaseHandlers
 
     public class BoxRegion
     {
-        public float PositionX { get; set; }
-        public float PositionY { get; set; }
-        public float PositionZ { get; set; }
-        public float RotationX { get; set; }
-        public float RotationY { get; set; }
-        public float RotationZ { get; set; }
-        public float DimensionX { get; set; }
-        public float DimensionY { get; set; }
-        public float DimensionZ { get; set; }
+        public float PositionX { get; set; } = 0;
+        public float PositionY { get; set; } = 0;
+        public float PositionZ { get; set; } = 0;
+        public float RotationX { get; set; } = 0;
+        public float RotationY { get; set; } = 0;
+        public float RotationZ { get; set; } = 0;
+        public float DimensionX { get; set; } = 0;
+        public float DimensionY { get; set; } = 0;
+        public float DimensionZ { get; set; } = 0;
 
         public void Read(BinaryReader reader)
         {
@@ -142,11 +142,11 @@ namespace BaseHandlers
 
     public class TriggerRegion
     {
-        public BoxRegion mBoxRegion { get; set; }
-        public int mId { get; set; }
-        public short miRegionIndex { get; set; }
-        public RegionType meType { get; set; }
-        private byte[] muPad { get; set; }
+        public BoxRegion mBoxRegion { get; set; } = new BoxRegion();
+        public int mId { get; set; } = 0;
+        public short miRegionIndex { get; set; } = 0;
+        public RegionType meType { get; set; } = RegionType.E_TYPE_LANDMARK;
+        private byte[] muPad { get; set; } = new byte[1];
 
         public virtual void Read(BinaryReader reader)
         {
@@ -171,13 +171,13 @@ namespace BaseHandlers
 
     public class Landmark : TriggerRegion
     {
-        public List<StartingGrid> mpaStartingGrids { get; set; }
+        public List<StartingGrid> mpaStartingGrids { get; set; } = new List<StartingGrid>();
 
-        private long startingGridsOffset;
-        public byte miStartingGridCount { get; set; }
-        public byte muDesignIndex { get; set; }
-        public byte muDistrict { get; set; } 
-        public byte mu8Flags { get; set; }
+        private long startingGridsOffset = 0;
+        public byte miStartingGridCount { get; set; } = 0;
+        public byte muDesignIndex { get; set; } = 0;
+        public byte muDistrict { get; set; } = 0;
+        public byte mu8Flags { get; set; } = 0;
 
         public void Read(BinaryReader reader)
         {
@@ -222,13 +222,13 @@ namespace BaseHandlers
 
     public class GenericRegion : TriggerRegion
     {
-        public int GroupID { get; set; }
-        public short CameraCut1 { get; set; }
-        public short CameraCut2 { get; set; }
-        public sbyte CameraType1 { get; set; }
-        public sbyte CameraType2 { get; set; }
-        public byte Type { get; set; }
-        public sbyte IsOneWay { get; set; }
+        public int GroupID { get; set; } = 0;
+        public short CameraCut1 { get; set; } = 0;
+        public short CameraCut2 { get; set; } = 0;
+        public sbyte CameraType1 { get; set; } = 0;
+        public sbyte CameraType2 { get; set; } = 0;
+        public byte Type { get; set; } = 0;
+        public sbyte IsOneWay { get; set; } = 0;
 
         public void Read(BinaryReader reader)
         {
@@ -257,8 +257,8 @@ namespace BaseHandlers
 
     public class Blackspot : TriggerRegion
     {
-        public byte muScoreType { get; set; }
-        public int miScoreAmount { get; set; }
+        public byte muScoreType { get; set; } = 0;
+        public int miScoreAmount { get; set; } = 0;
 
         public override void Read(BinaryReader reader)
         {
@@ -281,12 +281,12 @@ namespace BaseHandlers
 
     public class Killzone 
     {
-        public List<int> TriggerIds { get; set; }
-        public CgsID[] RegionIds { get; set; }
+        public List<int> TriggerIds { get; set; } = new List<int>();
+        public CgsID[] RegionIds { get; set; } = new CgsID[1];
 
-        private long TriggerOffsetPosition;
+        private long TriggerOffsetPosition = 0;
 
-        private long CGSIDOffsetPosition;
+        private long CGSIDOffsetPosition = 0;
         public void Read(BinaryReader reader)
         {
             // Read the trigger pointer array
@@ -373,9 +373,9 @@ namespace BaseHandlers
 
     public class SignatureStunt
     {
-        public CgsID mId { get; set; }
-        public long miCamera { get; set; }
-        public List<int> genericRegionIds { get; set; }
+        public CgsID mId { get; set; } = new CgsID();
+        public long miCamera { get; set; } = 0;
+        public List<int> genericRegionIds { get; set; } = new List<int>();
 
         public void Read(BinaryReader reader)
         {
@@ -444,10 +444,10 @@ namespace BaseHandlers
         }
     }
 
-    public struct RoamingLocation
+    public class RoamingLocation
     {
-        public Vector3I Position { get; set; }
-        public byte DistrictIndex { get; set; }
+        public Vector3I Position { get; set; } = new Vector3I(0,0,0,0);
+        public byte DistrictIndex { get; set; } = 0;
 
         public void Read(BinaryReader reader) { 
 
@@ -494,10 +494,10 @@ namespace BaseHandlers
 
     public class SpawnLocation
     {
-        public Vector3I mPosition { get; set; }
-        public Vector3I mDirection { get; set; }
-        public CgsID mJunkyardId { get; set; }
-        public byte muType { get; set; }
+        public Vector3I mPosition { get; set; } = new Vector3I(0, 0, 0, 0);
+        public Vector3I mDirection { get; set; } = new Vector3I(0, 0, 0, 0);
+        public CgsID mJunkyardId { get; set; } = new CgsID();
+        public byte muType { get; set; } = 0;
         private byte[] padding = new byte[7];
 
         public void Read(BinaryReader reader)
@@ -532,8 +532,8 @@ public class TriggerData : IEntryData
     {
         public int miVersionNumber { get; set; }
         public uint muSize { get; set; }
-        public Vector3I mPlayerStartPosition { get; set; }
-        public Vector3I mPlayerStartDirection { get; set; }
+        public Vector3I mPlayerStartPosition { get; set; } 
+        public Vector3I mPlayerStartDirection { get; set; } 
         public List<Landmark> mpLandmarks { get; set; }
         public int miOnlineLandmarkCount { get; set; }
         public SignatureStunt[] mpSignatureStunts { get; set; }
@@ -751,15 +751,7 @@ public class TriggerData : IEntryData
                 TriggerRegionOffsets.Add((uint)writer.BaseStream.Position);
                 landmark.Write(writer);
             }
-
-            // Write padding
-            long paddingCount = 16 - (writer.BaseStream.Position % 16);
-            if (paddingCount < 16)
-            {
-                for (int i = 0; i < paddingCount; i++)
-                    writer.Write((byte)0);
-            }
-
+            writer.WritePadding();
 
             currentPosition = writer.BaseStream.Position;
             long offsetForSignatureStunts = writer.BaseStream.Position;
@@ -771,13 +763,7 @@ public class TriggerData : IEntryData
             {
                 stunt.WriteWithEmpty(writer);
             }
-
-            // Write padding
-            paddingCount = 16 - (writer.BaseStream.Position % 16);
-            if(paddingCount < 16) { 
-                for (int i = 0; i < paddingCount; i++)
-                    writer.Write((byte)0);
-            }
+            writer.WritePadding();
 
             currentPosition = writer.BaseStream.Position;
             writer.BaseStream.Position = GenericRegionsOffsetPosition;
@@ -790,14 +776,7 @@ public class TriggerData : IEntryData
                 TriggerRegionOffsets.Add((uint)writer.BaseStream.Position);
                 region.Write(writer);
             }
-
-            // Write padding
-            paddingCount = 16 - (writer.BaseStream.Position % 16);
-            if (paddingCount < 16)
-            {
-                for (int i = 0; i < paddingCount; i++)
-                    writer.Write((byte)0);
-            }
+            writer.WritePadding();
 
             // Go Back To SignatureStunt and Overwrite it with the actual positions in the file, then go back
             currentPosition = writer.BaseStream.Position;
@@ -816,14 +795,7 @@ public class TriggerData : IEntryData
             {
                 killzone.Write(writer);
             };
-
-            // Write padding
-            paddingCount = 16 - (writer.BaseStream.Position % 16);
-            if (paddingCount < 16)
-            {
-                for (int i = 0; i < paddingCount; i++)
-                    writer.Write((byte)0);
-            }
+            writer.WritePadding();
 
             currentPosition = writer.BaseStream.Position;
             writer.BaseStream.Position = BlackspotOffsetPosition;
@@ -834,14 +806,7 @@ public class TriggerData : IEntryData
                 TriggerRegionOffsets.Add((uint)writer.BaseStream.Position);
                 blackspot.Write(writer);
             }
-
-            // Write padding
-            paddingCount = 16 - (writer.BaseStream.Position % 16);
-            if (paddingCount < 16)
-            {
-                for (int i = 0; i < paddingCount; i++)
-                    writer.Write((byte)0);
-            }
+            writer.WritePadding();
 
             currentPosition = writer.BaseStream.Position;
             writer.BaseStream.Position = VFXBoxRegionsOffsetPosition;
@@ -852,14 +817,7 @@ public class TriggerData : IEntryData
                 TriggerRegionOffsets.Add((uint)writer.BaseStream.Position);
                 region.Write(writer);
             }
-
-            // Write padding
-            paddingCount = 16 - (writer.BaseStream.Position % 16);
-            if (paddingCount < 16)
-            {
-                for (int i = 0; i < paddingCount; i++)
-                    writer.Write((byte)0);
-            }
+            writer.WritePadding();
 
             currentPosition = writer.BaseStream.Position;
             writer.BaseStream.Position = RoamingLocationsOffsetPosition;
@@ -869,14 +827,7 @@ public class TriggerData : IEntryData
             {
                 location.Write(writer);
             }
-
-            // Write padding
-            paddingCount = 16 - (writer.BaseStream.Position % 16);
-            if (paddingCount < 16)
-            {
-                for (int i = 0; i < paddingCount; i++)
-                    writer.Write((byte)0);
-            }
+            writer.WritePadding();
 
             currentPosition = writer.BaseStream.Position;
             writer.BaseStream.Position = SpawnLocationsOffsetPosition;
@@ -886,13 +837,7 @@ public class TriggerData : IEntryData
             {
                 location.Write(writer);
             }
-            // Write padding
-            paddingCount = 16 - (writer.BaseStream.Position % 16);
-            if (paddingCount < 16)
-            {
-                for (int i = 0; i < paddingCount; i++)
-                    writer.Write((byte)0);
-            }
+            writer.WritePadding();
 
             foreach (Killzone killzone in mpKillzones)
             {
@@ -913,13 +858,7 @@ public class TriggerData : IEntryData
             writer.BaseStream.Position = SizePosition;
             writer.Write((uint)currentPosition);
             writer.BaseStream.Position = currentPosition;
-
-            paddingCount = 16 - (writer.BaseStream.Position % 16);
-            if (paddingCount < 16)
-            {
-                for (int i = 0; i < paddingCount; i++)
-                    writer.Write((byte)0);
-            }
+            writer.WritePadding();
 
             writer.Flush();
 

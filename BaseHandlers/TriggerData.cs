@@ -4,11 +4,36 @@ using PluginAPI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Drawing.Design;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace BaseHandlers
 {
+    class DescriptiveCollectionEditor : CollectionEditor
+    {
+        public DescriptiveCollectionEditor(Type type) : base(type) { }
+        protected override CollectionForm CreateCollectionForm()
+        {
+            CollectionForm form = base.CreateCollectionForm();
+            form.Shown += delegate
+            {
+                ShowDescription(form);
+            };
+            return form;
+        }
+        static void ShowDescription(Control control)
+        {
+            PropertyGrid grid = control as PropertyGrid;
+            if (grid != null) grid.HelpVisible = true;
+            foreach (Control child in control.Controls)
+            {
+                ShowDescription(child);
+            }
+        }
+    }
     public class CgsID
     {
         private UInt64 m_id = 0;
@@ -327,6 +352,7 @@ namespace BaseHandlers
 
     public class Killzone 
     {
+        [Description("Triggers as GenericRegions. Uses region.mId")]
         public List<int> TriggerIds { get; set; } = new List<int>();
         public CgsID[] RegionIds { get; set; } = new CgsID[1];
 
@@ -588,6 +614,8 @@ public class TriggerData : IEntryData
         public int miOnlineLandmarkCount { get; set; }
         public SignatureStunt[] mpSignatureStunts { get; set; }
         public GenericRegion[] mpGenericRegions { get; set; }
+
+        [Editor(typeof(DescriptiveCollectionEditor), typeof(UITypeEditor))]
         public Killzone[] mpKillzones { get; set; }
         public Blackspot[] mpBlackspots { get; set; }
         public VFXBoxRegion[] mpVFXBoxRegions { get; set; }

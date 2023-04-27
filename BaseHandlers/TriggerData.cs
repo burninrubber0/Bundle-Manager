@@ -453,7 +453,9 @@ namespace BaseHandlers
     {
         public CgsID mId { get; set; } = new CgsID();
         public long miCamera { get; set; } = 0;
-        public List<int> genericRegionIds { get; set; } = new List<int>();
+        public List<int> stuntElementRegions { get; set; } = new List<int>();
+
+        private long StuntElementOffsetPosition = 0;
 
         public void Read(BinaryReader reader)
         {
@@ -472,54 +474,38 @@ namespace BaseHandlers
                 Triggers[i] = reader.ReadUInt32();
             }
 
-            genericRegionIds = new List<int>();
+            stuntElementRegions = new List<int>();
             foreach (uint trigger in Triggers)
             {
                 reader.BaseStream.Position = trigger;
                 GenericRegion region = new GenericRegion();
                 region.Read(reader);
-                genericRegionIds.Add(region.mId);
+                stuntElementRegions.Add(region.mId);
             }
             reader.BaseStream.Position = currentPosition;
         }
 
         // Write something in triggerIds, because we dont have the actual positions yet
-        public void WriteWithEmpty(BinaryWriter writer)
+        public void Write(BinaryWriter writer)
         {
             mId.Write(writer);
             writer.Write(miCamera);
-            long GenericRegionIdsPosition = writer.BaseStream.Position;
+            StuntElementOffsetPosition = writer.BaseStream.Position;
             writer.WriteUniquePadding(4);
-            writer.Write(genericRegionIds.Count);
-
-            long currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = GenericRegionIdsPosition;
-            writer.Write(currentPosition);
-            writer.BaseStream.Position = currentPosition;
-            foreach (int trigger in genericRegionIds)
-            {
-                writer.Write((uint)trigger);
-            }
+            writer.Write(stuntElementRegions.Count);
         }
 
-        public void Write(BinaryWriter writer, Dictionary<int, uint> genericRegionOffsets)
-        {
-            mId.Write(writer);
-            writer.Write(miCamera);
-            long GenericRegionIdsPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(genericRegionIds.Count);
-
-
+        public void WriteStuntElements(BinaryWriter writer, Dictionary<int, uint> genericRegionOffsets) {
             long currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = GenericRegionIdsPosition;
+            writer.BaseStream.Position = StuntElementOffsetPosition;
             writer.Write(currentPosition);
             writer.BaseStream.Position = currentPosition;
-            foreach (int trigger in genericRegionIds)
+            foreach (int trigger in stuntElementRegions)
             {
                 writer.Write(genericRegionOffsets[trigger]);
             }
         }
+
     }
 
     public class RoamingLocation
@@ -845,14 +831,12 @@ public class TriggerData : IEntryData
             writer.WritePadding();
 
             currentPosition = writer.BaseStream.Position;
-            long offsetForSignatureStunts = writer.BaseStream.Position;
             writer.BaseStream.Position = SignatureStuntskOffsetPosition;
             writer.Write((uint)currentPosition);
             writer.BaseStream.Position = currentPosition;
-            
             foreach (SignatureStunt stunt in mpSignatureStunts)
             {
-                stunt.WriteWithEmpty(writer);
+                stunt.Write(writer);
             }
             writer.WritePadding();
 
@@ -869,13 +853,7 @@ public class TriggerData : IEntryData
             }
             writer.WritePadding();
 
-            // Go Back To SignatureStunt and Overwrite it with the actual positions in the file, then go back
-            currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = offsetForSignatureStunts;
-            foreach (SignatureStunt stunt in mpSignatureStunts)
-            {
-                stunt.Write(writer, genericRegionOffsets);
-            }
+          
             writer.BaseStream.Position = currentPosition;
 
             currentPosition = writer.BaseStream.Position;
@@ -934,7 +912,10 @@ public class TriggerData : IEntryData
                 land.WriteStartingGrid(writer);
             }
 
-            // To-Do: Signature Stunts belong here
+            foreach (SignatureStunt stunt in mpSignatureStunts)
+            {
+                stunt.WriteStuntElements(writer, genericRegionOffsets);
+            }
 
             foreach (Killzone killzone in mpKillzones)
             {

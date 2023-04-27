@@ -200,7 +200,8 @@ namespace BaseHandlers
         public List<StartingGrid> mpaStartingGrids { get; set; } = new List<StartingGrid>();
 
         private long startingGridsOffset = 0;
-        public byte miStartingGridCount { get; set; } = 0;
+
+        private long startingGridOffsetPosition = 0;
         public byte muDesignIndex { get; set; } = 0;
         public byte muDistrict { get; set; } = 0;
         public byte mu8Flags { get; set; } = 0;
@@ -209,7 +210,7 @@ namespace BaseHandlers
         {
             base.Read(reader);
             startingGridsOffset = reader.ReadUInt32();
-            miStartingGridCount = reader.ReadByte();
+            long miStartingGridCount = reader.ReadByte();
             muDesignIndex = reader.ReadByte();
             muDistrict = reader.ReadByte();
             mu8Flags = reader.ReadByte();
@@ -230,18 +231,23 @@ namespace BaseHandlers
         public void Write(BinaryWriter writer)
         {
             base.Write(writer);
+            startingGridOffsetPosition = writer.BaseStream.Position;
             writer.Write((uint)startingGridsOffset);
-            writer.Write(miStartingGridCount);
+            writer.Write(mpaStartingGrids.Count);
             writer.Write(muDesignIndex);
             writer.Write(muDistrict);
             writer.Write(mu8Flags);
-            // To-Do: Does not handle saving startingGridsOffsetAtAll, not clear where it should be saved in the file
-            /*
-            for (int i = 0; i < miStartingGridCount; i++)
-            {
-                mpaStartingGrids[i].Write(writer);
+        }
+
+        public void WriteStartingGrid(BinaryWriter writer){
+
+            long currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = startingGridOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (StartingGrid grid in mpaStartingGrids) {
+                grid.Write(writer);
             }
-            */
         }
     }
 
@@ -924,10 +930,15 @@ public class TriggerData : IEntryData
             }
             writer.WritePadding();
 
+            foreach (Landmark land in mpLandmarks) {
+                land.WriteStartingGrid(writer);
+            }
+
+            // To-Do: Signature Stunts belong here
+
             foreach (Killzone killzone in mpKillzones)
             {
                 killzone.WritePointerStuff(writer, genericRegionOffsets);
-                
             };
 
             currentPosition = writer.BaseStream.Position;

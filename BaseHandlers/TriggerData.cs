@@ -231,7 +231,7 @@ namespace BaseHandlers
             base.Write(writer);
             startingGridOffsetPosition = writer.BaseStream.Position;
             writer.WriteUniquePadding(4);
-            writer.Write(mpaStartingGrids.Count);
+            writer.Write((byte)mpaStartingGrids.Count);
             writer.Write(muDesignIndex);
             writer.Write(muDistrict);
             writer.Write(mu8Flags);

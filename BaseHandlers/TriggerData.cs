@@ -82,12 +82,12 @@ namespace BaseHandlers
     }
 
     public class StartingGrid {
-        public Vector3I[] StartingPositions { get; set; } = new Vector3I[1];
-        public Vector3I[] StartingDirections { get; set; } = new Vector3I[1];
+        public List<Vector3I> StartingPositions { get; set; } = new List<Vector3I>();
+        public List<Vector3I> StartingDirections { get; set; } = new List<Vector3I>();
 
         public void Read(BinaryReader reader)
         {
-            StartingPositions = new Vector3I[8];
+            StartingPositions = new List<Vector3I>(8);
             for (int i = 0; i < 8; i++)
             {
                 StartingPositions[i] = new Vector3I(
@@ -96,7 +96,7 @@ namespace BaseHandlers
                     reader.ReadSingle(), reader.ReadSingle());
             }
 
-            StartingDirections = new Vector3I[8];
+            StartingDirections = new List<Vector3I>(8);
             for (int i = 0; i < 8; i++)
             {
                 StartingDirections[i] = new Vector3I(
@@ -612,15 +612,15 @@ public class TriggerData : IEntryData
         public Vector3I mPlayerStartDirection { get; set; } 
         public List<Landmark> mpLandmarks { get; set; }
         public int miOnlineLandmarkCount { get; set; }
-        public SignatureStunt[] mpSignatureStunts { get; set; }
-        public GenericRegion[] mpGenericRegions { get; set; }
+        public List<SignatureStunt> mpSignatureStunts { get; set; }
+        public List<GenericRegion> mpGenericRegions { get; set; }
 
         [Editor(typeof(DescriptiveCollectionEditor), typeof(UITypeEditor))]
-        public Killzone[] mpKillzones { get; set; }
-        public Blackspot[] mpBlackspots { get; set; }
-        public VFXBoxRegion[] mpVFXBoxRegions { get; set; }
-        public RoamingLocation[] mpRoamingLocations { get; set; }
-        public SpawnLocation[] mpSpawnLocations { get; set; }
+        public List<Killzone> mpKillzones { get; set; }
+        public List<Blackspot> mpBlackspots { get; set; }
+        public List<VFXBoxRegion> mpVFXBoxRegions { get; set; }
+        public List<RoamingLocation> mpRoamingLocations { get; set; }
+        public List<SpawnLocation> mpSpawnLocations { get; set; }
         private List<uint> TriggerOffsets { get; set; }
 
 
@@ -675,68 +675,75 @@ public class TriggerData : IEntryData
 
             reader.BaseStream.Position = SignatureStuntsOffset;
             // read signature stunts
-            mpSignatureStunts = new SignatureStunt[miSignatureStuntCount];
+            mpSignatureStunts = new List<SignatureStunt>();
             for (int i = 0; i < miSignatureStuntCount; i++)
             {
-                mpSignatureStunts[i] = new SignatureStunt();
-                mpSignatureStunts[i].Read(reader);
+                SignatureStunt stunt = new SignatureStunt();
+                stunt.Read(reader);
+                mpSignatureStunts.Add(stunt);
             }
             
             reader.BaseStream.Position = GenericRegionsOffset;
             // read generic regions
-            mpGenericRegions = new GenericRegion[miGenericRegionCount];
+            mpGenericRegions = new List<GenericRegion>();
             for (int i = 0; i < miGenericRegionCount; i++)
             {
-                mpGenericRegions[i] = new GenericRegion();
-                mpGenericRegions[i].Read(reader);
+                GenericRegion region = new GenericRegion();
+                region.Read(reader);
+                mpGenericRegions.Add(region);
             }
             
 
             reader.BaseStream.Position = KillzoneOffset;
             // read killzones
-            mpKillzones = new Killzone[miKillzoneCount];
+            mpKillzones = new List<Killzone>();
             for (int i = 0; i < miKillzoneCount; i++)
             {
-                mpKillzones[i] = new Killzone();
-                mpKillzones[i].Read(reader);
+                Killzone killzone = new Killzone();
+                killzone.Read(reader);
+                mpKillzones.Add(killzone);
             }
 
             // read blackspots
             reader.BaseStream.Position = BlackspotOffset;
-            mpBlackspots = new Blackspot[miBlackspotCount];
+            mpBlackspots = new List<Blackspot>();
             for (int i = 0; i < miBlackspotCount; i++)
             {
-                mpBlackspots[i] = new Blackspot();
-                mpBlackspots[i].Read(reader);
+                Blackspot spot = new Blackspot();
+                spot.Read(reader);
+                mpBlackspots.Add(spot);
             }
 
             reader.BaseStream.Position = VFXBoxRegionOffset;
 
             // read VFX box regions
-            mpVFXBoxRegions = new VFXBoxRegion[miVFXBoxRegionCount];
+            mpVFXBoxRegions = new List<VFXBoxRegion>();
             for (int i = 0; i < miVFXBoxRegionCount; i++)
             {
-                mpVFXBoxRegions[i] = new VFXBoxRegion();
-                mpVFXBoxRegions[i].Read(reader);
+                VFXBoxRegion box = new VFXBoxRegion();
+                box.Read(reader);
+                mpVFXBoxRegions.Add(box);
             }
 
             reader.BaseStream.Position = RoamingLocationOffset;
             
             // read roaming locations
-            mpRoamingLocations = new RoamingLocation[miRoamingLocationCount];
+            mpRoamingLocations = new List<RoamingLocation>();
             for (int i = 0; i < miRoamingLocationCount; i++)
             {
-            mpRoamingLocations[i] = new RoamingLocation();
-             mpRoamingLocations[i].Read(reader);
+                RoamingLocation location = new RoamingLocation();
+                location.Read(reader);
+                mpRoamingLocations.Add(location);
             }
             
             reader.BaseStream.Position = SpawnLocationOffset;
 
-            mpSpawnLocations = new SpawnLocation[miSpawnLocationCount];
+            mpSpawnLocations = new List<SpawnLocation>();
             for (int i = 0; i < miSpawnLocationCount; i++)
             {
-                mpSpawnLocations[i] = new SpawnLocation();
-                mpSpawnLocations[i].Read(reader);
+                SpawnLocation location = new SpawnLocation();
+                location.Read(reader);
+                mpSpawnLocations.Add(location);
             }
 
             reader.BaseStream.Position = TriggerRegionOffset;
@@ -792,28 +799,28 @@ public class TriggerData : IEntryData
             writer.Write(miOnlineLandmarkCount);
             long SignatureStuntskOffsetPosition = writer.BaseStream.Position;
             writer.WriteUniquePadding(4);
-            writer.Write(mpSignatureStunts.Length);
+            writer.Write(mpSignatureStunts.Count);
             long GenericRegionsOffsetPosition = writer.BaseStream.Position;
             writer.WriteUniquePadding(4);
-            writer.Write(mpGenericRegions.Length);
+            writer.Write(mpGenericRegions.Count);
             long KillzoneOffsetPosition = writer.BaseStream.Position;
             writer.WriteUniquePadding(4);
-            writer.Write(mpKillzones.Length);
+            writer.Write(mpKillzones.Count);
             long BlackspotOffsetPosition = writer.BaseStream.Position;
             writer.WriteUniquePadding(4);
-            writer.Write(mpBlackspots.Length);
+            writer.Write(mpBlackspots.Count);
             long VFXBoxRegionsOffsetPosition = writer.BaseStream.Position;
             writer.WriteUniquePadding(4);
-            writer.Write(mpVFXBoxRegions.Length);
+            writer.Write(mpVFXBoxRegions.Count);
             long RoamingLocationsOffsetPosition = writer.BaseStream.Position;
             writer.WriteUniquePadding(4);
-            writer.Write(mpRoamingLocations.Length);
+            writer.Write(mpRoamingLocations.Count);
             long SpawnLocationsOffsetPosition = writer.BaseStream.Position;
             writer.WriteUniquePadding(4);
-            writer.Write(mpSpawnLocations.Length);
+            writer.Write(mpSpawnLocations.Count);
             long TriggerOffsetPosition = writer.BaseStream.Position;
             writer.WriteUniquePadding(4);
-            writer.Write(mpLandmarks.Count + mpGenericRegions.Length + mpBlackspots.Length + mpVFXBoxRegions.Length);
+            writer.Write(mpLandmarks.Count + mpGenericRegions.Count + mpBlackspots.Count + mpVFXBoxRegions.Count);
             writer.WriteUniquePadding(4); // padding
 
 

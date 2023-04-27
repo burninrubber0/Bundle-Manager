@@ -199,8 +199,6 @@ namespace BaseHandlers
     {
         public List<StartingGrid> mpaStartingGrids { get; set; } = new List<StartingGrid>();
 
-        private long startingGridsOffset = 0;
-
         private long startingGridOffsetPosition = 0;
         public byte muDesignIndex { get; set; } = 0;
         public byte muDistrict { get; set; } = 0;
@@ -209,14 +207,14 @@ namespace BaseHandlers
         public void Read(BinaryReader reader)
         {
             base.Read(reader);
-            startingGridsOffset = reader.ReadUInt32();
-            long miStartingGridCount = reader.ReadByte();
+            long startingGridOffset = reader.ReadUInt32();
+            int miStartingGridCount = reader.ReadByte();
             muDesignIndex = reader.ReadByte();
             muDistrict = reader.ReadByte();
             mu8Flags = reader.ReadByte();
 
             long currentPosition = reader.BaseStream.Position;
-            reader.BaseStream.Position = startingGridsOffset;
+            reader.BaseStream.Position = startingGridOffset;
 
             for (int i = 0; i < miStartingGridCount; i++)
             {
@@ -232,7 +230,7 @@ namespace BaseHandlers
         {
             base.Write(writer);
             startingGridOffsetPosition = writer.BaseStream.Position;
-            writer.Write((uint)startingGridsOffset);
+            writer.WriteUniquePadding(4);
             writer.Write(mpaStartingGrids.Count);
             writer.Write(muDesignIndex);
             writer.Write(muDistrict);
@@ -815,9 +813,7 @@ public class TriggerData : IEntryData
             writer.Write(mpLandmarks.Count + mpGenericRegions.Count + mpBlackspots.Count + mpVFXBoxRegions.Count);
             writer.WriteUniquePadding(4); // padding
 
-
             List<uint> TriggerRegionOffsets = new List<uint>();
-            
 
             long currentPosition = writer.BaseStream.Position;
             writer.BaseStream.Position = LandmarkOffsetPosition;
@@ -852,9 +848,6 @@ public class TriggerData : IEntryData
                 region.Write(writer);
             }
             writer.WritePadding();
-
-          
-            writer.BaseStream.Position = currentPosition;
 
             currentPosition = writer.BaseStream.Position;
             writer.BaseStream.Position = KillzoneOffsetPosition;

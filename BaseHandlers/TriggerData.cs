@@ -358,7 +358,7 @@ namespace BaseHandlers
     {
         [Description("Triggers as GenericRegions. Uses region.mId")]
         public List<int> TriggerIds { get; set; } = new List<int>();
-        public CgsID[] RegionIds { get; set; } = new CgsID[1];
+        public List<CgsID> RegionIds { get; set; } = new List<CgsID>();
 
         private long TriggerOffsetPosition = 0;
 
@@ -391,11 +391,12 @@ namespace BaseHandlers
             }
 
             reader.BaseStream.Position = cgsOffset;
-            RegionIds = new CgsID[RegionIdCount];
-            for (int i = 0; i < RegionIds.Length; i++)
+            RegionIds = new List<CgsID>();
+            for (int i = 0; i < RegionIdCount; i++)
             {
-                RegionIds[i] = new CgsID();
-                RegionIds[i].Read(reader);
+                CgsID id = new CgsID();
+                id.Read(reader);
+                RegionIds.Add(id);
             }
 
             reader.BaseStream.Position = currentPosition;
@@ -408,7 +409,7 @@ namespace BaseHandlers
             writer.Write(TriggerIds.Count);
             CGSIDOffsetPosition = writer.BaseStream.Position;
             writer.WriteUniquePadding(4);
-            writer.Write(RegionIds.Length);            
+            writer.Write(RegionIds.Count);            
         }
 
         public void WritePointerStuff(BinaryWriter writer, Dictionary<int, uint> genericRegionOffsets) {
@@ -449,6 +450,7 @@ namespace BaseHandlers
 
     public class SignatureStunt
     {
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public CgsID mId { get; set; } = new CgsID();
         public long miCamera { get; set; } = 0;
         public List<int> stuntElementRegions { get; set; } = new List<int>();

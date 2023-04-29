@@ -77,11 +77,11 @@ namespace BaseHandlers
         E_TYPE_LANDMARK = 0,
         E_TYPE_BLACKSPOT = 1,
         E_TYPE_GENERIC_REGION = 2,
-        E_TYPE_VFXBOX_REGION = 3,
-        E_TYPE_COUNT = 4
+        E_TYPE_VFXBOX_REGION = 3
     }
 
-    public class StartingGrid {
+    public class StartingGrid
+    {
         public List<Vector3I> StartingPositions { get; set; } = new List<Vector3I>();
         public List<Vector3I> StartingDirections { get; set; } = new List<Vector3I>();
 
@@ -298,8 +298,7 @@ namespace BaseHandlers
         E_TYPE_PASS_NARROWALLEY = 31,
         E_TYPE_RAMP = 32,
         E_TYPE_GOLD = 33,
-        E_TYPE_ISLAND_ENTITLEMENT = 34,
-        E_TYPE_COUNT = 35,
+        E_TYPE_ISLAND_ENTITLEMENT = 34
     }
 
     public class GenericRegion : TriggerRegion
@@ -343,10 +342,10 @@ namespace BaseHandlers
         }
     }
 
-    public enum BlackspotScoreType {
+    public enum BlackspotScoreType
+    {
         E_SCORE_TYPE_DISTANCE = 0,
-        E_SCORE_TYPE_CAR_COUNT = 1,
-        E_SCORE_TYPE_COUNT = 2,
+        E_SCORE_TYPE_CAR_COUNT = 1
     }
 
     public class Blackspot : TriggerRegion
@@ -587,8 +586,7 @@ namespace BaseHandlers
         E_TYPE_PLAYER_SPAWN = 0,
         E_TYPE_CAR_SELECT_LEFT = 1,
         E_TYPE_CAR_SELECT_RIGHT = 2,
-        E_TYPE_CAR_UNLOCK = 3,
-        E_TYPE_COUNT = 4
+        E_TYPE_CAR_UNLOCK = 3
     }
 
     public class SpawnLocation

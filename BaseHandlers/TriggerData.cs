@@ -255,6 +255,13 @@ namespace BaseHandlers
         }
     }
 
+    public enum GenericRegionStuntCameraType
+    {
+        E_STUNT_CAMERA_TYPE_NO_CUTS = 0,
+        E_STUNT_CAMERA_TYPE_CUSTOM = 1,
+        E_STUNT_CAMERA_TYPE_NORMAL = 2
+    }
+
     public enum GenericRegionType
     {
         E_TYPE_JUNK_YARD = 0,
@@ -306,8 +313,8 @@ namespace BaseHandlers
         public int GroupID { get; set; } = 0;
         public short CameraCut1 { get; set; } = 0;
         public short CameraCut2 { get; set; } = 0;
-        public sbyte CameraType1 { get; set; } = 0;
-        public sbyte CameraType2 { get; set; } = 0;
+        public GenericRegionStuntCameraType CameraType1 { get; set; } = 0;
+        public GenericRegionStuntCameraType CameraType2 { get; set; } = 0;
         public GenericRegionType Type { get; set; } = GenericRegionType.E_TYPE_JUNK_YARD;
         public sbyte IsOneWay { get; set; } = 0;
 
@@ -317,8 +324,8 @@ namespace BaseHandlers
             GroupID = reader.ReadInt32();
             CameraCut1 = reader.ReadInt16();
             CameraCut2 = reader.ReadInt16();
-            CameraType1 = reader.ReadSByte();
-            CameraType2 = reader.ReadSByte();
+            CameraType1 = (GenericRegionStuntCameraType)reader.ReadSByte();
+            CameraType2 = (GenericRegionStuntCameraType)reader.ReadSByte();
             Type = (GenericRegionType)reader.ReadByte();
             IsOneWay = reader.ReadSByte();
         }
@@ -329,8 +336,8 @@ namespace BaseHandlers
             writer.Write(GroupID);
             writer.Write(CameraCut1);
             writer.Write(CameraCut2);
-            writer.Write(CameraType1);
-            writer.Write(CameraType2);
+            writer.Write((sbyte)CameraType1);
+            writer.Write((sbyte)CameraType2);
             writer.Write((byte)Type);
             writer.Write(IsOneWay);
         }
@@ -575,6 +582,15 @@ namespace BaseHandlers
         }
     }
 
+    public enum SpawnLocationType
+    {
+        E_TYPE_PLAYER_SPAWN = 0,
+        E_TYPE_CAR_SELECT_LEFT = 1,
+        E_TYPE_CAR_SELECT_RIGHT = 2,
+        E_TYPE_CAR_UNLOCK = 3,
+        E_TYPE_COUNT = 4
+    }
+
     public class SpawnLocation
     {
         [TypeConverter(typeof(ExpandableObjectConverter))]
@@ -583,7 +599,7 @@ namespace BaseHandlers
         public Vector3I mDirection { get; set; } = new Vector3I(0, 0, 0, 0);
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public CgsID mJunkyardId { get; set; } = new CgsID();
-        public byte muType { get; set; } = 0;
+        public SpawnLocationType muType { get; set; } = 0;
         private byte[] padding = new byte[7];
 
         public void Read(BinaryReader reader)
@@ -592,7 +608,7 @@ namespace BaseHandlers
             mDirection = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             mJunkyardId = new CgsID();
             mJunkyardId.Read(reader);
-            muType = reader.ReadByte();
+            muType = (SpawnLocationType)reader.ReadByte();
             padding = reader.ReadBytes(7);
         }
 
@@ -607,7 +623,7 @@ namespace BaseHandlers
             writer.Write(mDirection.Z);
             writer.Write(mDirection.S);
             mJunkyardId.Write(writer);
-            writer.Write(muType);
+            writer.Write((byte)muType);
             writer.Write(padding);
         }
 

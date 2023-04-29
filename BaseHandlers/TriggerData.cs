@@ -1,405 +1,798 @@
-﻿using BundleFormat;
+using BundleFormat;
 using BundleUtilities;
 using PluginAPI;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Drawing.Design;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace BaseHandlers
 {
-    public struct LandmarkTrigger
+    class DescriptiveCollectionEditor : CollectionEditor
     {
-        public float PositionX;
-        public float PositionY;
-        public float PositionZ;
-        public float RotationX;
-        public float RotationY;
-        public float RotationZ;
-        public float SizeX;
-        public float SizeY;
-        public float SizeZ;
-        public int GameDBID;
-        public short GlobalIndex;
-        public byte Type; // Should be 0
-        public byte UnknownByte2B;
-        public uint UnknownOffset;
-        public byte UnknownByte30;
-        public byte LocalIndex;
-        public byte Subtype;
-        public byte UnknownByte33;
-
-        public override string ToString() => $"ID {GameDBID}";
-    }
-
-    public struct GenericRegionTrigger
-    {
-        public float PositionX;
-        public float PositionY;
-        public float PositionZ;
-        public float RotationX;
-        public float RotationY;
-        public float RotationZ;
-        public float SizeX;
-        public float SizeY;
-        public float SizeZ;
-        public int GameDBID;
-        public short Index;
-        public byte Type; // Should be 2
-        public byte UnknownByte2B;
-        public int GameDBID2; // Only used for _some_ super jumps
-        public short UnknownShort30;
-        public short UnknownShort32;
-        public byte UnknownByte34;
-        public byte UnknownByte35;
-        public byte Subtype;
-        public byte UnknownByte37; // most, but not all, super jumps have this set (to 1)
-
-        public override string ToString() => $"ID {GameDBID}";
-    }
-
-    public struct TriggerSection4Entry
-    {
-        public uint TriggerOffsetListOffset;
-        public int TriggerOffsetListCount;
-        public uint GameDBIDListOffset;
-        public int GameDBIDListCount;
-
-        public List<GenericRegionTrigger> Triggers;
-        public List<long> GameDBIDs;
-    }
-
-    public struct RoamingLocation
-    {
-        public float PositionX;
-        public float PositionY;
-        public float PositionZ;
-        public uint UnknownHash;
-        public byte Subdistrict;
-        public byte UnknownByte11;
-        public byte UnknownByte12;
-        public byte UnknownByte13;
-        public int UnknownInt14;
-        public int UnknownInt18;
-        public int UnknownInt1C;
-    }
-
-    public struct SpawnLocation
-    {
-        public float PositionX;
-        public float PositionY;
-        public float PositionZ;
-        public uint UnknownHash;
-        public float RotationX;
-        public float RotationY;
-        public float RotationZ;
-        public float UnknownFloat1C;
-        public long JunkyardGameDBID;
-        public GenericRegionTrigger JunkyardTrigger;
-        public byte UnknownByte28;
-        public byte UnknownByte29;
-        public byte UnknownByte30;
-        public byte UnknownByte31;
-        public int UnknownInt32;
-    }
-
-    public class TriggerData : IEntryData
-    {
-        public int FormatRevision;
-        public uint FileSize;
-        public int Unknown0C;
-        public int Unknown10;
-        public float DevSpawnPositionX;
-        public float DevSpawnPositionY;
-        public float DevSpawnPositionZ;
-        public uint DevSpawnUnknownHash;
-        public float DevSpawnRotationX;
-        public float DevSpawnRotationY;
-        public float DevSpawnRotationZ;
-        public float DevSpawnUnknownFloat;
-        public uint LandmarkTriggersOffset;
-        public int LandmarkTriggersCount;
-        public int LandmarkNonFinishLineCount;
-        public uint BlackspotTriggersOffset;
-        public int BlackspotTriggersCount;
-        public uint GenericRegionTriggersOffset;
-        public int GenericRegionTriggersCount;
-        public uint Section4Offset;
-        public int Section4Count;
-        public uint VFXBoxRegionOffset;
-        public int VFXBoxRegionCount;
-        public uint StartPositionsOffset;
-        public int StartPositionsCount;
-        public uint RoamingLocationsOffset;
-        public int RoamingLocationsCount;
-        public uint SpawnLocationsOffset;
-        public int SpawnLocationsCount;
-        public uint TriggerOffsetListOffset;
-        public int TriggerOffsetListCount;
-
-        public List<LandmarkTrigger> LandmarkTriggers;
-        public SortedDictionary<uint, GenericRegionTrigger> GenericRegionTriggers;
-        public List<TriggerSection4Entry> Section4Entries;
-        public List<RoamingLocation> RoamingLocationEntries;
-        public List<SpawnLocation> SpawnLocationEntries;
-        public List<uint> TriggerOffsets;
-
-        public TriggerData()
+        public DescriptiveCollectionEditor(Type type) : base(type) { }
+        protected override CollectionForm CreateCollectionForm()
         {
-            LandmarkTriggers = new List<LandmarkTrigger>();
-            GenericRegionTriggers = new SortedDictionary<uint, GenericRegionTrigger>();
-            Section4Entries = new List<TriggerSection4Entry>();
-            RoamingLocationEntries = new List<RoamingLocation>();
-            SpawnLocationEntries = new List<SpawnLocation>();
-            TriggerOffsets = new List<uint>();
+            CollectionForm form = base.CreateCollectionForm();
+            form.Shown += delegate
+            {
+                ShowDescription(form);
+            };
+            return form;
+        }
+        static void ShowDescription(Control control)
+        {
+            PropertyGrid grid = control as PropertyGrid;
+            if (grid != null) grid.HelpVisible = true;
+            foreach (Control child in control.Controls)
+            {
+                ShowDescription(child);
+            }
+        }
+    }
+    public class CgsID
+    {
+        private UInt64 m_id = 0;
+
+        public UInt64 ID
+        {
+            get { return m_id; }
+            set { m_id = value; }
         }
 
-        private void Clear()
+        public static CgsID FromByteArray(byte[] data, int startIndex)
         {
-            FormatRevision = default;
-            FileSize = default;
-            Unknown0C = default;
-            Unknown10 = default;
-            DevSpawnPositionX = default;
-            DevSpawnPositionY = default;
-            DevSpawnPositionZ = default;
-            DevSpawnUnknownHash = default;
-            DevSpawnRotationX = default;
-            DevSpawnRotationY = default;
-            DevSpawnRotationZ = default;
-            DevSpawnUnknownFloat = default;
-            LandmarkTriggersOffset = default;
-            LandmarkTriggersCount = default;
-            LandmarkNonFinishLineCount = default;
-            BlackspotTriggersOffset = default;
-            BlackspotTriggersCount = default;
-            GenericRegionTriggersOffset = default;
-            GenericRegionTriggersCount = default;
-            Section4Offset = default;
-            Section4Count = default;
-            VFXBoxRegionOffset = default;
-            VFXBoxRegionCount = default;
-            StartPositionsOffset = default;
-            StartPositionsCount = default;
-            RoamingLocationsOffset = default;
-            RoamingLocationsCount = default;
-            SpawnLocationsOffset = default;
-            SpawnLocationsCount = default;
-            TriggerOffsetListOffset = default;
-            TriggerOffsetListCount = default;
-
-            LandmarkTriggers.Clear();
-            GenericRegionTriggers.Clear();
-            Section4Entries.Clear();
-            RoamingLocationEntries.Clear();
-            SpawnLocationEntries.Clear();
-            TriggerOffsets.Clear();
+            UInt64 id = BitConverter.ToUInt64(data, startIndex);
+            CgsID result = new CgsID();
+            result.ID = id;
+            return new CgsID();
         }
+
+        public byte[] ToByteArray()
+        {
+            return BitConverter.GetBytes(m_id);
+        }
+
+        public void Read(BinaryReader reader)
+        {
+            m_id = reader.ReadUInt64();
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            writer.Write(m_id);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0:X16}", m_id);
+        }
+    }
+    public enum RegionType
+    {
+        E_TYPE_LANDMARK = 0,
+        E_TYPE_BLACKSPOT = 1,
+        E_TYPE_GENERIC_REGION = 2,
+        E_TYPE_VFXBOX_REGION = 3
+    }
+
+    public class StartingGrid
+    {
+        public List<Vector3I> StartingPositions { get; set; } = new List<Vector3I>();
+        public List<Vector3I> StartingDirections { get; set; } = new List<Vector3I>();
+
+        public void Read(BinaryReader reader)
+        {
+            StartingPositions = new List<Vector3I>(8);
+            for (int i = 0; i < 8; i++)
+            {
+                StartingPositions[i] = new Vector3I(
+                    reader.ReadSingle(),
+                    reader.ReadSingle(),
+                    reader.ReadSingle(), reader.ReadSingle());
+            }
+
+            StartingDirections = new List<Vector3I>(8);
+            for (int i = 0; i < 8; i++)
+            {
+                StartingDirections[i] = new Vector3I(
+                    reader.ReadSingle(),
+                    reader.ReadSingle(),
+                    reader.ReadSingle(), reader.ReadSingle());
+            }
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                writer.Write(StartingPositions[i].X);
+                writer.Write(StartingPositions[i].Y);
+                writer.Write(StartingPositions[i].Z);
+                writer.Write(StartingPositions[i].S);
+            }
+
+            for (int i = 0; i < 8; i++)
+            {
+                writer.Write(StartingDirections[i].X);
+                writer.Write(StartingDirections[i].Y);
+                writer.Write(StartingDirections[i].Z);
+                writer.Write(StartingDirections[i].S);
+            }
+        }
+    }
+
+    public class BoxRegion
+    {
+        public float PositionX { get; set; } = 0;
+        public float PositionY { get; set; } = 0;
+        public float PositionZ { get; set; } = 0;
+        public float RotationX { get; set; } = 0;
+        public float RotationY { get; set; } = 0;
+        public float RotationZ { get; set; } = 0;
+        public float DimensionX { get; set; } = 0;
+        public float DimensionY { get; set; } = 0;
+        public float DimensionZ { get; set; } = 0;
+
+        public void Read(BinaryReader reader)
+        {
+            PositionX = reader.ReadSingle();
+            PositionY = reader.ReadSingle();
+            PositionZ = reader.ReadSingle();
+            RotationX = reader.ReadSingle();
+            RotationY = reader.ReadSingle();
+            RotationZ = reader.ReadSingle();
+            DimensionX = reader.ReadSingle();
+            DimensionY = reader.ReadSingle();
+            DimensionZ = reader.ReadSingle();
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            writer.Write(PositionX);
+            writer.Write(PositionY);
+            writer.Write(PositionZ);
+            writer.Write(RotationX);
+            writer.Write(RotationY);
+            writer.Write(RotationZ);
+            writer.Write(DimensionX);
+            writer.Write(DimensionY);
+            writer.Write(DimensionZ);
+        }
+    }
+
+    public class TriggerRegion
+    {
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public BoxRegion mBoxRegion { get; set; } = new BoxRegion();
+        public int mId { get; set; } = 0;
+        public short miRegionIndex { get; set; } = 0;
+        public RegionType meType { get; set; } = RegionType.E_TYPE_LANDMARK;
+        private byte[] muPad { get; set; } = new byte[1];
+
+        public virtual void Read(BinaryReader reader)
+        {
+            mBoxRegion = new BoxRegion();
+            mBoxRegion.Read(reader);
+            mId = reader.ReadInt32();
+            miRegionIndex = reader.ReadInt16();
+            meType = (RegionType)reader.ReadByte();
+            muPad = reader.ReadBytes(1);
+        }
+
+        public virtual void Write(BinaryWriter writer)
+        {
+            mBoxRegion.Write(writer);
+
+            writer.Write(mId);
+            writer.Write(miRegionIndex);
+            writer.Write((byte)meType);
+            writer.Write(muPad);
+        }
+    }
+
+    public class Landmark : TriggerRegion
+    {
+        public Landmark() : base()
+        {
+            // Set meType to E_TYPE_LANDMARK
+            meType = RegionType.E_TYPE_LANDMARK;
+        }
+
+        public List<StartingGrid> mpaStartingGrids { get; set; } = new List<StartingGrid>();
+
+        private long startingGridOffsetPosition = 0;
+        public byte muDesignIndex { get; set; } = 0;
+        public byte muDistrict { get; set; } = 0;
+        public byte mu8Flags { get; set; } = 0;
+
+        public void Read(BinaryReader reader)
+        {
+            base.Read(reader);
+            long startingGridOffset = reader.ReadUInt32();
+            int miStartingGridCount = reader.ReadByte();
+            muDesignIndex = reader.ReadByte();
+            muDistrict = reader.ReadByte();
+            mu8Flags = reader.ReadByte();
+
+            long currentPosition = reader.BaseStream.Position;
+            reader.BaseStream.Position = startingGridOffset;
+
+            for (int i = 0; i < miStartingGridCount; i++)
+            {
+                StartingGrid startingGrid = new StartingGrid();
+                startingGrid.Read(reader);
+                mpaStartingGrids.Add(startingGrid);
+            }
+            reader.BaseStream.Position = currentPosition;
+
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            base.Write(writer);
+            startingGridOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write((byte)mpaStartingGrids.Count);
+            writer.Write(muDesignIndex);
+            writer.Write(muDistrict);
+            writer.Write(mu8Flags);
+        }
+
+        public void WriteStartingGrid(BinaryWriter writer){
+
+            long currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = startingGridOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (StartingGrid grid in mpaStartingGrids) {
+                grid.Write(writer);
+            }
+        }
+    }
+
+    public enum GenericRegionStuntCameraType
+    {
+        E_STUNT_CAMERA_TYPE_NO_CUTS = 0,
+        E_STUNT_CAMERA_TYPE_CUSTOM = 1,
+        E_STUNT_CAMERA_TYPE_NORMAL = 2
+    }
+
+    public enum GenericRegionType
+    {
+        E_TYPE_JUNK_YARD = 0,
+        E_TYPE_BIKE_SHOP = 1,
+        E_TYPE_GAS_STATION = 2,
+        E_TYPE_BODY_SHOP = 3,
+        E_TYPE_PAINT_SHOP = 4,
+        E_TYPE_CAR_PARK = 5,
+        E_TYPE_SIGNATURE_TAKEDOWN = 6,
+        E_TYPE_KILLZONE = 7,
+        E_TYPE_JUMP = 8,
+        E_TYPE_SMASH = 9,
+        E_TYPE_SIGNATURE_CRASH = 10,
+        E_TYPE_SIGNATURE_CRASH_CAMERA = 11,
+        E_TYPE_ROAD_LIMIT = 12,
+        E_TYPE_OVERDRIVE_BOOST = 13,
+        E_TYPE_OVERDRIVE_STRENGTH = 14,
+        E_TYPE_OVERDRIVE_SPEED = 15,
+        E_TYPE_OVERDRIVE_CONTROL = 16,
+        E_TYPE_TIRE_SHOP = 17,
+        E_TYPE_TUNING_SHOP = 18,
+        E_TYPE_PICTURE_PARADISE = 19,
+        E_TYPE_TUNNEL = 20,
+        E_TYPE_OVERPASS = 21,
+        E_TYPE_BRIDGE = 22,
+        E_TYPE_WAREHOUSE = 23,
+        E_TYPE_LARGE_OVERHEAD_OBJECT = 24,
+        E_TYPE_NARROW_ALLEY = 25,
+        E_TYPE_PASS_TUNNEL = 26,
+        E_TYPE_PASS_OVERPASS = 27,
+        E_TYPE_PASS_BRIDGE = 28,
+        E_TYPE_PASS_WAREHOUSE = 29,
+        E_TYPE_PASS_LARGEOVERHEADOBJECT = 30,
+        E_TYPE_PASS_NARROWALLEY = 31,
+        E_TYPE_RAMP = 32,
+        E_TYPE_GOLD = 33,
+        E_TYPE_ISLAND_ENTITLEMENT = 34
+    }
+
+    public class GenericRegion : TriggerRegion
+    {
+        public GenericRegion() : base()
+        {
+            // Set meType to E_TYPE_GENERIC_REGION
+            meType = RegionType.E_TYPE_GENERIC_REGION;
+        }
+
+        public int GroupID { get; set; } = 0;
+        public short CameraCut1 { get; set; } = 0;
+        public short CameraCut2 { get; set; } = 0;
+        public GenericRegionStuntCameraType CameraType1 { get; set; } = 0;
+        public GenericRegionStuntCameraType CameraType2 { get; set; } = 0;
+        public GenericRegionType Type { get; set; } = GenericRegionType.E_TYPE_JUNK_YARD;
+        public sbyte IsOneWay { get; set; } = 0;
+
+        public void Read(BinaryReader reader)
+        {
+            base.Read(reader);
+            GroupID = reader.ReadInt32();
+            CameraCut1 = reader.ReadInt16();
+            CameraCut2 = reader.ReadInt16();
+            CameraType1 = (GenericRegionStuntCameraType)reader.ReadSByte();
+            CameraType2 = (GenericRegionStuntCameraType)reader.ReadSByte();
+            Type = (GenericRegionType)reader.ReadByte();
+            IsOneWay = reader.ReadSByte();
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            base.Write(writer);
+            writer.Write(GroupID);
+            writer.Write(CameraCut1);
+            writer.Write(CameraCut2);
+            writer.Write((sbyte)CameraType1);
+            writer.Write((sbyte)CameraType2);
+            writer.Write((byte)Type);
+            writer.Write(IsOneWay);
+        }
+    }
+
+    public enum BlackspotScoreType
+    {
+        E_SCORE_TYPE_DISTANCE = 0,
+        E_SCORE_TYPE_CAR_COUNT = 1
+    }
+
+    public class Blackspot : TriggerRegion
+    {
+        public Blackspot() : base()
+        {
+            // Set meType to E_TYPE_BLACKSPOT
+            meType = RegionType.E_TYPE_BLACKSPOT;
+        }
+
+        public BlackspotScoreType muScoreType { get; set; } = BlackspotScoreType.E_SCORE_TYPE_DISTANCE;
+        public int miScoreAmount { get; set; } = 0;
+
+        public override void Read(BinaryReader reader)
+        {
+            base.Read(reader);
+
+            muScoreType = (BlackspotScoreType) reader.ReadByte();
+            reader.ReadBytes(3); // Padding
+            miScoreAmount = reader.ReadInt32();
+        }
+
+        public override void Write(BinaryWriter writer)
+        {
+            base.Write(writer);
+
+            writer.Write((byte)muScoreType);
+            writer.Write(new byte[3]); // Padding
+            writer.Write(miScoreAmount);
+        }
+    }
+
+    public class Killzone 
+    {
+        [Description("Triggers as GenericRegions. Uses region.mId")]
+        public List<int> TriggerIds { get; set; } = new List<int>();
+        public List<CgsID> RegionIds { get; set; } = new List<CgsID>();
+
+        private long TriggerOffsetPosition = 0;
+
+        private long CGSIDOffsetPosition = 0;
+        public void Read(BinaryReader reader)
+        {
+            // Read the trigger pointer array
+            long genericRegionOffset = reader.ReadUInt32();
+            int TriggerCount = reader.ReadInt32();
+
+            // Read the region ID array
+            long cgsOffset = reader.ReadUInt32();
+            int RegionIdCount = reader.ReadInt32();
+            long currentPosition = reader.BaseStream.Position;
+
+            reader.BaseStream.Position = genericRegionOffset;
+            uint[]  Triggers = new uint[TriggerCount];
+            for (int i = 0; i < TriggerCount; i++)
+            {
+                Triggers[i] = reader.ReadUInt32();
+            }
+
+            TriggerIds = new List<int>();
+            foreach (uint trigger in Triggers)
+            {
+                reader.BaseStream.Position = trigger;
+                GenericRegion region = new GenericRegion();
+                region.Read(reader);
+                TriggerIds.Add(region.mId);
+            }
+
+            reader.BaseStream.Position = cgsOffset;
+            RegionIds = new List<CgsID>();
+            for (int i = 0; i < RegionIdCount; i++)
+            {
+                CgsID id = new CgsID();
+                id.Read(reader);
+                RegionIds.Add(id);
+            }
+
+            reader.BaseStream.Position = currentPosition;
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            TriggerOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write(TriggerIds.Count);
+            CGSIDOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write(RegionIds.Count);            
+        }
+
+        public void WritePointerStuff(BinaryWriter writer, Dictionary<int, uint> genericRegionOffsets) {
+
+            long currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = TriggerOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (int trigger in TriggerIds)
+            {
+                writer.Write(genericRegionOffsets[trigger]);
+            }
+            long paddingCount = 16 - (writer.BaseStream.Position % 16);
+            if (paddingCount < 16)
+            {
+                for (int i = 0; i < paddingCount; i++)
+                    writer.Write((byte)0);
+            }
+            currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = CGSIDOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (CgsID ids in RegionIds)
+            {
+                ids.Write(writer);
+            }
+            paddingCount = 16 - (writer.BaseStream.Position % 16);
+            if (paddingCount < 16)
+            {
+                for (int i = 0; i < paddingCount; i++)
+                    writer.Write((byte)0);
+            }
+
+        }
+
+
+    }
+
+    public class SignatureStunt
+    {
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public CgsID mId { get; set; } = new CgsID();
+        public long miCamera { get; set; } = 0;
+        public List<int> stuntElementRegions { get; set; } = new List<int>();
+
+        private long StuntElementOffsetPosition = 0;
+
+        public void Read(BinaryReader reader)
+        {
+            mId = new CgsID();
+            mId.Read(reader);
+            miCamera = reader.ReadInt64();
+
+            uint mppStuntElementsOffset = reader.ReadUInt32();
+            int miStuntElementCount = reader.ReadInt32();
+
+            long currentPosition = reader.BaseStream.Position;
+            reader.BaseStream.Position = mppStuntElementsOffset;
+            uint[] Triggers = new uint[miStuntElementCount];
+            for (int i = 0; i < miStuntElementCount; i++)
+            {
+                Triggers[i] = reader.ReadUInt32();
+            }
+
+            stuntElementRegions = new List<int>();
+            foreach (uint trigger in Triggers)
+            {
+                reader.BaseStream.Position = trigger;
+                GenericRegion region = new GenericRegion();
+                region.Read(reader);
+                stuntElementRegions.Add(region.mId);
+            }
+            reader.BaseStream.Position = currentPosition;
+        }
+
+        // Write something in triggerIds, because we dont have the actual positions yet
+        public void Write(BinaryWriter writer)
+        {
+            mId.Write(writer);
+            writer.Write(miCamera);
+            StuntElementOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write(stuntElementRegions.Count);
+        }
+
+        public void WriteStuntElements(BinaryWriter writer, Dictionary<int, uint> genericRegionOffsets) {
+            long currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = StuntElementOffsetPosition;
+            writer.Write(currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (int trigger in stuntElementRegions)
+            {
+                writer.Write(genericRegionOffsets[trigger]);
+            }
+        }
+
+    }
+
+    public class RoamingLocation
+    {
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public Vector3I Position { get; set; } = new Vector3I(0,0,0,0);
+        public byte DistrictIndex { get; set; } = 0;
+
+        public void Read(BinaryReader reader) { 
+
+            Position = new Vector3I(
+                    reader.ReadSingle(),
+                    reader.ReadSingle(),
+                    reader.ReadSingle(), reader.ReadSingle());
+            DistrictIndex = reader.ReadByte();
+            // Read and discard padding
+            reader.ReadBytes(15);
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            writer.Write(Position.X);
+            writer.Write(Position.Y);
+            writer.Write(Position.Z);
+            writer.Write(Position.S);
+            writer.Write(DistrictIndex);
+
+            // Write padding
+            writer.Write(new byte[15]);
+        }
+    }
+
+    public class VFXBoxRegion : TriggerRegion
+    {
+        public VFXBoxRegion() : base()
+        {
+            // Set meType to E_TYPE_VFXBOX_REGION
+            meType = RegionType.E_TYPE_VFXBOX_REGION;
+        }
+
+        public override void Read(BinaryReader reader)
+        {
+            base.Read(reader);
+        }
+
+        public override void Write(BinaryWriter writer)
+        {
+            base.Write(writer);
+        }
+    }
+
+    public enum SpawnLocationType
+    {
+        E_TYPE_PLAYER_SPAWN = 0,
+        E_TYPE_CAR_SELECT_LEFT = 1,
+        E_TYPE_CAR_SELECT_RIGHT = 2,
+        E_TYPE_CAR_UNLOCK = 3
+    }
+
+    public class SpawnLocation
+    {
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public Vector3I mPosition { get; set; } = new Vector3I(0, 0, 0, 0);
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public Vector3I mDirection { get; set; } = new Vector3I(0, 0, 0, 0);
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public CgsID mJunkyardId { get; set; } = new CgsID();
+        public SpawnLocationType muType { get; set; } = 0;
+        private byte[] padding = new byte[7];
+
+        public void Read(BinaryReader reader)
+        {
+            mPosition = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            mDirection = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            mJunkyardId = new CgsID();
+            mJunkyardId.Read(reader);
+            muType = (SpawnLocationType)reader.ReadByte();
+            padding = reader.ReadBytes(7);
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            writer.Write(mPosition.X);
+            writer.Write(mPosition.Y);
+            writer.Write(mPosition.Z);
+            writer.Write(mPosition.S);
+            writer.Write(mDirection.X);
+            writer.Write(mDirection.Y);
+            writer.Write(mDirection.Z);
+            writer.Write(mDirection.S);
+            mJunkyardId.Write(writer);
+            writer.Write((byte)muType);
+            writer.Write(padding);
+        }
+
+    }
+
+
+public class TriggerData : IEntryData
+    {
+        public int miVersionNumber { get; set; }
+        public uint muSize { get; set; }
+        public Vector3I mPlayerStartPosition { get; set; } 
+        public Vector3I mPlayerStartDirection { get; set; } 
+        public List<Landmark> mpLandmarks { get; set; }
+        public int miOnlineLandmarkCount { get; set; }
+        public List<SignatureStunt> mpSignatureStunts { get; set; }
+        public List<GenericRegion> mpGenericRegions { get; set; }
+
+        [Editor(typeof(DescriptiveCollectionEditor), typeof(UITypeEditor))]
+        public List<Killzone> mpKillzones { get; set; }
+        public List<Blackspot> mpBlackspots { get; set; }
+        public List<VFXBoxRegion> mpVFXBoxRegions { get; set; }
+        public List<RoamingLocation> mpRoamingLocations { get; set; }
+        public List<SpawnLocation> mpSpawnLocations { get; set; }
+        private List<uint> TriggerOffsets { get; set; }
+
 
         public bool Read(BundleEntry entry, ILoader loader = null)
         {
-            Clear();
-
             MemoryStream ms = entry.MakeStream();
-            BinaryReader2 br = new BinaryReader2(ms);
-            br.BigEndian = entry.Console;
+            BinaryReader2 reader = new BinaryReader2(ms);
+            reader.BigEndian = entry.Console;
 
-            FormatRevision = br.ReadInt32();
-            FileSize = br.ReadUInt32();
-            Unknown0C = br.ReadInt32();
-            Unknown10 = br.ReadInt32();
-            DevSpawnPositionX = br.ReadSingle();
-            DevSpawnPositionY = br.ReadSingle();
-            DevSpawnPositionZ = br.ReadSingle();
-            DevSpawnUnknownHash = br.ReadUInt32();
-            DevSpawnRotationX = br.ReadSingle();
-            DevSpawnRotationY = br.ReadSingle();
-            DevSpawnRotationZ = br.ReadSingle();
-            DevSpawnUnknownFloat = br.ReadSingle();
-            LandmarkTriggersOffset = br.ReadUInt32();
-            LandmarkTriggersCount = br.ReadInt32();
-            LandmarkNonFinishLineCount = br.ReadInt32();
-            BlackspotTriggersOffset = br.ReadUInt32();
-            BlackspotTriggersCount = br.ReadInt32();
-            GenericRegionTriggersOffset = br.ReadUInt32();
-            GenericRegionTriggersCount = br.ReadInt32();
-            Section4Offset = br.ReadUInt32();
-            Section4Count = br.ReadInt32();
-            VFXBoxRegionOffset = br.ReadUInt32();
-            VFXBoxRegionCount = br.ReadInt32();
-            StartPositionsOffset = br.ReadUInt32();
-            StartPositionsCount = br.ReadInt32();
-            RoamingLocationsOffset = br.ReadUInt32();
-            RoamingLocationsCount = br.ReadInt32();
-            SpawnLocationsOffset = br.ReadUInt32();
-            SpawnLocationsCount = br.ReadInt32();
-            TriggerOffsetListOffset = br.ReadUInt32();
-            TriggerOffsetListCount = br.ReadInt32();
+            miVersionNumber = reader.ReadInt32();
+            muSize = reader.ReadUInt32();
+            reader.ReadBytes(8);// skip 8 bytes of padding
+            mPlayerStartPosition = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            mPlayerStartDirection = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            // read landmarks
+            long LandmarkTriggersOffset = reader.ReadUInt32();
+            int miLandmarkCount = reader.ReadInt32();
+            miOnlineLandmarkCount = reader.ReadInt32();
 
-            br.BaseStream.Position = LandmarkTriggersOffset;
+            long SignatureStuntsOffset = reader.ReadUInt32();
+            int miSignatureStuntCount = reader.ReadInt32();
 
-            for (int i = 0; i < LandmarkTriggersCount; i++)
+            long GenericRegionsOffset = reader.ReadUInt32();
+            int miGenericRegionCount = reader.ReadInt32();
+
+            long KillzoneOffset = reader.ReadUInt32();
+            int miKillzoneCount = reader.ReadInt32();
+
+            long BlackspotOffset = reader.ReadUInt32();
+            int miBlackspotCount = reader.ReadInt32();
+
+            long VFXBoxRegionOffset = reader.ReadUInt32();
+            int miVFXBoxRegionCount = reader.ReadInt32();
+
+            long RoamingLocationOffset = reader.ReadUInt32();
+            int miRoamingLocationCount = reader.ReadInt32();
+
+            long SpawnLocationOffset = reader.ReadUInt32();
+            int miSpawnLocationCount = reader.ReadInt32();
+
+            long TriggerRegionOffset = reader.ReadUInt32();
+            int miRegionCount = reader.ReadInt32();
+
+            reader.BaseStream.Position = LandmarkTriggersOffset;
+            mpLandmarks = new List<Landmark>();
+            for (int i = 0; i < miLandmarkCount; i++)
             {
-                LandmarkTrigger landmarkTrigger = new LandmarkTrigger();
-
-                landmarkTrigger.PositionX = br.ReadSingle();
-                landmarkTrigger.PositionY = br.ReadSingle();
-                landmarkTrigger.PositionZ = br.ReadSingle();
-                landmarkTrigger.RotationX = br.ReadSingle();
-                landmarkTrigger.RotationY = br.ReadSingle();
-                landmarkTrigger.RotationZ = br.ReadSingle();
-                landmarkTrigger.SizeX = br.ReadSingle();
-                landmarkTrigger.SizeY = br.ReadSingle();
-                landmarkTrigger.SizeZ = br.ReadSingle();
-                landmarkTrigger.GameDBID = br.ReadInt32();
-                landmarkTrigger.GlobalIndex = br.ReadInt16();
-                landmarkTrigger.Type = br.ReadByte();
-                landmarkTrigger.UnknownByte2B = br.ReadByte();
-                landmarkTrigger.UnknownOffset = br.ReadUInt32();
-                landmarkTrigger.UnknownByte30 = br.ReadByte();
-                landmarkTrigger.LocalIndex = br.ReadByte();
-                landmarkTrigger.Subtype = br.ReadByte();
-                landmarkTrigger.UnknownByte33 = br.ReadByte();
-
-                LandmarkTriggers.Add(landmarkTrigger);
+                Landmark landmark = new Landmark();
+                landmark.Read(reader);
+                mpLandmarks.Add(landmark);
             }
 
-            br.BaseStream.Position = GenericRegionTriggersOffset;
-
-            for (int i = 0; i < GenericRegionTriggersCount; i++)
+            reader.BaseStream.Position = SignatureStuntsOffset;
+            // read signature stunts
+            mpSignatureStunts = new List<SignatureStunt>();
+            for (int i = 0; i < miSignatureStuntCount; i++)
             {
-                long startPosition = br.BaseStream.Position;
+                SignatureStunt stunt = new SignatureStunt();
+                stunt.Read(reader);
+                mpSignatureStunts.Add(stunt);
+            }
+            
+            reader.BaseStream.Position = GenericRegionsOffset;
+            // read generic regions
+            mpGenericRegions = new List<GenericRegion>();
+            for (int i = 0; i < miGenericRegionCount; i++)
+            {
+                GenericRegion region = new GenericRegion();
+                region.Read(reader);
+                mpGenericRegions.Add(region);
+            }
+            
 
-                GenericRegionTrigger genericRegionTrigger = new GenericRegionTrigger();
-
-                genericRegionTrigger.PositionX = br.ReadSingle();
-                genericRegionTrigger.PositionY = br.ReadSingle();
-                genericRegionTrigger.PositionZ = br.ReadSingle();
-                genericRegionTrigger.RotationX = br.ReadSingle();
-                genericRegionTrigger.RotationY = br.ReadSingle();
-                genericRegionTrigger.RotationZ = br.ReadSingle();
-                genericRegionTrigger.SizeX = br.ReadSingle();
-                genericRegionTrigger.SizeY = br.ReadSingle();
-                genericRegionTrigger.SizeZ = br.ReadSingle();
-                genericRegionTrigger.GameDBID = br.ReadInt32();
-                genericRegionTrigger.Index = br.ReadInt16();
-                genericRegionTrigger.Type = br.ReadByte();
-                genericRegionTrigger.UnknownByte2B = br.ReadByte();
-                genericRegionTrigger.GameDBID2 = br.ReadInt32();
-                genericRegionTrigger.UnknownShort30 = br.ReadInt16();
-                genericRegionTrigger.UnknownShort32 = br.ReadInt16();
-                genericRegionTrigger.UnknownByte34 = br.ReadByte();
-                genericRegionTrigger.UnknownByte35 = br.ReadByte();
-                genericRegionTrigger.Subtype = br.ReadByte();
-                genericRegionTrigger.UnknownByte37 = br.ReadByte();
-
-                GenericRegionTriggers.Add((uint)startPosition, genericRegionTrigger);
+            reader.BaseStream.Position = KillzoneOffset;
+            // read killzones
+            mpKillzones = new List<Killzone>();
+            for (int i = 0; i < miKillzoneCount; i++)
+            {
+                Killzone killzone = new Killzone();
+                killzone.Read(reader);
+                mpKillzones.Add(killzone);
             }
 
-            br.BaseStream.Position = Section4Offset;
-
-            for (int i = 0; i < Section4Count; i++)
+            // read blackspots
+            reader.BaseStream.Position = BlackspotOffset;
+            mpBlackspots = new List<Blackspot>();
+            for (int i = 0; i < miBlackspotCount; i++)
             {
-                TriggerSection4Entry section4Entry = new TriggerSection4Entry();
-
-                section4Entry.TriggerOffsetListOffset = br.ReadUInt32();
-                section4Entry.TriggerOffsetListCount = br.ReadInt32();
-                section4Entry.GameDBIDListOffset = br.ReadUInt32();
-                section4Entry.GameDBIDListCount = br.ReadInt32();
-
-                long oldPosition = br.BaseStream.Position;
-
-                br.BaseStream.Position = section4Entry.TriggerOffsetListOffset;
-                section4Entry.Triggers = new List<GenericRegionTrigger>();
-                for (int j = 0; j < section4Entry.TriggerOffsetListCount; j++)
-                {
-                    uint offset = br.ReadUInt32();
-                    section4Entry.Triggers.Add(GenericRegionTriggers[offset]);
-                }
-
-                br.BaseStream.Position = section4Entry.GameDBIDListOffset;
-                section4Entry.GameDBIDs = new List<long>();
-                for (int j = 0; j < section4Entry.GameDBIDListCount; j++)
-                {
-                    section4Entry.GameDBIDs.Add(br.ReadInt64());
-                }
-
-                br.BaseStream.Position = oldPosition;
-
-                Section4Entries.Add(section4Entry);
+                Blackspot spot = new Blackspot();
+                spot.Read(reader);
+                mpBlackspots.Add(spot);
             }
 
-            br.BaseStream.Position = RoamingLocationsOffset;
+            reader.BaseStream.Position = VFXBoxRegionOffset;
 
-            for (int i = 0; i < RoamingLocationsCount; i++)
+            // read VFX box regions
+            mpVFXBoxRegions = new List<VFXBoxRegion>();
+            for (int i = 0; i < miVFXBoxRegionCount; i++)
             {
-                RoamingLocation roamingLocation = new RoamingLocation();
-
-                roamingLocation.PositionX = br.ReadSingle();
-                roamingLocation.PositionY = br.ReadSingle();
-                roamingLocation.PositionZ = br.ReadSingle();
-                roamingLocation.UnknownHash = br.ReadUInt32();
-                roamingLocation.Subdistrict = br.ReadByte();
-                roamingLocation.UnknownByte11 = br.ReadByte();
-                roamingLocation.UnknownByte12 = br.ReadByte();
-                roamingLocation.UnknownByte13 = br.ReadByte();
-                roamingLocation.UnknownInt14 = br.ReadInt32();
-                roamingLocation.UnknownInt18 = br.ReadInt32();
-                roamingLocation.UnknownInt1C = br.ReadInt32();
-
-                RoamingLocationEntries.Add(roamingLocation);
+                VFXBoxRegion box = new VFXBoxRegion();
+                box.Read(reader);
+                mpVFXBoxRegions.Add(box);
             }
 
-            br.BaseStream.Position = SpawnLocationsOffset;
-
-            for (int i = 0; i < SpawnLocationsCount; i++)
+            reader.BaseStream.Position = RoamingLocationOffset;
+            
+            // read roaming locations
+            mpRoamingLocations = new List<RoamingLocation>();
+            for (int i = 0; i < miRoamingLocationCount; i++)
             {
-                SpawnLocation spawnLocation = new SpawnLocation();
+                RoamingLocation location = new RoamingLocation();
+                location.Read(reader);
+                mpRoamingLocations.Add(location);
+            }
+            
+            reader.BaseStream.Position = SpawnLocationOffset;
 
-                spawnLocation.PositionX = br.ReadSingle();
-                spawnLocation.PositionY = br.ReadSingle();
-                spawnLocation.PositionZ = br.ReadSingle();
-                spawnLocation.UnknownHash = br.ReadUInt32();
-                spawnLocation.RotationX = br.ReadSingle();
-                spawnLocation.RotationY = br.ReadSingle();
-                spawnLocation.RotationZ = br.ReadSingle();
-                spawnLocation.UnknownFloat1C = br.ReadSingle();
-                spawnLocation.JunkyardGameDBID = br.ReadInt64();
-                spawnLocation.UnknownByte28 = br.ReadByte();
-                spawnLocation.UnknownByte29 = br.ReadByte();
-                spawnLocation.UnknownByte30 = br.ReadByte();
-                spawnLocation.UnknownByte31 = br.ReadByte();
-                spawnLocation.UnknownInt32 = br.ReadInt32();
-
-                foreach (GenericRegionTrigger trigger in GenericRegionTriggers.Values)
-                {
-                    if (trigger.GameDBID == spawnLocation.JunkyardGameDBID)
-                    {
-                        spawnLocation.JunkyardTrigger = trigger;
-                        break;
-                    }
-                }
-
-                SpawnLocationEntries.Add(spawnLocation);
+            mpSpawnLocations = new List<SpawnLocation>();
+            for (int i = 0; i < miSpawnLocationCount; i++)
+            {
+                SpawnLocation location = new SpawnLocation();
+                location.Read(reader);
+                mpSpawnLocations.Add(location);
             }
 
-            br.BaseStream.Position = TriggerOffsetListOffset;
+            reader.BaseStream.Position = TriggerRegionOffset;
 
-            for (int i = 0; i < TriggerOffsetListCount; i++)
+             // read TriggerRegion (miGenericCount + miLandmarkCount)
+            TriggerOffsets = new List<uint>();
+            for (int i = 0; i < miRegionCount; i++)
             {
-                uint section6Entry = br.ReadUInt32();
+                uint section6Entry = reader.ReadUInt32();
                 TriggerOffsets.Add(section6Entry);
             }
-
-            br.Close();
-            ms.Close();
 
             return true;
         }
 
         public IEntryEditor GetEditor(BundleEntry entry)
         {
-            return null;
+            TriggerDataEditor triggerDataEditor = new TriggerDataEditor();
+            triggerDataEditor.trigger = this;
+
+            triggerDataEditor.EditEvent += () =>
+            {
+                Write(entry);
+            };
+            return triggerDataEditor;
         }
 
         public EntryType GetEntryType(BundleEntry entry)
@@ -410,169 +803,172 @@ namespace BaseHandlers
         public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(ms);
+            BinaryWriter writer = new BinaryWriter(ms);
+            writer.Write(miVersionNumber);
+            long SizePosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.WriteUniquePadding(8); //padding
+            writer.Write(mPlayerStartPosition.X);
+            writer.Write(mPlayerStartPosition.Y);
+            writer.Write(mPlayerStartPosition.Z);
+            writer.Write(mPlayerStartPosition.S);
+            writer.Write(mPlayerStartDirection.X);
+            writer.Write(mPlayerStartDirection.Y);
+            writer.Write(mPlayerStartDirection.Z);
+            writer.Write(mPlayerStartDirection.S);
 
-            bw.Write(FormatRevision);
-            long fileSizeOffset = bw.BaseStream.Position;
-            bw.Write((int)0);
-            bw.Write(Unknown0C);
-            bw.Write(Unknown10);
-            bw.Write(DevSpawnPositionX);
-            bw.Write(DevSpawnPositionY);
-            bw.Write(DevSpawnPositionZ);
-            bw.Write(DevSpawnUnknownHash);
-            bw.Write(DevSpawnRotationX);
-            bw.Write(DevSpawnRotationY);
-            bw.Write(DevSpawnRotationZ);
-            bw.Write(DevSpawnUnknownFloat);
-            bw.Write(LandmarkTriggersOffset);
-            bw.Write(LandmarkTriggersCount);
-            bw.Write(LandmarkNonFinishLineCount);
-            bw.Write(BlackspotTriggersOffset);
-            bw.Write(BlackspotTriggersCount);
-            bw.Write(GenericRegionTriggersOffset);
-            bw.Write(GenericRegionTriggersCount);
-            bw.Write(Section4Offset);
-            bw.Write(Section4Count);
-            bw.Write(VFXBoxRegionOffset);
-            bw.Write(VFXBoxRegionCount);
-            bw.Write(StartPositionsOffset);
-            bw.Write(StartPositionsCount);
-            bw.Write(RoamingLocationsOffset);
-            bw.Write(RoamingLocationsCount);
-            bw.Write(SpawnLocationsOffset);
-            bw.Write(SpawnLocationsCount);
-            bw.Write(TriggerOffsetListOffset);
-            bw.Write(TriggerOffsetListCount);
+            long LandmarkOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write(mpLandmarks.Count);
+            writer.Write(miOnlineLandmarkCount);
+            long SignatureStuntskOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write(mpSignatureStunts.Count);
+            long GenericRegionsOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write(mpGenericRegions.Count);
+            long KillzoneOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write(mpKillzones.Count);
+            long BlackspotOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write(mpBlackspots.Count);
+            long VFXBoxRegionsOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write(mpVFXBoxRegions.Count);
+            long RoamingLocationsOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write(mpRoamingLocations.Count);
+            long SpawnLocationsOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write(mpSpawnLocations.Count);
+            long TriggerOffsetPosition = writer.BaseStream.Position;
+            writer.WriteUniquePadding(4);
+            writer.Write(mpLandmarks.Count + mpGenericRegions.Count + mpBlackspots.Count + mpVFXBoxRegions.Count);
+            writer.WriteUniquePadding(4); // padding
 
-            bw.BaseStream.Position = LandmarkTriggersOffset;
+            List<uint> TriggerRegionOffsets = new List<uint>();
 
-            for (int i = 0; i < LandmarkTriggers.Count; i++)
+            long currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = LandmarkOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (Landmark landmark in mpLandmarks)
             {
-                LandmarkTrigger landmarkTrigger = LandmarkTriggers[i];
+                TriggerRegionOffsets.Add((uint)writer.BaseStream.Position);
+                landmark.Write(writer);
+            }
+            writer.WritePadding();
 
-                bw.Write(landmarkTrigger.PositionX);
-                bw.Write(landmarkTrigger.PositionY);
-                bw.Write(landmarkTrigger.PositionZ);
-                bw.Write(landmarkTrigger.RotationX);
-                bw.Write(landmarkTrigger.RotationY);
-                bw.Write(landmarkTrigger.RotationZ);
-                bw.Write(landmarkTrigger.SizeX);
-                bw.Write(landmarkTrigger.SizeY);
-                bw.Write(landmarkTrigger.SizeZ);
-                bw.Write(landmarkTrigger.GameDBID);
-                bw.Write(landmarkTrigger.GlobalIndex);
-                bw.Write(landmarkTrigger.Type);
-                bw.Write(landmarkTrigger.UnknownByte2B);
-                bw.Write(landmarkTrigger.UnknownOffset);
-                bw.Write(landmarkTrigger.UnknownByte30);
-                bw.Write(landmarkTrigger.LocalIndex);
-                bw.Write(landmarkTrigger.Subtype);
-                bw.Write(landmarkTrigger.UnknownByte33);
+            currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = SignatureStuntskOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (SignatureStunt stunt in mpSignatureStunts)
+            {
+                stunt.Write(writer);
+            }
+            writer.WritePadding();
+
+            currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = GenericRegionsOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            Dictionary<int, uint> genericRegionOffsets = new Dictionary<int, uint>();
+            foreach (GenericRegion region in mpGenericRegions)
+            {
+                genericRegionOffsets.Add(region.mId, (uint)writer.BaseStream.Position);
+                TriggerRegionOffsets.Add((uint)writer.BaseStream.Position);
+                region.Write(writer);
+            }
+            writer.WritePadding();
+
+            currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = KillzoneOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (Killzone killzone in mpKillzones)
+            {
+                killzone.Write(writer);
+            };
+            writer.WritePadding();
+
+            currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = BlackspotOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (Blackspot blackspot in mpBlackspots)
+            {
+                TriggerRegionOffsets.Add((uint)writer.BaseStream.Position);
+                blackspot.Write(writer);
+            }
+            writer.WritePadding();
+
+            currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = VFXBoxRegionsOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (VFXBoxRegion region in mpVFXBoxRegions)
+            {
+                TriggerRegionOffsets.Add((uint)writer.BaseStream.Position);
+                region.Write(writer);
+            }
+            writer.WritePadding();
+
+            currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = RoamingLocationsOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (RoamingLocation location in mpRoamingLocations)
+            {
+                location.Write(writer);
+            }
+            writer.WritePadding();
+
+            currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = SpawnLocationsOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (SpawnLocation location in mpSpawnLocations)
+            {
+                location.Write(writer);
+            }
+            writer.WritePadding();
+
+            foreach (Landmark land in mpLandmarks) {
+                land.WriteStartingGrid(writer);
             }
 
-            bw.BaseStream.Position = GenericRegionTriggersOffset;
-
-            foreach (GenericRegionTrigger genericRegionTrigger in GenericRegionTriggers.Values)
+            foreach (SignatureStunt stunt in mpSignatureStunts)
             {
-                bw.Write(genericRegionTrigger.PositionX);
-                bw.Write(genericRegionTrigger.PositionY);
-                bw.Write(genericRegionTrigger.PositionZ);
-                bw.Write(genericRegionTrigger.RotationX);
-                bw.Write(genericRegionTrigger.RotationY);
-                bw.Write(genericRegionTrigger.RotationZ);
-                bw.Write(genericRegionTrigger.SizeX);
-                bw.Write(genericRegionTrigger.SizeY);
-                bw.Write(genericRegionTrigger.SizeZ);
-                bw.Write(genericRegionTrigger.GameDBID);
-                bw.Write(genericRegionTrigger.Index);
-                bw.Write(genericRegionTrigger.Type);
-                bw.Write(genericRegionTrigger.UnknownByte2B);
-                bw.Write(genericRegionTrigger.GameDBID2);
-                bw.Write(genericRegionTrigger.UnknownShort30);
-                bw.Write(genericRegionTrigger.UnknownShort32);
-                bw.Write(genericRegionTrigger.UnknownByte34);
-                bw.Write(genericRegionTrigger.UnknownByte35);
-                bw.Write(genericRegionTrigger.Subtype);
-                bw.Write(genericRegionTrigger.UnknownByte37);
+                stunt.WriteStuntElements(writer, genericRegionOffsets);
             }
 
-            bw.BaseStream.Position = Section4Offset;
-
-            foreach (TriggerSection4Entry section4Entry in Section4Entries)
+            foreach (Killzone killzone in mpKillzones)
             {
-                bw.Write(section4Entry.TriggerOffsetListOffset);
-                bw.Write(section4Entry.TriggerOffsetListCount);
-                bw.Write(section4Entry.GameDBIDListOffset);
-                bw.Write(section4Entry.GameDBIDListCount);
+                killzone.WritePointerStuff(writer, genericRegionOffsets);
+            };
 
-                // TODO: write list
+            currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = TriggerOffsetPosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            foreach (uint region in TriggerOffsets)
+            {
+                writer.Write(region);
             }
 
-            bw.BaseStream.Position = RoamingLocationsOffset;
+            currentPosition = writer.BaseStream.Position;
+            writer.BaseStream.Position = SizePosition;
+            writer.Write((uint)currentPosition);
+            writer.BaseStream.Position = currentPosition;
+            writer.WritePadding();
 
-            for (int i = 0; i < RoamingLocationEntries.Count; i++)
-            {
-                RoamingLocation roamingLocation = RoamingLocationEntries[i];
-
-                bw.Write(roamingLocation.PositionX);
-                bw.Write(roamingLocation.PositionY);
-                bw.Write(roamingLocation.PositionZ);
-                bw.Write(roamingLocation.UnknownHash);
-                bw.Write(roamingLocation.Subdistrict);
-                bw.Write(roamingLocation.UnknownByte11);
-                bw.Write(roamingLocation.UnknownByte12);
-                bw.Write(roamingLocation.UnknownByte13);
-                bw.Write(roamingLocation.UnknownInt14);
-                bw.Write(roamingLocation.UnknownInt18);
-                bw.Write(roamingLocation.UnknownInt1C);
-            }
-
-            bw.BaseStream.Position = SpawnLocationsOffset;
-
-            for (int i = 0; i < SpawnLocationEntries.Count; i++)
-            {
-                SpawnLocation spawnLocation = SpawnLocationEntries[i];
-
-                bw.Write(spawnLocation.PositionX);
-                bw.Write(spawnLocation.PositionY);
-                bw.Write(spawnLocation.PositionZ);
-                bw.Write(spawnLocation.UnknownHash);
-                bw.Write(spawnLocation.RotationX);
-                bw.Write(spawnLocation.RotationY);
-                bw.Write(spawnLocation.RotationZ);
-                bw.Write(spawnLocation.UnknownFloat1C);
-                bw.Write(spawnLocation.JunkyardGameDBID);
-                bw.Write(spawnLocation.UnknownByte28);
-                bw.Write(spawnLocation.UnknownByte29);
-                bw.Write(spawnLocation.UnknownByte30);
-                bw.Write(spawnLocation.UnknownByte31);
-                bw.Write(spawnLocation.UnknownInt32);
-            }
-
-            bw.BaseStream.Position = TriggerOffsetListOffset;
-
-            for (int i = 0; i < TriggerOffsets.Count; i++)
-            {
-                uint section6Entry = TriggerOffsets[i];
-                bw.Write(section6Entry);
-            }
-
-            long fileSize = bw.BaseStream.Position;
-            bw.BaseStream.Position = fileSizeOffset;
-            bw.Write((int)fileSize);
-
-            bw.BaseStream.Position = fileSize;
-
-            long paddingCount = 16 - (bw.BaseStream.Position % 16);
-            for (int i = 0; i < paddingCount; i++)
-                bw.Write((byte) 0);
-
-            bw.Flush();
+            writer.Flush();
 
             byte[] data = ms.ToArray();
 
-            bw.Close();
+            writer.Close();
             ms.Close();
 
             entry.EntryBlocks[0].Data = data;

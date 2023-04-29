@@ -197,6 +197,12 @@ namespace BaseHandlers
 
     public class Landmark : TriggerRegion
     {
+        public Landmark() : base()
+        {
+            // Set meType to E_TYPE_LANDMARK
+            meType = RegionType.E_TYPE_LANDMARK;
+        }
+
         public List<StartingGrid> mpaStartingGrids { get; set; } = new List<StartingGrid>();
 
         private long startingGridOffsetPosition = 0;
@@ -291,6 +297,12 @@ namespace BaseHandlers
 
     public class GenericRegion : TriggerRegion
     {
+        public GenericRegion() : base()
+        {
+            // Set meType to E_TYPE_GENERIC_REGION
+            meType = RegionType.E_TYPE_GENERIC_REGION;
+        }
+
         public int GroupID { get; set; } = 0;
         public short CameraCut1 { get; set; } = 0;
         public short CameraCut2 { get; set; } = 0;
@@ -332,6 +344,12 @@ namespace BaseHandlers
 
     public class Blackspot : TriggerRegion
     {
+        public Blackspot() : base()
+        {
+            // Set meType to E_TYPE_BLACKSPOT
+            meType = RegionType.E_TYPE_BLACKSPOT;
+        }
+
         public BlackspotScoreType muScoreType { get; set; } = BlackspotScoreType.E_SCORE_TYPE_DISTANCE;
         public int miScoreAmount { get; set; } = 0;
 

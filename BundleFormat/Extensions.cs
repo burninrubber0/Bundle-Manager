@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -106,9 +106,13 @@ namespace BundleFormat
 
         public static void Align(this BinaryWriter self, byte alignment)
         {
+            long originalPosition = self.BaseStream.Position;
             self.BaseStream.Position = alignment * ((self.BaseStream.Position + (alignment - 1)) / alignment);
-            self.BaseStream.Position--;
-            self.Write((byte)0);
+            if (self.BaseStream.Position != originalPosition)
+            {
+                self.BaseStream.Position--;
+                self.Write((byte)0);
+            }
 
             /*long currentOffset = self.BaseStream.Position;
             for (int i = 0; i < (alignment - (currentOffset % alignment)); i++)

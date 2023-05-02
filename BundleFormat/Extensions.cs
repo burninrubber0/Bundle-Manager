@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ManagedZLib;
 using System.Runtime.InteropServices;
 using BundleUtilities;
+using Ionic.Zlib;
 
 namespace BundleFormat
 {
@@ -45,12 +44,18 @@ namespace BundleFormat
 
         public static byte[] Compress(this byte[] self)
         {
-            return ZLib.Compress(self, ZLib.CompressionLevels.BEST_COMPRESSION);
+            byte[] compressedData = new byte[self.Length]; // Size not known yet, use uncompressed size as upper bound
+            ZlibStream zlibStream = new ZlibStream(new MemoryStream(self), CompressionMode.Compress, CompressionLevel.BestCompression);
+            zlibStream.Read(compressedData, 0, self.Length);
+            return new ArraySegment<byte>(compressedData, 0, (int)zlibStream.TotalOut).ToArray(); // Size known, return correctly sized segment
         }
         
         public static byte[] Decompress(this byte[] self, int uncompressedSize)
         {
-            return ZLib.Uncompress(self, uncompressedSize);
+            byte[] uncompressedData = new byte[uncompressedSize];
+            ZlibStream zlibStream = new ZlibStream(new MemoryStream(uncompressedData), CompressionMode.Decompress);
+            zlibStream.Write(self, 0, self.Length);
+            return uncompressedData;
         }
 
         /*public static byte[] Decompress(this byte[] self)

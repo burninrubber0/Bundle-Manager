@@ -77,14 +77,12 @@ namespace BundleManager
                     SetArchive method = (BundleArchive archive) =>
                     {
                         _archive = archive;
-                        Task.Run(() => UpdateDisplay());
                     };
                     Invoke(method, value);
                 }
                 else
                 {
                     _archive = value;
-                    UpdateDisplay();
                 }
             }
         }
@@ -119,14 +117,12 @@ namespace BundleManager
                     SetString method = (string filename) =>
                     {
                         _currentFileName = filename;
-                        //Task.Run(() => UpdateDisplay());
                     };
                     Invoke(method, value);
                 }
                 else
                 {
                     _currentFileName = value;
-                    UpdateDisplay();
                 }
             }
         }
@@ -173,6 +169,16 @@ namespace BundleManager
             for (int i = 0; i < CurrentArchive.Entries.Count; i++)
             {
                 BundleEntry entry = CurrentArchive.Entries[i];
+                if (entry.EntryBlocks[0].Data == null) // Exception occurred
+                {
+                    lstEntries.Items.Clear();
+                    lstEntries.Enabled = false;
+                    CurrentArchive = null;
+                    CurrentFileName = null;
+                    lstEntries.EndUpdate();
+                    UpdatePluginMenu();
+                    return;
+                }
                 string[] values = new string[]
                 {
                     i.ToString("d3"),
@@ -357,6 +363,7 @@ namespace BundleManager
 
                 CurrentFileName = sfd.FileName;
                 Text = "Bundle Manager - " + CurrentFileName;
+                UpdateDisplay();
 
                 return true;
             }
@@ -670,6 +677,7 @@ namespace BundleManager
 
             CurrentArchive = null;
             CurrentFileName = null;
+            UpdateDisplay();
 
             Hide();
             Program.folderModeForm.Show();

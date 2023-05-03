@@ -20,8 +20,10 @@ namespace VaultFormat
 
         public int getDataSize()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(BodyBox.toBytes());
+            List<byte[]> bytes = new List<byte[]>
+            {
+                BodyBox.toBytes()
+            };
             Console.WriteLine(bytes.SelectMany(i => i).Count());
             return CountingUtilities.AddPadding(bytes);
         }

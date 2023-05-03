@@ -88,76 +88,6 @@ namespace BundleManager
             }
         }
 
-        private delegate byte[] GetDataHex();
-        private delegate void SetDataHex(byte[] hex);
-        private byte[] DataHex
-        {
-            get
-            {
-                if (hexData.InvokeRequired)
-                {
-                    GetDataHex method = () =>
-                    {
-                        return hexData.HexData;
-                    };
-                    return (byte[])Invoke(method);
-                }
-                else
-                {
-                    return hexData.HexData;
-                }
-            }
-            set
-            {
-                if (hexData.InvokeRequired)
-                {
-                    SetDataHex method = (byte[] hex) =>
-                    {
-                        hexData.HexData = hex;
-                    };
-                    Invoke(method, value);
-                }
-                else
-                {
-                    hexData.HexData = value;
-                }
-            }
-        }
-
-        private byte[] ExtraDataHex
-        {
-            get
-            {
-                if (hexExtraData.InvokeRequired)
-                {
-                    GetDataHex method = () =>
-                    {
-                        return hexExtraData.HexData;
-                    };
-                    return (byte[])Invoke(method);
-                }
-                else
-                {
-                    return hexExtraData.HexData;
-                }
-            }
-            set
-            {
-                if (hexExtraData.InvokeRequired)
-                {
-                    SetDataHex method = (byte[] hex) =>
-                    {
-                        hexExtraData.HexData = hex;
-                    };
-                    Invoke(method, value);
-                }
-                else
-                {
-                    hexExtraData.HexData = value;
-                }
-            }
-        }
-
         private delegate Image GetImage();
         private delegate void SetImage(Image img);
         private Image Image
@@ -235,53 +165,6 @@ namespace BundleManager
             }
         }
 
-        /*private bool ImageVisible
-        {
-            get
-            {
-                if (tabList.InvokeRequired)
-                {
-                    GetBool method = () =>
-                    {
-                        return tabList.TabPages.Contains(tabImage);
-                    };
-                    return (bool)Invoke(method);
-                }
-                else
-                {
-                    return tabList.TabPages.Contains(tabImage);
-                }
-            }
-            set
-            {
-                if (tabList.InvokeRequired)
-                {
-                    SetBool method = (bool visible) =>
-                    {
-                        if (visible && !tabList.TabPages.Contains(tabImage))
-                        {
-                            tabList.TabPages.Add(tabImage);
-                        } else if (!visible && tabList.TabPages.Contains(tabImage))
-                        {
-                            tabList.TabPages.Remove(tabImage);
-                        }
-                    };
-                    Invoke(method, value);
-                }
-                else
-                {
-                    if (value && !tabList.TabPages.Contains(tabImage))
-                    {
-                        tabList.TabPages.Add(tabImage);
-                    }
-                    else if (!value && tabList.TabPages.Contains(tabImage))
-                    {
-                        tabList.TabPages.Remove(tabImage);
-                    }
-                }
-            }
-        }*/
-
         private delegate void SetTitleText(string val);
         private string Title
         {
@@ -298,40 +181,6 @@ namespace BundleManager
                 else
                 {
                     Text = value;
-                }
-            }
-        }
-
-        private bool TabsEnabled
-        {
-            get
-            {
-                if (tabList.InvokeRequired)
-                {
-                    GetBool method = () =>
-                    {
-                        return tabList.Enabled;
-                    };
-                    return (bool)Invoke(method);
-                }
-                else
-                {
-                    return tabList.Enabled;
-                }
-            }
-            set
-            {
-                if (tabList.InvokeRequired)
-                {
-                    SetBool method = (bool enabled) =>
-                    {
-                        tabList.Enabled = enabled;
-                    };
-                    Invoke(method, value);
-                }
-                else
-                {
-                    tabList.Enabled = value;
                 }
             }
         }
@@ -369,40 +218,6 @@ namespace BundleManager
                 }
             }
         }
-
-        /*private bool ModelMenuVisible
-        {
-            get
-            {
-                if (mnuBar.InvokeRequired)
-                {
-                    GetBool method = () =>
-                    {
-                        return modelToolStripMenuItem.Visible;
-                    };
-                    return (bool)Invoke(method);
-                }
-                else
-                {
-                    return modelToolStripMenuItem.Visible;
-                }
-            }
-            set
-            {
-                if (mnuBar.InvokeRequired)
-                {
-                    SetBool method = (bool enabled) =>
-                    {
-                        modelToolStripMenuItem.Visible = enabled;
-                    };
-                    Invoke(method, value);
-                }
-                else
-                {
-                    modelToolStripMenuItem.Visible = value;
-                }
-            }
-        }*/
 
         private bool ImageMenuVisible
         {
@@ -506,112 +321,6 @@ namespace BundleManager
             }
         }
 
-        /*private bool BodyTabVisible
-        {
-            get
-            {
-                if (tabBody.InvokeRequired)
-                {
-                    GetBool method = () =>
-                    {
-                        return tabBody.Enabled;
-                    };
-                    return (bool)Invoke(method);
-                }
-                else
-                {
-                    return tabBody.Enabled;
-                }
-            }
-            set
-            {
-                if (tabBody.InvokeRequired)
-                {
-                    SetBool method = (bool visible) =>
-                    {
-                        tabBody.Enabled = visible;
-                    };
-                    Invoke(method, value);
-                }
-                else
-                {
-                    tabBody.Enabled = value;
-                }
-            }
-        }
-
-        private bool HeaderTabVisible
-        {
-            get
-            {
-                if (tabHeader.InvokeRequired)
-                {
-                    GetBool method = () =>
-                    {
-                        return tabHeader.Enabled;
-                    };
-                    return (bool)Invoke(method);
-                }
-                else
-                {
-                    return tabHeader.Enabled;
-                }
-            }
-            set
-            {
-                if (tabHeader.InvokeRequired)
-                {
-                    SetBool method = (bool visible) =>
-                    {
-                        tabHeader.Enabled = visible;
-                    };
-                    Invoke(method, value);
-                }
-                else
-                {
-                    tabHeader.Enabled = value;
-                }
-            }
-        }*/
-
-        /*private TabControl TabList
-        {
-            get
-            {
-                if (tabList.InvokeRequired)
-                {
-                    GetTabControl method = () =>
-                    {
-                        return tabList;
-                    };
-                    return (TabControl)tabList.Invoke(method);
-                }
-                else
-                {
-                    return tabList;
-                }
-            }
-        }
-
-        private TabPage TabBody
-        {
-            get
-            {
-                if (tabBody.InvokeRequired)
-                {
-                    GetTabPage method = () =>
-                    {
-                        return tabBody;
-                    };
-                    return (TabPage)tabBody.Invoke(method);
-                }
-                else
-                {
-                    return tabBody;
-                }
-            }
-        }*/
-
         private string InfoText
         {
             get
@@ -692,31 +401,10 @@ namespace BundleManager
 
             }
             TabsVisible = !ImageVisible;
-            //}
             ImageMenuVisible = ImageVisible;
             BinaryMenuVisible = TabsVisible;
 
-            //ModelMenuVisible = _entry.Type == EntryType.RwRenderableResourceType;
-
-            if (TabsVisible)
-            {
-                DataHex = _entry.EntryBlocks[0].Data;//.AsString();
-                ExtraDataHex = _entry.EntryBlocks[1].Data;//.AsString();
-            }
-
             MenuVisible = true;
-
-            /*try
-            {
-                if (_entry.HasBody && !TabList.TabPages.Contains(TabBody))
-                    TabList.TabPages.Add(TabBody);
-                else if (!_entry.HasBody && TabList.TabPages.Contains(TabBody))
-                    TabList.TabPages.Remove(TabBody);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + "\n\n" + ex.StackTrace);
-            }*/
 
             InfoText = GetInfo();
         }
@@ -929,53 +617,6 @@ namespace BundleManager
             public float X, Y, Z;
         }
 
-        /*private int GetVertexSize()
-        {
-            List<int> vertexSizes = new List<int>();
-            foreach (BundleEntry entry in Entry.Archive.Entries)
-            {
-                if (entry.Type != EntryType.RwVertexDescResourceType)
-                    continue;
-
-                byte[] entryData = entry.EntryBlocks[0].Data;
-
-                MemoryStream ems = new MemoryStream(entryData);
-                BinaryReader2 ebr = new BinaryReader2(ems);
-                ebr.BigEndian = entry.Console;
-
-                ebr.BaseStream.Position += 17;
-                int vSize = ebr.ReadByte();
-
-                ebr.Close();
-                ems.Close();
-
-                if (!vertexSizes.Contains(vSize))
-                    vertexSizes.Add(vSize);
-            }
-
-            vertexSizes.Reverse();
-
-            int vertexSize;
-
-            if (vertexSizes.Count > 1)
-            {
-                VertexSizePicker picker = new VertexSizePicker();
-                picker.VertexSizeList = vertexSizes;
-                picker.ShowDialog(this);
-                vertexSize = picker.VertexSize;
-            }
-            else if (vertexSizes.Count == 1)
-            {
-                vertexSize = vertexSizes[0];
-            }
-            else
-            {
-                vertexSize = -1;
-            }
-
-            return vertexSize;
-        }*/
-
         private void infoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Entry.Type != EntryType.Renderable)
@@ -1020,115 +661,5 @@ namespace BundleManager
 
             MessageBox.Show(this, modelInfo, "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
-
-        /*private void exportObjToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (Entry.Type != EntryType.RwRenderableResourceType)
-                return;
-
-            int vertexSize = GetVertexSize();
-            if (vertexSize == -1)
-            {
-                MessageBox.Show(this, "No VertexDesc was found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            
-            byte[] header = Entry.EntryBlocks[0].Data;
-
-            MemoryStream ms = new MemoryStream(header);
-            BinaryReader2 br = new BinaryReader2(ms);
-            br.BigEndian = Entry.Console;
-
-            br.BaseStream.Position = 0x24;
-            int offset = br.ReadInt32();
-            br.BaseStream.Position = offset;
-
-            int vertexBlockOff = br.ReadInt32();
-            int dummy = br.ReadInt32();
-            int vertexBlockSize = br.ReadInt32();
-
-            long paddingCount = 16 - (br.BaseStream.Position % 16);
-            br.BaseStream.Position += paddingCount;
-
-            long blablaOff = br.BaseStream.Position;
-
-            br.BaseStream.Position = blablaOff + 0x4C;
-            int vertexCount = br.ReadInt32();
-            br.BaseStream.Position = blablaOff + 0x54;
-            int polyCount = br.ReadInt32();
-            int indexCount = polyCount * 3;
-
-            br.Close();
-            ms.Close();
-
-            try
-            {
-
-                byte[] data = Entry.EntryBlocks[1].Data;
-                ms = new MemoryStream(data);
-                br = new BinaryReader2(ms);
-                br.BigEndian = Entry.Console;
-
-                List<short> indices = new List<short>();
-
-                for (int i = 0; i < indexCount; i++)
-                {
-                    indices.Add((short)(br.ReadInt16() + 1));
-                }
-
-                br.BaseStream.Position = vertexBlockOff;
-
-                List<Vertex> vertices = new List<Vertex>();
-
-                for (int i = 0; i < vertexCount; i++)
-                {
-                    br.BaseStream.Position = vertexBlockOff + vertexSize * i;
-                    Vertex vertex = new Vertex();
-                    vertex.X = br.ReadSingle();
-                    vertex.Y = br.ReadSingle();
-                    vertex.Z = br.ReadSingle();
-                    vertices.Add(vertex);
-                }
-
-                br.Close();
-                ms.Close();
-
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.Filter = "Wavefront OBJ|*.obj|All Files|*.*";
-                DialogResult result = sfd.ShowDialog(this);
-                if (result == DialogResult.OK)
-                {
-                    Stream s = File.Open(sfd.FileName, FileMode.Create);
-                    StreamWriter sw = new StreamWriter(s);
-
-                    for (int i = 0; i < vertices.Count; i++)
-                    {
-                        Vertex v = vertices[i];
-                        sw.WriteLine("v " + v.X + " " + v.Y + " " + v.Z);
-                    }
-
-                    sw.WriteLine();
-                    sw.WriteLine("g submesh_0");
-
-                    for (int i = 0; i < indices.Count; i += 3)
-                    {
-                        int index1 = indices[i + 0];
-                        int index2 = indices[i + 1];
-                        int index3 = indices[i + 2];
-                        sw.WriteLine("f " + index1 + " " + index2 + " " + index3);
-                    }
-
-                    sw.WriteLine();
-
-                    sw.Flush();
-                    sw.Close();
-                    sw.Close();
-                }
-            }
-            catch (IOException ex)
-            {
-                MessageBox.Show(this, "Error: " + ex.Message + "\n\n" + ex.StackTrace, "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }*/
     }
 }

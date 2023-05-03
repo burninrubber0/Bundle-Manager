@@ -1,17 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using PluginAPI;
 
 namespace BaseHandlers
 {
-
     public delegate void Notify();  // delegate
     public partial class TriggerDataEditor : Form, IEntryEditor
     {
@@ -47,10 +39,5 @@ namespace BaseHandlers
         {
             EditEvent?.Invoke();
         }
-
-        private void propertyChanged() {
-            EditEvent?.Invoke();
-        }
-
     }
 }

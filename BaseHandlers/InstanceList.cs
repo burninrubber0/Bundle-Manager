@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using BundleFormat;
 using BundleUtilities;
 using MathLib;
-using ModelViewer;
 using ModelViewer.SceneData;
 using OpenTK.Mathematics;
 using PluginAPI;

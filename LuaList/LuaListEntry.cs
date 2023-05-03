@@ -33,16 +33,18 @@ namespace LuaList
         public int Variables { get; set; } = 0;
 
         public int getDataSize() {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(BitConverter.GetBytes(CgsId.Encrypted));
-            bytes.Add(Encoding.ASCII.GetBytes((Name.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
-            bytes.Add(Encoding.ASCII.GetBytes((Goal.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
-            bytes.Add(Encoding.ASCII.GetBytes((Description.PadRight(256, '\0').Substring(0, 256).ToCharArray())));
-            bytes.Add(BitConverter.GetBytes((int)ScoreMultiplier));
-            bytes.Add(BitConverter.GetBytes((int)ScoringMethod));
-            bytes.Add(BitConverter.GetBytes((int)Type));
-            bytes.Add(BitConverter.GetBytes((int)Variables));
-            bytes.Add(new byte[8]);
+            List<byte[]> bytes = new List<byte[]>
+            {
+                BitConverter.GetBytes(CgsId.Encrypted),
+                Encoding.ASCII.GetBytes((Name.PadRight(128, '\0').Substring(0, 128).ToCharArray())),
+                Encoding.ASCII.GetBytes((Goal.PadRight(128, '\0').Substring(0, 128).ToCharArray())),
+                Encoding.ASCII.GetBytes((Description.PadRight(256, '\0').Substring(0, 256).ToCharArray())),
+                BitConverter.GetBytes((int)ScoreMultiplier),
+                BitConverter.GetBytes((int)ScoringMethod),
+                BitConverter.GetBytes((int)Type),
+                BitConverter.GetBytes((int)Variables),
+                new byte[8]
+            };
             return bytes.SelectMany(i => i).Count();
         }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -29,30 +29,15 @@ namespace BurnoutImage
         public void SetPixel(int x, int y, Color colour)
         {
             int index = x + (y * Width);
-
-            /*Bits[index + 0] = colour.A;
-            Bits[index + 1] = colour.R;
-            Bits[index + 2] = colour.G;
-            Bits[index + 3] = colour.B;*/
-
             int col = colour.ToArgb();
-
             Bits[index] = col;
         }
 
         public Color GetPixel(int x, int y)
         {
             int index = x + (y * Width);
-
-            /*byte alpha = Bits[index + 0];
-            byte red = Bits[index + 1];
-            byte green = Bits[index + 2];
-            byte blue = Bits[index + 3];
-            Color result = Color.FromArgb(alpha, red, green, blue);*/
-
             int col = Bits[index];
             Color result = Color.FromArgb(col);
-
             return result;
         }
 

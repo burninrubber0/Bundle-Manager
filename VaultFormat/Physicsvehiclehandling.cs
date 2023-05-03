@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,15 +26,17 @@ namespace VaultFormat
 
         public int getDataSize()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(PhysicsVehicleSuspensionAttribs.ToBytes());
-            bytes.Add(PhysicsVehicleSteeringAttribs.ToBytes());
-            bytes.Add(PhysicsVehicleEngineAttribs.ToBytes());
-            bytes.Add(PhysicsVehicleDriftAttribs.ToBytes());
-            bytes.Add(PhysicsVehicleCollisionAttribs.ToBytes());
-            bytes.Add(PhysicsVehicleBoostAttribs.ToBytes());
-            bytes.Add(PhysicsVehicleBodyRollAttribs.ToBytes());
-            bytes.Add(PhysicsVehicleBaseAttribs.ToBytes());
+            List<byte[]> bytes = new List<byte[]>
+            {
+                PhysicsVehicleSuspensionAttribs.ToBytes(),
+                PhysicsVehicleSteeringAttribs.ToBytes(),
+                PhysicsVehicleEngineAttribs.ToBytes(),
+                PhysicsVehicleDriftAttribs.ToBytes(),
+                PhysicsVehicleCollisionAttribs.ToBytes(),
+                PhysicsVehicleBoostAttribs.ToBytes(),
+                PhysicsVehicleBodyRollAttribs.ToBytes(),
+                PhysicsVehicleBaseAttribs.ToBytes()
+            };
             Console.WriteLine(bytes.SelectMany(i => i).Count());
             return CountingUtilities.AddPadding(bytes);
         }

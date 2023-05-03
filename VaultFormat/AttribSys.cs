@@ -360,9 +360,11 @@ namespace VaultFormat
 
         private int getSizeOfStrE()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("StrE")));
-            bytes.Add(BitConverter.GetBytes(16));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                Utilities.Flip(Encoding.ASCII.GetBytes("StrE")),
+                BitConverter.GetBytes(16)
+            };
             foreach (string String in Strings)
             {
                 byte[] nullterminating = { (byte)0 };
@@ -373,26 +375,30 @@ namespace VaultFormat
 
         private int getSizeOfVers()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("Vers")));
-            bytes.Add(BitConverter.GetBytes(16));
-            bytes.Add(BitConverter.GetBytes(VersionHash));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                Utilities.Flip(Encoding.ASCII.GetBytes("Vers")),
+                BitConverter.GetBytes(16),
+                BitConverter.GetBytes(VersionHash)
+            };
             return addPadding(bytes);
         }
 
         private int getSizeOfDepN()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("DepN")));
-            bytes.Add(BitConverter.GetBytes(96));
-            bytes.Add(BitConverter.GetBytes((UInt64)Dependencies.Count()));
-            bytes.Add(BitConverter.GetBytes(DepHash1));
-            bytes.Add(BitConverter.GetBytes(DepHash2));
-            bytes.Add(BitConverter.GetBytes(DepNop));
-            bytes.Add(BitConverter.GetBytes(Dependencies[0].Length + 1));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                Utilities.Flip(Encoding.ASCII.GetBytes("DepN")),
+                BitConverter.GetBytes(96),
+                BitConverter.GetBytes((UInt64)Dependencies.Count()),
+                BitConverter.GetBytes(DepHash1),
+                BitConverter.GetBytes(DepHash2),
+                BitConverter.GetBytes(DepNop),
+                BitConverter.GetBytes(Dependencies[0].Length + 1)
+            };
             foreach (string d in Dependencies)
             {
-                byte[] nullterminating = { (byte)0 };
+                byte[] nullterminating = { 0 };
                 bytes.Add(Encoding.ASCII.GetBytes(d).Concat(nullterminating).ToArray());
             }
             return addPadding(bytes);
@@ -400,8 +406,10 @@ namespace VaultFormat
 
         private int getSizeOfDatN()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("DatN")));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                Utilities.Flip(Encoding.ASCII.GetBytes("DatN"))
+            };
             foreach (AttributeHeader dataChunk in Attributes.Select(x => x.getHeader()))
             {
                 bytes.Add(BitConverter.GetBytes(dataChunk.CollectionHash));
@@ -433,10 +441,12 @@ namespace VaultFormat
 
         private int getSizeOfExpN()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("ExpN")));
-            bytes.Add(BitConverter.GetBytes(16));
-            bytes.Add(BitConverter.GetBytes((UInt64)Attributes.Select(x => x.getInfo()).Count()));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                Utilities.Flip(Encoding.ASCII.GetBytes("ExpN")),
+                BitConverter.GetBytes(16),
+                BitConverter.GetBytes((UInt64)Attributes.Select(x => x.getInfo()).Count())
+            };
             foreach (SizeAndPositionInformation chunk in Attributes.Select(x => x.getInfo()))
             {
                 bytes.Add(BitConverter.GetBytes(chunk.Hash));
@@ -449,18 +459,22 @@ namespace VaultFormat
 
         private int getSizeOfStrN()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("StrN")));
-            bytes.Add(BitConverter.GetBytes(16));
-            bytes.Add(BitConverter.GetBytes(StrUnknown1));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                Utilities.Flip(Encoding.ASCII.GetBytes("StrN")),
+                BitConverter.GetBytes(16),
+                BitConverter.GetBytes(StrUnknown1)
+            };
             return addPadding(bytes);
         }
 
         private int getSizeOfPtrN()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(Utilities.Flip(Encoding.ASCII.GetBytes("PtrN")));
-            bytes.Add(BitConverter.GetBytes(16));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                Utilities.Flip(Encoding.ASCII.GetBytes("PtrN")),
+                BitConverter.GetBytes(16)
+            };
             foreach (PtrChunkData data in PtrN.allData)
             {
                 bytes.Add(BitConverter.GetBytes(data.Ptr));

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using BundleUtilities;
 
 namespace VaultFormat
@@ -73,10 +72,12 @@ namespace VaultFormat
 
         private byte[] AddPadding(List<byte[]> bytes)
         {
-            List<byte> padding = new List<byte>();
-            padding.Add((byte)0);
-            padding.Add((byte)0);
-            padding.Add((byte)0);
+            List<byte> padding = new List<byte>
+            {
+                0,
+                0,
+                0
+            };
             bytes.Add(padding.ToArray());
             return bytes.SelectMany(i => i).ToArray();
         }

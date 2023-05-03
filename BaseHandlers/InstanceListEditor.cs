@@ -6,13 +6,7 @@ using ModelViewer.SceneData;
 using PluginAPI;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BaseHandlers
@@ -253,16 +247,6 @@ namespace BaseHandlers
         private void LstMain_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             ViewSelectedModel();
-        }
-
-        private void LstMain_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
-        {
-            //e.Cancel = true;
-        }
-
-        private void LstMain_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
-        {
-            //UpdateColumnWidth();
         }
     }
 }

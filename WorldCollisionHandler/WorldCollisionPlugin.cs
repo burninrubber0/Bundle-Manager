@@ -1,13 +1,8 @@
-﻿using BundleFormat;
+using BundleFormat;
 using BundleUtilities;
 using ModelViewer.SceneData;
 using PluginAPI;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WorldCollisionHandler
@@ -111,33 +106,6 @@ namespace WorldCollisionHandler
                 }
             }
         }
-
-        /*public void ConvertToPC(IWin32Window window, BundleArchive archive)
-        {
-            // TODO: Support everything
-
-            for (int i = 0; i < archive.Entries.Count; i++)
-            {
-                BundleEntry entry = archive.Entries[i];
-
-                if (entry.Type == EntryType.IDList)
-                {
-                    IDList list = new IDList();
-                    list.Read(entry);
-                    list.Write(entry);
-                }
-                else if (entry.Type == EntryType.PolygonSoupListResourceType)
-                {
-                    PolygonSoupList list = new PolygonSoupList();
-                    list.Read(entry);
-                    list.Write(entry);
-                }
-            }
-
-            //PatchImages();
-
-            archive.Platform = BundlePlatform.PC;
-        }*/
 
         #endregion
     }

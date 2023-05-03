@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing.Design;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace BaseHandlers
@@ -71,13 +70,6 @@ namespace BaseHandlers
         {
             return string.Format("{0:X16}", m_id);
         }
-    }
-    public enum RegionType
-    {
-        E_TYPE_LANDMARK = 0,
-        E_TYPE_BLACKSPOT = 1,
-        E_TYPE_GENERIC_REGION = 2,
-        E_TYPE_VFXBOX_REGION = 3
     }
 
     public class StartingGrid
@@ -167,6 +159,14 @@ namespace BaseHandlers
 
     public class TriggerRegion
     {
+        public enum RegionType
+        {
+            E_TYPE_LANDMARK = 0,
+            E_TYPE_BLACKSPOT = 1,
+            E_TYPE_GENERIC_REGION = 2,
+            E_TYPE_VFXBOX_REGION = 3
+        }
+
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public BoxRegion mBoxRegion { get; set; } = new BoxRegion();
         public int mId { get; set; } = 0;
@@ -210,7 +210,7 @@ namespace BaseHandlers
         public byte muDistrict { get; set; } = 0;
         public byte mu8Flags { get; set; } = 0;
 
-        public void Read(BinaryReader reader)
+        public new void Read(BinaryReader reader)
         {
             base.Read(reader);
             long startingGridOffset = reader.ReadUInt32();
@@ -232,7 +232,7 @@ namespace BaseHandlers
 
         }
 
-        public void Write(BinaryWriter writer)
+        public new void Write(BinaryWriter writer)
         {
             base.Write(writer);
             startingGridOffsetPosition = writer.BaseStream.Position;
@@ -255,54 +255,54 @@ namespace BaseHandlers
         }
     }
 
-    public enum GenericRegionStuntCameraType
-    {
-        E_STUNT_CAMERA_TYPE_NO_CUTS = 0,
-        E_STUNT_CAMERA_TYPE_CUSTOM = 1,
-        E_STUNT_CAMERA_TYPE_NORMAL = 2
-    }
-
-    public enum GenericRegionType
-    {
-        E_TYPE_JUNK_YARD = 0,
-        E_TYPE_BIKE_SHOP = 1,
-        E_TYPE_GAS_STATION = 2,
-        E_TYPE_BODY_SHOP = 3,
-        E_TYPE_PAINT_SHOP = 4,
-        E_TYPE_CAR_PARK = 5,
-        E_TYPE_SIGNATURE_TAKEDOWN = 6,
-        E_TYPE_KILLZONE = 7,
-        E_TYPE_JUMP = 8,
-        E_TYPE_SMASH = 9,
-        E_TYPE_SIGNATURE_CRASH = 10,
-        E_TYPE_SIGNATURE_CRASH_CAMERA = 11,
-        E_TYPE_ROAD_LIMIT = 12,
-        E_TYPE_OVERDRIVE_BOOST = 13,
-        E_TYPE_OVERDRIVE_STRENGTH = 14,
-        E_TYPE_OVERDRIVE_SPEED = 15,
-        E_TYPE_OVERDRIVE_CONTROL = 16,
-        E_TYPE_TIRE_SHOP = 17,
-        E_TYPE_TUNING_SHOP = 18,
-        E_TYPE_PICTURE_PARADISE = 19,
-        E_TYPE_TUNNEL = 20,
-        E_TYPE_OVERPASS = 21,
-        E_TYPE_BRIDGE = 22,
-        E_TYPE_WAREHOUSE = 23,
-        E_TYPE_LARGE_OVERHEAD_OBJECT = 24,
-        E_TYPE_NARROW_ALLEY = 25,
-        E_TYPE_PASS_TUNNEL = 26,
-        E_TYPE_PASS_OVERPASS = 27,
-        E_TYPE_PASS_BRIDGE = 28,
-        E_TYPE_PASS_WAREHOUSE = 29,
-        E_TYPE_PASS_LARGEOVERHEADOBJECT = 30,
-        E_TYPE_PASS_NARROWALLEY = 31,
-        E_TYPE_RAMP = 32,
-        E_TYPE_GOLD = 33,
-        E_TYPE_ISLAND_ENTITLEMENT = 34
-    }
-
     public class GenericRegion : TriggerRegion
     {
+        public enum StuntCameraType
+        {
+            E_STUNT_CAMERA_TYPE_NO_CUTS = 0,
+            E_STUNT_CAMERA_TYPE_CUSTOM = 1,
+            E_STUNT_CAMERA_TYPE_NORMAL = 2
+        }
+
+        public enum Type
+        {
+            E_TYPE_JUNK_YARD = 0,
+            E_TYPE_BIKE_SHOP = 1,
+            E_TYPE_GAS_STATION = 2,
+            E_TYPE_BODY_SHOP = 3,
+            E_TYPE_PAINT_SHOP = 4,
+            E_TYPE_CAR_PARK = 5,
+            E_TYPE_SIGNATURE_TAKEDOWN = 6,
+            E_TYPE_KILLZONE = 7,
+            E_TYPE_JUMP = 8,
+            E_TYPE_SMASH = 9,
+            E_TYPE_SIGNATURE_CRASH = 10,
+            E_TYPE_SIGNATURE_CRASH_CAMERA = 11,
+            E_TYPE_ROAD_LIMIT = 12,
+            E_TYPE_OVERDRIVE_BOOST = 13,
+            E_TYPE_OVERDRIVE_STRENGTH = 14,
+            E_TYPE_OVERDRIVE_SPEED = 15,
+            E_TYPE_OVERDRIVE_CONTROL = 16,
+            E_TYPE_TIRE_SHOP = 17,
+            E_TYPE_TUNING_SHOP = 18,
+            E_TYPE_PICTURE_PARADISE = 19,
+            E_TYPE_TUNNEL = 20,
+            E_TYPE_OVERPASS = 21,
+            E_TYPE_BRIDGE = 22,
+            E_TYPE_WAREHOUSE = 23,
+            E_TYPE_LARGE_OVERHEAD_OBJECT = 24,
+            E_TYPE_NARROW_ALLEY = 25,
+            E_TYPE_PASS_TUNNEL = 26,
+            E_TYPE_PASS_OVERPASS = 27,
+            E_TYPE_PASS_BRIDGE = 28,
+            E_TYPE_PASS_WAREHOUSE = 29,
+            E_TYPE_PASS_LARGEOVERHEADOBJECT = 30,
+            E_TYPE_PASS_NARROWALLEY = 31,
+            E_TYPE_RAMP = 32,
+            E_TYPE_GOLD = 33,
+            E_TYPE_ISLAND_ENTITLEMENT = 34
+        }
+
         public GenericRegion() : base()
         {
             // Set meType to E_TYPE_GENERIC_REGION
@@ -312,24 +312,24 @@ namespace BaseHandlers
         public int GroupID { get; set; } = 0;
         public short CameraCut1 { get; set; } = 0;
         public short CameraCut2 { get; set; } = 0;
-        public GenericRegionStuntCameraType CameraType1 { get; set; } = 0;
-        public GenericRegionStuntCameraType CameraType2 { get; set; } = 0;
-        public GenericRegionType Type { get; set; } = GenericRegionType.E_TYPE_JUNK_YARD;
+        public StuntCameraType CameraType1 { get; set; } = 0;
+        public StuntCameraType CameraType2 { get; set; } = 0;
+        public Type GenericRegionType { get; set; } = Type.E_TYPE_JUNK_YARD;
         public sbyte IsOneWay { get; set; } = 0;
 
-        public void Read(BinaryReader reader)
+        public new void Read(BinaryReader reader)
         {
             base.Read(reader);
             GroupID = reader.ReadInt32();
             CameraCut1 = reader.ReadInt16();
             CameraCut2 = reader.ReadInt16();
-            CameraType1 = (GenericRegionStuntCameraType)reader.ReadSByte();
-            CameraType2 = (GenericRegionStuntCameraType)reader.ReadSByte();
-            Type = (GenericRegionType)reader.ReadByte();
+            CameraType1 = (StuntCameraType)reader.ReadSByte();
+            CameraType2 = (StuntCameraType)reader.ReadSByte();
+            GenericRegionType = (Type)reader.ReadByte();
             IsOneWay = reader.ReadSByte();
         }
 
-        public void Write(BinaryWriter writer)
+        public new void Write(BinaryWriter writer)
         {
             base.Write(writer);
             writer.Write(GroupID);
@@ -337,33 +337,33 @@ namespace BaseHandlers
             writer.Write(CameraCut2);
             writer.Write((sbyte)CameraType1);
             writer.Write((sbyte)CameraType2);
-            writer.Write((byte)Type);
+            writer.Write((byte)GenericRegionType);
             writer.Write(IsOneWay);
         }
     }
 
-    public enum BlackspotScoreType
-    {
-        E_SCORE_TYPE_DISTANCE = 0,
-        E_SCORE_TYPE_CAR_COUNT = 1
-    }
-
     public class Blackspot : TriggerRegion
     {
+        public enum ScoreType
+        {
+            E_SCORE_TYPE_DISTANCE = 0,
+            E_SCORE_TYPE_CAR_COUNT = 1
+        }
+
         public Blackspot() : base()
         {
             // Set meType to E_TYPE_BLACKSPOT
             meType = RegionType.E_TYPE_BLACKSPOT;
         }
 
-        public BlackspotScoreType muScoreType { get; set; } = BlackspotScoreType.E_SCORE_TYPE_DISTANCE;
+        public ScoreType muScoreType { get; set; } = ScoreType.E_SCORE_TYPE_DISTANCE;
         public int miScoreAmount { get; set; } = 0;
 
         public override void Read(BinaryReader reader)
         {
             base.Read(reader);
 
-            muScoreType = (BlackspotScoreType) reader.ReadByte();
+            muScoreType = (ScoreType)reader.ReadByte();
             reader.ReadBytes(3); // Padding
             miScoreAmount = reader.ReadInt32();
         }
@@ -466,10 +466,7 @@ namespace BaseHandlers
                 for (int i = 0; i < paddingCount; i++)
                     writer.Write((byte)0);
             }
-
         }
-
-
     }
 
     public class SignatureStunt
@@ -529,7 +526,6 @@ namespace BaseHandlers
                 writer.Write(genericRegionOffsets[trigger]);
             }
         }
-
     }
 
     public class RoamingLocation
@@ -538,12 +534,13 @@ namespace BaseHandlers
         public Vector3I Position { get; set; } = new Vector3I(0,0,0,0);
         public byte DistrictIndex { get; set; } = 0;
 
-        public void Read(BinaryReader reader) { 
-
+        public void Read(BinaryReader reader)
+        {
             Position = new Vector3I(
-                    reader.ReadSingle(),
-                    reader.ReadSingle(),
-                    reader.ReadSingle(), reader.ReadSingle());
+                reader.ReadSingle(),
+                reader.ReadSingle(),
+                reader.ReadSingle(),
+                reader.ReadSingle());
             DistrictIndex = reader.ReadByte();
             // Read and discard padding
             reader.ReadBytes(15);
@@ -581,23 +578,23 @@ namespace BaseHandlers
         }
     }
 
-    public enum SpawnLocationType
-    {
-        E_TYPE_PLAYER_SPAWN = 0,
-        E_TYPE_CAR_SELECT_LEFT = 1,
-        E_TYPE_CAR_SELECT_RIGHT = 2,
-        E_TYPE_CAR_UNLOCK = 3
-    }
-
     public class SpawnLocation
     {
+        public enum Type
+        {
+            E_TYPE_PLAYER_SPAWN = 0,
+            E_TYPE_CAR_SELECT_LEFT = 1,
+            E_TYPE_CAR_SELECT_RIGHT = 2,
+            E_TYPE_CAR_UNLOCK = 3
+        }
+
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public Vector3I mPosition { get; set; } = new Vector3I(0, 0, 0, 0);
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public Vector3I mDirection { get; set; } = new Vector3I(0, 0, 0, 0);
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public CgsID mJunkyardId { get; set; } = new CgsID();
-        public SpawnLocationType muType { get; set; } = 0;
+        public Type muType { get; set; } = 0;
         private byte[] padding = new byte[7];
 
         public void Read(BinaryReader reader)
@@ -606,7 +603,7 @@ namespace BaseHandlers
             mDirection = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             mJunkyardId = new CgsID();
             mJunkyardId.Read(reader);
-            muType = (SpawnLocationType)reader.ReadByte();
+            muType = (Type)reader.ReadByte();
             padding = reader.ReadBytes(7);
         }
 
@@ -624,11 +621,9 @@ namespace BaseHandlers
             writer.Write((byte)muType);
             writer.Write(padding);
         }
-
     }
 
-
-public class TriggerData : IEntryData
+    public class TriggerData : IEntryData
     {
         public int miVersionNumber { get; set; }
         public uint muSize { get; set; }
@@ -646,7 +641,6 @@ public class TriggerData : IEntryData
         public List<RoamingLocation> mpRoamingLocations { get; set; }
         public List<SpawnLocation> mpSpawnLocations { get; set; }
         private List<uint> TriggerOffsets { get; set; }
-
 
         public bool Read(BundleEntry entry, ILoader loader = null)
         {

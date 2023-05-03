@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BundleUtilities
 {
@@ -158,7 +156,6 @@ namespace BundleUtilities
                 base.BaseStream.Position = base.BaseStream.Position + (16 - currentLength % 16);
             };
         }
-
 
         public Vector3I ReadVector3I()
         {

@@ -1,12 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using BundleUtilities;
 using Ionic.Zlib;
 
 namespace BundleFormat
@@ -66,26 +61,6 @@ namespace BundleFormat
             return uncompressedData;
         }
 
-        /*public static byte[] Decompress(this byte[] self)
-        {
-            MemoryStream ms = new MemoryStream(self);
-            int cmagic1 = ms.ReadByte();
-            int cmagic2 = ms.ReadByte();
-
-            if (cmagic1 != 0x78 || cmagic2 != 0xDA)
-                return null;
-
-            DeflateStream ds = new DeflateStream(ms, CompressionMode.Decompress);
-
-            MemoryStream ms2 = new MemoryStream();
-            ds.CopyTo(ms2);
-            ds.Close();
-
-            byte[] result = ms2.ToArray();
-            ms2.Close();
-            return result;
-        }*/
-
         public static bool Matches(this byte[] self, byte[] other)
         {
             if (self == null || other == null)
@@ -119,17 +94,11 @@ namespace BundleFormat
 
         public static void Align(this BinaryWriter self, byte alignment)
         {
-            long originalPosition = self.BaseStream.Position;
+            if (self.BaseStream.Position % alignment == 0)
+                return;
             self.BaseStream.Position = alignment * ((self.BaseStream.Position + (alignment - 1)) / alignment);
-            if (self.BaseStream.Position != originalPosition)
-            {
-                self.BaseStream.Position--;
-                self.Write((byte)0);
-            }
-
-            /*long currentOffset = self.BaseStream.Position;
-            for (int i = 0; i < (alignment - (currentOffset % alignment)); i++)
-                self.Write((byte)0);*/
+            self.BaseStream.Position--;
+            self.Write((byte)0);
         }
     }
 }

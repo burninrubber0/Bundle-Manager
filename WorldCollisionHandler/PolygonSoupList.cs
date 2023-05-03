@@ -12,7 +12,7 @@ using BundleUtilities;
 using MathLib;
 using ModelViewer;
 using ModelViewer.SceneData;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using PluginAPI;
 

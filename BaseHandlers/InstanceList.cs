@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -7,7 +7,7 @@ using BundleUtilities;
 using MathLib;
 using ModelViewer;
 using ModelViewer.SceneData;
-using OpenTK;
+using OpenTK.Mathematics;
 using PluginAPI;
 
 namespace BaseHandlers

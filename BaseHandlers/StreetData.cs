@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using BundleFormat;
 using BundleUtilities;
 using MathLib;
-using OpenTK;
+using OpenTK.Mathematics;
 using PluginAPI;
 
 namespace BaseHandlers

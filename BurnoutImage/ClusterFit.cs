@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BCnEncoder.Shared;
 
 namespace BurnoutImage
 {
@@ -18,7 +19,7 @@ namespace BurnoutImage
         public Vec4 Metric;
         public Vec4 BestError;
 
-        public ClusterFit(ColourSet colours, DXTCompression compression) : base(colours, compression)
+        public ClusterFit(ColourSet colours, CompressionFormat compression) : base(colours, compression)
         {
             Order = new byte[16 * MaxIterations];
             PointWeights = new Vec4[16];

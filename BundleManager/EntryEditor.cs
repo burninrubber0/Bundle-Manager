@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -772,7 +772,7 @@ namespace BundleManager
 
             ImageHeader header = GameImage.GetImageHeader(_entry.EntryBlocks[0].Data);
 
-            ImageInfo info = GameImage.SetImage(newImage, header.CompressionType);
+            ImageInfo info = GameImage.SetImage(path, newImage.Width, newImage.Height, header.CompressionType);
 
             Entry.EntryBlocks[0].Data = info.Header;
             Entry.EntryBlocks[1].Data = info.Data;

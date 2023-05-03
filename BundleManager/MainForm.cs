@@ -285,7 +285,7 @@ namespace BundleManager
         {
             if (cancelled)
             {
-                _openSaveThread?.Abort();
+                _openSaveThread?.Interrupt();
                 CurrentArchive = null;
                 CurrentFileName = null;
             }
@@ -374,7 +374,7 @@ namespace BundleManager
         {
             if (cancelled)
             {
-                _openSaveThread?.Abort();
+                _openSaveThread?.Interrupt();
             } else
             {
                 CurrentArchive.Dirty = false;
@@ -437,7 +437,7 @@ namespace BundleManager
                 loader.Done += (cancelled, value) =>
                 {
                     if (cancelled)
-                        loadInstanceThread?.Abort();
+                        loadInstanceThread?.Interrupt();
                     else
                     {
                         if (failure)

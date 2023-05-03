@@ -1,4 +1,4 @@
-﻿using BundleFormat;
+using BundleFormat;
 using BundleUtilities;
 using DebugHelper;
 using ModelViewer;
@@ -151,7 +151,7 @@ namespace BaseHandlers
             loader.Done += (cancelled, value) =>
             {
                 if (cancelled)
-                    loadInstanceThread?.Abort();
+                    loadInstanceThread?.Interrupt();
                 else
                 {
                     loader.Hide();
@@ -213,7 +213,7 @@ namespace BaseHandlers
             loader.Done += (cancelled, value) =>
             {
                 if (cancelled)
-                    loadInstanceThread?.Abort();
+                    loadInstanceThread?.Interrupt();
                 else
                 {
                     loader.Hide();

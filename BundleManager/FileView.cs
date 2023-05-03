@@ -136,7 +136,7 @@ namespace BundleManager
                 {
                     if (cancelled)
                     {
-                        _updateDisplayThread?.Abort();
+                        _updateDisplayThread?.Interrupt();
                         _currentPath = null;
                     }
                     UpdateDisplay();

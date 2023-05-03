@@ -31,297 +31,295 @@ namespace BundleManager
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EntryEditor));
-            this.tabList = new System.Windows.Forms.TabControl();
-            this.tabInfo = new System.Windows.Forms.TabPage();
-            this.txtInfo = new System.Windows.Forms.TextBox();
-            this.tabHeader = new System.Windows.Forms.TabPage();
-            this.hexData = new HexEditor.HexView();
-            this.tabBody = new System.Windows.Forms.TabPage();
-            this.hexExtraData = new HexEditor.HexView();
-            this.lblLoading = new System.Windows.Forms.Label();
-            this.mnuBar = new System.Windows.Forms.MenuStrip();
-            this.editStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.editHashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.calcLookupHashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.binaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importHeaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportHeaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-            this.importBodyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportBodyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.imageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.stsMain = new System.Windows.Forms.StatusStrip();
-            this.pbMain = new System.Windows.Forms.ProgressBar();
-            this.pboImage = new System.Windows.Forms.PictureBox();
-            this.tabList.SuspendLayout();
-            this.tabInfo.SuspendLayout();
-            this.tabHeader.SuspendLayout();
-            this.tabBody.SuspendLayout();
-            this.mnuBar.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pboImage)).BeginInit();
-            this.SuspendLayout();
+            tabList = new System.Windows.Forms.TabControl();
+            tabInfo = new System.Windows.Forms.TabPage();
+            txtInfo = new System.Windows.Forms.TextBox();
+            tabHeader = new System.Windows.Forms.TabPage();
+            hexData = new HexEditor.HexView();
+            tabBody = new System.Windows.Forms.TabPage();
+            hexExtraData = new HexEditor.HexView();
+            lblLoading = new System.Windows.Forms.Label();
+            mnuBar = new System.Windows.Forms.MenuStrip();
+            binaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            importHeaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            exportHeaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            importBodyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            exportBodyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            editStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            editHashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            calcLookupHashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            imageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            stsMain = new System.Windows.Forms.StatusStrip();
+            pbMain = new System.Windows.Forms.ProgressBar();
+            pboImage = new System.Windows.Forms.PictureBox();
+            tabList.SuspendLayout();
+            tabInfo.SuspendLayout();
+            tabHeader.SuspendLayout();
+            tabBody.SuspendLayout();
+            mnuBar.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pboImage).BeginInit();
+            SuspendLayout();
             // 
             // tabList
             // 
-            this.tabList.Controls.Add(this.tabInfo);
-            this.tabList.Controls.Add(this.tabHeader);
-            this.tabList.Controls.Add(this.tabBody);
-            this.tabList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabList.Location = new System.Drawing.Point(0, 0);
-            this.tabList.Name = "tabList";
-            this.tabList.SelectedIndex = 0;
-            this.tabList.Size = new System.Drawing.Size(624, 419);
-            this.tabList.TabIndex = 0;
-            this.tabList.SelectedIndexChanged += new System.EventHandler(this.tabList_SelectedIndexChanged);
+            tabList.Controls.Add(tabInfo);
+            tabList.Controls.Add(tabHeader);
+            tabList.Controls.Add(tabBody);
+            tabList.Dock = System.Windows.Forms.DockStyle.Fill;
+            tabList.Location = new System.Drawing.Point(0, 0);
+            tabList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabList.Name = "tabList";
+            tabList.SelectedIndex = 0;
+            tabList.Size = new System.Drawing.Size(728, 487);
+            tabList.TabIndex = 0;
+            tabList.SelectedIndexChanged += tabList_SelectedIndexChanged;
             // 
             // tabInfo
             // 
-            this.tabInfo.Controls.Add(this.txtInfo);
-            this.tabInfo.Location = new System.Drawing.Point(4, 22);
-            this.tabInfo.Name = "tabInfo";
-            this.tabInfo.Size = new System.Drawing.Size(616, 393);
-            this.tabInfo.TabIndex = 3;
-            this.tabInfo.Text = "Info";
-            this.tabInfo.UseVisualStyleBackColor = true;
+            tabInfo.Controls.Add(txtInfo);
+            tabInfo.Location = new System.Drawing.Point(4, 24);
+            tabInfo.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabInfo.Name = "tabInfo";
+            tabInfo.Size = new System.Drawing.Size(720, 459);
+            tabInfo.TabIndex = 3;
+            tabInfo.Text = "Info";
+            tabInfo.UseVisualStyleBackColor = true;
             // 
             // txtInfo
             // 
-            this.txtInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtInfo.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.txtInfo.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtInfo.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtInfo.Location = new System.Drawing.Point(8, 3);
-            this.txtInfo.Multiline = true;
-            this.txtInfo.Name = "txtInfo";
-            this.txtInfo.ReadOnly = true;
-            this.txtInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtInfo.Size = new System.Drawing.Size(600, 387);
-            this.txtInfo.TabIndex = 1;
+            txtInfo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            txtInfo.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            txtInfo.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            txtInfo.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            txtInfo.Location = new System.Drawing.Point(9, 3);
+            txtInfo.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtInfo.Multiline = true;
+            txtInfo.Name = "txtInfo";
+            txtInfo.ReadOnly = true;
+            txtInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            txtInfo.Size = new System.Drawing.Size(700, 451);
+            txtInfo.TabIndex = 1;
             // 
             // tabHeader
             // 
-            this.tabHeader.Controls.Add(this.hexData);
-            this.tabHeader.Location = new System.Drawing.Point(4, 22);
-            this.tabHeader.Name = "tabHeader";
-            this.tabHeader.Padding = new System.Windows.Forms.Padding(3);
-            this.tabHeader.Size = new System.Drawing.Size(616, 393);
-            this.tabHeader.TabIndex = 0;
-            this.tabHeader.Text = "Header";
-            this.tabHeader.UseVisualStyleBackColor = true;
+            tabHeader.Controls.Add(hexData);
+            tabHeader.Location = new System.Drawing.Point(4, 24);
+            tabHeader.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabHeader.Name = "tabHeader";
+            tabHeader.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabHeader.Size = new System.Drawing.Size(720, 455);
+            tabHeader.TabIndex = 0;
+            tabHeader.Text = "Header";
+            tabHeader.UseVisualStyleBackColor = true;
             // 
             // hexData
             // 
-            this.hexData.AutoScroll = true;
-            this.hexData.BackColor = System.Drawing.Color.White;
-            this.hexData.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.hexData.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.hexData.Font = new System.Drawing.Font("Courier New", 10F);
-            this.hexData.HexData = null;
-            this.hexData.Location = new System.Drawing.Point(3, 3);
-            this.hexData.Name = "hexData";
-            this.hexData.Size = new System.Drawing.Size(610, 387);
-            this.hexData.TabIndex = 0;
+            hexData.AutoScroll = true;
+            hexData.BackColor = System.Drawing.Color.White;
+            hexData.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            hexData.Dock = System.Windows.Forms.DockStyle.Fill;
+            hexData.Font = new System.Drawing.Font("Courier New", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            hexData.HexData = null;
+            hexData.Location = new System.Drawing.Point(4, 3);
+            hexData.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            hexData.Name = "hexData";
+            hexData.Size = new System.Drawing.Size(712, 449);
+            hexData.TabIndex = 0;
             // 
             // tabBody
             // 
-            this.tabBody.Controls.Add(this.hexExtraData);
-            this.tabBody.Location = new System.Drawing.Point(4, 22);
-            this.tabBody.Name = "tabBody";
-            this.tabBody.Padding = new System.Windows.Forms.Padding(3);
-            this.tabBody.Size = new System.Drawing.Size(616, 393);
-            this.tabBody.TabIndex = 2;
-            this.tabBody.Text = "Body";
-            this.tabBody.UseVisualStyleBackColor = true;
+            tabBody.Controls.Add(hexExtraData);
+            tabBody.Location = new System.Drawing.Point(4, 24);
+            tabBody.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabBody.Name = "tabBody";
+            tabBody.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabBody.Size = new System.Drawing.Size(720, 455);
+            tabBody.TabIndex = 2;
+            tabBody.Text = "Body";
+            tabBody.UseVisualStyleBackColor = true;
             // 
             // hexExtraData
             // 
-            this.hexExtraData.AutoScroll = true;
-            this.hexExtraData.BackColor = System.Drawing.Color.White;
-            this.hexExtraData.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.hexExtraData.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.hexExtraData.Font = new System.Drawing.Font("Courier New", 10F);
-            this.hexExtraData.HexData = null;
-            this.hexExtraData.Location = new System.Drawing.Point(3, 3);
-            this.hexExtraData.Name = "hexExtraData";
-            this.hexExtraData.Size = new System.Drawing.Size(610, 387);
-            this.hexExtraData.TabIndex = 0;
+            hexExtraData.AutoScroll = true;
+            hexExtraData.BackColor = System.Drawing.Color.White;
+            hexExtraData.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            hexExtraData.Dock = System.Windows.Forms.DockStyle.Fill;
+            hexExtraData.Font = new System.Drawing.Font("Courier New", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            hexExtraData.HexData = null;
+            hexExtraData.Location = new System.Drawing.Point(4, 3);
+            hexExtraData.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            hexExtraData.Name = "hexExtraData";
+            hexExtraData.Size = new System.Drawing.Size(712, 449);
+            hexExtraData.TabIndex = 0;
             // 
             // lblLoading
             // 
-            this.lblLoading.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblLoading.Font = new System.Drawing.Font("Courier New", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLoading.Location = new System.Drawing.Point(0, 0);
-            this.lblLoading.Name = "lblLoading";
-            this.lblLoading.Size = new System.Drawing.Size(624, 441);
-            this.lblLoading.TabIndex = 4;
-            this.lblLoading.Text = "Loading";
-            this.lblLoading.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            lblLoading.Dock = System.Windows.Forms.DockStyle.Fill;
+            lblLoading.Font = new System.Drawing.Font("Courier New", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            lblLoading.Location = new System.Drawing.Point(0, 0);
+            lblLoading.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblLoading.Name = "lblLoading";
+            lblLoading.Size = new System.Drawing.Size(728, 509);
+            lblLoading.TabIndex = 4;
+            lblLoading.Text = "Loading";
+            lblLoading.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // mnuBar
             // 
-            this.mnuBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.binaryToolStripMenuItem,
-            this.editStripMenuItem,
-            this.imageToolStripMenuItem});
-            this.mnuBar.Location = new System.Drawing.Point(0, 0);
-            this.mnuBar.Name = "mnuBar";
-            this.mnuBar.Size = new System.Drawing.Size(624, 24);
-            this.mnuBar.TabIndex = 6;
-            this.mnuBar.Text = "menuStrip1";
-            // 
-            //editStripMenuItem
-            // 
-            this.editStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.editHashToolStripMenuItem, this.calcLookupHashToolStripMenuItem});
-            this.editStripMenuItem.Name = "editStripMenuItem";
-            this.editStripMenuItem.Size = new System.Drawing.Size(52, 20);
-            this.editStripMenuItem.Text = "Edit";
-            // 
-            // editHashToolStripMenuItem
-            // 
-            this.editHashToolStripMenuItem.Name = "editHashToolStripMenuItem";
-            this.editHashToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
-            this.editHashToolStripMenuItem.Text = "Edit ID";
-            this.editHashToolStripMenuItem.Click += new System.EventHandler(this.editId_Click);
-            // 
-            // editHashToolStripMenuItem
-            // 
-            this.calcLookupHashToolStripMenuItem.Name = "calcLookupHashToolStripMenuItem";
-            this.calcLookupHashToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
-            this.calcLookupHashToolStripMenuItem.Text = "Calc Lookup8 Hash";
-            this.calcLookupHashToolStripMenuItem.Click += new System.EventHandler(this.calcLookup8_Click);
+            mnuBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { binaryToolStripMenuItem, editStripMenuItem, imageToolStripMenuItem });
+            mnuBar.Location = new System.Drawing.Point(0, 0);
+            mnuBar.Name = "mnuBar";
+            mnuBar.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
+            mnuBar.Size = new System.Drawing.Size(728, 24);
+            mnuBar.TabIndex = 6;
+            mnuBar.Text = "menuStrip1";
             // 
             // binaryToolStripMenuItem
             // 
-            this.binaryToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importHeaderToolStripMenuItem,
-            this.exportHeaderToolStripMenuItem,
-            this.toolStripMenuItem1,
-            this.importBodyToolStripMenuItem,
-            this.exportBodyToolStripMenuItem});
-            this.binaryToolStripMenuItem.Name = "binaryToolStripMenuItem";
-            this.binaryToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
-            this.binaryToolStripMenuItem.Text = "Binary";
+            binaryToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { importHeaderToolStripMenuItem, exportHeaderToolStripMenuItem, toolStripMenuItem1, importBodyToolStripMenuItem, exportBodyToolStripMenuItem });
+            binaryToolStripMenuItem.Name = "binaryToolStripMenuItem";
+            binaryToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
+            binaryToolStripMenuItem.Text = "Binary";
             // 
             // importHeaderToolStripMenuItem
             // 
-            this.importHeaderToolStripMenuItem.Name = "importHeaderToolStripMenuItem";
-            this.importHeaderToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
-            this.importHeaderToolStripMenuItem.Text = "Import Header";
-            this.importHeaderToolStripMenuItem.Click += new System.EventHandler(this.importDataToolStripMenuItem_Click);
+            importHeaderToolStripMenuItem.Name = "importHeaderToolStripMenuItem";
+            importHeaderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            importHeaderToolStripMenuItem.Text = "Import Header";
+            importHeaderToolStripMenuItem.Click += importDataToolStripMenuItem_Click;
             // 
             // exportHeaderToolStripMenuItem
             // 
-            this.exportHeaderToolStripMenuItem.Name = "exportHeaderToolStripMenuItem";
-            this.exportHeaderToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
-            this.exportHeaderToolStripMenuItem.Text = "Export Header";
-            this.exportHeaderToolStripMenuItem.Click += new System.EventHandler(this.exportDataToolStripMenuItem_Click);
+            exportHeaderToolStripMenuItem.Name = "exportHeaderToolStripMenuItem";
+            exportHeaderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            exportHeaderToolStripMenuItem.Text = "Export Header";
+            exportHeaderToolStripMenuItem.Click += exportDataToolStripMenuItem_Click;
             // 
             // toolStripMenuItem1
             // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(148, 6);
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
             // 
             // importBodyToolStripMenuItem
             // 
-            this.importBodyToolStripMenuItem.Name = "importBodyToolStripMenuItem";
-            this.importBodyToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
-            this.importBodyToolStripMenuItem.Text = "Import Body";
-            this.importBodyToolStripMenuItem.Click += new System.EventHandler(this.importExtraToolStripMenuItem_Click);
+            importBodyToolStripMenuItem.Name = "importBodyToolStripMenuItem";
+            importBodyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            importBodyToolStripMenuItem.Text = "Import Body";
+            importBodyToolStripMenuItem.Click += importExtraToolStripMenuItem_Click;
             // 
             // exportBodyToolStripMenuItem
             // 
-            this.exportBodyToolStripMenuItem.Name = "exportBodyToolStripMenuItem";
-            this.exportBodyToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
-            this.exportBodyToolStripMenuItem.Text = "Export Body";
-            this.exportBodyToolStripMenuItem.Click += new System.EventHandler(this.exportExtraToolStripMenuItem_Click);
+            exportBodyToolStripMenuItem.Name = "exportBodyToolStripMenuItem";
+            exportBodyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            exportBodyToolStripMenuItem.Text = "Export Body";
+            exportBodyToolStripMenuItem.Click += exportExtraToolStripMenuItem_Click;
+            // 
+            // editStripMenuItem
+            // 
+            editStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { editHashToolStripMenuItem, calcLookupHashToolStripMenuItem });
+            editStripMenuItem.Name = "editStripMenuItem";
+            editStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            editStripMenuItem.Text = "Edit";
+            // 
+            // editHashToolStripMenuItem
+            // 
+            editHashToolStripMenuItem.Name = "editHashToolStripMenuItem";
+            editHashToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            editHashToolStripMenuItem.Text = "Edit ID";
+            editHashToolStripMenuItem.Click += editId_Click;
+            // 
+            // calcLookupHashToolStripMenuItem
+            // 
+            calcLookupHashToolStripMenuItem.Name = "calcLookupHashToolStripMenuItem";
+            calcLookupHashToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            calcLookupHashToolStripMenuItem.Text = "Calc Lookup8 Hash";
+            calcLookupHashToolStripMenuItem.Click += calcLookup8_Click;
             // 
             // imageToolStripMenuItem
             // 
-            this.imageToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportToolStripMenuItem,
-            this.importToolStripMenuItem});
-            this.imageToolStripMenuItem.Name = "imageToolStripMenuItem";
-            this.imageToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
-            this.imageToolStripMenuItem.Text = "Image";
+            imageToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { exportToolStripMenuItem, importToolStripMenuItem });
+            imageToolStripMenuItem.Name = "imageToolStripMenuItem";
+            imageToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
+            imageToolStripMenuItem.Text = "Image";
             // 
             // exportToolStripMenuItem
             // 
-            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.exportToolStripMenuItem.Text = "Export";
-            this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
+            exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            exportToolStripMenuItem.Text = "Export";
+            exportToolStripMenuItem.Click += exportToolStripMenuItem_Click;
             // 
             // importToolStripMenuItem
             // 
-            this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.importToolStripMenuItem.Text = "Import (Legacy PC)";
-            this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
+            importToolStripMenuItem.Name = "importToolStripMenuItem";
+            importToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            importToolStripMenuItem.Text = "Import";
+            importToolStripMenuItem.Click += importToolStripMenuItem_Click;
             // 
             // stsMain
             // 
-            this.stsMain.Location = new System.Drawing.Point(0, 419);
-            this.stsMain.Name = "stsMain";
-            this.stsMain.Size = new System.Drawing.Size(624, 22);
-            this.stsMain.TabIndex = 7;
+            stsMain.Location = new System.Drawing.Point(0, 487);
+            stsMain.Name = "stsMain";
+            stsMain.Padding = new System.Windows.Forms.Padding(1, 0, 16, 0);
+            stsMain.Size = new System.Drawing.Size(728, 22);
+            stsMain.TabIndex = 7;
             // 
             // pbMain
             // 
-            this.pbMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pbMain.Location = new System.Drawing.Point(12, 384);
-            this.pbMain.MarqueeAnimationSpeed = 10;
-            this.pbMain.Name = "pbMain";
-            this.pbMain.Size = new System.Drawing.Size(600, 23);
-            this.pbMain.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
-            this.pbMain.TabIndex = 8;
+            pbMain.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            pbMain.Location = new System.Drawing.Point(14, 443);
+            pbMain.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            pbMain.MarqueeAnimationSpeed = 10;
+            pbMain.Name = "pbMain";
+            pbMain.Size = new System.Drawing.Size(700, 27);
+            pbMain.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            pbMain.TabIndex = 8;
             // 
             // pboImage
             // 
-            this.pboImage.BackColor = System.Drawing.Color.DarkGray;
-            this.pboImage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pboImage.Location = new System.Drawing.Point(0, 24);
-            this.pboImage.Name = "pboImage";
-            this.pboImage.Size = new System.Drawing.Size(624, 395);
-            this.pboImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pboImage.TabIndex = 9;
-            this.pboImage.TabStop = false;
+            pboImage.BackColor = System.Drawing.Color.DarkGray;
+            pboImage.Dock = System.Windows.Forms.DockStyle.Fill;
+            pboImage.Location = new System.Drawing.Point(0, 24);
+            pboImage.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            pboImage.Name = "pboImage";
+            pboImage.Size = new System.Drawing.Size(728, 463);
+            pboImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            pboImage.TabIndex = 9;
+            pboImage.TabStop = false;
             // 
             // EntryEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(624, 441);
-            this.Controls.Add(this.pboImage);
-            this.Controls.Add(this.mnuBar);
-            this.Controls.Add(this.tabList);
-            this.Controls.Add(this.stsMain);
-            this.Controls.Add(this.pbMain);
-            this.Controls.Add(this.lblLoading);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MainMenuStrip = this.mnuBar;
-            this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(300, 200);
-            this.Name = "EntryEditor";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "EntryEditor";
-            this.Shown += new System.EventHandler(this.EntryEditor_Shown);
-            this.tabList.ResumeLayout(false);
-            this.tabInfo.ResumeLayout(false);
-            this.tabInfo.PerformLayout();
-            this.tabHeader.ResumeLayout(false);
-            this.tabBody.ResumeLayout(false);
-            this.mnuBar.ResumeLayout(false);
-            this.mnuBar.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pboImage)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(728, 509);
+            Controls.Add(pboImage);
+            Controls.Add(mnuBar);
+            Controls.Add(tabList);
+            Controls.Add(stsMain);
+            Controls.Add(pbMain);
+            Controls.Add(lblLoading);
+            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            MainMenuStrip = mnuBar;
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            MinimizeBox = false;
+            MinimumSize = new System.Drawing.Size(347, 225);
+            Name = "EntryEditor";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            Text = "EntryEditor";
+            Shown += EntryEditor_Shown;
+            tabList.ResumeLayout(false);
+            tabInfo.ResumeLayout(false);
+            tabInfo.PerformLayout();
+            tabHeader.ResumeLayout(false);
+            tabBody.ResumeLayout(false);
+            mnuBar.ResumeLayout(false);
+            mnuBar.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pboImage).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
 

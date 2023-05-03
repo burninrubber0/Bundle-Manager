@@ -44,7 +44,7 @@ namespace BundleManager
                     SetEntry method = (BundleEntry entry) =>
                     {
                         _entry = entry;
-                        Task.Run(()=>UpdateDisplay());
+                        Task.Run(() => UpdateDisplay());
                     };
                     Invoke(method, value);
                 }
@@ -301,7 +301,7 @@ namespace BundleManager
                 }
             }
         }
-        
+
         private bool TabsEnabled
         {
             get
@@ -676,7 +676,7 @@ namespace BundleManager
         private void UpdateDisplay()
         {
             Title = "Edit Entry: " + _entry.Index.ToString("d3");
-            
+
             if (ForceHex)
             {
                 ImageVisible = false;
@@ -705,7 +705,7 @@ namespace BundleManager
             }
 
             MenuVisible = true;
-            
+
             /*try
             {
                 if (_entry.HasBody && !TabList.TabPages.Contains(TabBody))
@@ -744,7 +744,7 @@ namespace BundleManager
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "PNG Images|*.png";
+            ofd.Filter = "Image Files(*.bmp;*.gif;*.jpg;*.png;*.tif;*.tga;*.webp)|*.bmp;*.gif;*.jpg;*.png;*.tif;*.tga;*.webp|All files (*.*)|*.*";
             ofd.FileOk += Ofd_FileOk;
             ofd.ShowDialog(this);
         }
@@ -808,7 +808,7 @@ namespace BundleManager
 
             Entry.EntryBlocks[0].Data = data;
             Entry.Dirty = true;
-            
+
             Task.Run(() => UpdateDisplay());
         }
 
@@ -890,7 +890,7 @@ namespace BundleManager
                 return;
             ulong result = Utilities.calcLookup8(value);
             Task.Run(() => UpdateDisplay());
-            MessageBox.Show(this, "The lookup 8 hashed value is: " + result.ToString("X16") , "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(this, "The lookup 8 hashed value is: " + result.ToString("X16"), "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void Sfd_FileOk2(object sender, CancelEventArgs e)

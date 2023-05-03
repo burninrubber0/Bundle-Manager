@@ -1,4 +1,4 @@
-using PluginSystem;
+﻿using PluginSystem;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -21,6 +21,7 @@ namespace BundleManager
             CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
 
             Application.EnableVisualStyles();
+            Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             Application.SetCompatibleTextRenderingDefault(false);
 
             PluginLoader.LoadPlugins();

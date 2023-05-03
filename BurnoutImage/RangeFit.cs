@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BCnEncoder.Shared;
 
 namespace BurnoutImage
 {
@@ -13,7 +14,7 @@ namespace BurnoutImage
         public Vec3 End;
         public float BestError;
 
-        public RangeFit(ColourSet colours, DXTCompression compression) : base(colours, compression)
+        public RangeFit(ColourSet colours, CompressionFormat compression) : base(colours, compression)
         {
             bool colourMetricPerceptual = false;
 

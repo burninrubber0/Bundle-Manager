@@ -54,7 +54,15 @@ namespace BundleFormat
         {
             byte[] uncompressedData = new byte[uncompressedSize];
             ZlibStream zlibStream = new ZlibStream(new MemoryStream(uncompressedData), CompressionMode.Decompress);
-            zlibStream.Write(self, 0, self.Length);
+            try
+            {
+                zlibStream.Write(self, 0, self.Length);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), e.Source, MessageBoxButtons.OK);
+                return null;
+            }
             return uncompressedData;
         }
 

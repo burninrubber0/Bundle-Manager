@@ -70,13 +70,11 @@
   <ItemGroup>
     <PackageReference Include="DebugHelper" Version="1.0.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(SolutionDir)libs\*&quot; &quot;$(ProjectDir)$(OutDir)&quot; /s /e /y
-xcopy &quot;$(SolutionDir)resources\*&quot; &quot;$(ProjectDir)$(OutDir)&quot; /s /e /y" />
+    <Exec Command="xcopy &quot;$(SolutionDir)libs\*&quot; &quot;$(ProjectDir)$(OutDir)&quot; /s /e /y&#xD;&#xA;xcopy &quot;$(SolutionDir)resources\*&quot; &quot;$(ProjectDir)$(OutDir)&quot; /s /e /y" />
   </Target>
 </Project>

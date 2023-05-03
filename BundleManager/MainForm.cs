@@ -1,12 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
-using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,7 +7,6 @@ using BundleFormat;
 using BundleUtilities;
 using DebugHelper;
 using PluginAPI;
-using Util = BundleFormat.Util;
 
 namespace BundleManager
 {

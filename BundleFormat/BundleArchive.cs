@@ -1,14 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Xml;
 using BundleUtilities;
 
@@ -573,8 +567,6 @@ namespace BundleFormat
 
         public void Write(string path)
         {
-            //if (Console)
-            //    ConvertToPC();
             Stream s = File.Open(path, FileMode.Create);
             BinaryWriter bw = new BinaryWriter(s);
 

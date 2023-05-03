@@ -1,13 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using BundleUtilities;
-using Microsoft.SqlServer.Server;
 
 namespace BundleFormat
 {
@@ -70,12 +64,6 @@ namespace BundleFormat
         public string Name;
         public string TypeName;
     }
-
-    /*public struct BundleReference
-    {
-        public string Path;
-        public uint EntryCount;
-    }*/
 
     public class BundleEntry
     {

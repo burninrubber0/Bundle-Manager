@@ -1,16 +1,10 @@
-﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 using BundleFormat;
 using BundleUtilities;
 using MathLib;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using PluginAPI;
 
 namespace BaseHandlers

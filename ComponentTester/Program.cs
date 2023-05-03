@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using System;
 using System.Windows.Forms;
 
 namespace ComponentTester
@@ -19,11 +15,6 @@ namespace ComponentTester
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.SetCompatibleTextRenderingDefault(false);
             
-            /*if (!File.Exists("test.bin"))
-            {
-                MessageBox.Show("Missing test.bin!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }*/
             Application.Run(new Tester());
         }
     }

@@ -1,19 +1,9 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using BundleFormat;
 using BundleUtilities;
 using PluginAPI;
-using Util = BundleFormat.Util;
 
 namespace VehicleList
 {
@@ -99,8 +89,7 @@ namespace VehicleList
             if (List == null || lstVehicles.SelectedIndices.Count <= 0)
                 return;
 
-            int index;
-            if (!int.TryParse(lstVehicles.SelectedItems[0].Text, out index))
+            if (!int.TryParse(lstVehicles.SelectedItems[0].Text, out int index))
                 return;
             Vehicle vehicle = List.Entries[index];
 
@@ -133,8 +122,7 @@ namespace VehicleList
                 || lstVehicles.SelectedIndices.Count <= 0)
                 return;
 
-            int index;
-            if (!int.TryParse(lstVehicles.SelectedItems[0].Text, out index))
+            if (!int.TryParse(lstVehicles.SelectedItems[0].Text, out int index))
                 return;
             Vehicle vehicle = new Vehicle(List.Entries[index]);
             vehicle.Index = List.Entries.Count;
@@ -227,8 +215,8 @@ namespace VehicleList
 
             public VehicleSorter(int column)
             {
-                this.Column = column;
-                this.Direction = false;
+                Column = column;
+                Direction = false;
             }
 
             public int Compare(object x, object y)
@@ -238,7 +226,7 @@ namespace VehicleList
 
                 if (Column > itemX.SubItems.Count || Column > itemY.SubItems.Count)
                 {
-                    if (this.Direction)
+                    if (Direction)
                         return -1;
                     return 1;
                 }
@@ -246,12 +234,10 @@ namespace VehicleList
                 string iX = itemX.SubItems[Column].Text;
                 string iY = itemY.SubItems[Column].Text;
 
-                int iXint;
-                int iYint;
 
-                if (int.TryParse(iX, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out iXint))
+                if (int.TryParse(iX, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out int iXint))
                 {
-                    if (int.TryParse(iY, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out iYint))
+                    if (int.TryParse(iY, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out int iYint))
                     {
                         int val2 = iXint.CompareTo(iYint);
                         if (this.Direction)
@@ -260,15 +246,15 @@ namespace VehicleList
                     }
                 }
 
-                int val = String.CompareOrdinal(iX, iY);
-                if (this.Direction)
+                int val = string.CompareOrdinal(iX, iY);
+                if (Direction)
                     return val * -1;
                 return val;
             }
 
             public void Swap()
             {
-                this.Direction = !this.Direction;
+                Direction = !Direction;
             }
         }
 

@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BCnEncoder.Shared;
 
 namespace BurnoutImage
@@ -35,24 +31,6 @@ namespace BurnoutImage
             int count = Colours.Count;
             Vec3[] values = Colours.Points;
             float[] weights = Colours.Weights;
-
-            // get the covariance matrix
-            /*Sym3x3 covariance = ComputeWeightedCovariance(count, values, weights);
-
-            // compute the principle components
-            Vec3 principle = ComputePrincipleComponent(covariance);
-
-            // get the min and max range as the codebook endpoints
-            Vec3 start = new Vec3(0.0f);
-            Vec3 end = new Vec3(0.0f);
-            if (count > 0)
-            {
-                float min, max;
-
-                // compute the range
-                start = end = values[0];
-                
-            }*/
         }
 
         protected override void Compress3(byte[] block, int offset)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -35,23 +35,25 @@ namespace VaultFormat
 
         public int getDataSize()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(BitConverter.GetBytes(MaxBoostSpeed));
-            bytes.Add(BitConverter.GetBytes(BoostRule));
-            bytes.Add(BitConverter.GetBytes(BoostKickTime));
-            bytes.Add(BitConverter.GetBytes(BoostKickMinTime));
-            bytes.Add(BitConverter.GetBytes(BoostKickMaxTime));
-            bytes.Add(BitConverter.GetBytes(BoostKickMaxStartSpeed));
-            bytes.Add(BitConverter.GetBytes(BoostKickHeightOffset));
-            bytes.Add(BitConverter.GetBytes(BoostKickAcceleration));
-            bytes.Add(BitConverter.GetBytes(BoostKick));
-            bytes.Add(BitConverter.GetBytes(BoostHeightOffset));
-            bytes.Add(BitConverter.GetBytes(BoostBase));
-            bytes.Add(BitConverter.GetBytes(BoostAcceleration));
-            bytes.Add(BitConverter.GetBytes(BlueMaxBoostSpeed));
-            bytes.Add(BitConverter.GetBytes(BlueBoostKickTime));
-            bytes.Add(BitConverter.GetBytes(BlueBoostKick));
-            bytes.Add(BitConverter.GetBytes(BlueBoostBase));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                BitConverter.GetBytes(MaxBoostSpeed),
+                BitConverter.GetBytes(BoostRule),
+                BitConverter.GetBytes(BoostKickTime),
+                BitConverter.GetBytes(BoostKickMinTime),
+                BitConverter.GetBytes(BoostKickMaxTime),
+                BitConverter.GetBytes(BoostKickMaxStartSpeed),
+                BitConverter.GetBytes(BoostKickHeightOffset),
+                BitConverter.GetBytes(BoostKickAcceleration),
+                BitConverter.GetBytes(BoostKick),
+                BitConverter.GetBytes(BoostHeightOffset),
+                BitConverter.GetBytes(BoostBase),
+                BitConverter.GetBytes(BoostAcceleration),
+                BitConverter.GetBytes(BlueMaxBoostSpeed),
+                BitConverter.GetBytes(BlueBoostKickTime),
+                BitConverter.GetBytes(BlueBoostKick),
+                BitConverter.GetBytes(BlueBoostBase)
+            };
             Console.WriteLine(bytes.SelectMany(i => i).Count());
             return CountingUtilities.AddPadding(bytes);
         }

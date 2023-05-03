@@ -1,12 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 
@@ -347,7 +343,9 @@ namespace ModelViewer.SceneData
             if (camera != null)
                 modelView *= camera.LookAtMatrix;
 
-            GL.UniformMatrix4(21, false, ref modelView);
+            OpenTK.Matrix4 modelViewOTK3 = OpenTKCompat.ToOTK3Matrix4(modelView);
+            GL.UniformMatrix4(21, false, ref modelViewOTK3);
+            modelView = OpenTKCompat.ToOTK4Matrix4(modelViewOTK3);
 
             GL.BindVertexArray(_vertexArray);
             //GL.PointSize(4.0f);

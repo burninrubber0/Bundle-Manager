@@ -30,18 +30,20 @@ namespace VaultFormat
 
         public int getDataSize()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(BitConverter.GetBytes(ZOffset));
-            bytes.Add(BitConverter.GetBytes(YOffset));
-            bytes.Add(BitConverter.GetBytes(YawSpring));
-            bytes.Add(BitConverter.GetBytes(RollSpring));
-            bytes.Add(BitConverter.GetBytes(PitchSpring));
-            bytes.Add(BitConverter.GetBytes(FieldOfView));
-            bytes.Add(BitConverter.GetBytes(BoostFieldOfView));
-            bytes.Add(BitConverter.GetBytes(BodyRollScale));
-            bytes.Add(BitConverter.GetBytes(BodyPitchScale));
-            bytes.Add(BitConverter.GetBytes(AccelerationResponse));
-            bytes.Add(BitConverter.GetBytes(AccelerationDampening));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                BitConverter.GetBytes(ZOffset),
+                BitConverter.GetBytes(YOffset),
+                BitConverter.GetBytes(YawSpring),
+                BitConverter.GetBytes(RollSpring),
+                BitConverter.GetBytes(PitchSpring),
+                BitConverter.GetBytes(FieldOfView),
+                BitConverter.GetBytes(BoostFieldOfView),
+                BitConverter.GetBytes(BodyRollScale),
+                BitConverter.GetBytes(BodyPitchScale),
+                BitConverter.GetBytes(AccelerationResponse),
+                BitConverter.GetBytes(AccelerationDampening)
+            };
             //To-Do: again here we have not padding, but usually we should have it 
             return bytes.SelectMany(i => i).Count();
         }

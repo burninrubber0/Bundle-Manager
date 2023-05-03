@@ -10,8 +10,6 @@ namespace BundleManager
 {
     public partial class FileView : Form
     {
-        private static FileView _instance;
-
         private static bool _loadMaterials;
         public static bool LoadMaterials
         {
@@ -38,7 +36,6 @@ namespace BundleManager
         {
             InitializeComponent();
 
-            _instance = this;
             LoadMaterials = true;
 
             UpdateRecentFiles();
@@ -354,33 +351,6 @@ namespace BundleManager
         private void OpenBundle(int index)
         {
             string file = BundleCache.Paths[index];
-            /*List<EntryInfo> entryIDs = BundleArchive.GetEntryInfos(file, false);
-            bool ignoreAllConflicts = false;
-            foreach (EntryInfo info in entryIDs)
-            {
-                uint entryID = info.ID;
-                if (BundleCache.Files.ContainsKey(entryID))
-                {
-                    if (ignoreAllConflicts)
-                        continue;
-                    int index1 = BundleCache.Files[entryID];
-                    string otherFile = BundleCache.Paths[index1];
-                    ConflictChoice choice = ResolveConflict(entryID, file, otherFile);
-                    if (choice.Cancel)
-                    {
-                        break;
-                    }
-                    if (choice.IgnoreAll)
-                        ignoreAllConflicts = true;
-                    continue;
-                }
-                
-                if (!BundleCache.EntryInfos.ContainsKey(entryID))
-                {
-                    BundleCache.EntryInfos.Add(entryID, info);
-                    BundleCache.Files.Add(entryID, index);
-                }
-            }*/
             MainForm form = new MainForm();
             form.SubForm = true;
             form.Open(file);
@@ -426,26 +396,6 @@ namespace BundleManager
             {
                 OpenBundle(lstMain.SelectedIndices[0]);
             }
-        }
-
-        private List<string> ScanTest(BundleArchive archive)
-        {
-            List<string> referenceList = new List<string>();
-            foreach (BundleEntry entry in archive.Entries)
-            {
-                if (entry.Type != EntryType.TextureState)
-                    continue;
-
-                List<BundleDependency> dependencies = entry.GetDependencies();
-                foreach (BundleDependency dependency in dependencies)
-                {
-                    ulong id = dependency.EntryID;
-                    string entryFile = BundleCache.GetFileByEntryID(id);
-                    if (entryFile.ToUpper().Contains("WORLDTEX4"))
-                        referenceList.Add(Path.GetFileName(archive.Path));
-                }
-            }
-            return referenceList;
         }
 
         private void ignoreIDConflictsToolStripMenuItem_Click(object sender, EventArgs e)

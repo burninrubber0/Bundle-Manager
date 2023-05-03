@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using BundleUtilities;
 
 namespace VaultFormat
@@ -34,20 +33,22 @@ namespace VaultFormat
         // Hack, because of weird padding of suspension attribs
         public static byte[][] getDefaultBytes() {
             float value = 0;
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(BitConverter.GetBytes(value)); // UpwardMovement
-            bytes.Add(BitConverter.GetBytes(0)); // TimeToDampAfterLanding
-            bytes.Add(BitConverter.GetBytes(0)); // Strength
-            bytes.Add(BitConverter.GetBytes(0)); // etc
-            bytes.Add(BitConverter.GetBytes(0));
-            bytes.Add(BitConverter.GetBytes(0));
-            bytes.Add(BitConverter.GetBytes(0));
-            bytes.Add(BitConverter.GetBytes(0));
-            bytes.Add(BitConverter.GetBytes(0));
-            bytes.Add(BitConverter.GetBytes(0));
-            bytes.Add(BitConverter.GetBytes(0));
-            bytes.Add(BitConverter.GetBytes(0));
-            bytes.Add(BitConverter.GetBytes(0));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                BitConverter.GetBytes(value), // UpwardMovement
+                BitConverter.GetBytes(0), // TimeToDampAfterLanding
+                BitConverter.GetBytes(0), // Strength
+                BitConverter.GetBytes(0), // etc
+                BitConverter.GetBytes(0),
+                BitConverter.GetBytes(0),
+                BitConverter.GetBytes(0),
+                BitConverter.GetBytes(0),
+                BitConverter.GetBytes(0),
+                BitConverter.GetBytes(0),
+                BitConverter.GetBytes(0),
+                BitConverter.GetBytes(0),
+                BitConverter.GetBytes(0)
+            };
             return bytes.ToArray();
         }
 

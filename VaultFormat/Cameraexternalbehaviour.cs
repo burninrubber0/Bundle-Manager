@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -35,24 +35,26 @@ namespace VaultFormat
 
         public int getDataSize()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(BitConverter.GetBytes(ZDistanceScale));
-            bytes.Add(BitConverter.GetBytes(ZAndTiltCutoffSpeedMPH));
-            bytes.Add(BitConverter.GetBytes(YawSpring));
-            bytes.Add(BitConverter.GetBytes(TiltCameraScale));
-            bytes.Add(BitConverter.GetBytes(TiltAroundCar));
-            bytes.Add(BitConverter.GetBytes(SlideZOffsetMax));
-            bytes.Add(BitConverter.GetBytes(SlideYScale));
-            bytes.Add(BitConverter.GetBytes(SlideXScale));
-            bytes.Add(BitConverter.GetBytes(PivotZOffset));
-            bytes.Add(BitConverter.GetBytes(PivotLength));
-            bytes.Add(BitConverter.GetBytes(PivotHeight));
-            bytes.Add(BitConverter.GetBytes(PitchSpring));
-            bytes.Add(BitConverter.GetBytes(FieldOfView));
-            bytes.Add(BitConverter.GetBytes(DriftYawSpring));
-            bytes.Add(BitConverter.GetBytes(DownAngle));
-            bytes.Add(BitConverter.GetBytes(BoostFieldOfViewZoom));
-            bytes.Add(BitConverter.GetBytes(BoostFieldOfView));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                BitConverter.GetBytes(ZDistanceScale),
+                BitConverter.GetBytes(ZAndTiltCutoffSpeedMPH),
+                BitConverter.GetBytes(YawSpring),
+                BitConverter.GetBytes(TiltCameraScale),
+                BitConverter.GetBytes(TiltAroundCar),
+                BitConverter.GetBytes(SlideZOffsetMax),
+                BitConverter.GetBytes(SlideYScale),
+                BitConverter.GetBytes(SlideXScale),
+                BitConverter.GetBytes(PivotZOffset),
+                BitConverter.GetBytes(PivotLength),
+                BitConverter.GetBytes(PivotHeight),
+                BitConverter.GetBytes(PitchSpring),
+                BitConverter.GetBytes(FieldOfView),
+                BitConverter.GetBytes(DriftYawSpring),
+                BitConverter.GetBytes(DownAngle),
+                BitConverter.GetBytes(BoostFieldOfViewZoom),
+                BitConverter.GetBytes(BoostFieldOfView)
+            };
             return bytes.SelectMany(i => i).Count();
         }
 

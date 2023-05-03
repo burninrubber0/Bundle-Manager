@@ -31,18 +31,20 @@ namespace VaultFormat
 
         public int getDataSize()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(BitConverter.GetBytes(PlayerPalletteIndex));
-            bytes.Add(BitConverter.GetBytes(PlayerColourIndex));
-            bytes.Add(BitConverter.GetBytes(Alloc));
-            bytes.Add(BitConverter.GetBytes(Num_RandomTrafficColours));
-            bytes.Add(BitConverter.GetBytes(Size));
-            bytes.Add(BitConverter.GetBytes(EncodedTypePad));
-            bytes.Add(BitConverter.GetBytes(RandomTrafficColours));
-            bytes.Add(BitConverter.GetBytes(Alloc_Offences));
-            bytes.Add(BitConverter.GetBytes(Num_Offences));
-            bytes.Add(BitConverter.GetBytes(Size_Offences));
-            bytes.Add(BitConverter.GetBytes(EncodedTypePad_Offences));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                BitConverter.GetBytes(PlayerPalletteIndex),
+                BitConverter.GetBytes(PlayerColourIndex),
+                BitConverter.GetBytes(Alloc),
+                BitConverter.GetBytes(Num_RandomTrafficColours),
+                BitConverter.GetBytes(Size),
+                BitConverter.GetBytes(EncodedTypePad),
+                BitConverter.GetBytes(RandomTrafficColours),
+                BitConverter.GetBytes(Alloc_Offences),
+                BitConverter.GetBytes(Num_Offences),
+                BitConverter.GetBytes(Size_Offences),
+                BitConverter.GetBytes(EncodedTypePad_Offences)
+            };
             Console.Write("Lenght:" + bytes.SelectMany(i => i).Count());
             // 28 bytes but not padding...
             return bytes.SelectMany(i => i).Count();

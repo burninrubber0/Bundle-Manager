@@ -15,7 +15,6 @@ using ModelViewer.SceneData;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using PluginAPI;
-using StandardExtension;
 
 namespace WorldCollisionHandler
 {

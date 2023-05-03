@@ -12,11 +12,9 @@
     <ProjectReference Include="..\MathLib\MathLib.csproj" />
     <ProjectReference Include="..\ModelViewer\ModelViewer.csproj" />
     <ProjectReference Include="..\PluginAPI\PluginAPI.csproj" />
-    <ProjectReference Include="..\StandardExtension\StandardExtension.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DebugHelper" Version="1.0.0" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

@@ -1,4 +1,6 @@
-﻿namespace ModelViewer
+using OpenTK;
+
+namespace ModelViewer
 {
     partial class SceneRenderControl
     {
@@ -29,7 +31,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.glcMain = new OpenTK.GLControl();
+            this.glcMain = new GLControl();
             this.tmrUpdate = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
@@ -56,12 +58,11 @@
             this.Controls.Add(this.glcMain);
             this.Name = "SceneRenderControl";
             this.ResumeLayout(false);
-
         }
 
         #endregion
 
-        private OpenTK.GLControl glcMain;
+        private GLControl glcMain;
         private System.Windows.Forms.Timer tmrUpdate;
     }
 }

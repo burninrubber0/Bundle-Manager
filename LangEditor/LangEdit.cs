@@ -25,7 +25,7 @@ namespace LangEditor
                 _ignoreChanges = false;
             }
         }
-        
+
         public LangEdit()
         {
             _ignoreChanges = true;
@@ -35,11 +35,8 @@ namespace LangEditor
 
         public void UpdateDisplay()
         {
-            foreach (uint key in _lang.Data.Keys)
-            {
-                string txt = _lang.Data[key];
-                dgvMain.Rows.Add(key.ToString("X8"), txt);
-            }
+            foreach (uint key in _lang.mpEntries.Keys)
+                dgvMain.Rows.Add(key.ToString("X8"), _lang.mpEntries[key]);
         }
 
         public void RebuildLanguage()
@@ -49,21 +46,18 @@ namespace LangEditor
 
             Dictionary<uint, string> data = new Dictionary<uint, string>();
 
-            int index = 0;
-            foreach (DataGridViewRow row in dgvMain.Rows)
+            for (int i = 0; i < dgvMain.Rows.Count - 1; ++i)
             {
-                if (index >= dgvMain.Rows.Count - 1)
-                    break;
-                string idString = (string) row.Cells[0].Value;
+                string idString = (string)dgvMain.Rows[i].Cells[0].Value;
 
                 if (!uint.TryParse(idString, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out var id))
                 {
-                    MessageBox.Show(this, "Failed to parse ID for row " + index, "Warning", MessageBoxButtons.OK,
+                    MessageBox.Show(this, "Failed to parse ID \"" + idString + "\"", "Warning", MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     return;
                 }
 
-                string value = (string) row.Cells[1].Value;
+                string value = (string)dgvMain.Rows[i].Cells[1].Value;
                 if (data.ContainsKey(id))
                 {
                     MessageBox.Show(this, "ID Already In Use " + idString, "Warning", MessageBoxButtons.OK,
@@ -71,10 +65,10 @@ namespace LangEditor
                     return;
                 }
                 data.Add(id, value);
-
-                index++;
             }
-            _lang.Data = data;
+
+            _lang.mpEntries = data;
+
             Changed?.Invoke();
         }
 
@@ -88,14 +82,11 @@ namespace LangEditor
             // TODO: Export CSV
         }
 
-        private void hashToolStripMenuItem_Click(object sender, EventArgs e)
+        private void applyChangesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string value = InputDialog.ShowInput(this, "Please enter the value to hash.");
-            if (value == null)
-                return;
-            uint result = Language.HashID(value);
+            RebuildLanguage();
 
-            MessageBox.Show(this, "Hashed value is: " + result.ToString("X8"), "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(this, "Done!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void findToolStripMenuItem_Click(object sender, EventArgs e)
@@ -105,13 +96,13 @@ namespace LangEditor
                 return;
             uint result = Language.HashID(value);
 
-            dgvMain.ClearSelection();
+            string hash;
             foreach (DataGridViewRow row in dgvMain.Rows)
             {
-                string hash = (string)row.Cells[0].Value;
+                hash = (string)row.Cells[0].Value;
                 if (result.ToString("X8") == hash)
                 {
-                    //MessageBox.Show(this, "FOUND!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    dgvMain.ClearSelection();
                     dgvMain.CurrentCell = row.Cells[0];
                     row.Selected = true;
                     return;
@@ -121,11 +112,14 @@ namespace LangEditor
             MessageBox.Show(this, "Hash not found!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
-        private void applyChangesToolStripMenuItem_Click(object sender, EventArgs e)
+        private void hashToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            RebuildLanguage();
+            string value = InputDialog.ShowInput(this, "Please enter the value to hash.");
+            if (value == null)
+                return;
+            uint result = Language.HashID(value);
 
-            MessageBox.Show(this, "Done!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(this, "Hashed value is: " + result.ToString("X8"), "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void dgvMain_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)

@@ -2,6 +2,8 @@ using PluginAPI;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Text;
 using System.Windows.Forms;
 
 namespace LangEditor
@@ -52,16 +54,16 @@ namespace LangEditor
 
                 if (!uint.TryParse(idString, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out var id))
                 {
-                    MessageBox.Show(this, "Failed to parse ID \"" + idString + "\"", "Warning", MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
+                    MessageBox.Show(this, "Failed to parse ID \"" + idString + "\"", "Warning",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 string value = (string)dgvMain.Rows[i].Cells[1].Value;
                 if (data.ContainsKey(id))
                 {
-                    MessageBox.Show(this, "ID Already In Use " + idString, "Warning", MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
+                    MessageBox.Show(this, "ID Already In Use " + idString, "Warning",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
                 data.Add(id, value);
@@ -79,7 +81,41 @@ namespace LangEditor
 
         private void exportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // TODO: Export CSV
+            // TODO: Note when language is dirty, not just bundle
+            if (MessageBox.Show(this, "Changes must be applied before exporting. Save now?", "Information",
+                MessageBoxButtons.OKCancel) == DialogResult.Cancel)
+                return;
+
+            SaveFileDialog saveDialog = new SaveFileDialog();
+            saveDialog.Filter = "Column-separated values (*.csv)|*.csv";
+            if (saveDialog.ShowDialog() == DialogResult.Cancel)
+                return;
+
+            RebuildLanguage();
+
+            // CSV content as a single contiguous string.
+            // Keys are prepended with 0x and padded to 8 characters.
+            // In values, incompatible characters are escaped.
+            // Both keys and values are enclosed in double quotes.
+            string languageContent = "";
+            foreach (KeyValuePair<uint, string> entry in _lang.mpEntries)
+            {
+                languageContent += "\"0x" + entry.Key.ToString("X8") + "\","; // Key
+                string tempValue = entry.Value;
+                tempValue = tempValue.Replace("\xD", "\\r").Replace("\xA", "\\n"); // Newlines
+                tempValue = tempValue.Replace("\"", "\"\""); // Quotation marks
+                if (tempValue != "") // Enclose non-empty strings in double quotes
+                {
+                    tempValue = "\"" + tempValue;
+                    tempValue += "\"";
+                }
+                languageContent += tempValue + "\r\n";
+            }
+
+            FileStream file = (FileStream)saveDialog.OpenFile();
+            file.Write(Encoding.ASCII.GetBytes(languageContent));
+            file.Flush();
+            file.Close();
         }
 
         private void applyChangesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -119,7 +155,8 @@ namespace LangEditor
                 return;
             uint result = Language.HashID(value);
 
-            MessageBox.Show(this, "Hashed value is: " + result.ToString("X8"), "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(this, "Hashed value is: " + result.ToString("X8"), "Information",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void dgvMain_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)

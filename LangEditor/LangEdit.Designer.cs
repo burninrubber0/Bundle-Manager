@@ -99,14 +99,14 @@ namespace LangEditor
             // 
             importToolStripMenuItem.Name = "importToolStripMenuItem";
             importToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            importToolStripMenuItem.Text = "Import";
+            importToolStripMenuItem.Text = "Import from CSV";
             importToolStripMenuItem.Click += importToolStripMenuItem_Click;
             // 
             // exportToolStripMenuItem
             // 
             exportToolStripMenuItem.Name = "exportToolStripMenuItem";
             exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            exportToolStripMenuItem.Text = "Export";
+            exportToolStripMenuItem.Text = "Export to CSV";
             exportToolStripMenuItem.Click += exportToolStripMenuItem_Click;
             // 
             // toolStripMenuItem1
@@ -132,7 +132,7 @@ namespace LangEditor
             // 
             findToolStripMenuItem.Name = "findToolStripMenuItem";
             findToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F;
-            findToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            findToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
             findToolStripMenuItem.Text = "Find";
             findToolStripMenuItem.Click += findToolStripMenuItem_Click;
             // 

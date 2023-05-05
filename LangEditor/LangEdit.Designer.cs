@@ -29,8 +29,6 @@ namespace LangEditor
         private void InitializeComponent()
         {
             dgvMain = new System.Windows.Forms.DataGridView();
-            colHashID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            colText = new System.Windows.Forms.DataGridViewTextBoxColumn();
             statusStrip1 = new System.Windows.Forms.StatusStrip();
             menuStrip1 = new System.Windows.Forms.MenuStrip();
             fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -42,6 +40,8 @@ namespace LangEditor
             findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             hashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            colID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            colString = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dgvMain).BeginInit();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -50,7 +50,7 @@ namespace LangEditor
             // 
             dgvMain.AllowUserToOrderColumns = true;
             dgvMain.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvMain.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { colHashID, colText });
+            dgvMain.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { colID, colString });
             dgvMain.Dock = System.Windows.Forms.DockStyle.Fill;
             dgvMain.Location = new System.Drawing.Point(0, 24);
             dgvMain.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -58,16 +58,6 @@ namespace LangEditor
             dgvMain.Size = new System.Drawing.Size(484, 382);
             dgvMain.TabIndex = 0;
             dgvMain.RowsAdded += dgvMain_RowsAdded;
-            // 
-            // colHashID
-            // 
-            colHashID.HeaderText = "Hash ID";
-            colHashID.Name = "colHashID";
-            // 
-            // colText
-            // 
-            colText.HeaderText = "Text";
-            colText.Name = "colText";
             // 
             // statusStrip1
             // 
@@ -98,26 +88,26 @@ namespace LangEditor
             // importToolStripMenuItem
             // 
             importToolStripMenuItem.Name = "importToolStripMenuItem";
-            importToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            importToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             importToolStripMenuItem.Text = "Import from CSV";
             importToolStripMenuItem.Click += importToolStripMenuItem_Click;
             // 
             // exportToolStripMenuItem
             // 
             exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            exportToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             exportToolStripMenuItem.Text = "Export to CSV";
             exportToolStripMenuItem.Click += exportToolStripMenuItem_Click;
             // 
             // toolStripMenuItem1
             // 
             toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
+            toolStripMenuItem1.Size = new System.Drawing.Size(160, 6);
             // 
             // applyChangesToolStripMenuItem
             // 
             applyChangesToolStripMenuItem.Name = "applyChangesToolStripMenuItem";
-            applyChangesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            applyChangesToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             applyChangesToolStripMenuItem.Text = "Apply Changes";
             applyChangesToolStripMenuItem.Click += applyChangesToolStripMenuItem_Click;
             // 
@@ -150,6 +140,16 @@ namespace LangEditor
             hashToolStripMenuItem.Text = "Hash";
             hashToolStripMenuItem.Click += hashToolStripMenuItem_Click;
             // 
+            // colID
+            // 
+            colID.HeaderText = "ID";
+            colID.Name = "colID";
+            // 
+            // colString
+            // 
+            colString.HeaderText = "String";
+            colString.Name = "colString";
+            // 
             // LangEdit
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -172,8 +172,6 @@ namespace LangEditor
         #endregion
 
         private System.Windows.Forms.DataGridView dgvMain;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHashID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colText;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
@@ -185,5 +183,7 @@ namespace LangEditor
         private System.Windows.Forms.ToolStripMenuItem findToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem applyChangesToolStripMenuItem;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colString;
     }
 }

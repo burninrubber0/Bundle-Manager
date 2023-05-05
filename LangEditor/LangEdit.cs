@@ -15,6 +15,7 @@ namespace LangEditor
 
         private bool _ignoreChanges;
 
+        private Dictionary<uint, string> dict;
         private Language _lang;
         public Language Lang
         {
@@ -32,13 +33,52 @@ namespace LangEditor
         {
             _ignoreChanges = true;
             InitializeComponent();
+            GenerateDictionary();
             _ignoreChanges = false;
+        }
+
+        public void GenerateDictionary()
+        {
+            dict = new Dictionary<uint, string>();
+            StreamReader keys = new StreamReader("keys/keys.csv", Encoding.UTF8);
+            string key;
+            while ((key = keys.ReadLine()) != null)
+            {
+                key = key.Substring(1, key.Length - 2);
+                if (key.Contains('<'))
+                {
+                    int subKeyFilePos = key.IndexOf("<") + 1;
+                    string subKeyFile = key.Substring(subKeyFilePos, key.IndexOf(">") - subKeyFilePos);
+                    StreamReader subKeys = new StreamReader("keys/" + subKeyFile + ".csv", Encoding.UTF8);
+                    string subKey;
+                    while ((subKey = subKeys.ReadLine()) != null)
+                    {
+                        string fullSubKey = key.Replace(subKeyFile, subKey); // Replace file name with subkey
+                        fullSubKey = fullSubKey.Remove(subKeyFilePos - 1, 1); // Remove <
+                        fullSubKey = fullSubKey.Remove(subKeyFilePos - 1 + subKey.Length, 1); // Remove >
+                        dict.Add(Language.HashID(fullSubKey), fullSubKey);
+                    }
+
+                    subKeys.Close();
+
+                    continue;
+                }
+
+                dict.Add(Language.HashID(key), key);
+
+                keys.Close();
+            }
         }
 
         public void UpdateDisplay()
         {
-            foreach (uint key in _lang.mpEntries.Keys)
-                dgvMain.Rows.Add(key.ToString("X8"), _lang.mpEntries[key]);
+            foreach (KeyValuePair<uint, string> entry in _lang.mpEntries)
+            {
+                if (dict.ContainsKey(entry.Key))
+                    dgvMain.Rows.Add(dict[entry.Key], entry.Value);
+                else
+                    dgvMain.Rows.Add("0x" + entry.Key.ToString("X8"), entry.Value);
+            }
         }
 
         public void RebuildLanguage()
@@ -52,11 +92,19 @@ namespace LangEditor
             {
                 string idString = (string)dgvMain.Rows[i].Cells[0].Value;
 
-                if (!uint.TryParse(idString, NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out var id))
+                uint id;
+                if (idString.Length == 8 && idString.StartsWith("0x")) // Hash
                 {
-                    MessageBox.Show(this, "Failed to parse ID \"" + idString + "\"", "Warning",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
+                    if (!uint.TryParse(idString[2..], NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out id))
+                    {
+                        MessageBox.Show(this, "Failed to parse ID \"" + idString + "\"", "Warning",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
+                else // String
+                {
+                    id = Language.HashID(idString);
                 }
 
                 string value = (string)dgvMain.Rows[i].Cells[1].Value;
@@ -82,7 +130,7 @@ namespace LangEditor
                 return;
 
             Dictionary<uint, string> data = new Dictionary<uint, string>();
-            StreamReader file = new StreamReader(openDialog.FileName);
+            StreamReader file = new StreamReader(openDialog.FileName, Encoding.UTF8);
             string line;
             while ((line = file.ReadLine()) != null)
             {
@@ -94,14 +142,9 @@ namespace LangEditor
                     pair[1] = pair[1].Replace("\"\"", "\""); // Convert double quotes
                     pair[1] = pair[1].Replace("\\r", "\xD").Replace("\\n", "\xA"); // Convert newlines
                 }
-                uint key;
-                try
+                if (!uint.TryParse(pair[0], NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out var key))
                 {
-                    key = uint.Parse(pair[0], NumberStyles.HexNumber);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Could not parse ID " + pair[0] + ". Import cancelled.", ex.Source, MessageBoxButtons.OK);
+                    MessageBox.Show("Could not parse ID " + pair[0] + ". Import cancelled.", "Error", MessageBoxButtons.OK);
                     return;
                 }
                 data.Add(key, pair[1]);

@@ -11,6 +11,14 @@
     <ProjectReference Include="..\BundleUtilities\BundleUtilities.csproj" />
     <ProjectReference Include="..\PluginAPI\PluginAPI.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="keys\keys.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\vehicles.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)BundleManager\bin\$(ConfigurationName)\$(TargetFramework)\plugins\&quot; /s /e /y" />
   </Target>

@@ -76,7 +76,43 @@ namespace LangEditor
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // TODO: Import CSV
+            OpenFileDialog openDialog = new OpenFileDialog();
+            openDialog.Filter = "Column-separated values (*.csv)|*.csv|All files(*.*)|*.*";
+            if (openDialog.ShowDialog() == DialogResult.Cancel)
+                return;
+
+            Dictionary<uint, string> data = new Dictionary<uint, string>();
+            StreamReader file = new StreamReader(openDialog.FileName);
+            string line;
+            while ((line = file.ReadLine()) != null)
+            {
+                string[] pair = line.Split(',', 2);
+                pair[0] = pair[0].Substring(3, 8); // Key
+                if (pair[1].Length != 0) // Non-empty value
+                {
+                    pair[1] = pair[1].Substring(1, pair[1].Length - 2); // Remove enclosing double quotes
+                    pair[1] = pair[1].Replace("\"\"", "\""); // Convert double quotes
+                    pair[1] = pair[1].Replace("\\r", "\xD").Replace("\\n", "\xA"); // Convert newlines
+                }
+                uint key;
+                try
+                {
+                    key = uint.Parse(pair[0], NumberStyles.HexNumber);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Could not parse ID " + pair[0] + ". Import cancelled.", ex.Source, MessageBoxButtons.OK);
+                    return;
+                }
+                data.Add(key, pair[1]);
+            }
+
+            _lang.mpEntries = data;
+
+            dgvMain.Rows.Clear();
+            UpdateDisplay();
+
+            MessageBox.Show("Import successful.", "Information", MessageBoxButtons.OK);
         }
 
         private void exportToolStripMenuItem_Click(object sender, EventArgs e)
@@ -102,9 +138,9 @@ namespace LangEditor
             {
                 languageContent += "\"0x" + entry.Key.ToString("X8") + "\","; // Key
                 string tempValue = entry.Value;
-                tempValue = tempValue.Replace("\xD", "\\r").Replace("\xA", "\\n"); // Newlines
-                tempValue = tempValue.Replace("\"", "\"\""); // Quotation marks
-                if (tempValue != "") // Enclose non-empty strings in double quotes
+                tempValue = tempValue.Replace("\xD", "\\r").Replace("\xA", "\\n"); // Convert newlines
+                tempValue = tempValue.Replace("\"", "\"\""); // Convert double quotes
+                if (tempValue.Length != 0) // Enclose non-empty strings in double quotes
                 {
                     tempValue = "\"" + tempValue;
                     tempValue += "\"";
@@ -113,9 +149,11 @@ namespace LangEditor
             }
 
             FileStream file = (FileStream)saveDialog.OpenFile();
-            file.Write(Encoding.ASCII.GetBytes(languageContent));
+            file.Write(Encoding.UTF8.GetBytes(languageContent));
             file.Flush();
             file.Close();
+
+            MessageBox.Show("Export successful.", "Information", MessageBoxButtons.OK);
         }
 
         private void applyChangesToolStripMenuItem_Click(object sender, EventArgs e)

@@ -29,6 +29,8 @@ namespace LangEditor
         private void InitializeComponent()
         {
             dgvMain = new System.Windows.Forms.DataGridView();
+            colID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            colString = new System.Windows.Forms.DataGridViewTextBoxColumn();
             statusStrip1 = new System.Windows.Forms.StatusStrip();
             menuStrip1 = new System.Windows.Forms.MenuStrip();
             fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -38,10 +40,9 @@ namespace LangEditor
             applyChangesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            findNextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             hashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            colID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            colString = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dgvMain).BeginInit();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -54,10 +55,21 @@ namespace LangEditor
             dgvMain.Dock = System.Windows.Forms.DockStyle.Fill;
             dgvMain.Location = new System.Drawing.Point(0, 24);
             dgvMain.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            dgvMain.MultiSelect = false;
             dgvMain.Name = "dgvMain";
             dgvMain.Size = new System.Drawing.Size(484, 382);
             dgvMain.TabIndex = 0;
             dgvMain.RowsAdded += dgvMain_RowsAdded;
+            // 
+            // colID
+            // 
+            colID.HeaderText = "ID";
+            colID.Name = "colID";
+            // 
+            // colString
+            // 
+            colString.HeaderText = "String";
+            colString.Name = "colString";
             // 
             // statusStrip1
             // 
@@ -113,7 +125,7 @@ namespace LangEditor
             // 
             // editToolStripMenuItem
             // 
-            editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { findToolStripMenuItem });
+            editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { findToolStripMenuItem, findNextToolStripMenuItem });
             editToolStripMenuItem.Name = "editToolStripMenuItem";
             editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             editToolStripMenuItem.Text = "Edit";
@@ -122,9 +134,18 @@ namespace LangEditor
             // 
             findToolStripMenuItem.Name = "findToolStripMenuItem";
             findToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F;
-            findToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            findToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
             findToolStripMenuItem.Text = "Find";
             findToolStripMenuItem.Click += findToolStripMenuItem_Click;
+            // 
+            // findNextToolStripMenuItem
+            // 
+            findNextToolStripMenuItem.Enabled = false;
+            findNextToolStripMenuItem.Name = "findNextToolStripMenuItem";
+            findNextToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F;
+            findNextToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            findNextToolStripMenuItem.Text = "Find next";
+            findNextToolStripMenuItem.Click += findNextToolStripMenuItem_Click;
             // 
             // toolsToolStripMenuItem
             // 
@@ -139,16 +160,6 @@ namespace LangEditor
             hashToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
             hashToolStripMenuItem.Text = "Hash";
             hashToolStripMenuItem.Click += hashToolStripMenuItem_Click;
-            // 
-            // colID
-            // 
-            colID.HeaderText = "ID";
-            colID.Name = "colID";
-            // 
-            // colString
-            // 
-            colString.HeaderText = "String";
-            colString.Name = "colString";
             // 
             // LangEdit
             // 
@@ -185,5 +196,6 @@ namespace LangEditor
         private System.Windows.Forms.ToolStripMenuItem applyChangesToolStripMenuItem;
         private System.Windows.Forms.DataGridViewTextBoxColumn colID;
         private System.Windows.Forms.DataGridViewTextBoxColumn colString;
+        private System.Windows.Forms.ToolStripMenuItem findNextToolStripMenuItem;
     }
 }

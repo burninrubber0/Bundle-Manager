@@ -29,7 +29,6 @@ namespace VaultFormat
             }
         }
 
-
         private void UpdateDisplay()
         {
             lstDataChunks.Items.Clear();
@@ -125,12 +124,10 @@ namespace VaultFormat
             propertyGrid2.SelectedObject = AttribSys.Attributes[index];
         }
 
-        private void propertyGrid2_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        private void AttribSysVaultForm_FormClosed(object s, FormClosedEventArgs e)
         {
             EditEvent?.Invoke();
             UpdateDisplay();
         }
-
     }
-
 }

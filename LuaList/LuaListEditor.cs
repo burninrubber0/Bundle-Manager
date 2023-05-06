@@ -21,7 +21,6 @@ namespace LuaList
 
         public void UpdateComponent()
         {
-           
             propertyGrid1.SelectedObject = LuaList;
         }
 
@@ -31,10 +30,9 @@ namespace LuaList
             UpdateComponent();
         }
 
-        private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        private void LuaListEditor_FormClosed(object s, FormClosedEventArgs e)
         {
             EditEvent?.Invoke();
         }
-
     }
 }

@@ -35,7 +35,7 @@ namespace BaseHandlers
             UpdateComponent();
         }
 
-        private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        private void TriggerDataEditor_FormClosed(object s, FormClosedEventArgs e)
         {
             EditEvent?.Invoke();
         }

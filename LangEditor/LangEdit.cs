@@ -124,7 +124,7 @@ namespace LangEditor
                 string idString = (string)dgvMain.Rows[i].Cells[0].Value;
 
                 uint id;
-                if (idString.Length == 8 && idString.StartsWith("0x")) // Hash
+                if (idString.StartsWith("0x") && idString.Length == 10) // Hash
                 {
                     if (!uint.TryParse(idString[2..], NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out id))
                     {
@@ -141,7 +141,7 @@ namespace LangEditor
                 string value = (string)dgvMain.Rows[i].Cells[1].Value;
                 if (data.ContainsKey(id))
                 {
-                    MessageBox.Show(this, "ID Already In Use " + idString, "Warning",
+                    MessageBox.Show(this, "ID " + idString + " already in use", "Warning",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
@@ -166,18 +166,26 @@ namespace LangEditor
             while ((line = file.ReadLine()) != null)
             {
                 string[] pair = line.Split(',', 2);
-                pair[0] = pair[0].Substring(3, 8); // Key
+                pair[0] = pair[0].Remove(0, 1).Remove(pair[0].Length - 2, 1); // Remove quotes
+                uint key;
+                if (pair[0].StartsWith("0x") && pair[0].Length == 10)
+                {
+                    if (!uint.TryParse(pair[0][2..], NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out key))
+                    {
+                        MessageBox.Show("Could not parse ID " + pair[0] + ". Import cancelled.", "Error", MessageBoxButtons.OK);
+                        return;
+                    }
+                }
+                else
+                    key = Language.HashID(pair[0]);
+
                 if (pair[1].Length != 0) // Non-empty value
                 {
                     pair[1] = pair[1].Substring(1, pair[1].Length - 2); // Remove enclosing double quotes
                     pair[1] = pair[1].Replace("\"\"", "\""); // Convert double quotes
                     pair[1] = pair[1].Replace("\\r", "\xD").Replace("\\n", "\xA"); // Convert newlines
                 }
-                if (!uint.TryParse(pair[0], NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out var key))
-                {
-                    MessageBox.Show("Could not parse ID " + pair[0] + ". Import cancelled.", "Error", MessageBoxButtons.OK);
-                    return;
-                }
+                
                 data.Add(key, pair[1]);
             }
 
@@ -185,33 +193,24 @@ namespace LangEditor
 
             dgvMain.Rows.Clear();
             UpdateDisplay();
-
-            MessageBox.Show("Import successful.", "Information", MessageBoxButtons.OK);
         }
 
         private void exportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // TODO: Note when language is dirty, not just bundle
-            if (MessageBox.Show(this, "Changes must be applied before exporting. Save now?", "Information",
-                MessageBoxButtons.OKCancel) == DialogResult.Cancel)
-                return;
-
             SaveFileDialog saveDialog = new SaveFileDialog();
             saveDialog.Filter = "Column-separated values (*.csv)|*.csv";
             if (saveDialog.ShowDialog() == DialogResult.Cancel)
                 return;
-
-            RebuildLanguage();
 
             // CSV content as a single contiguous string.
             // Keys are prepended with 0x and padded to 8 characters.
             // In values, incompatible characters are escaped.
             // Both keys and values are enclosed in double quotes.
             string languageContent = "";
-            foreach (KeyValuePair<uint, string> entry in _lang.mpEntries)
+            for (int i = 0; i < dgvMain.Rows.Count - 1; ++i)
             {
-                languageContent += "\"0x" + entry.Key.ToString("X8") + "\","; // Key
-                string tempValue = entry.Value;
+                languageContent += "\"" + (string)(dgvMain.Rows[i].Cells[0].Value) + "\",";
+                string tempValue = (string)dgvMain.Rows[i].Cells[1].Value;
                 tempValue = tempValue.Replace("\xD", "\\r").Replace("\xA", "\\n"); // Convert newlines
                 tempValue = tempValue.Replace("\"", "\"\""); // Convert double quotes
                 if (tempValue.Length != 0) // Enclose non-empty strings in double quotes
@@ -242,13 +241,11 @@ namespace LangEditor
             string value = InputDialog.ShowInput(this, "Please enter the value to search for.");
             if (value == null)
                 return;
-            uint result = Language.HashID(value);
 
-            string hash;
             foreach (DataGridViewRow row in dgvMain.Rows)
             {
-                hash = (string)row.Cells[0].Value;
-                if (result.ToString("X8") == hash)
+                if (((string)row.Cells[0].Value).Contains(value, StringComparison.CurrentCultureIgnoreCase)
+                    || ((string)row.Cells[1].Value).Contains(value, StringComparison.CurrentCultureIgnoreCase))
                 {
                     dgvMain.ClearSelection();
                     dgvMain.CurrentCell = row.Cells[0];

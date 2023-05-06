@@ -145,7 +145,7 @@ namespace LangEditor
 
             return result;*/
 
-            byte[] message = Encoding.ASCII.GetBytes(id);
+            byte[] message = Encoding.UTF8.GetBytes(id);
             UInt32 hash = UInt32.MaxValue;
             for (UInt32 i = 0; i < message.Length; i++)
             {

@@ -119,7 +119,6 @@ namespace VaultFormat
             this.propertyGrid2.Name = "propertyGrid2";
             this.propertyGrid2.Size = new System.Drawing.Size(1312, 752);
             this.propertyGrid2.TabIndex = 6;
-            this.propertyGrid2.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid2_PropertyValueChanged);
             // 
             // AttribSysVaultForm
             // 
@@ -133,6 +132,7 @@ namespace VaultFormat
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "AttribSysVaultForm";
             this.Text = "AttribSysVault Editor";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.AttribSysVaultForm_FormClosed);
             this.menu.ResumeLayout(false);
             this.menu.PerformLayout();
             this.contextMenu.ResumeLayout(false);

@@ -31,7 +31,6 @@ namespace BaseHandlers
             this.propertyGrid1.Name = "propertyGrid1";
             this.propertyGrid1.Size = new System.Drawing.Size(802, 456);
             this.propertyGrid1.TabIndex = 0;
-            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
             // TriggerDataEditor
             // 
@@ -41,6 +40,7 @@ namespace BaseHandlers
             this.Controls.Add(this.propertyGrid1);
             this.Name = "TriggerDataEditor";
             this.Text = "Trigger Data Editor";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.TriggerDataEditor_FormClosed);
             this.ResumeLayout(false);
 
         }

@@ -1,4 +1,4 @@
-﻿namespace LangEditor
+namespace LangEditor
 {
     partial class LangEdit
     {
@@ -28,160 +28,150 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.dgvMain = new System.Windows.Forms.DataGridView();
-            this.colHashID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colText = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.hashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-            this.applyChangesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvMain)).BeginInit();
-            this.menuStrip1.SuspendLayout();
-            this.SuspendLayout();
+            dgvMain = new System.Windows.Forms.DataGridView();
+            statusStrip1 = new System.Windows.Forms.StatusStrip();
+            menuStrip1 = new System.Windows.Forms.MenuStrip();
+            fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            applyChangesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            hashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            colID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            colString = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            ((System.ComponentModel.ISupportInitialize)dgvMain).BeginInit();
+            menuStrip1.SuspendLayout();
+            SuspendLayout();
             // 
             // dgvMain
             // 
-            this.dgvMain.AllowUserToOrderColumns = true;
-            this.dgvMain.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvMain.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.colHashID,
-            this.colText});
-            this.dgvMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvMain.Location = new System.Drawing.Point(0, 24);
-            this.dgvMain.Name = "dgvMain";
-            this.dgvMain.Size = new System.Drawing.Size(415, 325);
-            this.dgvMain.TabIndex = 0;
-            this.dgvMain.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgvMain_RowsAdded);
-            // 
-            // colHashID
-            // 
-            this.colHashID.HeaderText = "Hash ID";
-            this.colHashID.Name = "colHashID";
-            // 
-            // colText
-            // 
-            this.colText.HeaderText = "Text";
-            this.colText.Name = "colText";
+            dgvMain.AllowUserToOrderColumns = true;
+            dgvMain.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvMain.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { colID, colString });
+            dgvMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            dgvMain.Location = new System.Drawing.Point(0, 24);
+            dgvMain.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            dgvMain.Name = "dgvMain";
+            dgvMain.Size = new System.Drawing.Size(484, 382);
+            dgvMain.TabIndex = 0;
+            dgvMain.RowsAdded += dgvMain_RowsAdded;
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 349);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(415, 22);
-            this.statusStrip1.TabIndex = 1;
-            this.statusStrip1.Text = "statusStrip1";
+            statusStrip1.Location = new System.Drawing.Point(0, 406);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 16, 0);
+            statusStrip1.Size = new System.Drawing.Size(484, 22);
+            statusStrip1.TabIndex = 1;
+            statusStrip1.Text = "statusStrip1";
             // 
             // menuStrip1
             // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem,
-            this.editToolStripMenuItem,
-            this.toolsToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(415, 24);
-            this.menuStrip1.TabIndex = 2;
-            this.menuStrip1.Text = "menuStrip1";
+            menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { fileToolStripMenuItem, editToolStripMenuItem, toolsToolStripMenuItem });
+            menuStrip1.Location = new System.Drawing.Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
+            menuStrip1.Size = new System.Drawing.Size(484, 24);
+            menuStrip1.TabIndex = 2;
+            menuStrip1.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem
             // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importToolStripMenuItem,
-            this.exportToolStripMenuItem,
-            this.toolStripMenuItem1,
-            this.applyChangesToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "File";
+            fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { importToolStripMenuItem, exportToolStripMenuItem, toolStripMenuItem1, applyChangesToolStripMenuItem });
+            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            fileToolStripMenuItem.Text = "File";
             // 
             // importToolStripMenuItem
             // 
-            this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.importToolStripMenuItem.Text = "Import";
-            this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
+            importToolStripMenuItem.Name = "importToolStripMenuItem";
+            importToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            importToolStripMenuItem.Text = "Import from CSV";
+            importToolStripMenuItem.Click += importToolStripMenuItem_Click;
             // 
             // exportToolStripMenuItem
             // 
-            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.exportToolStripMenuItem.Text = "Export";
-            this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
-            // 
-            // toolsToolStripMenuItem
-            // 
-            this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.hashToolStripMenuItem});
-            this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
-            this.toolsToolStripMenuItem.Text = "Tools";
-            // 
-            // hashToolStripMenuItem
-            // 
-            this.hashToolStripMenuItem.Name = "hashToolStripMenuItem";
-            this.hashToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.hashToolStripMenuItem.Text = "Hash";
-            this.hashToolStripMenuItem.Click += new System.EventHandler(this.hashToolStripMenuItem_Click);
-            // 
-            // editToolStripMenuItem
-            // 
-            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.findToolStripMenuItem});
-            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
-            this.editToolStripMenuItem.Text = "Edit";
-            // 
-            // findToolStripMenuItem
-            // 
-            this.findToolStripMenuItem.Name = "findToolStripMenuItem";
-            this.findToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.findToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.findToolStripMenuItem.Text = "Find";
-            this.findToolStripMenuItem.Click += new System.EventHandler(this.findToolStripMenuItem_Click);
+            exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            exportToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            exportToolStripMenuItem.Text = "Export to CSV";
+            exportToolStripMenuItem.Click += exportToolStripMenuItem_Click;
             // 
             // toolStripMenuItem1
             // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(151, 6);
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new System.Drawing.Size(160, 6);
             // 
             // applyChangesToolStripMenuItem
             // 
-            this.applyChangesToolStripMenuItem.Name = "applyChangesToolStripMenuItem";
-            this.applyChangesToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
-            this.applyChangesToolStripMenuItem.Text = "Apply Changes";
-            this.applyChangesToolStripMenuItem.Click += new System.EventHandler(this.applyChangesToolStripMenuItem_Click);
+            applyChangesToolStripMenuItem.Name = "applyChangesToolStripMenuItem";
+            applyChangesToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            applyChangesToolStripMenuItem.Text = "Apply Changes";
+            applyChangesToolStripMenuItem.Click += applyChangesToolStripMenuItem_Click;
+            // 
+            // editToolStripMenuItem
+            // 
+            editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { findToolStripMenuItem });
+            editToolStripMenuItem.Name = "editToolStripMenuItem";
+            editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            editToolStripMenuItem.Text = "Edit";
+            // 
+            // findToolStripMenuItem
+            // 
+            findToolStripMenuItem.Name = "findToolStripMenuItem";
+            findToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F;
+            findToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            findToolStripMenuItem.Text = "Find";
+            findToolStripMenuItem.Click += findToolStripMenuItem_Click;
+            // 
+            // toolsToolStripMenuItem
+            // 
+            toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { hashToolStripMenuItem });
+            toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
+            toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
+            toolsToolStripMenuItem.Text = "Tools";
+            // 
+            // hashToolStripMenuItem
+            // 
+            hashToolStripMenuItem.Name = "hashToolStripMenuItem";
+            hashToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
+            hashToolStripMenuItem.Text = "Hash";
+            hashToolStripMenuItem.Click += hashToolStripMenuItem_Click;
+            // 
+            // colID
+            // 
+            colID.HeaderText = "ID";
+            colID.Name = "colID";
+            // 
+            // colString
+            // 
+            colString.HeaderText = "String";
+            colString.Name = "colString";
             // 
             // LangEdit
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(415, 371);
-            this.Controls.Add(this.dgvMain);
-            this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.menuStrip1);
-            this.MainMenuStrip = this.menuStrip1;
-            this.Name = "LangEdit";
-            this.Text = "Language Editor";
-            ((System.ComponentModel.ISupportInitialize)(this.dgvMain)).EndInit();
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(484, 428);
+            Controls.Add(dgvMain);
+            Controls.Add(statusStrip1);
+            Controls.Add(menuStrip1);
+            MainMenuStrip = menuStrip1;
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Name = "LangEdit";
+            Text = "Language Editor";
+            ((System.ComponentModel.ISupportInitialize)dgvMain).EndInit();
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
         private System.Windows.Forms.DataGridView dgvMain;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHashID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colText;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
@@ -193,5 +183,7 @@
         private System.Windows.Forms.ToolStripMenuItem findToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem applyChangesToolStripMenuItem;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colString;
     }
 }

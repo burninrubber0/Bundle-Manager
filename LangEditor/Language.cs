@@ -10,46 +10,61 @@ namespace LangEditor
 {
     public class Language : IEntryData
     {
-        public int Unknown1;
-        public Dictionary<uint, string> Data;
-        public int Unknown2;
+        private enum LanguageId : uint
+        {
+            E_LANGUAGE_ARABIC,
+            E_LANGUAGE_CHINESE,
+            E_LANGUAGE_CHINESE_SIMPLIFIED,
+            E_LANGUAGE_CHINESE_TRADITIONAL,
+            E_LANGUAGE_CZECH,
+            E_LANGUAGE_DANISH,
+            E_LANGUAGE_DUTCH,
+            E_LANGUAGE_ENGLISH_US,
+            E_LANGUAGE_ENGLISH_UK,
+            E_LANGUAGE_FINNISH,
+            E_LANGUAGE_FRENCH,
+            E_LANGUAGE_GERMAN,
+            E_LANGUAGE_GREEK,
+            E_LANGUAGE_HEBREW,
+            E_LANGUAGE_HUNGARIAN,
+            E_LANGUAGE_ITALIAN,
+            E_LANGUAGE_JAPANESE,
+            E_LANGUAGE_KOREAN,
+            E_LANGUAGE_NORWEGIAN,
+            E_LANGUAGE_POLISH,
+            E_LANGUAGE_PORTUGUESE_BRAZIL,
+            E_LANGUAGE_PORTUGUESE_PORTUGAL,
+            E_LANGUAGE_SPANISH,
+            E_LANGUAGE_SWEDISH,
+            E_LANGUAGE_THAI
+        }
+        
+        private LanguageId meLanguageID;
+        private uint muSize; // Number of entries
+        internal Dictionary<uint, string> mpEntries;
 
         public Language()
         {
-            Data = new Dictionary<uint, string>();
-        }
-
-        private void Clear()
-        {
-            Unknown1 = default;
-            Unknown2 = default;
-
-            Data.Clear();
+            mpEntries = new Dictionary<uint, string>();
         }
 
         public bool Read(BundleEntry entry, ILoader loader = null)
         {
-            Clear();
+            mpEntries.Clear(); // Clear any entries from a previous Bundle
 
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
             br.BigEndian = entry.Console;
 
-            Unknown1 = br.ReadInt32();
-            int count = br.ReadInt32();
-            Unknown2 = br.ReadInt32();
+            meLanguageID = (LanguageId)br.ReadUInt32();
+            muSize = br.ReadUInt32();
+            ms.Position = br.ReadUInt32();
 
-            for (int i = 0; i < count - 1; i++)
-            {
-                uint id = br.ReadUInt32();
-                string txt = br.ReadCStringPtr();
-                Data.Add(id, txt);
-            }
+            for (int i = 0; i < muSize; ++i)
+                mpEntries.Add(br.ReadUInt32(), br.ReadCStringPtr());
+            mpEntries.Remove(0); // If padding is present, remove it
 
             br.Close();
-            ms.Close();
-
-            //result.Write(entry);
 
             return true;
         }
@@ -59,57 +74,33 @@ namespace LangEditor
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
 
-            bw.Write(Unknown1);
-            bw.Write(Data.Count + 1);
-            bw.Write(Unknown2);
+            bw.Write((uint)meLanguageID);
+            bw.Write(mpEntries.Count);
+            bw.Write(0xC); // Pointer is always the same for 32-bit systems
 
-            long headPos = bw.BaseStream.Position;
-            
-            foreach (uint id in Data.Keys)
+            // Write at entries position so string position calculations are not needed later
+            // and to avoid double iteration
+            ms.Position = mpEntries.Count * 8 + 0xC - 1;
+            bw.Write((byte)0);
+            ms.Position = 0xC;
+
+            long lastPos;
+            foreach (KeyValuePair<uint, string> langEntry in mpEntries)
             {
-                bw.Write(id);
-                bw.Write((uint) 0); // offset
+                bw.Write(langEntry.Key); // Hash + padding
+                bw.Write((uint)ms.Length); // String pointer
+                lastPos = ms.Position;
+                ms.Position = ms.Length;
+                bw.Write(langEntry.Value.ToCharArray()); // String data
+                bw.Write((byte)0); // Null terminator
+                ms.Position = lastPos;
             }
-
-            bw.Write((uint)0);
-            bw.Write((uint)0); // offset
-
-            int index = 0;
-            foreach (uint id in Data.Keys)
-            {
-                long pos = bw.BaseStream.Position;
-
-                // go back and write offset
-                bw.BaseStream.Position = headPos + (index * 8) + 4;
-                bw.Write((uint)pos);
-
-                bw.BaseStream.Position = pos;
-                if (Data[id] == null)
-                    bw.WriteCStr("");
-                else
-                    bw.WriteCStr(Data[id]);
-                index++;
-            }
-
-            long pos2 = bw.BaseStream.Position;
-
-            // go back and write offset
-            bw.BaseStream.Position = headPos + (index * 8) + 4;
-            bw.Write((uint)pos2);
-
-            bw.BaseStream.Position = pos2;
-
-            int paddingCount = (int)(entry.EntryBlocks[0].Data.Length - bw.BaseStream.Position);
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < paddingCount; i++)
-                sb.Append("A");
-            bw.WriteCStr(sb.ToString());
 
             bw.Flush();
+            ms.Position = ms.Length;
+            bw.Align(0x10);
             byte[] data = ms.ToArray();
             bw.Close();
-            ms.Close();
 
             entry.EntryBlocks[0].Data = data;
             entry.Dirty = true;
@@ -154,7 +145,7 @@ namespace LangEditor
 
             return result;*/
 
-            byte[] message = Encoding.ASCII.GetBytes(id);
+            byte[] message = Encoding.UTF8.GetBytes(id);
             UInt32 hash = UInt32.MaxValue;
             for (UInt32 i = 0; i < message.Length; i++)
             {

@@ -158,9 +158,8 @@ namespace BundleManager
             lstEntries.BeginUpdate();
             lstEntries.ListViewItemSorter = null; // Disable sorting while adding
 
-            for (int i = 0; i < CurrentArchive.Entries.Count; i++)
+            foreach (BundleEntry entry in CurrentArchive.Entries)
             {
-                BundleEntry entry = CurrentArchive.Entries[i];
                 if (entry.EntryBlocks[0].Data == null) // Exception occurred
                 {
                     lstEntries.Items.Clear();
@@ -173,7 +172,7 @@ namespace BundleManager
                 }
                 string[] values = new string[]
                 {
-                    i.ToString("d3"),
+                    entry.Index.ToString("d3"),
                     entry.DetectName(),
                     "0x" + entry.ID.ToString("X8"),
                     entry.Type.ToString(),

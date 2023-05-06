@@ -40,45 +40,76 @@ namespace LangEditor
         public void GenerateDictionary()
         {
             dict = new Dictionary<uint, string>();
-            StreamReader keys = new StreamReader("keys/keys.csv", Encoding.UTF8);
+            StreamReader keys = new StreamReader("keys/keys.txt", Encoding.UTF8);
             string key;
             while ((key = keys.ReadLine()) != null)
             {
-                key = key.Substring(1, key.Length - 2);
-                if (key.Contains('<'))
+                if (key.Contains("<f")) // Use all keys in a secondary list
                 {
-                    int subKeyFilePos = key.IndexOf("<") + 1;
+                    int subKeyFilePos = key.IndexOf("<f") + 2;
                     string subKeyFile = key.Substring(subKeyFilePos, key.IndexOf(">") - subKeyFilePos);
-                    StreamReader subKeys = new StreamReader("keys/" + subKeyFile + ".csv", Encoding.UTF8);
+                    StreamReader subKeys = new StreamReader("keys/" + subKeyFile + ".txt", Encoding.UTF8);
                     string subKey;
                     while ((subKey = subKeys.ReadLine()) != null)
                     {
                         string fullSubKey = key.Replace(subKeyFile, subKey); // Replace file name with subkey
-                        fullSubKey = fullSubKey.Remove(subKeyFilePos - 1, 1); // Remove <
-                        fullSubKey = fullSubKey.Remove(subKeyFilePos - 1 + subKey.Length, 1); // Remove >
-                        dict.Add(Language.HashID(fullSubKey), fullSubKey);
+                        fullSubKey = fullSubKey.Remove(subKeyFilePos - 2, 2); // Remove <f
+                        fullSubKey = fullSubKey.Remove(subKeyFilePos - 2 + subKey.Length, 1); // Remove >
+                        try
+                        {
+                            dict.Add(Language.HashID(fullSubKey), fullSubKey);
+                        }
+                        catch
+                        {
+                            MessageBox.Show("ID " + fullSubKey + " (0x" + Language.HashID(fullSubKey).ToString("X8") + ") already exists.", "Error", MessageBoxButtons.OK);
+                            continue;
+                        }
                     }
 
                     subKeys.Close();
 
                     continue;
                 }
+                else if (key.Contains("<r")) // Range. Prone to false positives
+                {
+                    int subKeyRangePos = key.IndexOf("<r") + 2;
+                    string subKeyRange = key.Substring(subKeyRangePos, key.IndexOf(">") - subKeyRangePos);
+                    int start = int.Parse(subKeyRange.Substring(0, subKeyRange.IndexOf('-')));
+                    int end = int.Parse(subKeyRange.Substring(subKeyRange.IndexOf('-') + 1));
+                    for (int i = start; i <= end; ++i)
+                    {
+                        string fullSubKey = key.Replace(subKeyRange, i.ToString());
+                        fullSubKey = fullSubKey.Remove(subKeyRangePos - 2, 2); // Remove <f
+                        fullSubKey = fullSubKey.Remove(subKeyRangePos - 2 + i.ToString().Length, 1); // Remove >
+                        dict.Add(Language.HashID(fullSubKey), fullSubKey);
+                    }
+                }
 
                 dict.Add(Language.HashID(key), key);
-
-                keys.Close();
             }
+
+            keys.Close();
         }
 
         public void UpdateDisplay()
         {
+            int resolved = 0, total = 0;
             foreach (KeyValuePair<uint, string> entry in _lang.mpEntries)
             {
                 if (dict.ContainsKey(entry.Key))
+                {
                     dgvMain.Rows.Add(dict[entry.Key], entry.Value);
+                    total++;
+                    resolved++;
+                }
                 else
+                {
                     dgvMain.Rows.Add("0x" + entry.Key.ToString("X8"), entry.Value);
+                    total++;
+                }
             }
+            MessageBox.Show("Resolved " + resolved + "/" + total + " keys.", "Information",
+                MessageBoxButtons.OK);
         }
 
         public void RebuildLanguage()

@@ -12,12 +12,42 @@
     <ProjectReference Include="..\PluginAPI\PluginAPI.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="keys\keys.csv">
+    <None Update="keys\challenges.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="keys\vehicles.csv">
+    <None Update="keys\keys.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="keys\lualist\descriptions.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\lualist\goals.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\lualist\modifiers.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\lualist\names.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\luascript\messages.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\luascript\praises.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\luascript\scoretypes.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\luascript\titles.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\vehicles.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="keys\luascript\" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)BundleManager\bin\$(ConfigurationName)\$(TargetFramework)\plugins\&quot; /s /e /y" />

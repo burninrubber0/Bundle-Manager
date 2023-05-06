@@ -1,0 +1,15 @@
+CAR_<fvehicles>
+CAR_CAPS_<fvehicles>
+CAR_BLURB_<fvehicles>
+FBCT_<fchallenges>
+FBCD_<fchallenges>
+FBCD_<fchallenges>_1
+FBCD_<fchallenges>_2
+<flualist/names>
+<flualist/goals>
+<flualist/descriptions>
+<flualist/modifiers>
+<fluascript/messages>
+<fluascript/titles>
+<fluascript/scoretypes>
+<fluascript/praises>

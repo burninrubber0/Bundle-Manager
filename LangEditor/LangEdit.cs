@@ -15,6 +15,7 @@ namespace LangEditor
 
         private bool _ignoreChanges;
 
+        private string searchVal;
         private Dictionary<uint, string> dict;
         private Language _lang;
         public Language Lang
@@ -185,7 +186,7 @@ namespace LangEditor
                     pair[1] = pair[1].Replace("\"\"", "\""); // Convert double quotes
                     pair[1] = pair[1].Replace("\\r", "\xD").Replace("\\n", "\xA"); // Convert newlines
                 }
-                
+
                 data.Add(key, pair[1]);
             }
 
@@ -241,6 +242,8 @@ namespace LangEditor
             string value = InputDialog.ShowInput(this, "Please enter the value to search for.");
             if (value == null)
                 return;
+            searchVal = value;
+            findNextToolStripMenuItem.Enabled = true;
 
             foreach (DataGridViewRow row in dgvMain.Rows)
             {
@@ -250,6 +253,31 @@ namespace LangEditor
                     dgvMain.ClearSelection();
                     dgvMain.CurrentCell = row.Cells[0];
                     row.Selected = true;
+                    return;
+                }
+            }
+
+            MessageBox.Show(this, "Hash not found!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
+        private void findNextToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (searchVal == null)
+                return;
+            int start = dgvMain.SelectedCells[0].RowIndex + 1;
+            if (start > dgvMain.Rows.Count - 1)
+            {
+                MessageBox.Show(this, "Hash not found!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            for (int i = start; i < dgvMain.Rows.Count - 1; ++i)
+            {
+                if (((string)dgvMain.Rows[i].Cells[0].Value).Contains(searchVal, StringComparison.CurrentCultureIgnoreCase)
+                    || ((string)dgvMain.Rows[i].Cells[1].Value).Contains(searchVal, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    dgvMain.ClearSelection();
+                    dgvMain.CurrentCell = dgvMain.Rows[i].Cells[0];
+                    dgvMain.Rows[i].Selected = true;
                     return;
                 }
             }

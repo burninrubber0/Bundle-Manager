@@ -58,10 +58,13 @@ namespace LangEditor
 
             meLanguageID = (LanguageId)br.ReadUInt32();
             muSize = br.ReadUInt32();
-            ms.Position = br.ReadUInt32();
-
+            ms.Position = br.ReadInt64();
             for (int i = 0; i < muSize; ++i)
-                mpEntries.Add(br.ReadUInt32(), br.ReadCStringPtr());
+            {
+                uint hash = br.ReadUInt32();
+                br.SkipUniquePadding(4);
+                mpEntries.Add(hash, br.ReadCStringPtr());
+            }
             mpEntries.Remove(0); // If padding is present, remove it
 
             br.Close();
@@ -76,18 +79,19 @@ namespace LangEditor
 
             bw.Write((uint)meLanguageID);
             bw.Write(mpEntries.Count);
-            bw.Write(0xC); // Pointer is always the same for 32-bit systems
+            bw.Write(0x10); // Pointer is always the same for 64-bit systems
 
             // Write at entries position so string position calculations are not needed later
             // and to avoid double iteration
-            ms.Position = mpEntries.Count * 8 + 0xC - 1;
+            ms.Position = mpEntries.Count * 0x10 + 0x10 - 1;
             bw.Write((byte)0);
-            ms.Position = 0xC;
+            ms.Position = 0x10;
 
             long lastPos;
             foreach (KeyValuePair<uint, string> langEntry in mpEntries)
             {
-                bw.Write(langEntry.Key); // Hash + padding
+                bw.Write(langEntry.Key); // Hash
+                bw.Write(0); // Padding
                 bw.Write((uint)ms.Length); // String pointer
                 lastPos = ms.Position;
                 ms.Position = ms.Length;

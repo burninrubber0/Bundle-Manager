@@ -20,6 +20,8 @@ FBCT_<fids/challenges>
 RULER_<fids/roads>
 RULERQ_<fids/roads>
 SettingMenu_<r1-9>
+STELLAR_CREDITS_DETAIL_<r0-291>
+STELLAR_CREDITS_TITLE_<r0-291>
 STELLAR_CREDITS_V2_DETAIL_<r0-288>
 STELLAR_CREDITS_V2_TITLE_<r0-288>
 <funsorted>

@@ -1,5 +1,3 @@
-﻿using System;
-
 namespace VehicleList
 {
     public static class EncryptionData

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using ModelViewer.SceneData;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 
 namespace ModelViewer
@@ -108,7 +103,9 @@ namespace ModelViewer
             {
                 _shader.Bind();
 
-                GL.UniformMatrix4(20, false, ref _projection);
+                OpenTK.Matrix4 projectionOTK3 = OpenTKCompat.ToOTK3Matrix4(_projection);
+                GL.UniformMatrix4(20, false, ref projectionOTK3);
+                _projection = OpenTKCompat.ToOTK4Matrix4(projectionOTK3);
 
                 Scene?.Render(_camera);
             }

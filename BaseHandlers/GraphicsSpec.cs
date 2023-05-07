@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
+using System.Collections.Generic;
 using BundleFormat;
 using BundleUtilities;
-using MathLib;
 using ModelViewer;
 using ModelViewer.SceneData;
-using OpenTK;
 using PluginAPI;
 
 namespace BaseHandlers

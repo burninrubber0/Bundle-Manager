@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System;
 using System.IO;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VehicleList
 {
@@ -62,7 +55,7 @@ namespace VehicleList
         // reverse byte order (32-bit)
         public static float ReverseBytes(float value)
         {
-            return intToFloat(Util.ReverseBytes(floatToInt(value)));
+            return intToFloat(ReverseBytes(floatToInt(value)));
         }
 
         public static byte[] ReverseBytes(byte[] value)

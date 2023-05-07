@@ -1,9 +1,4 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace BundleFormat
 {
@@ -42,7 +37,7 @@ namespace BundleFormat
 
         public static string GetRelativePath(string path)
         {
-            string file = path.Replace('\\', '/').Replace(BundleCache.CurrentPath.Replace('\\', '/'), "");
+            string file = path.Replace('\\', '/').Replace(CurrentPath.Replace('\\', '/'), "");
 
             if (file.StartsWith("/"))
                 file = file.Substring(1);

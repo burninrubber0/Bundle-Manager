@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,19 +29,21 @@ namespace VaultFormat
 
         public int getDataSize()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(BitConverter.GetBytes(WheelLongForceHeightOffset));
-            bytes.Add(BitConverter.GetBytes(WheelLatForceHeightOffset));
-            bytes.Add(BitConverter.GetBytes(WeightTransferDecayZ));
-            bytes.Add(BitConverter.GetBytes(WeightTransferDecayX));
-            bytes.Add(BitConverter.GetBytes(RollSpringStiffness));
-            bytes.Add(BitConverter.GetBytes(RollSpringDampening));
-            bytes.Add(BitConverter.GetBytes(PitchSpringStiffness));
-            bytes.Add(BitConverter.GetBytes(PitchSpringDampening));
-            bytes.Add(BitConverter.GetBytes(FactorOfWeightZ));
-            bytes.Add(BitConverter.GetBytes(FactorOfWeightX));
-            //4 bytes padding is Wrong!
-            bytes.Add(BitConverter.GetBytes((float)0));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                BitConverter.GetBytes(WheelLongForceHeightOffset),
+                BitConverter.GetBytes(WheelLatForceHeightOffset),
+                BitConverter.GetBytes(WeightTransferDecayZ),
+                BitConverter.GetBytes(WeightTransferDecayX),
+                BitConverter.GetBytes(RollSpringStiffness),
+                BitConverter.GetBytes(RollSpringDampening),
+                BitConverter.GetBytes(PitchSpringStiffness),
+                BitConverter.GetBytes(PitchSpringDampening),
+                BitConverter.GetBytes(FactorOfWeightZ),
+                BitConverter.GetBytes(FactorOfWeightX),
+                //4 bytes padding is Wrong!
+                BitConverter.GetBytes((float)0)
+            };
             return bytes.SelectMany(i => i).Count();
         }
 

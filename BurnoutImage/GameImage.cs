@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using BundleUtilities;
+using BCnEncoder.Shared;
 
 namespace BurnoutImage
 {
@@ -38,16 +34,13 @@ namespace BurnoutImage
 
     public static class GameImage
     {
-        public static ImageInfo SetImage(Image newImage, CompressionType compression)
+        public static ImageInfo SetImage(string path, int width, int height, CompressionType compression)
         {
-            int width = newImage.Width;
-            int height = newImage.Height;
-            byte[] header = null;
-            byte[] data = null;
+            byte[] data;
 
             if (compression == CompressionType.BGRA)
             {
-                Bitmap image = new Bitmap(newImage);
+                Bitmap image = new Bitmap(Image.FromFile(path));
                 MemoryStream mspixels = new MemoryStream();
 
                 for (int i = 0; i < height; i++)
@@ -63,60 +56,70 @@ namespace BurnoutImage
                 }
 
                 data = mspixels.ToArray();
-
-                MemoryStream msx = new MemoryStream();
-                BinaryWriter bw = new BinaryWriter(msx);
-
-                bw.Write((int)0);
-                bw.Write((int)0);
-                bw.Write((int)0);
-                bw.Write((int)1);
-
-                bw.Write((int)0x15);
-                bw.Write((short)width);
-                bw.Write((short)height);
-
-                bw.Write((int)0x15);
-                bw.Write((int)0);
-
-                bw.Flush();
-
-                header = msx.ToArray();
-
-                bw.Close();
             }
             else
             {
-
-                DXTCompression dxt = DXTCompression.DXT1;
-                if (compression == CompressionType.DXT3)
-                    dxt = DXTCompression.DXT1;
+                CompressionFormat dxt = CompressionFormat.Unknown;
+                if (compression == CompressionType.DXT1)
+                    dxt = CompressionFormat.Bc1;
                 else if (compression == CompressionType.DXT5)
-                    dxt = DXTCompression.DXT5;
-                data = ImageUtil.CompressImage(newImage, dxt);
-
-                MemoryStream msx = new MemoryStream();
-                BinaryWriter bw = new BinaryWriter(msx);
-
-                bw.Write((int)0);
-                bw.Write((int)0);
-                bw.Write((int)0);
-                bw.Write((int)1);
-
-                bw.Write(Encoding.ASCII.GetBytes(compression.ToString()));
-                bw.Write((short)width);
-                bw.Write((short)height);
-                bw.Write((int)0x15);
-                bw.Write((int)0);
-
-                bw.Flush();
-
-                header = msx.ToArray();
-
-                bw.Close();
+                    dxt = CompressionFormat.Bc3;
+                data = ImageUtil.CompressImage(path, dxt);
             }
 
-            return new ImageInfo(header, data);
+            MemoryStream msx = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(msx);
+
+            // Original game header: https://burnout.wiki/wiki/Texture/PC
+            // TODO: Implement as separate option
+            //bw.Write(0); // Data pointer
+            //bw.Write(0); // Texture interface pointer
+            //bw.Write(0); // Padding
+            //bw.Write((short)1); // Pool
+            //bw.Write((byte)0); // ?
+            //bw.Write((byte)0); // ?
+            //if (compression == CompressionType.DXT1 || compression == CompressionType.DXT5) // Format
+            //    bw.Write(Encoding.ASCII.GetBytes(compression.ToString()));
+            //else
+            //    bw.Write(0x15); // A8R8G8B8
+            //bw.Write((short)width); // Width
+            //bw.Write((short)height); // Height
+            //bw.Write((byte)1); // Depth
+            //bw.Write(1); // MipLevels (TODO: Support mipmapping)
+            //bw.Write((byte)0); // Texture type
+            //bw.Write((byte)0); // Flags
+
+            // Remastered Texture header: https://burnout.wiki/wiki/Texture/Remastered
+            bw.Write(0); // Texture interface pointer
+            bw.Write(0); // Usage
+            bw.Write(7); // Dimension
+            bw.Write(0); // Pixel data pointer
+            bw.Write(0); // Shader resource view interface pointer 1
+            bw.Write(0); // Shader resource view interface pointer 2
+            bw.Write(0); // ?
+            if (compression == CompressionType.ARGB) // Format
+                bw.Write(0x1C); // R8G8B8A8_UNORM
+            else if (compression == CompressionType.DXT1)
+                bw.Write(0x47); // BC1_UNORM
+            else if (compression == CompressionType.DXT5)
+                bw.Write(0x4D); // BC3_UNORM
+            bw.Write(0); // Flags
+            bw.Write((short)width); // Width
+            bw.Write((short)height); // Height
+            bw.Write((short)1); // Depth
+            bw.Write((short)1); // Array size
+            bw.Write((byte)0); // Most detailed mip
+            bw.Write((byte)1); // Mip levels (TODO: Support mipmapping)
+            bw.Write((short)0); // ?
+            bw.Write(0); // ? pointer
+            bw.Write(0); // Array index (unused)
+            bw.Write(0); // Contents size (unused)
+            bw.Write(0); // Texture data (unused)
+
+            bw.Flush();
+            bw.Close();
+
+            return new ImageInfo(msx.ToArray(), data);
         }
 
         public static ImageHeader GetImageHeader(byte[] data)
@@ -153,10 +156,6 @@ namespace BurnoutImage
                     {
                         type = CompressionType.DXT1;
                     }
-                    else if (compression.Matches(new byte[] { 0x4A, 0x00, 0x00, 0x00 }))
-                    {
-                        type = CompressionType.DXT3;
-                    }
                     else if (compression.Matches(new byte[] { 0x4D, 0x00, 0x00, 0x00 }))
                     {
                         type = CompressionType.DXT5;
@@ -192,9 +191,6 @@ namespace BurnoutImage
                             case '1':
                                 type = CompressionType.DXT1;
                                 break;
-                            case '3':
-                                type = CompressionType.DXT3;
-                                break;
                             case '5':
                                 type = CompressionType.DXT5;
                                 break;
@@ -225,15 +221,11 @@ namespace BurnoutImage
 
                 if (header.CompressionType == CompressionType.DXT1)
                 {
-                    pixels = ImageUtil.DecompressImage(pixels, header.Width, header.Height, DXTCompression.DXT1);
-                }
-                else if (header.CompressionType == CompressionType.DXT3)
-                {
-                    pixels = ImageUtil.DecompressImage(pixels, header.Width, header.Height, DXTCompression.DXT3);
+                    pixels = ImageUtil.DecompressImage(pixels, header.Width, header.Height, CompressionFormat.Bc1);
                 }
                 else if (header.CompressionType == CompressionType.DXT5)
                 {
-                    pixels = ImageUtil.DecompressImage(pixels, header.Width, header.Height, DXTCompression.DXT5);
+                    pixels = ImageUtil.DecompressImage(pixels, header.Width, header.Height, CompressionFormat.Bc3);
                 }
 
                 DirectBitmap bitmap = new DirectBitmap(header.Width, header.Height);
@@ -254,18 +246,12 @@ namespace BurnoutImage
                             red = pixels[index + 2];
                             alpha = pixels[index + 3];
                         }
-                        else if (header.CompressionType == CompressionType.RGBA)
+                        else
                         {
                             red = pixels[index + 0];
                             green = pixels[index + 1];
                             blue = pixels[index + 2];
                             alpha = pixels[index + 3];
-                        } else 
-                        {
-                            alpha = pixels[index + 0];
-                            red = pixels[index + 1];
-                            green = pixels[index + 2];
-                            blue = pixels[index + 3];
                         }
 
                         Color color = Color.FromArgb(alpha, red, green, blue);
@@ -317,15 +303,11 @@ namespace BurnoutImage
 
                     if (type == CompressionType.DXT1)
                     {
-                        pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT1);
-                    }
-                    else if (type == CompressionType.DXT3)
-                    {
-                        pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT3);
+                        pixels = ImageUtil.DecompressImage(pixels, width, height, CompressionFormat.Bc1);
                     }
                     else if (type == CompressionType.DXT5)
                     {
-                        pixels = ImageUtil.DecompressImage(pixels, width, height, DXTCompression.DXT5);
+                        pixels = ImageUtil.DecompressImage(pixels, width, height, CompressionFormat.Bc3);
                     }
 
                     DirectBitmap bitmap = new DirectBitmap(width, height);
@@ -379,12 +361,11 @@ namespace BurnoutImage
 
     public enum CompressionType
     {
+        UNKNOWN,
         RGBA,
         ARGB,
         BGRA,
         DXT1,
-        DXT3,
-        DXT5,
-        UNKNOWN
+        DXT5
     }
 }

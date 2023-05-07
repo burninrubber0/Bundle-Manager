@@ -1,108 +1,21 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D1395FDE-6A64-4D9F-9DCA-60825BD0A43C}</ProjectGuid>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
-    <RootNamespace>LuaList</RootNamespace>
-    <AssemblyName>LuaList</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
+    <ProjectReference Include="..\BundleFormat\BundleFormat.csproj" />
+    <ProjectReference Include="..\BundleUtilities\BundleUtilities.csproj" />
+    <ProjectReference Include="..\PluginAPI\PluginAPI.csproj" />
+    <ProjectReference Include="..\VehicleList\VehicleList.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="LuaList.cs" />
-    <Compile Include="LuaListEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="LuaListEditor.Designer.cs">
-      <DependentUpon>LuaListEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="LuaListEntry.cs" />
-    <Compile Include="LuaListPlugin.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="EncryptedStringConverter.cs" />
-    <EmbeddedResource Include="LuaListEditor.resx">
-      <DependentUpon>LuaListEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BundleFormat\BundleFormat.csproj">
-      <Project>{49b81828-760c-42db-9fad-96755597c871}</Project>
-      <Name>BundleFormat</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BundleUtilities\BundleUtilities.csproj">
-      <Project>{34471573-f236-4a7c-abd9-c1fe4686b37e}</Project>
-      <Name>BundleUtilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PluginAPI\PluginAPI.csproj">
-      <Project>{757f0204-f091-464d-aa42-fe8919ff73bb}</Project>
-      <Name>PluginAPI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VehicleList\VehicleList.csproj">
-      <Project>{557FC08F-7ACD-44D7-AC1F-FB815A267A36}</Project>
-      <Name>VehicleList</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)BundleManager\bin\$(ConfigurationName)\plugins\" /s /e /y</PostBuildEvent>
-  </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)BundleManager\bin\$(ConfigurationName)\$(TargetFramework)\plugins\&quot; /s /e /y" />
+  </Target>
 </Project>

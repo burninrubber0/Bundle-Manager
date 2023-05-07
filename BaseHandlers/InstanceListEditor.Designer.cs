@@ -1,4 +1,4 @@
-﻿namespace BaseHandlers
+namespace BaseHandlers
 {
     partial class InstanceListEditor
     {
@@ -90,8 +90,6 @@
             this.lstMain.TabIndex = 2;
             this.lstMain.UseCompatibleStateImageBehavior = false;
             this.lstMain.View = System.Windows.Forms.View.Details;
-            this.lstMain.ColumnWidthChanged += new System.Windows.Forms.ColumnWidthChangedEventHandler(this.LstMain_ColumnWidthChanged);
-            this.lstMain.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.LstMain_ColumnWidthChanging);
             this.lstMain.SizeChanged += new System.EventHandler(this.LstMain_SizeChanged);
             this.lstMain.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.LstMain_MouseDoubleClick);
             // 

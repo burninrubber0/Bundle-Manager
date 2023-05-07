@@ -1,89 +1,43 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{20E7A1C4-AFCD-4B8A-8AEF-06B0C27E72B7}</ProjectGuid>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LangEditor</RootNamespace>
-    <AssemblyName>LangEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <ProjectReference Include="..\BundleFormat\BundleFormat.csproj" />
+    <ProjectReference Include="..\BundleUtilities\BundleUtilities.csproj" />
+    <ProjectReference Include="..\PluginAPI\PluginAPI.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InputDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="InputDialog.Designer.cs">
-      <DependentUpon>InputDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="LangEdit.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="LangEdit.Designer.cs">
-      <DependentUpon>LangEdit.cs</DependentUpon>
-    </Compile>
-    <Compile Include="LangPlugin.cs" />
-    <Compile Include="Language.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Update="keys\_all.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\ids\challenges.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\ids\drivethrus.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\ids\events.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\ids\roads.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\ids\vehicles.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\keys.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="keys\unsorted.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="InputDialog.resx">
-      <DependentUpon>InputDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="LangEdit.resx">
-      <DependentUpon>LangEdit.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BundleFormat\BundleFormat.csproj">
-      <Project>{49b81828-760c-42db-9fad-96755597c871}</Project>
-      <Name>BundleFormat</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BundleUtilities\BundleUtilities.csproj">
-      <Project>{34471573-f236-4a7c-abd9-c1fe4686b37e}</Project>
-      <Name>BundleUtilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PluginAPI\PluginAPI.csproj">
-      <Project>{757F0204-F091-464D-AA42-FE8919FF73BB}</Project>
-      <Name>PluginAPI</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)BundleManager\bin\$(ConfigurationName)\plugins\" /s /e /y</PostBuildEvent>
-  </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)BundleManager\bin\$(ConfigurationName)\$(TargetFramework)\plugins\&quot; /s /e /y" />
+  </Target>
 </Project>

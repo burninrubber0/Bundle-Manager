@@ -1,12 +1,5 @@
-﻿using OpenTK;
-using System;
-using System.Collections.Generic;
+using OpenTK.Mathematics;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MathLib
 {

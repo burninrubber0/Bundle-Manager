@@ -1,12 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
-using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,7 +7,6 @@ using BundleFormat;
 using BundleUtilities;
 using DebugHelper;
 using PluginAPI;
-using Util = BundleFormat.Util;
 
 namespace BundleManager
 {
@@ -77,14 +69,12 @@ namespace BundleManager
                     SetArchive method = (BundleArchive archive) =>
                     {
                         _archive = archive;
-                        Task.Run(() => UpdateDisplay());
                     };
                     Invoke(method, value);
                 }
                 else
                 {
                     _archive = value;
-                    UpdateDisplay();
                 }
             }
         }
@@ -119,14 +109,12 @@ namespace BundleManager
                     SetString method = (string filename) =>
                     {
                         _currentFileName = filename;
-                        //Task.Run(() => UpdateDisplay());
                     };
                     Invoke(method, value);
                 }
                 else
                 {
                     _currentFileName = value;
-                    UpdateDisplay();
                 }
             }
         }
@@ -170,13 +158,21 @@ namespace BundleManager
             lstEntries.BeginUpdate();
             lstEntries.ListViewItemSorter = null; // Disable sorting while adding
 
-            for (int i = 0; i < CurrentArchive.Entries.Count; i++)
+            foreach (BundleEntry entry in CurrentArchive.Entries)
             {
-                BundleEntry entry = CurrentArchive.Entries[i];
-                Color color = entry.GetColor();
+                if (entry.EntryBlocks[0].Data == null) // Exception occurred
+                {
+                    lstEntries.Items.Clear();
+                    lstEntries.Enabled = false;
+                    CurrentArchive = null;
+                    CurrentFileName = null;
+                    lstEntries.EndUpdate();
+                    UpdatePluginMenu();
+                    return;
+                }
                 string[] values = new string[]
                 {
-                    i.ToString("d3"),
+                    entry.Index.ToString("d3"),
                     entry.DetectName(),
                     "0x" + entry.ID.ToString("X8"),
                     entry.Type.ToString(),
@@ -185,7 +181,7 @@ namespace BundleManager
                 };
 
                 ListViewItem item = new ListViewItem(values);
-                item.BackColor = color;
+                item.BackColor = entry.GetColor();
                 lstEntries.Items.Add(item);
             }
 
@@ -280,7 +276,7 @@ namespace BundleManager
         {
             if (cancelled)
             {
-                _openSaveThread?.Abort();
+                _openSaveThread?.Interrupt();
                 CurrentArchive = null;
                 CurrentFileName = null;
             }
@@ -358,6 +354,7 @@ namespace BundleManager
 
                 CurrentFileName = sfd.FileName;
                 Text = "Bundle Manager - " + CurrentFileName;
+                UpdateDisplay();
 
                 return true;
             }
@@ -368,7 +365,7 @@ namespace BundleManager
         {
             if (cancelled)
             {
-                _openSaveThread?.Abort();
+                _openSaveThread?.Interrupt();
             } else
             {
                 CurrentArchive.Dirty = false;
@@ -431,7 +428,7 @@ namespace BundleManager
                 loader.Done += (cancelled, value) =>
                 {
                     if (cancelled)
-                        loadInstanceThread?.Abort();
+                        loadInstanceThread?.Interrupt();
                     else
                     {
                         if (failure)
@@ -671,6 +668,7 @@ namespace BundleManager
 
             CurrentArchive = null;
             CurrentFileName = null;
+            UpdateDisplay();
 
             Hide();
             Program.folderModeForm.Show();

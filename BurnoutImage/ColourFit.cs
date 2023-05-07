@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BCnEncoder.Shared;
 
 namespace BurnoutImage
 {
     internal abstract class ColourFit
     {
         protected ColourSet Colours;
-        protected DXTCompression Compression;
+        protected CompressionFormat Compression;
 
-        public ColourFit(ColourSet colours, DXTCompression compression)
+        public ColourFit(ColourSet colours, CompressionFormat compression)
         {
             Colours = colours;
             Compression = compression;
@@ -19,7 +15,7 @@ namespace BurnoutImage
 
         public void Compress(byte[] block, int offset)
         {
-            bool isDxt1 = Compression == DXTCompression.DXT1;
+            bool isDxt1 = Compression == CompressionFormat.Bc1;
             if (isDxt1)
             {
                 Compress3(block, offset);

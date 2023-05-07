@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.IO;
-using System.IO.Compression;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using ManagedZLib;
-using System.Runtime.InteropServices;
-using BundleUtilities;
+using Ionic.Zlib;
 
 namespace BundleFormat
 {
@@ -45,33 +39,27 @@ namespace BundleFormat
 
         public static byte[] Compress(this byte[] self)
         {
-            return ZLib.Compress(self, ZLib.CompressionLevels.BEST_COMPRESSION);
+            byte[] compressedData = new byte[self.Length]; // Size not known yet, use uncompressed size as upper bound
+            ZlibStream zlibStream = new ZlibStream(new MemoryStream(self), CompressionMode.Compress, CompressionLevel.BestCompression);
+            zlibStream.Read(compressedData, 0, self.Length);
+            return new ArraySegment<byte>(compressedData, 0, (int)zlibStream.TotalOut).ToArray(); // Size known, return correctly sized segment
         }
         
         public static byte[] Decompress(this byte[] self, int uncompressedSize)
         {
-            return ZLib.Uncompress(self, uncompressedSize);
-        }
-
-        /*public static byte[] Decompress(this byte[] self)
-        {
-            MemoryStream ms = new MemoryStream(self);
-            int cmagic1 = ms.ReadByte();
-            int cmagic2 = ms.ReadByte();
-
-            if (cmagic1 != 0x78 || cmagic2 != 0xDA)
+            byte[] uncompressedData = new byte[uncompressedSize];
+            ZlibStream zlibStream = new ZlibStream(new MemoryStream(uncompressedData), CompressionMode.Decompress);
+            try
+            {
+                zlibStream.Write(self, 0, self.Length);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), e.Source, MessageBoxButtons.OK);
                 return null;
-
-            DeflateStream ds = new DeflateStream(ms, CompressionMode.Decompress);
-
-            MemoryStream ms2 = new MemoryStream();
-            ds.CopyTo(ms2);
-            ds.Close();
-
-            byte[] result = ms2.ToArray();
-            ms2.Close();
-            return result;
-        }*/
+            }
+            return uncompressedData;
+        }
 
         public static bool Matches(this byte[] self, byte[] other)
         {
@@ -106,13 +94,11 @@ namespace BundleFormat
 
         public static void Align(this BinaryWriter self, byte alignment)
         {
+            if (self.BaseStream.Position % alignment == 0)
+                return;
             self.BaseStream.Position = alignment * ((self.BaseStream.Position + (alignment - 1)) / alignment);
             self.BaseStream.Position--;
             self.Write((byte)0);
-
-            /*long currentOffset = self.BaseStream.Position;
-            for (int i = 0; i < (alignment - (currentOffset % alignment)); i++)
-                self.Write((byte)0);*/
         }
     }
 }

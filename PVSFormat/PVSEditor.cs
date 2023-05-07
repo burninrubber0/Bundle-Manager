@@ -1,6 +1,5 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.Windows.Forms;
-using BundleFormat;
 using DebugHelper;
 using PluginAPI;
 

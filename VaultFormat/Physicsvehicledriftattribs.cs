@@ -55,42 +55,44 @@ namespace VaultFormat
 
         public int getDataSize()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(DriftScaleToYawTorque.toBytes());
-            bytes.Add(BitConverter.GetBytes(WheelSlip));
-            bytes.Add(BitConverter.GetBytes(TimeToCapScale));
-            bytes.Add(BitConverter.GetBytes(TimeForNaturalDrift));
-            bytes.Add(BitConverter.GetBytes(SteeringDriftScaleFactor));
-            bytes.Add(BitConverter.GetBytes(SideForcePeakDriftAngle));
-            bytes.Add(BitConverter.GetBytes(SideForceMagnitude));
-            bytes.Add(BitConverter.GetBytes(SideForceDriftSpeedCutOff));
-            bytes.Add(BitConverter.GetBytes(SideForceDriftAngleCutOff));
-            bytes.Add(BitConverter.GetBytes(SideForceDirftScaleCutOff));
-            bytes.Add(BitConverter.GetBytes(NeutralTimeToReduceDrift));
-            bytes.Add(BitConverter.GetBytes(NaturalYawTorqueCutOffAngle));
-            bytes.Add(BitConverter.GetBytes(NaturalYawTorque));
-            bytes.Add(BitConverter.GetBytes(NaturalDriftTimeToReachBaseSlip));
-            bytes.Add(BitConverter.GetBytes(NaturalDriftStartSlip));
-            bytes.Add(BitConverter.GetBytes(NaturalDriftScaleDecay));
-            bytes.Add(BitConverter.GetBytes(MinSpeedForDrift));
-            bytes.Add(BitConverter.GetBytes(InitialDriftPushTime));
-            bytes.Add(BitConverter.GetBytes(InitialDriftPushScaleLimit));
-            bytes.Add(BitConverter.GetBytes(InitialDriftPushDynamicInc));
-            bytes.Add(BitConverter.GetBytes(InitialDriftPushBaseInc));
-            bytes.Add(BitConverter.GetBytes(GripFromSteering));
-            bytes.Add(BitConverter.GetBytes(GripFromGasLetOff));
-            bytes.Add(BitConverter.GetBytes(GripFromBrake));
-            bytes.Add(BitConverter.GetBytes(GasDriftScaleFactor));
-            bytes.Add(BitConverter.GetBytes(ForcedDriftTimeToReachBaseSlip));
-            bytes.Add(BitConverter.GetBytes(ForcedDriftStartSlip));
-            bytes.Add(BitConverter.GetBytes(DriftTorqueFallOff));
-            bytes.Add(BitConverter.GetBytes(DriftSidewaysDamping));
-            bytes.Add(BitConverter.GetBytes(DriftMaxAngle));
-            bytes.Add(BitConverter.GetBytes(DriftAngularDamping));
-            bytes.Add(BitConverter.GetBytes(CounterSteeringDriftScaleFactor));
-            bytes.Add(BitConverter.GetBytes(CappedScale));
-            bytes.Add(BitConverter.GetBytes(BrakingDriftScaleFactor));
-            bytes.Add(BitConverter.GetBytes(BaseCounterSteeringDriftScaleFactor));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                DriftScaleToYawTorque.toBytes(),
+                BitConverter.GetBytes(WheelSlip),
+                BitConverter.GetBytes(TimeToCapScale),
+                BitConverter.GetBytes(TimeForNaturalDrift),
+                BitConverter.GetBytes(SteeringDriftScaleFactor),
+                BitConverter.GetBytes(SideForcePeakDriftAngle),
+                BitConverter.GetBytes(SideForceMagnitude),
+                BitConverter.GetBytes(SideForceDriftSpeedCutOff),
+                BitConverter.GetBytes(SideForceDriftAngleCutOff),
+                BitConverter.GetBytes(SideForceDirftScaleCutOff),
+                BitConverter.GetBytes(NeutralTimeToReduceDrift),
+                BitConverter.GetBytes(NaturalYawTorqueCutOffAngle),
+                BitConverter.GetBytes(NaturalYawTorque),
+                BitConverter.GetBytes(NaturalDriftTimeToReachBaseSlip),
+                BitConverter.GetBytes(NaturalDriftStartSlip),
+                BitConverter.GetBytes(NaturalDriftScaleDecay),
+                BitConverter.GetBytes(MinSpeedForDrift),
+                BitConverter.GetBytes(InitialDriftPushTime),
+                BitConverter.GetBytes(InitialDriftPushScaleLimit),
+                BitConverter.GetBytes(InitialDriftPushDynamicInc),
+                BitConverter.GetBytes(InitialDriftPushBaseInc),
+                BitConverter.GetBytes(GripFromSteering),
+                BitConverter.GetBytes(GripFromGasLetOff),
+                BitConverter.GetBytes(GripFromBrake),
+                BitConverter.GetBytes(GasDriftScaleFactor),
+                BitConverter.GetBytes(ForcedDriftTimeToReachBaseSlip),
+                BitConverter.GetBytes(ForcedDriftStartSlip),
+                BitConverter.GetBytes(DriftTorqueFallOff),
+                BitConverter.GetBytes(DriftSidewaysDamping),
+                BitConverter.GetBytes(DriftMaxAngle),
+                BitConverter.GetBytes(DriftAngularDamping),
+                BitConverter.GetBytes(CounterSteeringDriftScaleFactor),
+                BitConverter.GetBytes(CappedScale),
+                BitConverter.GetBytes(BrakingDriftScaleFactor),
+                BitConverter.GetBytes(BaseCounterSteeringDriftScaleFactor)
+            };
             Console.WriteLine(bytes.SelectMany(i => i).Count());
             return CountingUtilities.AddPadding(bytes);
         }

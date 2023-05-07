@@ -1,4 +1,4 @@
-﻿using BundleUtilities;
+using BundleUtilities;
 using System;
 using System.Windows.Forms;
 
@@ -69,10 +69,6 @@ namespace BundleUtilities
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            /*if (Done != null)
-            {
-                Done(shouldCancel);
-            }*/
             Close();
         }
 

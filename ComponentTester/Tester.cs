@@ -1,14 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using StandardExtension;
 
 namespace ComponentTester
 {
@@ -66,21 +60,6 @@ namespace ComponentTester
         {
             Application.Exit();
         }
-
-        /*private void Tester_Load(object sender, EventArgs e)
-        {
-            if (!File.Exists("test.bin"))
-            {
-                //byte[] msg = Encoding.ASCII.GetBytes("Missing Data!");
-                return;
-            }*/
-            /*Stream s = File.Open("test.bin", FileMode.Open);
-            BinaryReader br = new BinaryReader(s);
-            byte[] data = br.ReadToEnd();
-            br.Close();
-
-            hexView1.HexData = data;
-        }*/
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {

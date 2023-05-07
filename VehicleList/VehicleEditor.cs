@@ -1,14 +1,5 @@
 using BundleUtilities;
 using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace VehicleList
@@ -239,8 +230,7 @@ namespace VehicleList
             }
 
             // Damage limit
-            float damageLimit;
-            if (float.TryParse(txtDamageLimit.Text, out damageLimit))
+            if (float.TryParse(txtDamageLimit.Text, out float damageLimit))
             {
                 result.DamageLimit = damageLimit;
             }
@@ -272,8 +262,7 @@ namespace VehicleList
             }
 
             // Boost length
-            byte boostLength;
-            if (byte.TryParse(txtBoostLength.Text, out boostLength))
+            if (byte.TryParse(txtBoostLength.Text, out byte boostLength))
             {
                 result.BoostLength = boostLength;
             }
@@ -284,8 +273,7 @@ namespace VehicleList
             }
 
             // Rank
-            byte rank;
-            if (byte.TryParse(cboRank.SelectedIndex.ToString(), out rank))
+            if (byte.TryParse(cboRank.SelectedIndex.ToString(), out byte rank))
             {
                 result.VehicleRank = (VehicleRank)rank;
             }
@@ -296,8 +284,7 @@ namespace VehicleList
             }
 
             // Boost capacity
-            byte boostCapacity;
-            if (byte.TryParse(txtBoostCapacity.Text, out boostCapacity))
+            if (byte.TryParse(txtBoostCapacity.Text, out byte boostCapacity))
             {
                 result.BoostCapacity = boostCapacity;
             }
@@ -308,8 +295,7 @@ namespace VehicleList
             }
 
             // Strength stat
-            byte displayStrength;
-            if (byte.TryParse(txtStrengthStat.Text, out displayStrength))
+            if (byte.TryParse(txtStrengthStat.Text, out byte displayStrength))
             {
                 result.DisplayStrength = displayStrength;
             }
@@ -320,8 +306,7 @@ namespace VehicleList
             }
 
             // AttribSys ID
-            long attribsysId;
-            if (long.TryParse(txtAttribSysCollectionKey.Text, out attribsysId))
+            if (long.TryParse(txtAttribSysCollectionKey.Text, out long attribsysId))
             {
                 result.AttribSysCollectionKey = attribsysId;
             }
@@ -349,8 +334,7 @@ namespace VehicleList
             }
 
             // Exhaust ID
-            long group1;
-            if (long.TryParse(txtExhaustID.Text, out group1))
+            if (long.TryParse(txtExhaustID.Text, out long group1))
             {
                 result.ExhaustID = group1;
             }
@@ -361,8 +345,7 @@ namespace VehicleList
             }
 
             // Engine ID
-            long group2;
-            if (long.TryParse(txtEngineID.Text, out group2))
+            if (long.TryParse(txtEngineID.Text, out long group2))
             {
                 result.EngineID = group2;
             }
@@ -390,8 +373,7 @@ namespace VehicleList
             }
 
             // Class unlock stream hash
-            uint classUnlock;
-            if (uint.TryParse(cboClassUnlock.SelectedIndex.ToString(), out classUnlock))
+            if (uint.TryParse(cboClassUnlock.SelectedIndex.ToString(), out uint classUnlock))
             {
                 switch (classUnlock)
                 {
@@ -423,8 +405,7 @@ namespace VehicleList
             }
 
             // Car won stream ID
-            long carWon;
-            if (long.TryParse(txtCarWon.Text, out carWon))
+            if (long.TryParse(txtCarWon.Text, out long carWon))
             {
                 result.CarShutdownStreamID = carWon;
             }
@@ -435,8 +416,7 @@ namespace VehicleList
             }
 
             // Car released stream ID
-            long carReleased;
-            if (long.TryParse(txtCarReleased.Text, out carReleased))
+            if (long.TryParse(txtCarReleased.Text, out long carReleased))
             {
                 result.CarReleasedStreamID = carReleased;
             }
@@ -447,8 +427,7 @@ namespace VehicleList
             }
 
             // AI music loop stream hash
-            uint aiMusic;
-            if (uint.TryParse(cboAIMusic.SelectedIndex.ToString(), out aiMusic))
+            if (uint.TryParse(cboAIMusic.SelectedIndex.ToString(), out uint aiMusic))
             {
                 switch (aiMusic)
                 {
@@ -483,8 +462,7 @@ namespace VehicleList
             }
 
             // AI exhuast index
-            byte aiEx1;
-            if (byte.TryParse(cboAIExhaust1.SelectedIndex.ToString(), out aiEx1))
+            if (byte.TryParse(cboAIExhaust1.SelectedIndex.ToString(), out byte aiEx1))
             {
                 result.AIExhaustIndex = (AIExhaustIndex)aiEx1;
             }
@@ -495,8 +473,7 @@ namespace VehicleList
             }
 
             // AI exhuast index 2
-            byte aiEx2;
-            if (byte.TryParse(cboAIExhaust2.SelectedIndex.ToString(), out aiEx2))
+            if (byte.TryParse(cboAIExhaust2.SelectedIndex.ToString(), out byte aiEx2))
             {
                 result.AIExhaustIndex2 = (AIExhaustIndex)aiEx2;
             }
@@ -507,8 +484,7 @@ namespace VehicleList
             }
 
             // AI exhuast index 3
-            byte aiEx3;
-            if (byte.TryParse(cboAIExhaust3.SelectedIndex.ToString(), out aiEx3))
+            if (byte.TryParse(cboAIExhaust3.SelectedIndex.ToString(), out byte aiEx3))
             {
                 result.AIExhaustIndex3 = (AIExhaustIndex)aiEx3;
             }
@@ -538,8 +514,7 @@ namespace VehicleList
             }
 
             // Vehicle type
-            int vehType;
-            if (int.TryParse(cboVehicleType.SelectedIndex.ToString(), out vehType))
+            if (int.TryParse(cboVehicleType.SelectedIndex.ToString(), out int vehType))
             {
                 result.VehicleType = (VehicleType)vehType;
             }
@@ -550,8 +525,7 @@ namespace VehicleList
             }
 
             // Boost type
-            byte boostType;
-            if (byte.TryParse(cboBoostType.SelectedIndex.ToString(), out boostType))
+            if (byte.TryParse(cboBoostType.SelectedIndex.ToString(), out byte boostType))
             {
                 result.BoostType = (BoostType)boostType;
             }
@@ -562,8 +536,7 @@ namespace VehicleList
             }
 
             // Finish type
-            byte finishType;
-            if (byte.TryParse(cboFinishType.SelectedIndex.ToString(), out finishType))
+            if (byte.TryParse(cboFinishType.SelectedIndex.ToString(), out byte finishType))
             {
                 result.FinishType = (FinishType)cboFinishType.SelectedIndex;
             }
@@ -574,8 +547,7 @@ namespace VehicleList
             }
 
             // Max speed
-            byte maxSpeed;
-            if (byte.TryParse(txtMaxSpeed.Text, out maxSpeed))
+            if (byte.TryParse(txtMaxSpeed.Text, out byte maxSpeed))
             {
                 result.MaxSpeedNoBoost = maxSpeed;
             }
@@ -586,8 +558,7 @@ namespace VehicleList
             }
 
             // Max boost speed
-            byte maxBoostSpeed;
-            if (byte.TryParse(txtMaxBoostSpeed.Text, out maxBoostSpeed))
+            if (byte.TryParse(txtMaxBoostSpeed.Text, out byte maxBoostSpeed))
             {
                 result.MaxSpeedBoost = maxBoostSpeed;
             }
@@ -598,8 +569,7 @@ namespace VehicleList
             }
 
             // Speed stat
-            byte displaySpeed;
-            if (byte.TryParse(txtSpeedStat.Text, out displaySpeed))
+            if (byte.TryParse(txtSpeedStat.Text, out byte displaySpeed))
             {
                 result.DisplaySpeed = displaySpeed;
             }
@@ -610,8 +580,7 @@ namespace VehicleList
             }
 
             // Boost stat
-            byte displayBoost;
-            if (byte.TryParse(txtBoostStat.Text, out displayBoost))
+            if (byte.TryParse(txtBoostStat.Text, out byte displayBoost))
             {
                 result.DisplayBoost = displayBoost;
             }
@@ -622,8 +591,7 @@ namespace VehicleList
             }
 
             // Color index
-            byte color;
-            if (byte.TryParse(txtColor.Text, out color))
+            if (byte.TryParse(txtColor.Text, out byte color))
             {
                 result.Color = color;
             }
@@ -634,8 +602,7 @@ namespace VehicleList
             }
 
             // Color type
-            byte colorType;
-            if (byte.TryParse(cboColorType.SelectedIndex.ToString(), out colorType))
+            if (byte.TryParse(cboColorType.SelectedIndex.ToString(), out byte colorType))
             {
                 result.ColorType = (ColorType)colorType;
             }

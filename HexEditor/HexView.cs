@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+using System;
 using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HexEditor
@@ -23,26 +19,12 @@ namespace HexEditor
                 _hexData = value;
                 if (_hexData != null)
                 {
-                    //Height = (_hexData.Length / 16) * 23 + 5;
                     vScroll.Minimum = 0;
                     vScroll.Maximum = _hexData.Length / 16;
                 }
                 Invalidate();
             }
         }
-
-        /*[Browsable(false)]
-        private Rectangle VisibleRect
-        {
-            get
-            {
-                int left = 0;
-                int right = Width;
-                int top = Height - vScroll.Value;
-                int bottom = top + Height;
-                return Rectangle.FromLTRB(left, top, right, bottom);
-            }
-        }*/
 
         private VScrollBar vScroll;
 
@@ -87,7 +69,6 @@ namespace HexEditor
                 val += 1;
             else if (delta > 0)
                 val -= 1;
-            //val -= delta;
             if (val < 0)
                 val = 0;
             else if (val > max)
@@ -103,8 +84,6 @@ namespace HexEditor
             base.OnPaint(e);
 
             Graphics g = e.Graphics;
-
-            //g.DrawLine(Pens.DarkGray, Width - 100, 0, Width - 100, Height);
 
             if (HexData == null)
                 return;
@@ -130,9 +109,6 @@ namespace HexEditor
 
                 float xP = x * stringWidth + padding;
                 float yP = (y * stringHeight + padding) - vScroll.Value * stringHeight;
-
-                //if (yP > Height || yP < 0)
-                //    continue;
 
                 PointF point = new PointF(xP, yP);
 

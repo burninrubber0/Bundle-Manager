@@ -33,21 +33,23 @@ namespace VaultFormat
 
         public int getDataSize()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(BitConverter.GetBytes(TimeForLock));
-            bytes.Add(BitConverter.GetBytes(StraightReactionBias));
-            bytes.Add(BitConverter.GetBytes(SpeedForMinAngle));
-            bytes.Add(BitConverter.GetBytes(SpeedForMaxAngle));
-            bytes.Add(BitConverter.GetBytes(MinAngle));
-            bytes.Add(BitConverter.GetBytes(MaxAngle));
-            bytes.Add(BitConverter.GetBytes(AiPidCoefficientP));
-            bytes.Add(BitConverter.GetBytes(AiPidCoefficientI));
-            bytes.Add(BitConverter.GetBytes(AiPidCoefficientDriftP));
-            bytes.Add(BitConverter.GetBytes(AiPidCoefficientDriftI));
-            bytes.Add(BitConverter.GetBytes(AiPidCoefficientDriftD));
-            bytes.Add(BitConverter.GetBytes(AiPidCoefficientD));
-            bytes.Add(BitConverter.GetBytes(AiMinLookAheadDistanceForDrift));
-            bytes.Add(BitConverter.GetBytes(AiLookAheadTimeForDrift));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                BitConverter.GetBytes(TimeForLock),
+                BitConverter.GetBytes(StraightReactionBias),
+                BitConverter.GetBytes(SpeedForMinAngle),
+                BitConverter.GetBytes(SpeedForMaxAngle),
+                BitConverter.GetBytes(MinAngle),
+                BitConverter.GetBytes(MaxAngle),
+                BitConverter.GetBytes(AiPidCoefficientP),
+                BitConverter.GetBytes(AiPidCoefficientI),
+                BitConverter.GetBytes(AiPidCoefficientDriftP),
+                BitConverter.GetBytes(AiPidCoefficientDriftI),
+                BitConverter.GetBytes(AiPidCoefficientDriftD),
+                BitConverter.GetBytes(AiPidCoefficientD),
+                BitConverter.GetBytes(AiMinLookAheadDistanceForDrift),
+                BitConverter.GetBytes(AiLookAheadTimeForDrift)
+            };
             // Hack, because of weird padding of suspension attribs
             bytes.AddRange(Physicsvehiclesuspensionattribs.getDefaultBytes());
             Console.WriteLine(bytes.SelectMany(i => i).Count());

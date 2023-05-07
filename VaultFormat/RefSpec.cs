@@ -23,20 +23,24 @@ namespace VaultFormat
 
         public byte[] ToBytes()
         {
-            List<byte[]> bytes = new List<byte[]>();
-            bytes.Add(BitConverter.GetBytes(ClassKey));
-            bytes.Add(BitConverter.GetBytes(CollectionKey));
-            bytes.Add(BitConverter.GetBytes(CollectionPtr));
+            List<byte[]> bytes = new List<byte[]>
+            {
+                BitConverter.GetBytes(ClassKey),
+                BitConverter.GetBytes(CollectionKey),
+                BitConverter.GetBytes(CollectionPtr)
+            };
             return AddPadding(bytes);
         }
 
         private byte[] AddPadding(List<byte[]> bytes)
         {
-            List<byte> padding = new List<byte>();
-            padding.Add((byte)0);
-            padding.Add((byte)0);
-            padding.Add((byte)0);
-            padding.Add((byte)0);
+            List<byte> padding = new List<byte>
+            {
+                0,
+                0,
+                0,
+                0
+            };
             bytes.Add(padding.ToArray());
             return bytes.SelectMany(i => i).ToArray();
         }

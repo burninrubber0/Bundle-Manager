@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
+using BCnEncoder.Shared;
 
 namespace BurnoutImage
 {
@@ -14,7 +11,7 @@ namespace BurnoutImage
         public int[] Remap;
         public bool Transparent;
 
-        public ColourSet(byte[] rgba, int mask, DXTCompression compression)
+        public ColourSet(byte[] rgba, int mask, CompressionFormat compression)
         {
             Count = 0;
             Transparent = false;
@@ -24,7 +21,7 @@ namespace BurnoutImage
             Remap = new int[16];
 
             // Check the compression mode for dxt1
-            bool isDxt1 = compression == DXTCompression.DXT1;
+            bool isDxt1 = compression == CompressionFormat.Bc1;
             bool weightByAlpha = false;
 
             // Create the minimal set

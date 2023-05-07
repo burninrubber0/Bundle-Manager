@@ -1,13 +1,7 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using BundleUtilities;
-using Microsoft.SqlServer.Server;
 
 namespace BundleFormat
 {
@@ -70,12 +64,6 @@ namespace BundleFormat
         public string Name;
         public string TypeName;
     }
-
-    /*public struct BundleReference
-    {
-        public string Path;
-        public uint EntryCount;
-    }*/
 
     public class BundleEntry
     {
@@ -352,166 +340,20 @@ namespace BundleFormat
                 case EntryType.Texture:
                     return Color.Orange;
                 case EntryType.Material:
-                    return Color.DeepPink;
-                case EntryType.TextFile:
-                    break;
-                case EntryType.VertexDescriptor:
-                    break;
+                    return Color.HotPink;
                 case EntryType.Renderable:
                     return Color.Aquamarine;
-                case EntryType.MaterialTechnique:
-                    break;
-                case EntryType.TextureState:
-                    break;
-                case EntryType.MaterialState:
-                    break;
-                case EntryType.ShaderProgramBuffer:
-                    break;
-                case EntryType.ShaderParameter:
-                    break;
-                case EntryType.Debug:
-                    break;
-                case EntryType.KdTree:
-                    break;
-                case EntryType.Snr:
-                    break;
-                case EntryType.AttribSysSchema:
-                    break;
-                case EntryType.AttribSysVault:
-                    break;
-                case EntryType.AptData:
-                    break;
-                case EntryType.Popup:
-                    break;
-                case EntryType.Font:
-                    break;
-                case EntryType.LuaCode:
-                    break;
                 case EntryType.InstanceList:
                     return Color.BlueViolet;
                 case EntryType.EntryList:
                     return Color.Tomato;
-                case EntryType.Language:
-                    break;
-                case EntryType.SatNavTile:
-                    break;
-                case EntryType.SatNavTileDirectory:
-                    break;
                 case EntryType.Model:
-                    return Color.Blue;
-                case EntryType.ColourCube:
-                    break;
-                case EntryType.HudMessage:
-                    break;
-                case EntryType.HudMessageList:
-                    break;
-                case EntryType.HudMessageSequence:
-                    break;
-                case EntryType.HudMessageSequenceDictionary:
-                    break;
-                case EntryType.WorldPainter2D:
-                    break;
-                case EntryType.PFXHookBundle:
-                    break;
-                case EntryType.ShaderTechnique:
-                    break;
-                case EntryType.ICETakeDictionary:
-                    break;
-                case EntryType.VideoData:
-                    break;
+                    return Color.Yellow;
                 case EntryType.PolygonSoupList:
                     return Color.Goldenrod;
-                case EntryType.CommsToolListDefinition:
-                    break;
-                case EntryType.CommsToolList:
-                    break;
-                case EntryType.AnimationCollection:
-                    break;
-                case EntryType.Registry:
-                    break;
-                case EntryType.GenericRwacWaveContent:
-                    break;
-                case EntryType.GinsuWaveContent:
-                    break;
-                case EntryType.AemsBank:
-                    break;
-                case EntryType.Csis:
-                    break;
-                case EntryType.Nicotine:
-                    break;
-                case EntryType.Splicer:
-                    break;
-                case EntryType.GenericRwacReverbIRContent:
-                    break;
-                case EntryType.SnapshotData:
-                    break;
-                case EntryType.ZoneList:
-                    break;
-                case EntryType.LoopModel:
-                    break;
-                case EntryType.AISections:
-                    break;
-                case EntryType.TrafficData:
-                    break;
-                case EntryType.TriggerData:
-                    break;
-                case EntryType.VehicleList:
-                    break;
                 case EntryType.GraphicsSpec:
                     return Color.SeaGreen;
-                case EntryType.ParticleDescriptionCollection:
-                    break;
-                case EntryType.WheelList:
-                    break;
-                case EntryType.WheelGraphicsSpec:
-                    break;
-                case EntryType.TextureNameMap:
-                    break;
-                case EntryType.ProgressionData:
-                    break;
-                case EntryType.PropPhysics:
-                    break;
-                case EntryType.PropGraphicsList:
-                    break;
-                case EntryType.PropInstanceData:
-                    break;
-                case EntryType.BrnEnvironmentKeyframe:
-                    break;
-                case EntryType.BrnEnvironmentTimeLine:
-                    break;
-                case EntryType.BrnEnvironmentDictionary:
-                    break;
-                case EntryType.GraphicsStub:
-                    break;
-                case EntryType.StaticSoundMap:
-                    break;
-                case EntryType.StreetData:
-                    break;
-                case EntryType.VFXMeshCollection:
-                    break;
-                case EntryType.MassiveLookupTable:
-                    break;
-                case EntryType.VFXPropCollection:
-                    break;
-                case EntryType.StreamedDeformation:
-                    break;
-                case EntryType.ParticleDescription:
-                    break;
-                case EntryType.PlayerCarColours:
-                    break;
-                case EntryType.ChallengeList:
-                    break;
-                case EntryType.FlaptFile:
-                    break;
-                case EntryType.ProfileUpgrade:
-                    break;
-                case EntryType.VehicleAnimation:
-                    break;
-                case EntryType.BodypartRemapData:
-                    break;
-                case EntryType.LUAList:
-                    break;
-                case EntryType.LUAScript:
+                default:
                     break;
             }
             return Color.Transparent;

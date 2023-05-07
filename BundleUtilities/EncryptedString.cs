@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BundleUtilities
 {
@@ -100,7 +96,6 @@ namespace BundleUtilities
                 buf[--index + 1] = c;
             }
             while (index >= 0);
-            //buf[12] = 0; // Not required in C#
 
             return buf;
         }

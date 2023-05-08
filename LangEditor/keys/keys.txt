@@ -5,7 +5,7 @@ CAR_CAPS_<fids/vehicles>
 CAR_MAN_<fids/vehicles>
 CAR_MAN_CAPS_<fids/vehicles>
 CREDITS_DETAIL_<r0-73>
-CREDITS_TITLE_<r0-59>
+CREDITS_TITLE_<r0-73>
 DT_LOC_<fids/drivethrus>
 DT_NAME_<fids/drivethrus>
 EV_<fids/events>

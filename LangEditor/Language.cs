@@ -92,7 +92,7 @@ namespace LangEditor
             {
                 bw.Write(langEntry.Key); // Hash
                 bw.Write(0); // Padding
-                bw.Write((uint)ms.Length); // String pointer
+                bw.Write(ms.Length); // String pointer
                 lastPos = ms.Position;
                 ms.Position = ms.Length;
                 bw.Write(langEntry.Value.ToCharArray()); // String data

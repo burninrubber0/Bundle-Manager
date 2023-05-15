@@ -12,6 +12,7 @@ EV_<fids/events>
 EV_<fids/events>_O
 EV_<fids/events>_O_CREATOR
 EV_<fids/events>_O_TITLECASE
+EV_<fids/events>_PRE
 EV_BIKE_<fids/events>
 FBCD_<fids/challenges>
 FBCD_<fids/challenges>_1

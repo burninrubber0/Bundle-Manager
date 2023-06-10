@@ -841,15 +841,14 @@ namespace BaseHandlers
             writer.Write(mpLandmarks.Count + mpGenericRegions.Count + mpBlackspots.Count + mpVFXBoxRegions.Count);
             writer.WriteUniquePadding(4); // padding
 
-            List<uint> TriggerRegionOffsets = new List<uint>();
-
             long currentPosition = writer.BaseStream.Position;
             writer.BaseStream.Position = LandmarkOffsetPosition;
             writer.Write((uint)currentPosition);
             writer.BaseStream.Position = currentPosition;
+            List<uint> landmarkOffsets = new List<uint>();
             foreach (Landmark landmark in mpLandmarks)
             {
-                TriggerRegionOffsets.Add((uint)writer.BaseStream.Position);
+                landmarkOffsets.Add((uint)writer.BaseStream.Position);
                 landmark.Write(writer);
             }
             writer.WritePadding();
@@ -872,7 +871,6 @@ namespace BaseHandlers
             foreach (GenericRegion region in mpGenericRegions)
             {
                 genericRegionOffsets.Add(region.mId, (uint)writer.BaseStream.Position);
-                TriggerRegionOffsets.Add((uint)writer.BaseStream.Position);
                 region.Write(writer);
             }
             writer.WritePadding();
@@ -891,9 +889,10 @@ namespace BaseHandlers
             writer.BaseStream.Position = BlackspotOffsetPosition;
             writer.Write((uint)currentPosition);
             writer.BaseStream.Position = currentPosition;
+            List<uint> blackspotOffsets = new List<uint>();
             foreach (Blackspot blackspot in mpBlackspots)
             {
-                TriggerRegionOffsets.Add((uint)writer.BaseStream.Position);
+                blackspotOffsets.Add((uint)writer.BaseStream.Position);
                 blackspot.Write(writer);
             }
             writer.WritePadding();
@@ -902,9 +901,10 @@ namespace BaseHandlers
             writer.BaseStream.Position = VFXBoxRegionsOffsetPosition;
             writer.Write((uint)currentPosition);
             writer.BaseStream.Position = currentPosition;
+            List<uint> vfxBoxRegionOffsets = new List<uint>();
             foreach (VFXBoxRegion region in mpVFXBoxRegions)
             {
-                TriggerRegionOffsets.Add((uint)writer.BaseStream.Position);
+                vfxBoxRegionOffsets.Add((uint)writer.BaseStream.Position);
                 region.Write(writer);
             }
             writer.WritePadding();
@@ -947,10 +947,10 @@ namespace BaseHandlers
             writer.BaseStream.Position = TriggerOffsetPosition;
             writer.Write((uint)currentPosition);
             writer.BaseStream.Position = currentPosition;
-            foreach (uint region in TriggerOffsets)
-            {
-                writer.Write(region);
-            }
+            foreach (uint region in vfxBoxRegionOffsets) writer.Write(region);
+            foreach (uint region in blackspotOffsets) writer.Write(region);
+            foreach (uint region in genericRegionOffsets.Values) writer.Write(region);
+            foreach (uint region in landmarkOffsets) writer.Write(region);
 
             currentPosition = writer.BaseStream.Position;
             writer.BaseStream.Position = SizePosition;

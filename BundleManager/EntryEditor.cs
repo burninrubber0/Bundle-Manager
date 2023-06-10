@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -84,6 +85,76 @@ namespace BundleManager
                 if (tabList.SelectedTab.Controls.Count > 0)
                 {
                     tabList.SelectedTab.Controls[0].Focus();
+                }
+            }
+        }
+
+        private delegate byte[] GetDataHex();
+        private delegate void SetDataHex(byte[] hex);
+        private byte[] DataHex
+        {
+            get
+            {
+                if (hexData.InvokeRequired)
+                {
+                    GetDataHex method = () =>
+                    {
+                        return hexData.HexData;
+                    };
+                    return (byte[])Invoke(method);
+                }
+                else
+                {
+                    return hexData.HexData;
+                }
+            }
+            set
+            {
+                if (hexData.InvokeRequired)
+                {
+                    SetDataHex method = (byte[] hex) =>
+                    {
+                        hexData.HexData = hex;
+                    };
+                    Invoke(method, value);
+                }
+                else
+                {
+                    hexData.HexData = value;
+                }
+            }
+        }
+
+        private byte[] ExtraDataHex
+        {
+            get
+            {
+                if (hexExtraData.InvokeRequired)
+                {
+                    GetDataHex method = () =>
+                    {
+                        return hexExtraData.HexData;
+                    };
+                    return (byte[])Invoke(method);
+                }
+                else
+                {
+                    return hexExtraData.HexData;
+                }
+            }
+            set
+            {
+                if (hexExtraData.InvokeRequired)
+                {
+                    SetDataHex method = (byte[] hex) =>
+                    {
+                        hexExtraData.HexData = hex;
+                    };
+                    Invoke(method, value);
+                }
+                else
+                {
+                    hexExtraData.HexData = value;
                 }
             }
         }
@@ -403,6 +474,12 @@ namespace BundleManager
             TabsVisible = !ImageVisible;
             ImageMenuVisible = ImageVisible;
             BinaryMenuVisible = TabsVisible;
+
+            if (TabsVisible)
+            {
+                DataHex = _entry.EntryBlocks[0].Data;
+                ExtraDataHex = _entry.EntryBlocks[1].Data;
+            }
 
             MenuVisible = true;
 

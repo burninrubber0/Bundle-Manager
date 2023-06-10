@@ -41,7 +41,7 @@ namespace LangEditor
         public void GenerateDictionary()
         {
             dict = new Dictionary<uint, string>();
-            StreamReader keys = new StreamReader("keys/keys.txt", Encoding.UTF8);
+            StreamReader keys = new StreamReader(AppContext.BaseDirectory + "keys/keys.txt", Encoding.UTF8);
             string key;
             while ((key = keys.ReadLine()) != null)
             {

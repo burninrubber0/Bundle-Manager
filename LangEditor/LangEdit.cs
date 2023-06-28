@@ -49,7 +49,7 @@ namespace LangEditor
                 {
                     int subKeyFilePos = key.IndexOf("<f") + 2;
                     string subKeyFile = key.Substring(subKeyFilePos, key.IndexOf(">") - subKeyFilePos);
-                    StreamReader subKeys = new StreamReader("keys/" + subKeyFile + ".txt", Encoding.UTF8);
+                    StreamReader subKeys = new StreamReader(AppContext.BaseDirectory + "keys/" + subKeyFile + ".txt", Encoding.UTF8);
                     string subKey;
                     while ((subKey = subKeys.ReadLine()) != null)
                     {

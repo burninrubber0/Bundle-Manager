@@ -80,6 +80,12 @@ namespace VehicleList
 
             lstVehicles.ListViewItemSorter = new VehicleSorter(0);
             lstVehicles.Sort();
+
+            stlStatusLabel.Text = "";
+            copyItemToolStripMenuItem.Enabled = false;
+            deleteItemToolStripMenuItem.Enabled = false;
+            tsbCopyItem.Enabled = false;
+            tsbDeleteItem.Enabled = false;
         }
 
         private void EditSelectedEntry()
@@ -118,7 +124,7 @@ namespace VehicleList
 
         private void CopyItem()
         {
-            if (List == null || lstVehicles.SelectedItems.Count > 1
+            if (List == null || lstVehicles.SelectedItems.Count != 1
                 || lstVehicles.SelectedIndices.Count <= 0)
                 return;
 
@@ -131,6 +137,22 @@ namespace VehicleList
             editor.Vehicle = vehicle;
             editor.OnDone += Editor_OnDone1;
             editor.ShowDialog(this);
+        }
+
+        private void DeleteItem()
+        {
+            if (List == null || lstVehicles.SelectedItems.Count != 1
+                || lstVehicles.SelectedIndices.Count <= 0)
+                return;
+
+            if (!int.TryParse(lstVehicles.SelectedItems[0].Text, out int index))
+                return;
+            List.Entries.RemoveAt(index);
+            for (int i = index; i < List.Entries.Count; ++i)
+                List.Entries[i].Index--;
+
+            Edit?.Invoke();
+            UpdateDisplay();
         }
 
         private void Editor_OnDone1(Vehicle vehicle)
@@ -176,11 +198,14 @@ namespace VehicleList
         {
             EditSelectedEntry();
         }
-        
+
         private void lstVehicles_SelectedIndexChanged(object sender, EventArgs e)
         {
             stlStatusLabel.Text = lstVehicles.SelectedItems.Count + " Item(s) Selected";
+            copyItemToolStripMenuItem.Enabled = true;
+            deleteItemToolStripMenuItem.Enabled = true;
             tsbCopyItem.Enabled = true;
+            tsbDeleteItem.Enabled = true;
         }
 
         private void lstVehicles_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -276,6 +301,16 @@ namespace VehicleList
         private void tsbCopyItem_Click(object sender, EventArgs e)
         {
             CopyItem();
+        }
+
+        private void deleteItemToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DeleteItem();
+        }
+
+        private void tsbDeleteItem_Click(object sender, EventArgs e)
+        {
+            DeleteItem();
         }
     }
 }

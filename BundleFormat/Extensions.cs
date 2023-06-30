@@ -55,10 +55,48 @@ namespace BundleFormat
             }
             catch (Exception e)
             {
+                if (self[self.Length - 1] == 0
+                    && e.Message == "Bad state (incorrect data check)") // Likely a bugged resource
+                {
+                    uncompressedData = GetDataFromBadAlignedResource(self, uncompressedSize);
+                    if (uncompressedData != null)
+                        return uncompressedData;
+                }
                 MessageBox.Show(e.ToString(), e.Source, MessageBoxButtons.OK);
                 return null;
             }
             return uncompressedData;
+        }
+
+        // Validate resources from BM versions <0.3.0 where alignment corrupted the checksum
+        public static byte[] GetDataFromBadAlignedResource(byte[] original, int uncompressedSize)
+        {
+            // For some reason, the data validates when length is 1 less than it should be.
+            // Use this to get the correct uncompressed data.
+            byte[] uncompressedData = new byte[uncompressedSize];
+            ZlibStream zlibStream = new ZlibStream(new MemoryStream(uncompressedData), CompressionMode.Decompress);
+            byte[] trimmed = new ArraySegment<byte>(original, 0, original.Length - 1).ToArray();
+            try
+            {
+                zlibStream.Write(trimmed, 0, trimmed.Length);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            byte[] compressed = Compress(uncompressedData);
+
+            // Test first three checksum bytes
+            if (original[original.Length - 4] == compressed[compressed.Length - 4]
+                && original[original.Length - 3] == compressed[compressed.Length - 3]
+                && original[original.Length - 2] == compressed[compressed.Length - 2])
+            {
+                // Testing of data not necessary, likelihood of 24 bits matching without data matching is negligible
+                return uncompressedData;
+            }
+
+            return null;
         }
 
         public static bool Matches(this byte[] self, byte[] other)

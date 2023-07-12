@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Numerics;
 using System.Windows.Forms;
 
 namespace PVSFormat
@@ -26,10 +28,16 @@ namespace PVSFormat
         protected PointF CameraPosition;
         protected PointF RenderOffset => new PointF(-CameraPosition.X + ClientRectangle.Width / 2.0f, -CameraPosition.Y + ClientRectangle.Height / 2.0f);
         protected float MapSize => (RenderScale * 32);
-        protected bool isHand;
         protected bool isDragging;
         protected Point lastMouse;
         protected Point mousePos;
+
+        protected enum MapSectionType
+        {
+            Unloaded,
+            Current,
+            Neighbour
+        }
 
         protected PointF MousePosOnMap
         {
@@ -61,42 +69,58 @@ namespace PVSFormat
             CameraPosition = new Point(0, 0);
         }
 
-        protected override void OnKeyDown(KeyEventArgs e)
+        // Get zone ID for UI update
+        public ulong GetZoneId()
         {
-            if (e.KeyData == Keys.Space)
+            ulong id = ulong.MaxValue;
+            foreach (Zone zone in PVS.data.Zones)
             {
-                isHand = true;
-                UpdateCursor();
+                List<PointF> points = new();
+                foreach (Vector2 point in zone.Points)
+                    points.Add(new PointF(point.X, point.Y));
+                Polygon polygon = new Polygon(points);
+                if (MousePosOnMap.X >= polygon.MinX && MousePosOnMap.X < polygon.MaxX
+                    && MousePosOnMap.Y >= polygon.MinY && MousePosOnMap.Y < polygon.MaxY)
+                {
+                    id = zone.ZoneId;
+                    break;
+                }
             }
-            if (e.KeyData == Keys.Oemplus)
-            {
-                CameraPosition.X = 0;
-                CameraPosition.Y = 0;
-                Invalidate();
-            }
+            return id;
         }
 
-        protected override void OnKeyUp(KeyEventArgs e)
+        // Get zone index for UI update
+        public int GetZoneIndex(ulong zoneId)
         {
-            if (e.KeyData == Keys.Space)
-            {
-                isHand = false;
-                lastMouse = new Point(0, 0);
-            }
+            return PVS.data.Zones.FindIndex(z => z.ZoneId == zoneId);
+        }
 
-            UpdateCursor();
+        // Get zone info for UI update
+        public List<Vector2> GetZonePoints(ulong zoneId)
+        {
+            List<Vector2> points = new();
+            foreach (Vector2 point in PVS.data.Zones[GetZoneIndex(zoneId)].Points)
+                points.Add(new Vector2(point.X, point.Y));
+            return points;
+        }
+
+        // Get zone neighbours for UI update
+        public List<Neighbour> GetZoneNeighbours(ulong zoneId)
+        {
+            List<Neighbour> neighbours = new();
+            foreach (Neighbour neighbour in PVS.data.Zones[GetZoneIndex(zoneId)].UnsafeNeighbours)
+                neighbours.Add(neighbour);
+            return neighbours;
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
+            // Move the camera
             if (e.Button == MouseButtons.Left)
             {
                 lastMouse = e.Location;
 
-                if (isHand)
-                {
-                    isDragging = true;
-                }
+                isDragging = true;
             }
         }
 
@@ -109,11 +133,29 @@ namespace PVSFormat
             }
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            // Reset the camera
+            if (e.KeyData == Keys.R)
+            {
+                RenderScale = 1;
+                CameraPosition.X = 0;
+                CameraPosition.Y = 0;
+                Invalidate();
+            }
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            lastMouse = new Point(0, 0);
+        }
+
+        // Move the camera
         protected override void OnMouseMove(MouseEventArgs e)
         {
             mousePos = e.Location;
             Invalidate();
-            if (isHand && isDragging)
+            if (isDragging)
             {
                 Size difference = new Size(e.X - lastMouse.X, e.Y - lastMouse.Y);
                 lastMouse = new Point(e.X, e.Y);
@@ -123,6 +165,7 @@ namespace PVSFormat
             }
         }
 
+        // Zoom
         protected override void OnMouseWheel(MouseEventArgs e)
         {
             int wheelDelta = 120;
@@ -133,7 +176,7 @@ namespace PVSFormat
 
             if (RenderScale < 1)
             {
-                RenderScale = oldScale;
+                RenderScale = 1;
             }
             else if (RenderScale > 500)
             {
@@ -147,11 +190,6 @@ namespace PVSFormat
             }
 
             Invalidate();
-        }
-
-        protected void UpdateCursor()
-        {
-            Cursor = isHand ? Cursors.SizeAll : Cursors.Arrow;
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -194,20 +232,35 @@ namespace PVSFormat
                 return;
 
             // Draw all plates
-            for (int i = 0; i < PVS.Zones.Count; i++)
+            int selectedZoneIndex = PVS.data.Zones.FindIndex(z => z.ZoneId == PVS.selectedZoneId);
+            for (int i = 0; i < PVS.data.Zones.Count; i++)
             {
-                PVSZone plate = PVS.Zones[i];
+                Zone plate = PVS.data.Zones[i];
 
+                if (selectedZoneIndex != -1)
+                {
+                    if (i == selectedZoneIndex)
+                    {
+                        DrawMapSection(g, plate, MapSectionType.Current);
+                        continue;
+                    }
+                    if (PVS.data.Zones[selectedZoneIndex].UnsafeNeighbours.FindIndex(n => n.ZoneId == plate.ZoneId) != -1)
+                    {
+                        DrawMapSection(g, plate, MapSectionType.Neighbour);
+                        continue;
+                    }
+                }
+                
                 DrawMapSection(g, plate);
             }
         }
 
-        protected void DrawMapSection(Graphics g, PVSZone entry)
+        protected void DrawMapSection(Graphics g, Zone entry, MapSectionType type = MapSectionType.Unloaded)
         {
             PointF[] points = new PointF[entry.Points.Count];
             for (int i = 0; i < entry.Points.Count; i++)
             {
-                ZonePoint data = entry.Points[i];
+                Vector2 data = entry.Points[i];
                 points[i] = new PointF(data.X * Multiplier * RenderScale + RenderOffset.X, data.Y * Multiplier * RenderScale + RenderOffset.Y);
             }
 
@@ -216,8 +269,10 @@ namespace PVSFormat
 
             if (bounds.IntersectsWith(ClientRectangle))
             {
-
-                //g.FillPolygon(new SolidBrush(Color.IndianRed), points);
+                if (type == MapSectionType.Current)
+                    g.FillPolygon(new SolidBrush(Color.FromArgb(127, 255, 0, 0)), points); // Red
+                else if (type == MapSectionType.Neighbour)
+                    g.FillPolygon(new SolidBrush(Color.FromArgb(127, 255, 255, 0)), points); // Yellow
                 g.DrawPolygon(new Pen(Color.Cyan), points);
 
                 Font font;
@@ -241,7 +296,7 @@ namespace PVSFormat
                     }
                     float textScale = RenderScale / (Multiplier * 2) - times;
                     font = new Font(Font.FontFamily, textScale);
-                    infoText = entry.ZoneID.ToString();
+                    infoText = entry.ZoneId.ToString();
                     textSize = g.MeasureString(infoText, font);
 
                     times++;

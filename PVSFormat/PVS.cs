@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Numerics;
 using BundleFormat;
 using BundleUtilities;
 using BurnoutImage;
@@ -8,196 +10,122 @@ using PluginAPI;
 
 namespace PVSFormat
 {
-    public struct ZonePoint
+    public struct ZoneList
     {
-        public float X;
-        public float Y;
-        public int Padding1; // Padding???
-        public int Padding2; // Padding???
+        //public List<Vector2> Points; // Redundant; use Zones[zoneIndex].Points
+        public List<Zone> Zones;
+        //public List<uint> ZonePointStarts; // Per-zone start point index. Unnecessary as they are always sequential multiples of 4
+        //public List<short> ZonePointCounts; // Per-zone point count. Unnecessary as there are always 4 points
+        public uint TotalZones;
+        //public uint TotalPoints; // Unnecessary, calculated during writing
 
-        public override string ToString()
+        public ZoneList()
         {
-            return "X: " + X + ", Y: " + Y + ", Padding1: " + Padding1 + ", Padding2: " + Padding2;
+            Zones = new();
+            //ZonePointStarts = new();
+            //ZonePointCounts = new();
         }
     }
 
+    public struct Zone
+    {
+        public List<Vector2> Points;
+        //public List<Neighbour> SafeNeighbours; // Unnecessary, always empty
+        public List<Neighbour> UnsafeNeighbours;
+        public ulong ZoneId;
+        //public short ZoneType; // Unnecessary, always 0
+        //public short NumPoints; // Unnecessary, always 4
+        //public short NumSafeNeighbours; // Unnecessary, always 0
+        public short NumUnsafeNeighbours;
+        //public ulong Flags; // Unnecessary, always 0
+
+        public Zone()
+        {
+            Points = new();
+            for (int i = 0; i < 400; i += 100)
+                Points.Add(new(i % 200, i > 100 ? 0 : 100)); // 0x0,100x0,0x100,100x100
+            //SafeNeighbours = new();
+            UnsafeNeighbours = new();
+        }
+    }
+
+    public struct Neighbour
+    {
+        //Zone Zone; // Redundant, replaced by ZoneId
+        public ulong ZoneId; 
+        public NeighbourFlags Flags;
+    }
+
+    [Flags]
     public enum NeighbourFlags
     {
         E_RENDERFLAG_NONE = 0x0,
         E_NEIGHBOURFLAG_RENDER = 0x1,
-        E_NEIGHBOURFLAG_IMMEDIATE = 0x2,
-        E_NEIGHBOURFLAG_RENDER_IMMEDIATE = 0x3,
-    }
-
-    public struct ZoneNeighbour
-    {
-        public int NeighborIndex;
-        public uint NeighborPtr;
-        public NeighbourFlags Flags;
-        public int Padding1; // Padding???
-        public int Padding2; // Padding???
-
-        public override string ToString()
-        {
-            return "NeighborIndex: " + NeighborIndex + ", Type: " + Flags + ", Unk1: " + Padding1 + ", Unk2: " + Padding2;
-        }
-    }
-
-    public struct PVSZone
-    {
-        public uint Address;
-        public uint PointsPtr;
-        public uint SafeNeighboursPtr;
-        public uint UnsafeNeighboursPtr;
-        public uint Unknown;
-        public long ZoneID;
-        public short ZoneType;
-        public short NumPoints;
-        public short NumSafeNeighbours;
-        public short NumUnsafeNeighbours;
-        public int Flags;
-        public int Padding1; // Padding???
-        public int Padding2; // Padding???
-        public int Padding3; // Padding???
-
-        public List<ZonePoint> Points;
-        public List<ZoneNeighbour> UnsafeNeighbours;
-
-        public override string ToString()
-        {
-            return "ZoneID: " + ZoneID;
-        }
+        E_NEIGHBOURFLAG_IMMEDIATE = 0x2
     }
 
     public class PVS : IEntryData
     {
+        public ZoneList data;
+
         private Image _gameMap;
+        internal ulong selectedZoneId = ulong.MaxValue;
 
-        public uint PointsPtr;
-        public uint ZonePtr;
-        public uint ZonePointStart1;
-        public uint ZonePointStart2;
-        public uint ZonePointCount;
-        public uint TotalZones;
-        public uint TotalPoints;
-        public uint Padding; // Padding???
-        public List<PVSZone> Zones;
-
-        public PVS()
+        public bool Read(BundleEntry entry, ILoader loader = null)
         {
-            Zones = new List<PVSZone>();
-        }
+            data = new();
 
-        private void Clear()
-        {
-            PointsPtr = default;
-            ZonePtr = default;
-            ZonePointStart1 = default;
-            ZonePointStart2 = default;
-            ZonePointCount = default;
-            TotalZones = default;
-            TotalPoints = default;
-
-            Zones.Clear();
-        }
-
-        public bool Read(BundleEntry entry, ILoader loader)
-        {
-            Clear();
-
-            Stream s = entry.MakeStream();
-            BinaryReader2 br = new BinaryReader2(s);
+            BinaryReader2 br = new(entry.MakeStream());
             br.BigEndian = entry.Console;
 
-            PointsPtr = br.ReadUInt32();
-            ZonePtr = br.ReadUInt32();
+            // Get zone count
+            br.BaseStream.Position = 0x10;
+            data.TotalZones = br.ReadUInt32();
 
-            ZonePointStart1 = br.ReadUInt32();
-            ZonePointStart2 = br.ReadUInt32();
-
-            ZonePointCount = br.ReadUInt32();
-            TotalZones = br.ReadUInt32();
-            TotalPoints = br.ReadUInt32();
-            Padding = br.ReadUInt32();
-
-            for (uint i = 0; i < ZonePointCount; i++)
+            // Get zones
+            br.BaseStream.Position = 0x4;
+            br.BaseStream.Position = br.ReadUInt32();
+            long zonePos;
+            long unsafeNeighboursPos;
+            long unsafeNeighbourZonePos;
+            for (int i = 0; i < data.TotalZones; ++i)
             {
-                PVSZone pvsEntry = new PVSZone();
+                Zone zone = new();
+                zonePos = br.BaseStream.Position;
 
-                pvsEntry.Address = (uint)br.BaseStream.Position;
-                pvsEntry.PointsPtr = br.ReadUInt32();
-                pvsEntry.SafeNeighboursPtr = br.ReadUInt32();
-                pvsEntry.UnsafeNeighboursPtr = br.ReadUInt32();
-                pvsEntry.Unknown = br.ReadUInt32();
-                pvsEntry.ZoneID = br.ReadInt64();
-                pvsEntry.ZoneType = br.ReadInt16();
-                pvsEntry.NumPoints = br.ReadInt16();
-                pvsEntry.NumSafeNeighbours = br.ReadInt16();
-                pvsEntry.NumUnsafeNeighbours = br.ReadInt16();
-                pvsEntry.Flags = br.ReadInt32();
-                pvsEntry.Padding1 = br.ReadInt32();
-                pvsEntry.Padding2 = br.ReadInt32();
-                pvsEntry.Padding3 = br.ReadInt32();
-
-                long pos = br.BaseStream.Position;
-
-                br.BaseStream.Position = (long)pvsEntry.PointsPtr;
-
-                pvsEntry.Points = new List<ZonePoint>();
-                for (int j = 0; j < pvsEntry.NumPoints; j++)
+                // Get points
+                br.BaseStream.Position = br.ReadUInt32();
+                for (int j = 0; j < 4; ++j)
                 {
-                    ZonePoint data = new ZonePoint();
-
-                    data.X = br.ReadSingle();
-                    data.Y = br.ReadSingle();
-                    data.Padding1 = br.ReadInt32();
-                    data.Padding2 = br.ReadInt32();
-
-                    pvsEntry.Points.Add(data);
+                    zone.Points[j] = new(br.ReadSingle(), br.ReadSingle());
+                    br.SkipUniquePadding(8);
                 }
 
-                br.BaseStream.Position = (long) pvsEntry.UnsafeNeighboursPtr;
-
-                pvsEntry.UnsafeNeighbours = new List<ZoneNeighbour>();
-                for (int j = 0; j < pvsEntry.NumUnsafeNeighbours; j++)
+                // Get unsafe neighbours
+                br.BaseStream.Position = zonePos + 0x1E;
+                zone.NumUnsafeNeighbours = br.ReadInt16();
+                br.BaseStream.Position = zonePos + 8;
+                unsafeNeighboursPos = br.ReadUInt32();
+                for (int j = 0; j < zone.NumUnsafeNeighbours; ++j)
                 {
-                    ZoneNeighbour data = new ZoneNeighbour();
-
-                    data.NeighborIndex = -1;
-
-                    data.NeighborPtr = br.ReadUInt32();
-                    data.Flags = (NeighbourFlags)br.ReadInt32();
-                    data.Padding1 = br.ReadInt32();
-                    data.Padding2 = br.ReadInt32();
-
-                    pvsEntry.UnsafeNeighbours.Add(data);
+                    Neighbour neighbour = new();
+                    br.BaseStream.Position = unsafeNeighboursPos + 0x10 * j;
+                    unsafeNeighbourZonePos = br.ReadUInt32();
+                    neighbour.Flags = (NeighbourFlags)br.ReadUInt32();
+                    br.BaseStream.Position = unsafeNeighbourZonePos + 0x10;
+                    neighbour.ZoneId = br.ReadUInt64();
+                    zone.UnsafeNeighbours.Add(neighbour);
                 }
 
-                br.BaseStream.Position = pos;
+                // Get zone ID
+                br.BaseStream.Position = zonePos + 0x10;
+                zone.ZoneId = br.ReadUInt64();
+                br.BaseStream.Position += 0x18; // Seek to next zone
 
-                Zones.Add(pvsEntry);
-            }
-
-            for (int i = 0; i < Zones.Count; i++)
-            {
-                for (int k = 0; k < Zones[i].UnsafeNeighbours.Count; k++)
-                {
-                    ZoneNeighbour data = Zones[i].UnsafeNeighbours[k];
-                    uint ptr = data.NeighborPtr;
-                    for (int j = 0; j < Zones.Count; j++)
-                    {
-                        if (Zones[j].Address == ptr)
-                        {
-                            data.NeighborIndex = j;
-                            Zones[i].UnsafeNeighbours[k] = data;
-                            break;
-                        }
-                    }
-                }
+                data.Zones.Add(zone);
             }
 
             br.Close();
-            s.Close();
 
             _gameMap = GetGameMap(entry.Archive);
 
@@ -206,6 +134,109 @@ namespace PVSFormat
 
         public bool Write(BundleEntry entry)
         {
+            MemoryStream ms = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(ms);
+
+            // Update neighbours in case of zone deletion
+            for (int i = 0; i < data.TotalZones; ++i)
+            {
+                for (int j = 0; j < data.Zones[i].NumUnsafeNeighbours; ++j)
+                {
+                    if (data.Zones.FindIndex(z => z.ZoneId == data.Zones[i].UnsafeNeighbours[j].ZoneId) == -1)
+                    {
+                        Zone zone = data.Zones[i];
+                        zone.UnsafeNeighbours.RemoveAt(j);
+                        zone.NumUnsafeNeighbours--;
+                        data.Zones[i] = zone;
+                    }
+                }
+            }
+
+            // Get necessary information before writing
+            uint zonesPtr = 0x20;
+            uint zonesLength = data.TotalZones * 0x30;
+            uint neighboursPtr = zonesPtr + zonesLength;
+            uint neighborsLength = 0;
+            for (int i = 0; i < data.Zones.Count; ++i)
+                neighborsLength += (uint)data.Zones[i].NumUnsafeNeighbours * 0x10;
+            uint pointsPtr = neighboursPtr + neighborsLength;
+            uint pointsLength = (uint)(data.Zones.Count * 0x4 * 0x10);
+            uint zoneStartsPtr = pointsPtr + pointsLength;
+            uint zoneStartsLength = data.TotalZones * 0x4;
+            uint zoneCountsPtr = zoneStartsPtr + zoneStartsLength;
+            if (zoneCountsPtr % 0x10 != 0) // Align
+                zoneCountsPtr = (zoneCountsPtr & 0xFFFFFFF0) + 0x10;
+
+            // Write ZoneList
+            bw.Write(pointsPtr);
+            bw.Write(zonesPtr);
+            bw.Write(zoneStartsPtr);
+            bw.Write(zoneCountsPtr);
+            bw.Write(data.TotalZones);
+            bw.Write(data.TotalZones * 0x4);
+
+            // Write zones
+            uint neighboursPosition = 0;
+            for (int i = 0; i < data.TotalZones; ++i)
+            {
+                bw.BaseStream.Position = zonesPtr + i * 0x30;
+                bw.Write((uint)(pointsPtr + i * 0x4 * 0x10)); // Points
+                bw.Write(0); // Safe neighbours
+                if (data.Zones[i].NumUnsafeNeighbours == 0) // Unsafe neighbours
+                    bw.Write(0);
+                else
+                    bw.Write(neighboursPtr + neighboursPosition);
+                bw.Write(0); // Padding
+                bw.Write(data.Zones[i].ZoneId);
+                bw.Write((short)0); // Zone type
+                bw.Write((short)4); // Point count
+                bw.Write((short)0); // Safe neighbour count
+                bw.Write(data.Zones[i].NumUnsafeNeighbours); // Unsafe neighbour count
+                bw.Write(0); // Flags
+
+                // Write points
+                bw.BaseStream.Position = pointsPtr + i * 0x4 * 0x10;
+                for (int j = 0; j < 4; ++j)
+                {
+                    bw.Write(data.Zones[i].Points[j].X);
+                    bw.Write(data.Zones[i].Points[j].Y);
+                    bw.BaseStream.Position += 0x8;
+                }
+
+                // Write neighbours
+                bw.BaseStream.Position = neighboursPtr + neighboursPosition;
+                for (int j = 0; j < data.Zones[i].NumUnsafeNeighbours; ++j)
+                {
+                    ulong zoneId = data.Zones[i].UnsafeNeighbours[j].ZoneId;
+                    int neighbourZoneIndex = data.Zones.FindIndex(z => z.ZoneId == zoneId);
+                    uint neighbourZonePtr = (uint)(zonesPtr + neighbourZoneIndex * 0x30);
+                    bw.Write(neighbourZonePtr);
+                    bw.Write((uint)data.Zones[i].UnsafeNeighbours[j].Flags);
+                    bw.BaseStream.Position += 0x8;
+                    neighboursPosition += 0x10;
+                }
+            }
+
+            // Write zone start point indices
+            bw.BaseStream.Position = zoneStartsPtr;
+            for (int i = 0; i < data.TotalZones * 4; i += 4)
+                bw.Write(i);
+
+            // Write zone point counts
+            bw.BaseStream.Position = zoneCountsPtr;
+            for (int i = 0; i < data.TotalZones; ++i)
+                bw.Write((short)4);
+
+            bw.Align(16);
+
+            bw.Flush();
+            byte[] rawData = ms.ToArray();
+            bw.Close();
+            ms.Close();
+
+            entry.EntryBlocks[0].Data = rawData;
+            entry.Dirty = true;
+
             return true;
         }
 
@@ -216,9 +247,14 @@ namespace PVSFormat
 
         public IEntryEditor GetEditor(BundleEntry entry)
         {
-            PVSEditor pvsForm = new PVSEditor();
+            PVSEditor pvsForm = new();
             pvsForm.GameMap = _gameMap;
             pvsForm.Open(this);
+
+            pvsForm.Edit += () =>
+            {
+                Write(entry);
+            };
 
             return pvsForm;
         }
@@ -241,9 +277,12 @@ namespace PVSFormat
             if (descEntry1 == null)
             {
                 string path = Path.GetDirectoryName(archive.Path) + Path.DirectorySeparatorChar + "GUITEXTURES.BIN";
-                BundleArchive archive2 = BundleArchive.Read(path);
-                if (archive2 != null)
-                    descEntry1 = archive2.GetEntryByID(id);
+                if (Path.Exists(path))
+                {
+                    BundleArchive archive2 = BundleArchive.Read(path);
+                    if (archive2 != null)
+                        descEntry1 = archive2.GetEntryByID(id);
+                }
             }
 
             Image image = null;

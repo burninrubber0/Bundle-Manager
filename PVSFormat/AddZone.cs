@@ -26,6 +26,7 @@ namespace PVSFormat
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
+            zone = ulong.MaxValue;
             Close();
         }
     }

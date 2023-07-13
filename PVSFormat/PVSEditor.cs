@@ -135,6 +135,9 @@ namespace PVSFormat
                 }
                 break;
             }
+            if (newZoneId == ulong.MaxValue)
+                return;
+
             Zone newZone = new();
             newZone.ZoneId = newZoneId;
             zones.Add(newZone);
@@ -247,6 +250,8 @@ namespace PVSFormat
         private void addNeighbourButton_Click(object sender, System.EventArgs e)
         {
             ulong newZoneId = new AddZone().GetNewZoneId();
+            if (newZoneId == ulong.MaxValue)
+                return;
             var neighbours = GetUnsafeNeighbours();
             Neighbour newNeighbour = new();
             newNeighbour.ZoneId = newZoneId;

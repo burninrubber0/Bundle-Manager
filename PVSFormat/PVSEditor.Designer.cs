@@ -126,14 +126,15 @@ namespace PVSFormat
             pvsMain.PVS = null;
             pvsMain.Size = new System.Drawing.Size(580, 561);
             pvsMain.TabIndex = 0;
+            pvsMain.Click += pvsMain_Click;
             pvsMain.DoubleClick += pvsMain_DoubleClick;
             // 
             // deleteZoneButton
             // 
             deleteZoneButton.Enabled = false;
-            deleteZoneButton.Location = new System.Drawing.Point(136, 8);
+            deleteZoneButton.Location = new System.Drawing.Point(131, 8);
             deleteZoneButton.Name = "deleteZoneButton";
-            deleteZoneButton.Size = new System.Drawing.Size(48, 23);
+            deleteZoneButton.Size = new System.Drawing.Size(56, 23);
             deleteZoneButton.TabIndex = 28;
             deleteZoneButton.Text = "Delete";
             deleteZoneButton.UseVisualStyleBackColor = true;
@@ -141,9 +142,9 @@ namespace PVSFormat
             // 
             // addZoneButton
             // 
-            addZoneButton.Location = new System.Drawing.Point(16, 8);
+            addZoneButton.Location = new System.Drawing.Point(11, 8);
             addZoneButton.Name = "addZoneButton";
-            addZoneButton.Size = new System.Drawing.Size(48, 23);
+            addZoneButton.Size = new System.Drawing.Size(56, 23);
             addZoneButton.TabIndex = 27;
             addZoneButton.Text = "Add";
             addZoneButton.UseVisualStyleBackColor = true;
@@ -163,9 +164,9 @@ namespace PVSFormat
             // deleteNeighbourButton
             // 
             deleteNeighbourButton.Enabled = false;
-            deleteNeighbourButton.Location = new System.Drawing.Point(135, 353);
+            deleteNeighbourButton.Location = new System.Drawing.Point(131, 353);
             deleteNeighbourButton.Name = "deleteNeighbourButton";
-            deleteNeighbourButton.Size = new System.Drawing.Size(48, 23);
+            deleteNeighbourButton.Size = new System.Drawing.Size(56, 23);
             deleteNeighbourButton.TabIndex = 24;
             deleteNeighbourButton.Text = "Delete";
             deleteNeighbourButton.UseVisualStyleBackColor = true;
@@ -174,9 +175,9 @@ namespace PVSFormat
             // addNeighbourButton
             // 
             addNeighbourButton.Enabled = false;
-            addNeighbourButton.Location = new System.Drawing.Point(15, 353);
+            addNeighbourButton.Location = new System.Drawing.Point(11, 353);
             addNeighbourButton.Name = "addNeighbourButton";
-            addNeighbourButton.Size = new System.Drawing.Size(48, 23);
+            addNeighbourButton.Size = new System.Drawing.Size(56, 23);
             addNeighbourButton.TabIndex = 23;
             addNeighbourButton.Text = "Add";
             addNeighbourButton.UseVisualStyleBackColor = true;
@@ -266,7 +267,7 @@ namespace PVSFormat
             // neighboursLabel
             // 
             neighboursLabel.AutoSize = true;
-            neighboursLabel.Location = new System.Drawing.Point(64, 357);
+            neighboursLabel.Location = new System.Drawing.Point(65, 357);
             neighboursLabel.Name = "neighboursLabel";
             neighboursLabel.Size = new System.Drawing.Size(69, 15);
             neighboursLabel.TabIndex = 13;
@@ -415,13 +416,13 @@ namespace PVSFormat
             // 
             // PVSEditor
             // 
-            FormClosing += PVSEditor_FormClosing;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(784, 561);
             Controls.Add(pvsSplitContainer);
             Name = "PVSEditor";
             Text = "PVS Editor";
+            FormClosing += PVSEditor_FormClosing;
             pvsSplitContainer.Panel1.ResumeLayout(false);
             pvsSplitContainer.Panel2.ResumeLayout(false);
             pvsSplitContainer.Panel2.PerformLayout();

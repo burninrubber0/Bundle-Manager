@@ -39,7 +39,7 @@ namespace PVSFormat
             Neighbour
         }
 
-        protected PointF MousePosOnMap
+        internal PointF MousePosOnMap
         {
             get
             {

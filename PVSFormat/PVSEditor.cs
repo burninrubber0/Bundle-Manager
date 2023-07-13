@@ -102,7 +102,7 @@ namespace PVSFormat
             Edit?.Invoke();
         }
 
-        private void pvsMain_DoubleClick(object sender, System.EventArgs e)
+        private void pvsMain_DoubleClick(object sender, EventArgs e)
         {
             ulong zoneId = pvsMain.GetZoneId();
             if (zoneId == ulong.MaxValue)
@@ -111,7 +111,46 @@ namespace PVSFormat
             zonesListBox.SelectedIndex = zonesListBox.FindStringExact(zoneId.ToString("000"));
         }
 
-        private void zonesListBox_SelectedIndexChanged(object sender, System.EventArgs e)
+        private void pvsMain_Click(object sender, EventArgs e)
+        {
+            if (((MouseEventArgs)e).Button == MouseButtons.Right
+                && pvsMain.PVS.selectedZoneId != ulong.MaxValue)
+                OpenContextMenu();
+        }
+
+        private void OpenContextMenu()
+        {
+            ContextMenuStrip menu = new();
+            for (int i = 0; i < 4; ++i)
+                menu.Items.Add("Use as point " + (i + 1).ToString());
+            menu.Items[0].Click += (s, e) =>
+            {
+                Vector2 pos = pvsMain.MousePosOnMap.ToVector2();
+                point1XNumericUpDown.Value = (decimal)pos.X;
+                point1YNumericUpDown.Value = (decimal)pos.Y;
+            };
+            menu.Items[1].Click += (s, e) =>
+            {
+                Vector2 pos = pvsMain.MousePosOnMap.ToVector2();
+                point2XNumericUpDown.Value = (decimal)pos.X;
+                point2YNumericUpDown.Value = (decimal)pos.Y;
+            };
+            menu.Items[2].Click += (s, e) =>
+            {
+                Vector2 pos = pvsMain.MousePosOnMap.ToVector2();
+                point3XNumericUpDown.Value = (decimal)pos.X;
+                point3YNumericUpDown.Value = (decimal)pos.Y;
+            };
+            menu.Items[3].Click += (s, e) =>
+            {
+                Vector2 pos = pvsMain.MousePosOnMap.ToVector2();
+                point4XNumericUpDown.Value = (decimal)pos.X;
+                point4YNumericUpDown.Value = (decimal)pos.Y;
+            };
+            menu.Show(Cursor.Position);
+        }
+
+        private void zonesListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (zonesListBox.SelectedIndex == -1)
                 return;
@@ -121,7 +160,7 @@ namespace PVSFormat
             deleteZoneButton.Enabled = true;
         }
 
-        private void addZoneButton_Click(object sender, System.EventArgs e)
+        private void addZoneButton_Click(object sender, EventArgs e)
         {
             var zones = GetZones();
             ulong newZoneId;
@@ -135,6 +174,9 @@ namespace PVSFormat
                 }
                 break;
             }
+            if (newZoneId == ulong.MaxValue)
+                return;
+
             Zone newZone = new();
             newZone.ZoneId = newZoneId;
             zones.Add(newZone);
@@ -146,7 +188,7 @@ namespace PVSFormat
                 deleteZoneButton.Enabled = true;
         }
 
-        private void deleteZoneButton_Click(object sender, System.EventArgs e)
+        private void deleteZoneButton_Click(object sender, EventArgs e)
         {
             int index = zonesListBox.SelectedIndex;
             ulong zoneId = ulong.Parse(zonesListBox.Items[index].ToString());
@@ -165,7 +207,7 @@ namespace PVSFormat
                 zonesListBox.SelectedIndex = index;
         }
 
-        private void point1XNumericUpDown_ValueChanged(object sender, System.EventArgs e)
+        private void point1XNumericUpDown_ValueChanged(object sender, EventArgs e)
         {
             Vector2 point = GetPoints()[0];
             point.X = (float)point1XNumericUpDown.Value;
@@ -173,7 +215,7 @@ namespace PVSFormat
             pvsMain.Invalidate();
         }
 
-        private void point1YNumericUpDown_ValueChanged(object sender, System.EventArgs e)
+        private void point1YNumericUpDown_ValueChanged(object sender, EventArgs e)
         {
             Vector2 point = GetPoints()[0];
             point.Y = (float)point1YNumericUpDown.Value;
@@ -181,7 +223,7 @@ namespace PVSFormat
             pvsMain.Invalidate();
         }
 
-        private void point2XNumericUpDown_ValueChanged(object sender, System.EventArgs e)
+        private void point2XNumericUpDown_ValueChanged(object sender, EventArgs e)
         {
             Vector2 point = GetPoints()[1];
             point.X = (float)point2XNumericUpDown.Value;
@@ -189,7 +231,7 @@ namespace PVSFormat
             pvsMain.Invalidate();
         }
 
-        private void point2YNumericUpDown_ValueChanged(object sender, System.EventArgs e)
+        private void point2YNumericUpDown_ValueChanged(object sender, EventArgs e)
         {
             Vector2 point = GetPoints()[1];
             point.Y = (float)point2YNumericUpDown.Value;
@@ -197,7 +239,7 @@ namespace PVSFormat
             pvsMain.Invalidate();
         }
 
-        private void point3XNumericUpDown_ValueChanged(object sender, System.EventArgs e)
+        private void point3XNumericUpDown_ValueChanged(object sender, EventArgs e)
         {
             Vector2 point = GetPoints()[2];
             point.X = (float)point3XNumericUpDown.Value;
@@ -205,7 +247,7 @@ namespace PVSFormat
             pvsMain.Invalidate();
         }
 
-        private void point3YNumericUpDown_ValueChanged(object sender, System.EventArgs e)
+        private void point3YNumericUpDown_ValueChanged(object sender, EventArgs e)
         {
             Vector2 point = GetPoints()[2];
             point.Y = (float)point3YNumericUpDown.Value;
@@ -213,7 +255,7 @@ namespace PVSFormat
             pvsMain.Invalidate();
         }
 
-        private void point4XNumericUpDown_ValueChanged(object sender, System.EventArgs e)
+        private void point4XNumericUpDown_ValueChanged(object sender, EventArgs e)
         {
             Vector2 point = GetPoints()[3];
             point.X = (float)point4XNumericUpDown.Value;
@@ -221,7 +263,7 @@ namespace PVSFormat
             pvsMain.Invalidate();
         }
 
-        private void point4YNumericUpDown_ValueChanged(object sender, System.EventArgs e)
+        private void point4YNumericUpDown_ValueChanged(object sender, EventArgs e)
         {
             Vector2 point = GetPoints()[3];
             point.Y = (float)point4YNumericUpDown.Value;
@@ -229,7 +271,7 @@ namespace PVSFormat
             pvsMain.Invalidate();
         }
 
-        private void neighboursListBox_SelectedIndexChanged(object sender, System.EventArgs e)
+        private void neighboursListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (neighboursListBox.SelectedIndex == -1)
                 return;
@@ -244,9 +286,11 @@ namespace PVSFormat
             immediateCheckBox.Enabled = true;
         }
 
-        private void addNeighbourButton_Click(object sender, System.EventArgs e)
+        private void addNeighbourButton_Click(object sender, EventArgs e)
         {
             ulong newZoneId = new AddZone().GetNewZoneId();
+            if (newZoneId == ulong.MaxValue)
+                return;
             var neighbours = GetUnsafeNeighbours();
             Neighbour newNeighbour = new();
             newNeighbour.ZoneId = newZoneId;
@@ -263,7 +307,7 @@ namespace PVSFormat
                 deleteNeighbourButton.Enabled = true;
         }
 
-        private void deleteNeighbourButton_Click(object sender, System.EventArgs e)
+        private void deleteNeighbourButton_Click(object sender, EventArgs e)
         {
             int index = neighboursListBox.SelectedIndex;
             ulong zoneId = ulong.Parse(neighboursListBox.Items[index].ToString());
@@ -290,7 +334,7 @@ namespace PVSFormat
                 neighboursListBox.SelectedIndex = index;
         }
 
-        private void renderCheckBox_CheckedChanged(object sender, System.EventArgs e)
+        private void renderCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             if (neighboursListBox.SelectedIndex == -1)
                 return;
@@ -303,7 +347,7 @@ namespace PVSFormat
             GetUnsafeNeighbours()[neighbourIndex] = neighbour;
         }
 
-        private void immediateCheckBox_CheckedChanged(object sender, System.EventArgs e)
+        private void immediateCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             if (neighboursListBox.SelectedIndex == -1)
                 return;

@@ -58,7 +58,7 @@
             // zoneIdNumericUpDown
             // 
             zoneIdNumericUpDown.Location = new System.Drawing.Point(42, 32);
-            zoneIdNumericUpDown.Maximum = new decimal(new int[] { 1024, 0, 0, 0 });
+            zoneIdNumericUpDown.Maximum = new decimal(new int[] { 512, 0, 0, 0 });
             zoneIdNumericUpDown.Name = "zoneIdNumericUpDown";
             zoneIdNumericUpDown.Size = new System.Drawing.Size(100, 23);
             zoneIdNumericUpDown.TabIndex = 2;

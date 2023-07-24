@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -454,7 +455,7 @@ namespace BundleFormat
 
             int platform = br.ReadInt32();
             if (platform != 1)
-                platform = Util.ReverseBytes(platform);
+                platform = BinaryPrimitives.ReverseEndianness(platform);
             Platform = (BundlePlatform)platform;
             br.BigEndian = Console;
 
@@ -747,7 +748,7 @@ namespace BundleFormat
 
             int platformInt = br.ReadInt32();
             if (platformInt != 1)
-                platformInt = Util.ReverseBytes(platformInt);
+                platformInt = BinaryPrimitives.ReverseEndianness(platformInt);
             BundlePlatform platform = (BundlePlatform)platformInt;
             br.BigEndian = platform == BundlePlatform.X360 || platform == BundlePlatform.PS3;
 
@@ -789,7 +790,7 @@ namespace BundleFormat
 
             int platformInt = br.ReadInt32();
             if (platformInt != 1)
-                platformInt = Util.ReverseBytes(platformInt);
+                platformInt = BinaryPrimitives.ReverseEndianness(platformInt);
             BundlePlatform platform = (BundlePlatform)platformInt;
             br.BigEndian = platform == BundlePlatform.X360 || platform == BundlePlatform.PS3;
             
@@ -856,7 +857,7 @@ namespace BundleFormat
 
             int platformInt = br.ReadInt32();
             if (platformInt != 1)
-                platformInt = Util.ReverseBytes(platformInt);
+                platformInt = BinaryPrimitives.ReverseEndianness(platformInt);
             BundlePlatform platform = (BundlePlatform)platformInt;
             br.BigEndian = platform == BundlePlatform.X360 || platform == BundlePlatform.PS3;
             

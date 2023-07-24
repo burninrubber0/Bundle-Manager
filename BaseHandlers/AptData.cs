@@ -304,7 +304,7 @@ namespace BaseHandlers
         // Data
         public CharacterData Data;
 
-        private static Frame ReadFrame(BinaryReader br, uint dataStart)
+        private static Frame ReadFrame(BinaryReader2 br, uint dataStart)
         {
             Frame frame = new Frame();
 
@@ -435,7 +435,7 @@ namespace BaseHandlers
             return frame;
         }
 
-        public static Character Read(BinaryReader br, uint dataStart)
+        public static Character Read(BinaryReader2 br, uint dataStart)
         {
             Character result = new Character();
 

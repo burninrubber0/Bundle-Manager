@@ -181,7 +181,7 @@ namespace VaultFormat
             Strings = new List<string>();
         }
 
-        private void ReadChunk(ILoader loader, BinaryReader br)
+        private void ReadChunk(ILoader loader, BinaryReader2 br)
         {
             long initialPos = br.BaseStream.Position;
             string fourcc = Encoding.ASCII.GetString(BitConverter.GetBytes(br.ReadInt32()).Flip());
@@ -283,7 +283,7 @@ namespace VaultFormat
 
         }
 
-        private void ReadVlt(ILoader loader, BinaryReader br)
+        private void ReadVlt(ILoader loader, BinaryReader2 br)
         {
             while (!br.EOF())
             {

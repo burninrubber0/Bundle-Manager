@@ -42,7 +42,7 @@ namespace WorldCollisionHandler
             return result;
         }
 
-        public static PolygonSoupProperty Read(BinaryReader br)
+        public static PolygonSoupProperty Read(BinaryReader2 br)
         {
             PolygonSoupProperty result = new PolygonSoupProperty();
 
@@ -137,7 +137,7 @@ namespace WorldCollisionHandler
             PropertyList = new List<PolygonSoupProperty>();
         }
 
-        public static PolygonSoupChunk Read(BinaryReader br)
+        public static PolygonSoupChunk Read(BinaryReader2 br)
         {
             PolygonSoupChunk result = new PolygonSoupChunk();
 

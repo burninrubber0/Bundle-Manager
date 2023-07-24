@@ -91,15 +91,15 @@ namespace BundleUtilities
         }
 
         public void SkipUniquePadding(int numberOfBytes) {
-            base.BaseStream.Position = base.BaseStream.Position + numberOfBytes;
+            BaseStream.Position = BaseStream.Position + numberOfBytes;
         }
 
         public void SkipPadding()
         {
-            long currentLength = base.BaseStream.Position;
+            long currentLength = BaseStream.Position;
             if (currentLength % 16 != 0)
             {
-                base.BaseStream.Position = base.BaseStream.Position + (16 - currentLength % 16);
+                BaseStream.Position = BaseStream.Position + (16 - currentLength % 16);
             };
         }
     }

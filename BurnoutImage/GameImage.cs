@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using BCnEncoder.Shared;
+using BundleUtilities;
 
 namespace BurnoutImage
 {
@@ -127,7 +128,7 @@ namespace BurnoutImage
             try
             {
                 MemoryStream ms = new MemoryStream(data);
-                BinaryReader br = new BinaryReader(ms);
+                BinaryReader2 br = new BinaryReader2(ms);
                 if (data.Length == 0x40 || data.Length == 0x30)
                 {
                     // Remaster
@@ -276,7 +277,7 @@ namespace BurnoutImage
                 try
                 {
                     MemoryStream ms = new MemoryStream(data);
-                    BinaryReader br = new BinaryReader(ms);
+                    BinaryReader2 br = new BinaryReader2(ms);
 
                     byte compression = br.ReadByte();
                     byte[] unknown1 = br.ReadBytes(3);

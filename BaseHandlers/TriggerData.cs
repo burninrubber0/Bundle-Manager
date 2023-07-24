@@ -57,9 +57,9 @@ namespace BaseHandlers
             return BitConverter.GetBytes(m_id);
         }
 
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
-            m_id = reader.ReadUInt64();
+            m_id = br.ReadUInt64();
         }
 
         public void Write(BinaryWriter writer)
@@ -78,26 +78,26 @@ namespace BaseHandlers
         public List<Vector4> StartingPositions { get; set; } = new List<Vector4>();
         public List<Vector4> StartingDirections { get; set; } = new List<Vector4>();
 
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
             StartingPositions = new List<Vector4>(8);
             for (int i = 0; i < 8; i++)
             {
                 StartingPositions[i] = new Vector4(
-                    reader.ReadSingle(),
-                    reader.ReadSingle(),
-                    reader.ReadSingle(),
-                    reader.ReadSingle());
+                    br.ReadSingle(),
+                    br.ReadSingle(),
+                    br.ReadSingle(),
+                    br.ReadSingle());
             }
 
             StartingDirections = new List<Vector4>(8);
             for (int i = 0; i < 8; i++)
             {
                 StartingDirections[i] = new Vector4(
-                    reader.ReadSingle(),
-                    reader.ReadSingle(),
-                    reader.ReadSingle(),
-                    reader.ReadSingle());
+                    br.ReadSingle(),
+                    br.ReadSingle(),
+                    br.ReadSingle(),
+                    br.ReadSingle());
             }
         }
 
@@ -133,17 +133,17 @@ namespace BaseHandlers
         public float DimensionY { get; set; } = 0;
         public float DimensionZ { get; set; } = 0;
 
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
-            PositionX = reader.ReadSingle();
-            PositionY = reader.ReadSingle();
-            PositionZ = reader.ReadSingle();
-            RotationX = reader.ReadSingle();
-            RotationY = reader.ReadSingle();
-            RotationZ = reader.ReadSingle();
-            DimensionX = reader.ReadSingle();
-            DimensionY = reader.ReadSingle();
-            DimensionZ = reader.ReadSingle();
+            PositionX = br.ReadSingle();
+            PositionY = br.ReadSingle();
+            PositionZ = br.ReadSingle();
+            RotationX = br.ReadSingle();
+            RotationY = br.ReadSingle();
+            RotationZ = br.ReadSingle();
+            DimensionX = br.ReadSingle();
+            DimensionY = br.ReadSingle();
+            DimensionZ = br.ReadSingle();
         }
 
         public void Write(BinaryWriter writer)
@@ -177,14 +177,14 @@ namespace BaseHandlers
         public RegionType meType { get; set; } = RegionType.E_TYPE_LANDMARK;
         private byte[] muPad { get; set; } = new byte[1];
 
-        public virtual void Read(BinaryReader reader)
+        public virtual void Read(BinaryReader2 br)
         {
             mBoxRegion = new BoxRegion();
-            mBoxRegion.Read(reader);
-            mId = reader.ReadInt32();
-            miRegionIndex = reader.ReadInt16();
-            meType = (RegionType)reader.ReadByte();
-            muPad = reader.ReadBytes(1);
+            mBoxRegion.Read(br);
+            mId = br.ReadInt32();
+            miRegionIndex = br.ReadInt16();
+            meType = (RegionType)br.ReadByte();
+            muPad = br.ReadBytes(1);
         }
 
         public virtual void Write(BinaryWriter writer)
@@ -213,25 +213,25 @@ namespace BaseHandlers
         public byte muDistrict { get; set; } = 0;
         public byte mu8Flags { get; set; } = 0;
 
-        public new void Read(BinaryReader reader)
+        public new void Read(BinaryReader2 br)
         {
-            base.Read(reader);
-            long startingGridOffset = reader.ReadUInt32();
-            int miStartingGridCount = reader.ReadByte();
-            muDesignIndex = reader.ReadByte();
-            muDistrict = reader.ReadByte();
-            mu8Flags = reader.ReadByte();
+            base.Read(br);
+            long startingGridOffset = br.ReadUInt32();
+            int miStartingGridCount = br.ReadByte();
+            muDesignIndex = br.ReadByte();
+            muDistrict = br.ReadByte();
+            mu8Flags = br.ReadByte();
 
-            long currentPosition = reader.BaseStream.Position;
-            reader.BaseStream.Position = startingGridOffset;
+            long currentPosition = br.BaseStream.Position;
+            br.BaseStream.Position = startingGridOffset;
 
             for (int i = 0; i < miStartingGridCount; i++)
             {
                 StartingGrid startingGrid = new StartingGrid();
-                startingGrid.Read(reader);
+                startingGrid.Read(br);
                 mpaStartingGrids.Add(startingGrid);
             }
-            reader.BaseStream.Position = currentPosition;
+            br.BaseStream.Position = currentPosition;
 
         }
 
@@ -320,16 +320,16 @@ namespace BaseHandlers
         public Type GenericRegionType { get; set; } = Type.E_TYPE_JUNK_YARD;
         public sbyte IsOneWay { get; set; } = 0;
 
-        public new void Read(BinaryReader reader)
+        public new void Read(BinaryReader2 br)
         {
-            base.Read(reader);
-            GroupID = reader.ReadInt32();
-            CameraCut1 = reader.ReadInt16();
-            CameraCut2 = reader.ReadInt16();
-            CameraType1 = (StuntCameraType)reader.ReadSByte();
-            CameraType2 = (StuntCameraType)reader.ReadSByte();
-            GenericRegionType = (Type)reader.ReadByte();
-            IsOneWay = reader.ReadSByte();
+            base.Read(br);
+            GroupID = br.ReadInt32();
+            CameraCut1 = br.ReadInt16();
+            CameraCut2 = br.ReadInt16();
+            CameraType1 = (StuntCameraType)br.ReadSByte();
+            CameraType2 = (StuntCameraType)br.ReadSByte();
+            GenericRegionType = (Type)br.ReadByte();
+            IsOneWay = br.ReadSByte();
         }
 
         public new void Write(BinaryWriter writer)
@@ -362,13 +362,13 @@ namespace BaseHandlers
         public ScoreType muScoreType { get; set; } = ScoreType.E_SCORE_TYPE_DISTANCE;
         public int miScoreAmount { get; set; } = 0;
 
-        public override void Read(BinaryReader reader)
+        public override void Read(BinaryReader2 br)
         {
-            base.Read(reader);
+            base.Read(br);
 
-            muScoreType = (ScoreType)reader.ReadByte();
-            reader.ReadBytes(3); // Padding
-            miScoreAmount = reader.ReadInt32();
+            muScoreType = (ScoreType)br.ReadByte();
+            br.ReadBytes(3); // Padding
+            miScoreAmount = br.ReadInt32();
         }
 
         public override void Write(BinaryWriter writer)
@@ -390,43 +390,43 @@ namespace BaseHandlers
         private long TriggerOffsetPosition = 0;
 
         private long CGSIDOffsetPosition = 0;
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
             // Read the trigger pointer array
-            long genericRegionOffset = reader.ReadUInt32();
-            int TriggerCount = reader.ReadInt32();
+            long genericRegionOffset = br.ReadUInt32();
+            int TriggerCount = br.ReadInt32();
 
             // Read the region ID array
-            long cgsOffset = reader.ReadUInt32();
-            int RegionIdCount = reader.ReadInt32();
-            long currentPosition = reader.BaseStream.Position;
+            long cgsOffset = br.ReadUInt32();
+            int RegionIdCount = br.ReadInt32();
+            long currentPosition = br.BaseStream.Position;
 
-            reader.BaseStream.Position = genericRegionOffset;
+            br.BaseStream.Position = genericRegionOffset;
             uint[]  Triggers = new uint[TriggerCount];
             for (int i = 0; i < TriggerCount; i++)
             {
-                Triggers[i] = reader.ReadUInt32();
+                Triggers[i] = br.ReadUInt32();
             }
 
             TriggerIds = new List<int>();
             foreach (uint trigger in Triggers)
             {
-                reader.BaseStream.Position = trigger;
+                br.BaseStream.Position = trigger;
                 GenericRegion region = new GenericRegion();
-                region.Read(reader);
+                region.Read(br);
                 TriggerIds.Add(region.mId);
             }
 
-            reader.BaseStream.Position = cgsOffset;
+            br.BaseStream.Position = cgsOffset;
             RegionIds = new List<CgsID>();
             for (int i = 0; i < RegionIdCount; i++)
             {
                 CgsID id = new CgsID();
-                id.Read(reader);
+                id.Read(br);
                 RegionIds.Add(id);
             }
 
-            reader.BaseStream.Position = currentPosition;
+            br.BaseStream.Position = currentPosition;
         }
 
         public void Write(BinaryWriter writer)
@@ -481,32 +481,32 @@ namespace BaseHandlers
 
         private long StuntElementOffsetPosition = 0;
 
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
             mId = new CgsID();
-            mId.Read(reader);
-            miCamera = reader.ReadInt64();
+            mId.Read(br);
+            miCamera = br.ReadInt64();
 
-            uint mppStuntElementsOffset = reader.ReadUInt32();
-            int miStuntElementCount = reader.ReadInt32();
+            uint mppStuntElementsOffset = br.ReadUInt32();
+            int miStuntElementCount = br.ReadInt32();
 
-            long currentPosition = reader.BaseStream.Position;
-            reader.BaseStream.Position = mppStuntElementsOffset;
+            long currentPosition = br.BaseStream.Position;
+            br.BaseStream.Position = mppStuntElementsOffset;
             uint[] Triggers = new uint[miStuntElementCount];
             for (int i = 0; i < miStuntElementCount; i++)
             {
-                Triggers[i] = reader.ReadUInt32();
+                Triggers[i] = br.ReadUInt32();
             }
 
             stuntElementRegions = new List<int>();
             foreach (uint trigger in Triggers)
             {
-                reader.BaseStream.Position = trigger;
+                br.BaseStream.Position = trigger;
                 GenericRegion region = new GenericRegion();
-                region.Read(reader);
+                region.Read(br);
                 stuntElementRegions.Add(region.mId);
             }
-            reader.BaseStream.Position = currentPosition;
+            br.BaseStream.Position = currentPosition;
         }
 
         // Write something in triggerIds, because we dont have the actual positions yet
@@ -537,16 +537,16 @@ namespace BaseHandlers
         public Vector4 Position { get; set; } = new Vector4(0,0,0,0);
         public byte DistrictIndex { get; set; } = 0;
 
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
             Position = new Vector4(
-                reader.ReadSingle(),
-                reader.ReadSingle(),
-                reader.ReadSingle(),
-                reader.ReadSingle());
-            DistrictIndex = reader.ReadByte();
+                br.ReadSingle(),
+                br.ReadSingle(),
+                br.ReadSingle(),
+                br.ReadSingle());
+            DistrictIndex = br.ReadByte();
             // Read and discard padding
-            reader.ReadBytes(15);
+            br.ReadBytes(15);
         }
 
         public void Write(BinaryWriter writer)
@@ -570,9 +570,9 @@ namespace BaseHandlers
             meType = RegionType.E_TYPE_VFXBOX_REGION;
         }
 
-        public override void Read(BinaryReader reader)
+        public override void Read(BinaryReader2 br)
         {
-            base.Read(reader);
+            base.Read(br);
         }
 
         public override void Write(BinaryWriter writer)
@@ -600,14 +600,14 @@ namespace BaseHandlers
         public Type muType { get; set; } = 0;
         private byte[] padding = new byte[7];
 
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
-            mPosition = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            mDirection = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            mPosition = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            mDirection = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
             mJunkyardId = new CgsID();
-            mJunkyardId.Read(reader);
-            muType = (Type)reader.ReadByte();
-            padding = reader.ReadBytes(7);
+            mJunkyardId.Read(br);
+            muType = (Type)br.ReadByte();
+            padding = br.ReadBytes(7);
         }
 
         public void Write(BinaryWriter writer)

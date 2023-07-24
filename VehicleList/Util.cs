@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using BundleUtilities;
 
 namespace VehicleList
 {
@@ -79,7 +80,7 @@ namespace VehicleList
             byte[] b = ms.ToArray();
             bw.Close();
             ms = new MemoryStream(b);
-            BinaryReader br = new BinaryReader(ms);
+            BinaryReader2 br = new BinaryReader2(ms);
             UInt32 v = br.ReadUInt32();
             br.Close();
             return v;
@@ -93,7 +94,7 @@ namespace VehicleList
             byte[] b = ms.ToArray();
             bw.Close();
             ms = new MemoryStream(b);
-            BinaryReader br = new BinaryReader(ms);
+            BinaryReader2 br = new BinaryReader2(ms);
             float v = br.ReadSingle();
             br.Close();
             return v;

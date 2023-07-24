@@ -25,7 +25,7 @@ namespace BaseHandlers
 
         public Vector4 Rotation => Transform.ExtractRotation().ToAxisAngle();
 
-        public static ModelInstance Read(BinaryReader br)
+        public static ModelInstance Read(BinaryReader2 br)
         {
             ModelInstance result = new ModelInstance();
 

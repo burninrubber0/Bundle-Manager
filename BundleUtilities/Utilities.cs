@@ -201,7 +201,7 @@ namespace BundleUtilities
             }
             self.Write((byte)0);
         }
-      
+        
         public static void WriteUniquePadding(this BinaryWriter self, int numberOfPadding)
         {
             for (int i = 0; i < numberOfPadding; i++)

@@ -1,45 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
+using System.Numerics;
 using System.Text;
 
 namespace BundleUtilities
 {
-    [TypeConverter(typeof(ExpandableObjectConverter))]
-    public class Vector3I
-    {
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Z { get; set; }
-        public float S { get; set; }
-
-        public Vector3I() {
-            X = 0;
-            Y = 0;
-            Z = 0;
-            S = 0;
-        }
-        public Vector3I(float x, float y, float z, float s)
-        {
-            X = x;
-            Y = y;
-            Z = z;
-            S = s;
-        }
-
-        public byte[] toBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(BitConverter.GetBytes(X));
-            bytes.AddRange(BitConverter.GetBytes(Y));
-            bytes.AddRange(BitConverter.GetBytes(Z));
-            bytes.AddRange(BitConverter.GetBytes(S));
-            return bytes.ToArray();
-        }
-
-    }
-
     public class BinaryReader2 : BinaryReader
     {
         public bool BigEndian { get; set; }
@@ -144,6 +109,11 @@ namespace BundleUtilities
             return BitConverter.ToDouble(data, 0);
         }
 
+        public Vector4 ReadVector4()
+        {
+            return new Vector4(ReadSingle(), ReadSingle(), ReadSingle(), ReadSingle());
+        }
+
         public void SkipUniquePadding(int numberOfBytes) {
             base.BaseStream.Position = base.BaseStream.Position + numberOfBytes;
         }
@@ -155,15 +125,6 @@ namespace BundleUtilities
             {
                 base.BaseStream.Position = base.BaseStream.Position + (16 - currentLength % 16);
             };
-        }
-
-        public Vector3I ReadVector3I()
-        {
-            float x = base.ReadSingle();
-            float y = base.ReadSingle();
-            float z = base.ReadSingle();
-            float s = base.ReadSingle();
-            return new Vector3I(x, y, z, s);
         }
     }
 }

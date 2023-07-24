@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
+using BundleFormat;
 using BundleUtilities;
 
 namespace VaultFormat
@@ -11,7 +13,7 @@ namespace VaultFormat
         public AttributeHeader header { get; set; }
         public SizeAndPositionInformation info { get; set; }
 
-        public Vector3I DriftScaleToYawTorque { get; set; }
+        public Vector4 DriftScaleToYawTorque { get; set; }
         public float WheelSlip { get; set; }
         public float TimeToCapScale { get; set; }
         public float TimeForNaturalDrift { get; set; }
@@ -109,7 +111,7 @@ namespace VaultFormat
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
-            DriftScaleToYawTorque = br.ReadVector3I();
+            DriftScaleToYawTorque = br.ReadVector4();
             WheelSlip = br.ReadSingle();
             TimeToCapScale = br.ReadSingle();
             TimeForNaturalDrift = br.ReadSingle();

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
+using BundleFormat;
 using BundleUtilities;
 
 namespace VaultFormat
@@ -10,12 +12,12 @@ namespace VaultFormat
         public AttributeHeader header { get; set; }
         public SizeAndPositionInformation info { get; set; }
 
-        public Vector3I TorqueScales2 { get; set; }
-        public Vector3I TorqueScales1 { get; set; }
-        public Vector3I GearUpRPMs2 { get; set; }
-        public Vector3I GearUpRPMs1 { get; set; }
-        public Vector3I GearRatios2 { get; set; }
-        public Vector3I GearRatios1 { get; set; }
+        public Vector4 TorqueScales2 { get; set; }
+        public Vector4 TorqueScales1 { get; set; }
+        public Vector4 GearUpRPMs2 { get; set; }
+        public Vector4 GearUpRPMs1 { get; set; }
+        public Vector4 GearRatios2 { get; set; }
+        public Vector4 GearRatios1 { get; set; }
         public float TransmissionEfficiency { get; set; }
         public float TorqueFallOffRPM { get; set; }
         public float MaxTorque { get; set; }
@@ -83,12 +85,12 @@ namespace VaultFormat
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
-            TorqueScales2 = br.ReadVector3I();
-            TorqueScales1 = br.ReadVector3I();
-            GearUpRPMs2 = br.ReadVector3I();
-            GearUpRPMs1 = br.ReadVector3I();
-            GearRatios2 = br.ReadVector3I();
-            GearRatios1 = br.ReadVector3I();
+            TorqueScales2 = br.ReadVector4();
+            TorqueScales1 = br.ReadVector4();
+            GearUpRPMs2 = br.ReadVector4();
+            GearUpRPMs1 = br.ReadVector4();
+            GearRatios2 = br.ReadVector4();
+            GearRatios1 = br.ReadVector4();
             TransmissionEfficiency = br.ReadSingle();
             TorqueFallOffRPM = br.ReadSingle();
             MaxTorque = br.ReadSingle();

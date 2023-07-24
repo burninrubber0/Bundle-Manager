@@ -2,16 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
+using BundleFormat;
 using BundleUtilities;
 
 namespace VaultFormat
 {
     public class Physicsvehiclebaseattribs : IAttribute
     {
-        public Vector3I RearRightWheelPosition { get; set; }
-        public Vector3I FrontRightWheelPosition { get; set; }
-        public Vector3I CoMOffset { get; set; }
-        public Vector3I BrakeScaleToFactor { get; set; }
+        public Vector4 RearRightWheelPosition { get; set; }
+        public Vector4 FrontRightWheelPosition { get; set; }
+        public Vector4 CoMOffset { get; set; }
+        public Vector4 BrakeScaleToFactor { get; set; }
         public float YawDampingOnTakeOff { get; set; }
         public float TractionLineLength { get; set; }
         public float TimeForFullBrake { get; set; }
@@ -168,10 +170,10 @@ namespace VaultFormat
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
-            RearRightWheelPosition = br.ReadVector3I();
-            FrontRightWheelPosition = br.ReadVector3I();
-            CoMOffset = br.ReadVector3I();
-            BrakeScaleToFactor = br.ReadVector3I();
+            RearRightWheelPosition = br.ReadVector4();
+            FrontRightWheelPosition = br.ReadVector4();
+            CoMOffset = br.ReadVector4();
+            BrakeScaleToFactor = br.ReadVector4();
             YawDampingOnTakeOff = br.ReadSingle();
             TractionLineLength = br.ReadSingle();
             TimeForFullBrake = br.ReadSingle();

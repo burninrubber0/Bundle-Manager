@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using System.Text;
 using System.Windows.Forms;
 using Ionic.Zlib;
@@ -137,6 +139,16 @@ namespace BundleFormat
             self.BaseStream.Position = alignment * ((self.BaseStream.Position + (alignment - 1)) / alignment);
             self.BaseStream.Position--;
             self.Write((byte)0);
+        }
+
+        public static byte[] toBytes(this Vector4 vec)
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.AddRange(BitConverter.GetBytes(vec.X));
+            bytes.AddRange(BitConverter.GetBytes(vec.Y));
+            bytes.AddRange(BitConverter.GetBytes(vec.Z));
+            bytes.AddRange(BitConverter.GetBytes(vec.W));
+            return bytes.ToArray();
         }
     }
 }

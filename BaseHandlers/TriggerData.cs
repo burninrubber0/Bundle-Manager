@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing.Design;
 using System.IO;
+using System.Numerics;
 using System.Windows.Forms;
 
 namespace BaseHandlers
@@ -74,27 +75,29 @@ namespace BaseHandlers
 
     public class StartingGrid
     {
-        public List<Vector3I> StartingPositions { get; set; } = new List<Vector3I>();
-        public List<Vector3I> StartingDirections { get; set; } = new List<Vector3I>();
+        public List<Vector4> StartingPositions { get; set; } = new List<Vector4>();
+        public List<Vector4> StartingDirections { get; set; } = new List<Vector4>();
 
         public void Read(BinaryReader reader)
         {
-            StartingPositions = new List<Vector3I>(8);
+            StartingPositions = new List<Vector4>(8);
             for (int i = 0; i < 8; i++)
             {
-                StartingPositions[i] = new Vector3I(
+                StartingPositions[i] = new Vector4(
                     reader.ReadSingle(),
                     reader.ReadSingle(),
-                    reader.ReadSingle(), reader.ReadSingle());
+                    reader.ReadSingle(),
+                    reader.ReadSingle());
             }
 
-            StartingDirections = new List<Vector3I>(8);
+            StartingDirections = new List<Vector4>(8);
             for (int i = 0; i < 8; i++)
             {
-                StartingDirections[i] = new Vector3I(
+                StartingDirections[i] = new Vector4(
                     reader.ReadSingle(),
                     reader.ReadSingle(),
-                    reader.ReadSingle(), reader.ReadSingle());
+                    reader.ReadSingle(),
+                    reader.ReadSingle());
             }
         }
 
@@ -105,7 +108,7 @@ namespace BaseHandlers
                 writer.Write(StartingPositions[i].X);
                 writer.Write(StartingPositions[i].Y);
                 writer.Write(StartingPositions[i].Z);
-                writer.Write(StartingPositions[i].S);
+                writer.Write(StartingPositions[i].W);
             }
 
             for (int i = 0; i < 8; i++)
@@ -113,7 +116,7 @@ namespace BaseHandlers
                 writer.Write(StartingDirections[i].X);
                 writer.Write(StartingDirections[i].Y);
                 writer.Write(StartingDirections[i].Z);
-                writer.Write(StartingDirections[i].S);
+                writer.Write(StartingDirections[i].W);
             }
         }
     }
@@ -531,12 +534,12 @@ namespace BaseHandlers
     public class RoamingLocation
     {
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public Vector3I Position { get; set; } = new Vector3I(0,0,0,0);
+        public Vector4 Position { get; set; } = new Vector4(0,0,0,0);
         public byte DistrictIndex { get; set; } = 0;
 
         public void Read(BinaryReader reader)
         {
-            Position = new Vector3I(
+            Position = new Vector4(
                 reader.ReadSingle(),
                 reader.ReadSingle(),
                 reader.ReadSingle(),
@@ -551,7 +554,7 @@ namespace BaseHandlers
             writer.Write(Position.X);
             writer.Write(Position.Y);
             writer.Write(Position.Z);
-            writer.Write(Position.S);
+            writer.Write(Position.W);
             writer.Write(DistrictIndex);
 
             // Write padding
@@ -589,9 +592,9 @@ namespace BaseHandlers
         }
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public Vector3I mPosition { get; set; } = new Vector3I(0, 0, 0, 0);
+        public Vector4 mPosition { get; set; } = new Vector4(0, 0, 0, 0);
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public Vector3I mDirection { get; set; } = new Vector3I(0, 0, 0, 0);
+        public Vector4 mDirection { get; set; } = new Vector4(0, 0, 0, 0);
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public CgsID mJunkyardId { get; set; } = new CgsID();
         public Type muType { get; set; } = 0;
@@ -599,8 +602,8 @@ namespace BaseHandlers
 
         public void Read(BinaryReader reader)
         {
-            mPosition = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            mDirection = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            mPosition = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            mDirection = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             mJunkyardId = new CgsID();
             mJunkyardId.Read(reader);
             muType = (Type)reader.ReadByte();
@@ -612,11 +615,11 @@ namespace BaseHandlers
             writer.Write(mPosition.X);
             writer.Write(mPosition.Y);
             writer.Write(mPosition.Z);
-            writer.Write(mPosition.S);
+            writer.Write(mPosition.W);
             writer.Write(mDirection.X);
             writer.Write(mDirection.Y);
             writer.Write(mDirection.Z);
-            writer.Write(mDirection.S);
+            writer.Write(mDirection.W);
             mJunkyardId.Write(writer);
             writer.Write((byte)muType);
             writer.Write(padding);
@@ -627,8 +630,8 @@ namespace BaseHandlers
     {
         public int miVersionNumber { get; set; }
         public uint muSize { get; set; }
-        public Vector3I mPlayerStartPosition { get; set; } 
-        public Vector3I mPlayerStartDirection { get; set; } 
+        public Vector4 mPlayerStartPosition { get; set; } 
+        public Vector4 mPlayerStartDirection { get; set; } 
         public List<Landmark> mpLandmarks { get; set; }
         public int miOnlineLandmarkCount { get; set; }
         public List<SignatureStunt> mpSignatureStunts { get; set; }
@@ -651,8 +654,8 @@ namespace BaseHandlers
             miVersionNumber = reader.ReadInt32();
             muSize = reader.ReadUInt32();
             reader.ReadBytes(8);// skip 8 bytes of padding
-            mPlayerStartPosition = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            mPlayerStartDirection = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            mPlayerStartPosition = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            mPlayerStartDirection = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             // read landmarks
             long LandmarkTriggersOffset = reader.ReadUInt32();
             int miLandmarkCount = reader.ReadInt32();
@@ -805,11 +808,11 @@ namespace BaseHandlers
             writer.Write(mPlayerStartPosition.X);
             writer.Write(mPlayerStartPosition.Y);
             writer.Write(mPlayerStartPosition.Z);
-            writer.Write(mPlayerStartPosition.S);
+            writer.Write(mPlayerStartPosition.W);
             writer.Write(mPlayerStartDirection.X);
             writer.Write(mPlayerStartDirection.Y);
             writer.Write(mPlayerStartDirection.Z);
-            writer.Write(mPlayerStartDirection.S);
+            writer.Write(mPlayerStartDirection.W);
 
             long LandmarkOffsetPosition = writer.BaseStream.Position;
             writer.WriteUniquePadding(4);

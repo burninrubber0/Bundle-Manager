@@ -184,14 +184,14 @@ namespace VaultFormat
         private void ReadChunk(ILoader loader, BinaryReader2 br)
         {
             long initialPos = br.BaseStream.Position;
-            string fourcc = Encoding.ASCII.GetString(BitConverter.GetBytes(br.ReadInt32()).Flip());
+            uint fourcc = br.ReadUInt32();
             int size = br.ReadInt32();
             switch (fourcc)
             {
-                case "Vers":
+                case 0x56657273: // Vers
                     VersionHash = br.ReadUInt64();
                     break;
-                case "DepN":
+                case 0x4465704E: // DepN
                     long entryCount = br.ReadInt64();
                     DepHash1 = br.ReadUInt64();
                     DepHash2 = br.ReadUInt64();
@@ -204,13 +204,13 @@ namespace VaultFormat
                     }
 
                     break;
-                case "StrN":
+                case 0x5374724E: // StrN
                     StrUnknown1 = br.ReadInt64();
                     break;
-                case "DatN":
+                case 0x4461744E: // DatN
                     // Handled in ExpN
                     break;
-                case "ExpN":
+                case 0x4578704E: // ExpN
                     long nestedChunkCount = br.ReadInt64();
                     for (long i = 0; i < nestedChunkCount; i++)
                     {
@@ -259,7 +259,7 @@ namespace VaultFormat
                         br.BaseStream.Position = pos;
                     }
                     break;
-                case "PtrN":
+                case 0x5074724E: // PtrN
                     // Unknown
                     int dataSize = size - 8;
                     PtrN = new PtrChunk();
@@ -278,9 +278,7 @@ namespace VaultFormat
                     throw new ReadFailedError("Unknown Chunk: " + fourcc);
             }
 
-
             br.BaseStream.Position = initialPos + size;
-
         }
 
         private void ReadVlt(ILoader loader, BinaryReader2 br)
@@ -296,7 +294,7 @@ namespace VaultFormat
             try
             {
                 long initialPos = br.BaseStream.Position;
-                string fourcc = Encoding.ASCII.GetString(br.ReadBytes(4).Flip());
+                uint fourcc = br.ReadUInt32();
                 // StrE
                 int size = br.ReadInt32(); // Size of Strings Array in hex
                 while (br.BaseStream.Position < initialPos + size)
@@ -325,7 +323,7 @@ namespace VaultFormat
         {
             try
             {
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("StrE")));
+                wr.Write(BitConverter.ToUInt32(Encoding.ASCII.GetBytes("StrE")));
                 wr.Write(getSizeOfStrE());
                 foreach (string String in Strings)
                 {
@@ -362,7 +360,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("StrE")),
+                Encoding.ASCII.GetBytes("StrE"),
                 BitConverter.GetBytes(16)
             };
             foreach (string String in Strings)
@@ -377,7 +375,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("Vers")),
+                Encoding.ASCII.GetBytes("Vers"),
                 BitConverter.GetBytes(16),
                 BitConverter.GetBytes(VersionHash)
             };
@@ -388,7 +386,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("DepN")),
+                Encoding.ASCII.GetBytes("DepN"),
                 BitConverter.GetBytes(96),
                 BitConverter.GetBytes((UInt64)Dependencies.Count()),
                 BitConverter.GetBytes(DepHash1),
@@ -408,7 +406,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("DatN"))
+                Encoding.ASCII.GetBytes("DatN")
             };
             foreach (AttributeHeader dataChunk in Attributes.Select(x => x.getHeader()))
             {
@@ -443,7 +441,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("ExpN")),
+                Encoding.ASCII.GetBytes("ExpN"),
                 BitConverter.GetBytes(16),
                 BitConverter.GetBytes((UInt64)Attributes.Select(x => x.getInfo()).Count())
             };
@@ -461,7 +459,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("StrN")),
+                Encoding.ASCII.GetBytes("StrN"),
                 BitConverter.GetBytes(16),
                 BitConverter.GetBytes(StrUnknown1)
             };
@@ -472,7 +470,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("PtrN")),
+                Encoding.ASCII.GetBytes("PtrN"),
                 BitConverter.GetBytes(16)
             };
             foreach (PtrChunkData data in PtrN.allData)
@@ -485,17 +483,16 @@ namespace VaultFormat
             return addPadding(bytes);
         }
 
-
         private void WriteVlt(BinaryWriter wr)
         {
             try
             {
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("Vers")));
+                wr.Write(BitConverter.ToUInt32(Encoding.ASCII.GetBytes("Vers")));
                 wr.Write(getSizeOfVers());
                 wr.Write(VersionHash);
                 wr.WritePadding();
 
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("DepN")));
+                wr.Write(BitConverter.ToUInt32(Encoding.ASCII.GetBytes("DepN")));
                 wr.Write(getSizeOfDepN());
                 wr.Write((UInt64)Dependencies.Count());
                 wr.Write(DepHash1);
@@ -509,12 +506,12 @@ namespace VaultFormat
                 }
                 wr.WritePadding();
 
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("StrN")));
+                wr.Write(BitConverter.ToUInt32(Encoding.ASCII.GetBytes("StrN")));
                 wr.Write(getSizeOfStrN());
                 wr.Write(StrUnknown1);
                 wr.WritePadding();
 
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("DatN")));
+                wr.Write(BitConverter.ToUInt32(Encoding.ASCII.GetBytes("DatN")));
                 wr.Write(getSizeOfDatN());
                 foreach (AttributeHeader dataChunk in Attributes.Select(x => x.getHeader()))
                 {
@@ -544,7 +541,7 @@ namespace VaultFormat
                 }
                 wr.WritePadding();
 
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("ExpN")));
+                wr.Write(BitConverter.ToUInt32(Encoding.ASCII.GetBytes("ExpN")));
                 wr.Write(getSizeOfExpN());
                 wr.Write((UInt64)Attributes.Select(x => x.getInfo()).Count());
                 foreach (SizeAndPositionInformation chunk in Attributes.Select(x => x.getInfo()))
@@ -556,7 +553,7 @@ namespace VaultFormat
                 }
                 wr.WritePadding();
 
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("PtrN")));
+                wr.Write(BitConverter.ToUInt32(Encoding.ASCII.GetBytes("PtrN")));
                 wr.Write(getSizeOfPtrN());
                 foreach (PtrChunkData data in PtrN.allData)
                 {

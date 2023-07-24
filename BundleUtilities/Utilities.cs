@@ -90,31 +90,6 @@ namespace BundleUtilities
             return result;
         }
 
-        public static byte[] Flip(this byte[] self)
-        {
-            byte[] result = new byte[self.Length];
-
-            int j = 0;
-            for (int i = self.Length - 1; i >= 0; i--)
-            {
-                result[j] = self[i];
-                j++;
-            }
-
-            return result;
-        }
-
-        public static bool NoData(this byte[] self)
-        {
-            for (int i = 0; i < self.Length; i++)
-            {
-                if (self[i] != 0x00)
-                    return false;
-            }
-
-            return true;
-        }
-
         public static void WriteCStr(this BinaryWriter self, string value)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(value);
@@ -132,18 +107,6 @@ namespace BundleUtilities
                 self.Write((byte)0);
             }
 
-        }
-
-        public static void WriteStringPadding(this BinaryWriter self)
-        {
-            long currentLength = self.BaseStream.Length;
-            if (currentLength % 8 != 0)
-            {
-                for (int i = 0; i < (8 - currentLength % 8); i++)
-                {
-                    self.Write((byte)0);
-                }
-            };
         }
 
         // Add padding: Has to be divisible by 16, else add padding

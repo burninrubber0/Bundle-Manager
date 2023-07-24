@@ -84,18 +84,18 @@ namespace LuaList
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
 
-            version = br.ReadInt32(); //0x0	0x4	int32_t Version number	1
-            br.ReadBytes(4); // 0x4	0x4			padding	
-            CgsId = br.ReadEncryptedString();  //0x8	0x8	CgsID List ID Encoded
-            var entriesPointer = br.ReadInt32(); //0x10	0x4	Unk0* Script list Unk0 format	
-            var typePointer = br.ReadInt32(); //0x14	0x4	char[32] * *		Types
-            var variablePointer = br.ReadInt32(); //0x18	0x4	char[32] * *		Variables
-            var numScripts = br.ReadInt32(); //0x1C	0x4	uint32_t	Num scripts
-            var dataLength = br.ReadInt32(); //0x20	0x4	uint32_t Data length Not including padding to end
-            listTitle = br.ReadLenString(128); //0x24	0x80	char[128] List title	
-            var numTypes = br.ReadByte(); //0xA4	0x1	uint8_t Num types		
-            var numVariables = br.ReadByte(); //0xA5	0x1	uint8_t Num variables
-            br.ReadBytes(26); // padding
+            version = br.ReadInt32();
+            br.ReadBytes(4);
+            CgsId = new EncryptedString(br.ReadUInt64());
+            var entriesPointer = br.ReadInt32();
+            var typePointer = br.ReadInt32();
+            var variablePointer = br.ReadInt32();
+            var numScripts = br.ReadInt32();
+            var dataLength = br.ReadInt32();
+            listTitle = br.ReadLenString(128);
+            var numTypes = br.ReadByte();
+            var numVariables = br.ReadByte();
+            br.ReadBytes(26);
 
             entries = new List<LuaListEntry>();
             for (int i = 0; i < numScripts; i++)

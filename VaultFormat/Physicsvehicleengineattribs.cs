@@ -85,12 +85,12 @@ namespace VaultFormat
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
-            TorqueScales2 = br.ReadVector4();
-            TorqueScales1 = br.ReadVector4();
-            GearUpRPMs2 = br.ReadVector4();
-            GearUpRPMs1 = br.ReadVector4();
-            GearRatios2 = br.ReadVector4();
-            GearRatios1 = br.ReadVector4();
+            TorqueScales2 = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            TorqueScales1 = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            GearUpRPMs2 = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            GearUpRPMs1 = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            GearRatios2 = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            GearRatios1 = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
             TransmissionEfficiency = br.ReadSingle();
             TorqueFallOffRPM = br.ReadSingle();
             MaxTorque = br.ReadSingle();

@@ -1,6 +1,7 @@
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.IO;
-using System.Numerics;
+using System.Text;
 
 namespace BundleUtilities
 {
@@ -85,12 +86,68 @@ namespace BundleUtilities
             return BinaryPrimitives.ReadDoubleLittleEndian(ReadBytes(8));
         }
 
-        public Vector4 ReadVector4()
+        public string ReadCStr()
         {
-            return new Vector4(ReadSingle(), ReadSingle(), ReadSingle(), ReadSingle());
+            List<byte> bytes = new List<byte>();
+
+            try
+            {
+                while (true)
+                {
+                    byte c = ReadByte();
+                    if (c == '\0')
+                        break;
+                    bytes.Add(c);
+                }
+            }
+            catch (EndOfStreamException)
+            {
+                // Ignore
+            }
+            return Encoding.UTF8.GetString(bytes.ToArray());
         }
 
-        public void SkipUniquePadding(int numberOfBytes) {
+        public string ReadCStringPtr()
+        {
+            uint ptr = ReadUInt32();
+            long pos = BaseStream.Position;
+            BaseStream.Position = ptr;
+            string result = ReadCStr();
+            BaseStream.Position = pos;
+
+            return result;
+        }
+
+        public string ReadLenString(int size)
+        {
+            string result = "";
+            bool readNull = false;
+            for (int i = 0; i < size; i++)
+            {
+                char c = (char)ReadByte();
+                if (c == '\0')
+                    readNull = true;
+                if (!readNull)
+                    result += c;
+            }
+
+            return result;
+        }
+
+        public bool EOF()
+        {
+            return BaseStream.Position >= BaseStream.Length;
+        }
+
+        public byte Peek()
+        {
+            byte b = ReadByte();
+            BaseStream.Seek(-1, SeekOrigin.Current);
+            return b;
+        }
+
+        public void SkipUniquePadding(int numberOfBytes)
+        {
             BaseStream.Position = BaseStream.Position + numberOfBytes;
         }
 

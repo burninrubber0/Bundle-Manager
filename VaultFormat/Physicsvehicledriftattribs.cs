@@ -111,7 +111,7 @@ namespace VaultFormat
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
-            DriftScaleToYawTorque = br.ReadVector4();
+            DriftScaleToYawTorque = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
             WheelSlip = br.ReadSingle();
             TimeToCapScale = br.ReadSingle();
             TimeForNaturalDrift = br.ReadSingle();

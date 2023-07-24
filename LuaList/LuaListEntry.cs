@@ -49,7 +49,7 @@ namespace LuaList
         }
 
         public void Read(ILoader loader, BinaryReader2 br) {
-            CgsId = br.ReadEncryptedString();
+            CgsId = new EncryptedString(br.ReadUInt64());
             Name = br.ReadLenString(128);
             Goal = br.ReadLenString(128);
             Description = br.ReadLenString(256);

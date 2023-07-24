@@ -31,13 +31,6 @@ namespace VehicleList
             return sb.ToString();
         }
 
-        public static EncryptedString ReadEncryptedString(this BinaryReader self)
-        {
-            ulong value = self.ReadUInt64();
-            EncryptedString id = new EncryptedString(value);
-            return id;
-        }
-
         public static void WriteEncryptedString(this BinaryWriter self, EncryptedString id, bool xbox = false)
         {
             ulong value = id.Encrypted;

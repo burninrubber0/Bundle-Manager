@@ -178,8 +178,8 @@ namespace VehicleList
 
                 vehicle.Index = i;
 
-                vehicle.ID = br.ReadEncryptedString();
-                vehicle.ParentID = br.ReadEncryptedString();
+                vehicle.ID = new EncryptedString(br.ReadUInt64());
+                vehicle.ParentID = new EncryptedString(br.ReadUInt64());
                 vehicle.WheelType = Encoding.ASCII.GetString(br.ReadBytes(32));
                 vehicle.CarName = Encoding.ASCII.GetString(br.ReadBytes(64));
                 vehicle.CarBrand = Encoding.ASCII.GetString(br.ReadBytes(32));
@@ -191,10 +191,10 @@ namespace VehicleList
                 vehicle.DisplayStrength = br.ReadByte();
                 vehicle.padding0 = br.ReadInt32();
                 vehicle.AttribSysCollectionKey = br.ReadInt64();
-                vehicle.ExhaustName = br.ReadEncryptedString();
+                vehicle.ExhaustName = new EncryptedString(br.ReadUInt64());
                 vehicle.ExhaustID = br.ReadInt64();
                 vehicle.EngineID = br.ReadInt64();
-                vehicle.EngineName = br.ReadEncryptedString();
+                vehicle.EngineName = new EncryptedString(br.ReadUInt64());
                 vehicle.ClassUnlockStreamHash = (ClassUnlock)br.ReadInt32();
                 vehicle.padding1 = br.ReadInt32();
                 vehicle.CarShutdownStreamID = br.ReadInt64();

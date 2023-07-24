@@ -117,21 +117,6 @@ namespace BundleFormat
             return true;
         }
 
-        public static byte Peek(this BinaryReader self)
-        {
-            byte b = self.ReadByte();
-            self.BaseStream.Seek(-1, SeekOrigin.Current);
-            return b;
-        }
-
-        public static bool VerifyMagic(this BinaryReader self, byte[] magic)
-        {
-            byte[] readMagic = self.ReadBytes(magic.Length);
-            if (readMagic.Matches(magic))
-                return true;
-            return false;
-        }
-
         public static void Align(this BinaryWriter self, byte alignment)
         {
             if (self.BaseStream.Position % alignment == 0)

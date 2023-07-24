@@ -42,7 +42,7 @@ namespace VaultFormat
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
-            BodyBox = br.ReadVector4();
+            BodyBox = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
         }
 
         public void Write(BinaryWriter wr)

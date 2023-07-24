@@ -430,7 +430,7 @@ namespace BundleFormat
             br2.BigEndian = false;
 
             // TODO: Store only the debug info and not the full string
-            ResourceStringTable = br2.ReadLenString();
+            ResourceStringTable = br2.ReadLenString(br2.ReadInt32());
 
             br2.Close();
 
@@ -707,6 +707,14 @@ namespace BundleFormat
             }
         }
 
+        public static bool VerifyMagic(BinaryReader2 br, byte[] magic)
+        {
+            byte[] readMagic = br.ReadBytes(magic.Length);
+            if (readMagic.Matches(magic))
+                return true;
+            return false;
+        }
+
         public static bool IsBundle(string path)
         {
             bool result;
@@ -716,7 +724,7 @@ namespace BundleFormat
                 Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
                 BinaryReader2 br = new BinaryReader2(s);
 
-                result = br.VerifyMagic(BND2Magic);
+                result = VerifyMagic(br, BND2Magic);
 
                 br.Close();
                 s.Close();
@@ -737,7 +745,7 @@ namespace BundleFormat
             Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
             BinaryReader2 br = new BinaryReader2(s);
 
-            if (!br.VerifyMagic(BND2Magic))
+            if (!VerifyMagic(br, BND2Magic))
             {
                 br.Close();
                 s.Close();
@@ -779,7 +787,7 @@ namespace BundleFormat
             Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
             BinaryReader2 br = new BinaryReader2(s);
 
-            if (!br.VerifyMagic(BND2Magic))
+            if (!VerifyMagic(br, BND2Magic))
             {
                 br.Close();
                 s.Close();
@@ -845,7 +853,7 @@ namespace BundleFormat
             Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
             BinaryReader2 br = new BinaryReader2(s);
 
-            if (!br.VerifyMagic(BND2Magic))
+            if (!VerifyMagic(br, BND2Magic))
             {
                 timer.StopLog();
                 br.Close();

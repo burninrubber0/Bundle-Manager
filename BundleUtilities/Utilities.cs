@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Buffers.Binary;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
@@ -7,14 +7,15 @@ using System.Reflection;
 
 namespace BundleUtilities
 {
-
     public class LogWriter
     {
         private string m_exePath = string.Empty;
+
         public LogWriter(string logMessage)
         {
             LogWrite(logMessage);
         }
+
         public void LogWrite(string logMessage)
         {
             m_exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -43,20 +44,9 @@ namespace BundleUtilities
         }
     }
 
-    public static class Util
-    {
-        // reverse byte order (64-bit)
-        public static UInt64 ReverseBytes(UInt64 value)
-        {
-            return (value & 0x00000000000000FFUL) << 56 | (value & 0x000000000000FF00UL) << 40 |
-                   (value & 0x0000000000FF0000UL) << 24 | (value & 0x00000000FF000000UL) << 8 |
-                   (value & 0x000000FF00000000UL) >> 8 | (value & 0x0000FF0000000000UL) >> 24 |
-                   (value & 0x00FF000000000000UL) >> 40 | (value & 0xFF00000000000000UL) >> 56;
-        }
-    }
     public static class Utilities
     {
-        public static ulong calcLookup8(string text)
+        public static ulong CalcLookup8(string text)
         {
             byte[] message = Encoding.ASCII.GetBytes(text);
             var hashValue = Lookup8.Hash(message, (ulong)message.Length, 0xABCDEF0011223344);
@@ -64,18 +54,11 @@ namespace BundleUtilities
             return hashValue;
         }
 
-        public static EncryptedString ReadEncryptedString(this BinaryReader self)
-        {
-            ulong value = self.ReadUInt64();
-            EncryptedString id = new EncryptedString(value);
-            return id;
-        }
-
         public static void WriteEncryptedString(this BinaryWriter self, EncryptedString id, bool xbox = false)
         {
             ulong value = id.Encrypted;
             if (xbox)
-                value = Util.ReverseBytes(value);
+                value = BinaryPrimitives.ReverseEndianness(value);
             self.Write(value);
         }
 
@@ -107,32 +90,6 @@ namespace BundleUtilities
             return result;
         }
 
-        public static bool EOF(this BinaryReader self)
-        {
-            return self.BaseStream.Position >= self.BaseStream.Length;
-        }
-
-        public static string ReadCStr(this BinaryReader self)
-        {
-            List<byte> bytes = new List<byte>();
-
-            try
-            {
-                while (true)
-                {
-                    byte c = self.ReadByte();
-                    if (c == '\0')
-                        break;
-                    bytes.Add(c);
-                }
-            }
-            catch (EndOfStreamException)
-            {
-                // Ignore
-            }
-            return Encoding.UTF8.GetString(bytes.ToArray());
-        }
-
         public static byte[] Flip(this byte[] self)
         {
             byte[] result = new byte[self.Length];
@@ -156,40 +113,6 @@ namespace BundleUtilities
             }
 
             return true;
-        }
-
-        public static string ReadLenString(this BinaryReader self, int size)
-        {
-            string result = "";
-            bool readNull = false;
-            for (int i = 0; i < size; i++)
-            {
-                char c = (char)self.ReadByte();
-                if (c == '\0')
-                    readNull = true;
-                if (!readNull)
-                    result += c;
-            }
-
-            return result;
-        }
-
-        public static string ReadLenString(this BinaryReader self)
-        {
-            int len = self.ReadInt32();
-
-            return self.ReadLenString(len);
-        }
-
-        public static string ReadCStringPtr(this BinaryReader self)
-        {
-            uint ptr = self.ReadUInt32();
-            long pos = self.BaseStream.Position;
-            self.BaseStream.Position = ptr;
-            string result = self.ReadCStr();
-            self.BaseStream.Position = pos;
-
-            return result;
         }
 
         public static void WriteCStr(this BinaryWriter self, string value)

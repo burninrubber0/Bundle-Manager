@@ -170,10 +170,10 @@ namespace VaultFormat
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
-            RearRightWheelPosition = br.ReadVector4();
-            FrontRightWheelPosition = br.ReadVector4();
-            CoMOffset = br.ReadVector4();
-            BrakeScaleToFactor = br.ReadVector4();
+            RearRightWheelPosition = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            FrontRightWheelPosition = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            CoMOffset = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            BrakeScaleToFactor = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
             YawDampingOnTakeOff = br.ReadSingle();
             TractionLineLength = br.ReadSingle();
             TimeForFullBrake = br.ReadSingle();

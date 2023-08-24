@@ -88,24 +88,24 @@ namespace VaultFormat
             BlueBoostBase = br.ReadSingle();
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(MaxBoostSpeed);
-            wr.Write(BoostRule);
-            wr.Write(BoostKickTime);
-            wr.Write(BoostKickMinTime);
-            wr.Write(BoostKickMaxTime);
-            wr.Write(BoostKickMaxStartSpeed);
-            wr.Write(BoostKickHeightOffset);
-            wr.Write(BoostKickAcceleration);
-            wr.Write(BoostKick);
-            wr.Write(BoostHeightOffset);
-            wr.Write(BoostBase);
-            wr.Write(BoostAcceleration);
-            wr.Write(BlueMaxBoostSpeed);
-            wr.Write(BlueBoostKickTime);
-            wr.Write(BlueBoostKick);
-            wr.Write(BlueBoostBase);
+            bw.Write(MaxBoostSpeed);
+            bw.Write(BoostRule);
+            bw.Write(BoostKickTime);
+            bw.Write(BoostKickMinTime);
+            bw.Write(BoostKickMaxTime);
+            bw.Write(BoostKickMaxStartSpeed);
+            bw.Write(BoostKickHeightOffset);
+            bw.Write(BoostKickAcceleration);
+            bw.Write(BoostKick);
+            bw.Write(BoostHeightOffset);
+            bw.Write(BoostBase);
+            bw.Write(BoostAcceleration);
+            bw.Write(BlueMaxBoostSpeed);
+            bw.Write(BlueBoostKickTime);
+            bw.Write(BlueBoostKick);
+            bw.Write(BlueBoostBase);
         }
     }
 }

@@ -569,7 +569,8 @@ namespace BundleFormat
         public void Write(string path)
         {
             Stream s = File.Open(path, FileMode.Create);
-            BinaryWriter bw = new BinaryWriter(s);
+            BinaryWriter2 bw = new BinaryWriter2(s);
+            bw.BigEndian = Console;
 
             Write(bw);
 
@@ -577,19 +578,19 @@ namespace BundleFormat
             bw.Close();
         }
 
-        public void Write(BinaryWriter bw)
+        public void Write(BinaryWriter2 bw)
         {
-            bw.Write(BundleArchive.BND2Magic);
-            bw.Write(this.Version);
-            bw.Write((int)this.Platform);
+            bw.Write(BND2Magic);
+            bw.Write(Version);
+            bw.Write((int)Platform);
 
             long rstOffset = bw.BaseStream.Position;
-            bw.Write((int)0);
+            bw.Write(0);
 
-            bw.Write(this.Entries.Count);
+            bw.Write(Entries.Count);
 
             long idBlockOffsetPos = bw.BaseStream.Position;
-            bw.Write((int)0);
+            bw.Write(0);
 
             long[] fileBlockOffsetsPos = new long[3];
 
@@ -599,7 +600,7 @@ namespace BundleFormat
                 bw.BaseStream.Position += 4;
             }
 
-            bw.Write((int)this.Flags);
+            bw.Write((int)Flags);
 
             bw.Align(16);
 
@@ -608,10 +609,10 @@ namespace BundleFormat
             bw.Write((uint)currentOffset);
             bw.BaseStream.Position = currentOffset;
 
-            if (this.Flags.HasFlag(Flags.HasResourceStringTable))
+            if (Flags.HasFlag(Flags.HasResourceStringTable))
             {
                 // TODO: Rebuild RST from DebugInfo
-                bw.WriteCStr(this.ResourceStringTable);
+                bw.WriteCStr(ResourceStringTable);
 
                 bw.Align(16);
             }
@@ -679,11 +680,11 @@ namespace BundleFormat
                 bw.Write((uint)blockStart);
                 bw.BaseStream.Position = blockStart;
 
-                for (int j = 0; j < this.Entries.Count; j++)
+                for (int j = 0; j < Entries.Count; j++)
                 {
-                    BundleEntry entry = this.Entries[j];
+                    BundleEntry entry = Entries[j];
                     EntryBlock entryBlock = entry.EntryBlocks[i];
-                    bool compressed = this.Flags.HasFlag(Flags.Compressed);
+                    bool compressed = Flags.HasFlag(Flags.Compressed);
                     uint size = compressed ? (compressedBlocks[j][i] == null ? 0 : (uint)compressedBlocks[j][i].Length) : (uint)entryBlock.Data.Length;
 
                     if (size > 0)
@@ -698,7 +699,7 @@ namespace BundleFormat
                         else
                             bw.Write(entryBlock.Data);
 
-                        bw.Align((i != 0 && j != this.Entries.Count - 1) ? (byte)0x80 : (byte)16);
+                        bw.Align((i != 0 && j != Entries.Count - 1) ? (byte)0x80 : (byte)16);
                     }
                 }
 

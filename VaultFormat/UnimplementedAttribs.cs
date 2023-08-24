@@ -1,4 +1,3 @@
-using System.IO;
 using BundleUtilities;
 
 namespace VaultFormat
@@ -11,8 +10,8 @@ namespace VaultFormat
 
         public UnimplementedAttribs(SizeAndPositionInformation chunk, AttributeHeader dataChunk)
         {
-            this.info = chunk;
-            this.header = dataChunk;
+            info = chunk;
+            header = dataChunk;
         }
 
         public int getDataSize()
@@ -32,10 +31,12 @@ namespace VaultFormat
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
+
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
+
         }
     }
 }

@@ -73,7 +73,7 @@ namespace BundleUtilities
             if (BaseStream.Length - BaseStream.Position < 4)
                 throw new EndOfStreamException();
             if (BigEndian)
-                return BinaryPrimitives.ReadSingleBigEndian(ReadBytes(8));
+                return BinaryPrimitives.ReadSingleBigEndian(ReadBytes(4));
             return BinaryPrimitives.ReadSingleLittleEndian(ReadBytes(4));
         }
 

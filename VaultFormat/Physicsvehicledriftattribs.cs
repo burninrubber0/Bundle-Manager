@@ -149,45 +149,44 @@ namespace VaultFormat
             br.SkipPadding();
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(DriftScaleToYawTorque.toBytes());
-            wr.Write(WheelSlip);
-            wr.Write(TimeToCapScale);
-            wr.Write(TimeForNaturalDrift);
-            wr.Write(SteeringDriftScaleFactor);
-            wr.Write(SideForcePeakDriftAngle);
-            wr.Write(SideForceMagnitude);
-            wr.Write(SideForceDriftSpeedCutOff);
-            wr.Write(SideForceDriftAngleCutOff);
-            wr.Write(SideForceDirftScaleCutOff);
-            wr.Write(NeutralTimeToReduceDrift);
-            wr.Write(NaturalYawTorqueCutOffAngle);
-            wr.Write(NaturalYawTorque);
-            wr.Write(NaturalDriftTimeToReachBaseSlip);
-            wr.Write(NaturalDriftStartSlip);
-            wr.Write(NaturalDriftScaleDecay);
-            wr.Write(MinSpeedForDrift);
-            wr.Write(InitialDriftPushTime);
-            wr.Write(InitialDriftPushScaleLimit);
-            wr.Write(InitialDriftPushDynamicInc);
-            wr.Write(InitialDriftPushBaseInc);
-            wr.Write(GripFromSteering);
-            wr.Write(GripFromGasLetOff);
-            wr.Write(GripFromBrake);
-            wr.Write(GasDriftScaleFactor);
-            wr.Write(ForcedDriftTimeToReachBaseSlip);
-            wr.Write(ForcedDriftStartSlip);
-            wr.Write(DriftTorqueFallOff);
-            wr.Write(DriftSidewaysDamping);
-            wr.Write(DriftMaxAngle);
-            wr.Write(DriftAngularDamping);
-            wr.Write(CounterSteeringDriftScaleFactor);
-            wr.Write(CappedScale);
-            wr.Write(BrakingDriftScaleFactor);
-            wr.Write(BaseCounterSteeringDriftScaleFactor);
-            wr.WritePadding();
+            bw.Write(DriftScaleToYawTorque.toBytes(bw.BigEndian));
+            bw.Write(WheelSlip);
+            bw.Write(TimeToCapScale);
+            bw.Write(TimeForNaturalDrift);
+            bw.Write(SteeringDriftScaleFactor);
+            bw.Write(SideForcePeakDriftAngle);
+            bw.Write(SideForceMagnitude);
+            bw.Write(SideForceDriftSpeedCutOff);
+            bw.Write(SideForceDriftAngleCutOff);
+            bw.Write(SideForceDirftScaleCutOff);
+            bw.Write(NeutralTimeToReduceDrift);
+            bw.Write(NaturalYawTorqueCutOffAngle);
+            bw.Write(NaturalYawTorque);
+            bw.Write(NaturalDriftTimeToReachBaseSlip);
+            bw.Write(NaturalDriftStartSlip);
+            bw.Write(NaturalDriftScaleDecay);
+            bw.Write(MinSpeedForDrift);
+            bw.Write(InitialDriftPushTime);
+            bw.Write(InitialDriftPushScaleLimit);
+            bw.Write(InitialDriftPushDynamicInc);
+            bw.Write(InitialDriftPushBaseInc);
+            bw.Write(GripFromSteering);
+            bw.Write(GripFromGasLetOff);
+            bw.Write(GripFromBrake);
+            bw.Write(GasDriftScaleFactor);
+            bw.Write(ForcedDriftTimeToReachBaseSlip);
+            bw.Write(ForcedDriftStartSlip);
+            bw.Write(DriftTorqueFallOff);
+            bw.Write(DriftSidewaysDamping);
+            bw.Write(DriftMaxAngle);
+            bw.Write(DriftAngularDamping);
+            bw.Write(CounterSteeringDriftScaleFactor);
+            bw.Write(CappedScale);
+            bw.Write(BrakingDriftScaleFactor);
+            bw.Write(BaseCounterSteeringDriftScaleFactor);
+            bw.WritePadding();
         }
-
     }
 }

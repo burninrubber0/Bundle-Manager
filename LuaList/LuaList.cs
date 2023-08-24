@@ -83,6 +83,7 @@ namespace LuaList
         {
             MemoryStream ms = entry.MakeStream();
             BinaryReader2 br = new BinaryReader2(ms);
+            br.BigEndian = entry.Console;
 
             version = br.ReadInt32();
             br.ReadBytes(4);
@@ -145,10 +146,11 @@ namespace LuaList
         public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(ms);
+            BinaryWriter2 bw = new BinaryWriter2(ms);
+            bw.BigEndian = entry.Console;
             bw.Write(version);
             bw.WriteUniquePadding(4);
-            bw.WriteEncryptedString(CgsId);
+            bw.Write(CgsId.Encrypted);
             bw.Write(getLengthOfHeader());
             bw.Write(getLengthOfHeader() + getLengthOfEntries());
             bw.Write(getLengthOfHeader() + getLengthOfEntries() + getLengthOfTypes());

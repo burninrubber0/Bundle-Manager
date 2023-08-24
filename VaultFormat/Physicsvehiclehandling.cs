@@ -63,16 +63,16 @@ namespace VaultFormat
             PhysicsVehicleBaseAttribs = new RefSpec(loader, br);
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            PhysicsVehicleSuspensionAttribs.Write(wr);
-            PhysicsVehicleSteeringAttribs.Write(wr);
-            PhysicsVehicleEngineAttribs.Write(wr);
-            PhysicsVehicleDriftAttribs.Write(wr);
-            PhysicsVehicleCollisionAttribs.Write(wr);
-            PhysicsVehicleBoostAttribs.Write(wr);
-            PhysicsVehicleBodyRollAttribs.Write(wr);
-            PhysicsVehicleBaseAttribs.Write(wr);
+            PhysicsVehicleSuspensionAttribs.Write(bw);
+            PhysicsVehicleSteeringAttribs.Write(bw);
+            PhysicsVehicleEngineAttribs.Write(bw);
+            PhysicsVehicleDriftAttribs.Write(bw);
+            PhysicsVehicleCollisionAttribs.Write(bw);
+            PhysicsVehicleBoostAttribs.Write(bw);
+            PhysicsVehicleBodyRollAttribs.Write(bw);
+            PhysicsVehicleBaseAttribs.Write(bw);
         }
     }
 }

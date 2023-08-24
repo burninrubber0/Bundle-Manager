@@ -85,23 +85,23 @@ namespace VaultFormat
             br.SkipPadding();
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(TimeForLock);
-            wr.Write(StraightReactionBias);
-            wr.Write(SpeedForMinAngle);
-            wr.Write(SpeedForMaxAngle);
-            wr.Write(MinAngle);
-            wr.Write(MaxAngle);
-            wr.Write(AiPidCoefficientP);
-            wr.Write(AiPidCoefficientI);
-            wr.Write(AiPidCoefficientDriftP);
-            wr.Write(AiPidCoefficientDriftI);
-            wr.Write(AiPidCoefficientDriftD);
-            wr.Write(AiPidCoefficientD);
-            wr.Write(AiMinLookAheadDistanceForDrift);
-            wr.Write(AiLookAheadTimeForDrift);
-            wr.WritePadding();
+            bw.Write(TimeForLock);
+            bw.Write(StraightReactionBias);
+            bw.Write(SpeedForMinAngle);
+            bw.Write(SpeedForMaxAngle);
+            bw.Write(MinAngle);
+            bw.Write(MaxAngle);
+            bw.Write(AiPidCoefficientP);
+            bw.Write(AiPidCoefficientI);
+            bw.Write(AiPidCoefficientDriftP);
+            bw.Write(AiPidCoefficientDriftI);
+            bw.Write(AiPidCoefficientDriftD);
+            bw.Write(AiPidCoefficientD);
+            bw.Write(AiMinLookAheadDistanceForDrift);
+            bw.Write(AiLookAheadTimeForDrift);
+            bw.WritePadding();
         }
     }
 }

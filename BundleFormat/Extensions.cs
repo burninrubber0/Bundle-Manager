@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
@@ -117,22 +118,23 @@ namespace BundleFormat
             return true;
         }
 
-        public static void Align(this BinaryWriter self, byte alignment)
-        {
-            if (self.BaseStream.Position % alignment == 0)
-                return;
-            self.BaseStream.Position = alignment * ((self.BaseStream.Position + (alignment - 1)) / alignment);
-            self.BaseStream.Position--;
-            self.Write((byte)0);
-        }
-
-        public static byte[] toBytes(this Vector4 vec)
+        public static byte[] toBytes(this Vector4 vec, bool swap = false)
         {
             List<byte> bytes = new List<byte>();
-            bytes.AddRange(BitConverter.GetBytes(vec.X));
-            bytes.AddRange(BitConverter.GetBytes(vec.Y));
-            bytes.AddRange(BitConverter.GetBytes(vec.Z));
-            bytes.AddRange(BitConverter.GetBytes(vec.W));
+            if (swap)
+            {
+                bytes.AddRange(BitConverter.GetBytes(BinaryPrimitives.ReadSingleBigEndian(BitConverter.GetBytes(vec.X))));
+                bytes.AddRange(BitConverter.GetBytes(BinaryPrimitives.ReadSingleBigEndian(BitConverter.GetBytes(vec.Y))));
+                bytes.AddRange(BitConverter.GetBytes(BinaryPrimitives.ReadSingleBigEndian(BitConverter.GetBytes(vec.Z))));
+                bytes.AddRange(BitConverter.GetBytes(BinaryPrimitives.ReadSingleBigEndian(BitConverter.GetBytes(vec.W))));
+            }
+            else
+            {
+                bytes.AddRange(BitConverter.GetBytes(vec.X));
+                bytes.AddRange(BitConverter.GetBytes(vec.Y));
+                bytes.AddRange(BitConverter.GetBytes(vec.Z));
+                bytes.AddRange(BitConverter.GetBytes(vec.W));
+            }
             return bytes.ToArray();
         }
     }

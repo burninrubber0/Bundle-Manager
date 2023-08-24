@@ -69,7 +69,7 @@ namespace BurnoutImage
             }
 
             MemoryStream msx = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(msx);
+            BinaryWriter2 bw = new BinaryWriter2(msx);
 
             // Original game header: https://burnout.wiki/wiki/Texture/PC
             // TODO: Implement as separate option

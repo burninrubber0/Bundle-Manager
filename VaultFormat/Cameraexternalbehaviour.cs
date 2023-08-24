@@ -89,25 +89,25 @@ namespace VaultFormat
             BoostFieldOfView = br.ReadSingle();
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(ZDistanceScale);
-            wr.Write(ZAndTiltCutoffSpeedMPH);
-            wr.Write(YawSpring);
-            wr.Write(TiltCameraScale);
-            wr.Write(TiltAroundCar);
-            wr.Write(SlideZOffsetMax);
-            wr.Write(SlideYScale);
-            wr.Write(SlideXScale);
-            wr.Write(PivotZOffset);
-            wr.Write(PivotLength);
-            wr.Write(PivotHeight);
-            wr.Write(PitchSpring);
-            wr.Write(FieldOfView);
-            wr.Write(DriftYawSpring);
-            wr.Write(DownAngle);
-            wr.Write(BoostFieldOfViewZoom);
-            wr.Write(BoostFieldOfView);
+            bw.Write(ZDistanceScale);
+            bw.Write(ZAndTiltCutoffSpeedMPH);
+            bw.Write(YawSpring);
+            bw.Write(TiltCameraScale);
+            bw.Write(TiltAroundCar);
+            bw.Write(SlideZOffsetMax);
+            bw.Write(SlideYScale);
+            bw.Write(SlideXScale);
+            bw.Write(PivotZOffset);
+            bw.Write(PivotLength);
+            bw.Write(PivotHeight);
+            bw.Write(PitchSpring);
+            bw.Write(FieldOfView);
+            bw.Write(DriftYawSpring);
+            bw.Write(DownAngle);
+            bw.Write(BoostFieldOfViewZoom);
+            bw.Write(BoostFieldOfView);
         }
     }
 }

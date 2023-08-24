@@ -96,9 +96,7 @@ namespace VaultFormat
         {
             Offences = new RefSpec[12];
             for (int i = 0; i < 12; i++)
-            {
                 Offences[i] = new RefSpec(loader, br);
-            }
             SoundExhaustAsset = new RefSpec(loader, br);
             SoundEngineAsset = new RefSpec(loader, br);
             PhysicsVehicleHandlingAsset = new RefSpec(loader, br);
@@ -120,31 +118,29 @@ namespace VaultFormat
             br.SkipUniquePadding(3);
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
             foreach (RefSpec r in Offences)
-            {
-                r.Write(wr);
-            }
-            SoundExhaustAsset.Write(wr);
-            SoundEngineAsset.Write(wr);
-            PhysicsVehicleHandlingAsset.Write(wr);
-            GraphicsAsset.Write(wr);
-            CarUnlockShot.Write(wr);
-            CameraExternalBehaviourAsset.Write(wr);
-            CameraBumperBehaviourAsset.Write(wr);
-            wr.Write(VehicleID);
-            wr.Write(PhysicsAsset);
-            wr.Write(MasterSceneMayaBinaryFile);
-            wr.Write(InGameName);
-            wr.Write(GameplayAsset);
-            wr.Write(ExhaustName);
-            wr.Write(ExhaustEntityKey);
-            wr.Write(EngineName);
-            wr.Write(EngineEntityKey);
-            wr.Write(DefaultWheel);
-            wr.Write(BuildThisVehicle);
-            wr.WriteUniquePadding(3);
+                r.Write(bw);
+            SoundExhaustAsset.Write(bw);
+            SoundEngineAsset.Write(bw);
+            PhysicsVehicleHandlingAsset.Write(bw);
+            GraphicsAsset.Write(bw);
+            CarUnlockShot.Write(bw);
+            CameraExternalBehaviourAsset.Write(bw);
+            CameraBumperBehaviourAsset.Write(bw);
+            bw.Write(VehicleID);
+            bw.Write(PhysicsAsset);
+            bw.Write(MasterSceneMayaBinaryFile);
+            bw.Write(InGameName);
+            bw.Write(GameplayAsset);
+            bw.Write(ExhaustName);
+            bw.Write(ExhaustEntityKey);
+            bw.Write(EngineName);
+            bw.Write(EngineEntityKey);
+            bw.Write(DefaultWheel);
+            bw.Write(BuildThisVehicle);
+            bw.WriteUniquePadding(3);
         }
     }
 }

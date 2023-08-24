@@ -230,16 +230,13 @@ namespace VehicleList
         public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(ms);
+            BinaryWriter2 bw = new BinaryWriter2(ms);
+            bw.BigEndian = entry.Console;
 
-            bool console = entry.Console;
-            // TODO: Implement Console Saving
-
-            bw.Write(console ? Util.ReverseBytes((int)Entries.Count) : (int)Entries.Count);
-            bw.Write(console ? Util.ReverseBytes((int)0x10) : (int)0x10);
-
-            bw.Write(console ? Util.ReverseBytes(Unknown1) : Unknown1);
-            bw.Write(console ? Util.ReverseBytes(Unknown2) : Unknown2);
+            bw.Write(Entries.Count);
+            bw.Write(0x10);
+            bw.Write(Unknown1);
+            bw.Write(Unknown2);
 
             for (int i = 0; i < Entries.Count; i++)
             {
@@ -248,35 +245,35 @@ namespace VehicleList
                 // Need to create the correct byte before writing
                 vehicle.VehicleAndBoostType = (byte)(((byte)vehicle.VehicleType << 4) + (byte)vehicle.BoostType);
 
-                bw.WriteEncryptedString(vehicle.ID, console);
-                bw.WriteEncryptedString(vehicle.ParentID, console);
-                bw.WriteLenString(vehicle.WheelType, 32, console);
-                bw.WriteLenString(vehicle.CarName, 64, console);
-                bw.WriteLenString(vehicle.CarBrand, 32, console);
-                bw.Write(console ? Util.ReverseBytes(vehicle.DamageLimit) : vehicle.DamageLimit);
-                bw.Write(console ? Util.ReverseBytes((uint)vehicle.Flags) : (uint)vehicle.Flags);
+                bw.Write(vehicle.ID.Encrypted);
+                bw.Write(vehicle.ParentID.Encrypted);
+                bw.WriteLenString(vehicle.WheelType, 32);
+                bw.WriteLenString(vehicle.CarName, 64);
+                bw.WriteLenString(vehicle.CarBrand, 32);
+                bw.Write(vehicle.DamageLimit);
+                bw.Write((uint)vehicle.Flags);
                 bw.Write(vehicle.BoostLength);
                 bw.Write((byte)vehicle.VehicleRank);
                 bw.Write(vehicle.BoostCapacity);
                 bw.Write(vehicle.DisplayStrength);
                 bw.Write(vehicle.padding0);
-                bw.Write(console ? Util.ReverseBytes(vehicle.AttribSysCollectionKey) : vehicle.AttribSysCollectionKey);
-                bw.WriteEncryptedString(vehicle.ExhaustName, console);
-                bw.Write(console ? Util.ReverseBytes(vehicle.ExhaustID) : vehicle.ExhaustID);
-                bw.Write(console ? Util.ReverseBytes(vehicle.EngineID) : vehicle.EngineID);
-                bw.WriteEncryptedString(vehicle.EngineName, console);
-                bw.Write(console ? Util.ReverseBytes((uint)vehicle.ClassUnlockStreamHash) : (uint)vehicle.ClassUnlockStreamHash);
+                bw.Write(vehicle.AttribSysCollectionKey);
+                bw.Write(vehicle.ExhaustName.Encrypted);
+                bw.Write(vehicle.ExhaustID);
+                bw.Write(vehicle.EngineID);
+                bw.Write(vehicle.EngineName.Encrypted);
+                bw.Write((uint)vehicle.ClassUnlockStreamHash);
                 bw.Write(vehicle.padding1);
-                bw.Write(console ? Util.ReverseBytes(vehicle.CarShutdownStreamID) : vehicle.CarShutdownStreamID);
-                bw.Write(console ? Util.ReverseBytes(vehicle.CarReleasedStreamID) : vehicle.CarReleasedStreamID);
-                bw.Write(console ? Util.ReverseBytes((uint)vehicle.AIMusicHash) : (uint)vehicle.AIMusicHash);
+                bw.Write(vehicle.CarShutdownStreamID);
+                bw.Write(vehicle.CarReleasedStreamID);
+                bw.Write((uint)vehicle.AIMusicHash);
                 bw.Write((byte)vehicle.AIExhaustIndex);
                 bw.Write((byte)vehicle.AIExhaustIndex2);
                 bw.Write((byte)vehicle.AIExhaustIndex3);
                 bw.Write(vehicle.padding2);
                 bw.Write(vehicle.Unknown[0]);
                 bw.Write(vehicle.Unknown[1]);
-                bw.Write(console ? Util.ReverseBytes((uint)vehicle.Category) : (uint)vehicle.Category);
+                bw.Write((uint)vehicle.Category);
                 bw.Write(vehicle.VehicleAndBoostType);
                 bw.Write((byte)vehicle.FinishType);
                 bw.Write(vehicle.MaxSpeedNoBoost);

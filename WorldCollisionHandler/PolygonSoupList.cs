@@ -61,7 +61,7 @@ namespace WorldCollisionHandler
             return result;
         }
 
-        public void Write(BinaryWriter bw)
+        public void Write(BinaryWriter2 bw)
         {
             // Cap to 0x9D64 for PC
             ushort unknownProperty1 = (ushort)(UnknownProperty & 0xFFFF);
@@ -168,7 +168,7 @@ namespace WorldCollisionHandler
             return result;
         }
 
-        public void Write(BinaryWriter bw)
+        public void Write(BinaryWriter2 bw)
         {
             long chunkStartPtr = bw.BaseStream.Position;
             bw.Write(Position);
@@ -574,7 +574,8 @@ namespace WorldCollisionHandler
         public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(ms);
+            BinaryWriter2 bw = new BinaryWriter2(ms);
+            bw.BigEndian = entry.Console;
 
             bw.Write(Min);
             bw.Write(Unknown4);

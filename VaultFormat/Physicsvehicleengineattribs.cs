@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
 using BundleFormat;
 using BundleUtilities;
@@ -61,26 +60,26 @@ namespace VaultFormat
             return CountingUtilities.AddPadding(bytes);
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(TorqueScales2.toBytes());
-            wr.Write(TorqueScales1.toBytes());
-            wr.Write(GearUpRPMs2.toBytes());
-            wr.Write(GearUpRPMs1.toBytes());
-            wr.Write(GearRatios2.toBytes());
-            wr.Write(GearRatios1.toBytes());
-            wr.Write(TransmissionEfficiency);
-            wr.Write(TorqueFallOffRPM);
-            wr.Write(MaxTorque);
-            wr.Write(MaxRPM);
-            wr.Write(LSDMGearUpSpeed);
-            wr.Write(GearChangeTime);
-            wr.Write(FlyWheelInertia);
-            wr.Write(FlyWheelFriction);
-            wr.Write(EngineResistance);
-            wr.Write(EngineLowEndTorqueFactor);
-            wr.Write(EngineBraking);
-            wr.Write(Differential);
+            bw.Write(TorqueScales2.toBytes(bw.BigEndian));
+            bw.Write(TorqueScales1.toBytes(bw.BigEndian));
+            bw.Write(GearUpRPMs2.toBytes(bw.BigEndian));
+            bw.Write(GearUpRPMs1.toBytes(bw.BigEndian));
+            bw.Write(GearRatios2.toBytes(bw.BigEndian));
+            bw.Write(GearRatios1.toBytes(bw.BigEndian));
+            bw.Write(TransmissionEfficiency);
+            bw.Write(TorqueFallOffRPM);
+            bw.Write(MaxTorque);
+            bw.Write(MaxRPM);
+            bw.Write(LSDMGearUpSpeed);
+            bw.Write(GearChangeTime);
+            bw.Write(FlyWheelInertia);
+            bw.Write(FlyWheelFriction);
+            bw.Write(EngineResistance);
+            bw.Write(EngineLowEndTorqueFactor);
+            bw.Write(EngineBraking);
+            bw.Write(Differential);
         }
 
         public void Read(ILoader loader, BinaryReader2 br)

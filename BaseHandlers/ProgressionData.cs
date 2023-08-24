@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using BundleFormat;
@@ -603,7 +603,8 @@ namespace BaseHandlers
         public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(ms);
+            BinaryWriter2 bw = new BinaryWriter2(ms);
+            bw.BigEndian = entry.Console;
 
             // TODO: Write
 

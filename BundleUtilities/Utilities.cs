@@ -54,14 +54,6 @@ namespace BundleUtilities
             return hashValue;
         }
 
-        public static void WriteEncryptedString(this BinaryWriter self, EncryptedString id, bool xbox = false)
-        {
-            ulong value = id.Encrypted;
-            if (xbox)
-                value = BinaryPrimitives.ReverseEndianness(value);
-            self.Write(value);
-        }
-
         public static bool IsValidPath(string path)
         {
             return !string.IsNullOrEmpty(path);
@@ -88,38 +80,6 @@ namespace BundleUtilities
             }
 
             return result;
-        }
-
-        public static void WriteCStr(this BinaryWriter self, string value)
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(value);
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                self.Write(bytes[i]);
-            }
-            self.Write((byte)0);
-        }
-        
-        public static void WriteUniquePadding(this BinaryWriter self, int numberOfPadding)
-        {
-            for (int i = 0; i < numberOfPadding; i++)
-            {
-                self.Write((byte)0);
-            }
-
-        }
-
-        // Add padding: Has to be divisible by 16, else add padding
-        public static void WritePadding(this BinaryWriter self)
-        {
-            long currentLength = self.BaseStream.Length;
-            if (currentLength % 16 != 0)
-            {
-                for (int i = 0; i < (16 - currentLength % 16); i++)
-                {
-                    self.Write((byte)0);
-                }
-            };
         }
 
         /// <summary>

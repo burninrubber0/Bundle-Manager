@@ -75,19 +75,19 @@ namespace VaultFormat
             EncodedTypePad_Offences = br.ReadInt16();
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(PlayerPalletteIndex);
-            wr.Write(PlayerColourIndex);
-            wr.Write(Alloc);   //Allocate space for x* Size   Always 1 in VEH_P*	
-            wr.Write(Num_RandomTrafficColours);   // Count
-            wr.Write(Size);   // Size of each entry
-            wr.Write(EncodedTypePad);  // padding
-            wr.Write(RandomTrafficColours);
-            wr.Write(Alloc_Offences);   // Allocate space for x* Size
-            wr.Write(Num_Offences);  //  Count
-            wr.Write(Size_Offences);    //  Size of ea // ch entry
-            wr.Write(EncodedTypePad_Offences); //padding
+            bw.Write(PlayerPalletteIndex);
+            bw.Write(PlayerColourIndex);
+            bw.Write(Alloc);   //Allocate space for x* Size   Always 1 in VEH_P*	
+            bw.Write(Num_RandomTrafficColours);   // Count
+            bw.Write(Size);   // Size of each entry
+            bw.Write(EncodedTypePad);  // padding
+            bw.Write(RandomTrafficColours);
+            bw.Write(Alloc_Offences);   // Allocate space for x* Size
+            bw.Write(Num_Offences);  //  Count
+            bw.Write(Size_Offences);    //  Size of ea // ch entry
+            bw.Write(EncodedTypePad_Offences); //padding
         }
     }
 }

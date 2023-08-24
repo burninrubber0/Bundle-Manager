@@ -45,9 +45,9 @@ namespace VaultFormat
             BodyBox = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(BodyBox.toBytes());
+            bw.Write(BodyBox.toBytes(bw.BigEndian));
         }
     }
 }

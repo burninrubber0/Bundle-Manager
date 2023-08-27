@@ -72,19 +72,19 @@ namespace VaultFormat
             br.SkipUniquePadding(4);
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(WheelLongForceHeightOffset);
-            wr.Write(WheelLatForceHeightOffset);
-            wr.Write(WeightTransferDecayZ);
-            wr.Write(WeightTransferDecayX);
-            wr.Write(RollSpringStiffness);
-            wr.Write(RollSpringDampening);
-            wr.Write(PitchSpringStiffness);
-            wr.Write(PitchSpringDampening);
-            wr.Write(FactorOfWeightZ);
-            wr.Write(FactorOfWeightX);
-            wr.WriteUniquePadding(4);
+            bw.Write(WheelLongForceHeightOffset);
+            bw.Write(WheelLatForceHeightOffset);
+            bw.Write(WeightTransferDecayZ);
+            bw.Write(WeightTransferDecayX);
+            bw.Write(RollSpringStiffness);
+            bw.Write(RollSpringDampening);
+            bw.Write(PitchSpringStiffness);
+            bw.Write(PitchSpringDampening);
+            bw.Write(FactorOfWeightZ);
+            bw.Write(FactorOfWeightX);
+            bw.WriteUniquePadding(4);
         }
     }
 }

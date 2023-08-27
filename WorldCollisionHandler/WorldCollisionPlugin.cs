@@ -65,7 +65,7 @@ namespace WorldCollisionHandler
                     if (entry == null)
                         break;
                     Stream outFile = File.Open(path + "/" + idListName + ".bin", FileMode.Create, FileAccess.Write);
-                    BinaryWriter bw = new BinaryWriter(outFile);
+                    BinaryWriter2 bw = new BinaryWriter2(outFile);
                     bw.Write(entry.EntryBlocks[0].Data);
                     bw.Flush();
                     bw.Close();
@@ -75,7 +75,7 @@ namespace WorldCollisionHandler
                     if (polyEntry == null)
                         break;
                     Stream outFilePoly = File.Open(path + "/" + polyName + ".bin", FileMode.Create, FileAccess.Write);
-                    BinaryWriter bwPoly = new BinaryWriter(outFilePoly);
+                    BinaryWriter2 bwPoly = new BinaryWriter2(outFilePoly);
                     bwPoly.Write(polyEntry.EntryBlocks[0].Data);
                     bwPoly.Flush();
                     bwPoly.Close();

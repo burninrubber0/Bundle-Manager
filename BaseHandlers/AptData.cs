@@ -304,7 +304,7 @@ namespace BaseHandlers
         // Data
         public CharacterData Data;
 
-        private static Frame ReadFrame(BinaryReader br, uint dataStart)
+        private static Frame ReadFrame(BinaryReader2 br, uint dataStart)
         {
             Frame frame = new Frame();
 
@@ -435,7 +435,7 @@ namespace BaseHandlers
             return frame;
         }
 
-        public static Character Read(BinaryReader br, uint dataStart)
+        public static Character Read(BinaryReader2 br, uint dataStart)
         {
             Character result = new Character();
 
@@ -669,7 +669,7 @@ namespace BaseHandlers
             return result;
         }
 
-        public void Write(BinaryWriter bw)
+        public void Write(BinaryWriter2 bw)
         {
             bw.Write((uint)Type);
             bw.Write(Signature);
@@ -779,7 +779,8 @@ namespace BaseHandlers
         public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(ms);
+            BinaryWriter2 bw = new BinaryWriter2(ms);
+            bw.BigEndian = entry.Console;
 
             // TODO: Write
 

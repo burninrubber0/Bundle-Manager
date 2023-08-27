@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing.Design;
 using System.IO;
+using System.Numerics;
 using System.Windows.Forms;
 
 namespace BaseHandlers
@@ -56,14 +57,14 @@ namespace BaseHandlers
             return BitConverter.GetBytes(m_id);
         }
 
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
-            m_id = reader.ReadUInt64();
+            m_id = br.ReadUInt64();
         }
 
-        public void Write(BinaryWriter writer)
+        public void Write(BinaryWriter2 bw)
         {
-            writer.Write(m_id);
+            bw.Write(m_id);
         }
 
         public override string ToString()
@@ -74,46 +75,48 @@ namespace BaseHandlers
 
     public class StartingGrid
     {
-        public List<Vector3I> StartingPositions { get; set; } = new List<Vector3I>();
-        public List<Vector3I> StartingDirections { get; set; } = new List<Vector3I>();
+        public List<Vector4> StartingPositions { get; set; } = new List<Vector4>();
+        public List<Vector4> StartingDirections { get; set; } = new List<Vector4>();
 
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
-            StartingPositions = new List<Vector3I>(8);
+            StartingPositions = new List<Vector4>(8);
             for (int i = 0; i < 8; i++)
             {
-                StartingPositions[i] = new Vector3I(
-                    reader.ReadSingle(),
-                    reader.ReadSingle(),
-                    reader.ReadSingle(), reader.ReadSingle());
+                StartingPositions[i] = new Vector4(
+                    br.ReadSingle(),
+                    br.ReadSingle(),
+                    br.ReadSingle(),
+                    br.ReadSingle());
             }
 
-            StartingDirections = new List<Vector3I>(8);
+            StartingDirections = new List<Vector4>(8);
             for (int i = 0; i < 8; i++)
             {
-                StartingDirections[i] = new Vector3I(
-                    reader.ReadSingle(),
-                    reader.ReadSingle(),
-                    reader.ReadSingle(), reader.ReadSingle());
+                StartingDirections[i] = new Vector4(
+                    br.ReadSingle(),
+                    br.ReadSingle(),
+                    br.ReadSingle(),
+                    br.ReadSingle());
             }
         }
 
-        public void Write(BinaryWriter writer)
+        public void Write(BinaryWriter2 bw)
         {
             for (int i = 0; i < 8; i++)
             {
-                writer.Write(StartingPositions[i].X);
-                writer.Write(StartingPositions[i].Y);
-                writer.Write(StartingPositions[i].Z);
-                writer.Write(StartingPositions[i].S);
+                bw.Write(StartingPositions[i].X);
+                bw.Write(StartingPositions[i].Y);
+                bw.Write(StartingPositions[i].Z);
+                bw.Write(StartingPositions[i].W);
             }
 
             for (int i = 0; i < 8; i++)
             {
-                writer.Write(StartingDirections[i].X);
-                writer.Write(StartingDirections[i].Y);
-                writer.Write(StartingDirections[i].Z);
-                writer.Write(StartingDirections[i].S);
+                bw.Write(StartingDirections[i].X);
+                bw.Write(StartingDirections[i].Y);
+                bw.Write(StartingDirections[i].Z);
+                bw.Write(StartingDirections[i].W);
             }
         }
     }
@@ -130,30 +133,30 @@ namespace BaseHandlers
         public float DimensionY { get; set; } = 0;
         public float DimensionZ { get; set; } = 0;
 
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
-            PositionX = reader.ReadSingle();
-            PositionY = reader.ReadSingle();
-            PositionZ = reader.ReadSingle();
-            RotationX = reader.ReadSingle();
-            RotationY = reader.ReadSingle();
-            RotationZ = reader.ReadSingle();
-            DimensionX = reader.ReadSingle();
-            DimensionY = reader.ReadSingle();
-            DimensionZ = reader.ReadSingle();
+            PositionX = br.ReadSingle();
+            PositionY = br.ReadSingle();
+            PositionZ = br.ReadSingle();
+            RotationX = br.ReadSingle();
+            RotationY = br.ReadSingle();
+            RotationZ = br.ReadSingle();
+            DimensionX = br.ReadSingle();
+            DimensionY = br.ReadSingle();
+            DimensionZ = br.ReadSingle();
         }
 
-        public void Write(BinaryWriter writer)
+        public void Write(BinaryWriter2 bw)
         {
-            writer.Write(PositionX);
-            writer.Write(PositionY);
-            writer.Write(PositionZ);
-            writer.Write(RotationX);
-            writer.Write(RotationY);
-            writer.Write(RotationZ);
-            writer.Write(DimensionX);
-            writer.Write(DimensionY);
-            writer.Write(DimensionZ);
+            bw.Write(PositionX);
+            bw.Write(PositionY);
+            bw.Write(PositionZ);
+            bw.Write(RotationX);
+            bw.Write(RotationY);
+            bw.Write(RotationZ);
+            bw.Write(DimensionX);
+            bw.Write(DimensionY);
+            bw.Write(DimensionZ);
         }
     }
 
@@ -174,24 +177,24 @@ namespace BaseHandlers
         public RegionType meType { get; set; } = RegionType.E_TYPE_LANDMARK;
         private byte[] muPad { get; set; } = new byte[1];
 
-        public virtual void Read(BinaryReader reader)
+        public virtual void Read(BinaryReader2 br)
         {
             mBoxRegion = new BoxRegion();
-            mBoxRegion.Read(reader);
-            mId = reader.ReadInt32();
-            miRegionIndex = reader.ReadInt16();
-            meType = (RegionType)reader.ReadByte();
-            muPad = reader.ReadBytes(1);
+            mBoxRegion.Read(br);
+            mId = br.ReadInt32();
+            miRegionIndex = br.ReadInt16();
+            meType = (RegionType)br.ReadByte();
+            muPad = br.ReadBytes(1);
         }
 
-        public virtual void Write(BinaryWriter writer)
+        public virtual void Write(BinaryWriter2 bw)
         {
-            mBoxRegion.Write(writer);
+            mBoxRegion.Write(bw);
 
-            writer.Write(mId);
-            writer.Write(miRegionIndex);
-            writer.Write((byte)meType);
-            writer.Write(muPad);
+            bw.Write(mId);
+            bw.Write(miRegionIndex);
+            bw.Write((byte)meType);
+            bw.Write(muPad);
         }
     }
 
@@ -210,47 +213,47 @@ namespace BaseHandlers
         public byte muDistrict { get; set; } = 0;
         public byte mu8Flags { get; set; } = 0;
 
-        public new void Read(BinaryReader reader)
+        public new void Read(BinaryReader2 br)
         {
-            base.Read(reader);
-            long startingGridOffset = reader.ReadUInt32();
-            int miStartingGridCount = reader.ReadByte();
-            muDesignIndex = reader.ReadByte();
-            muDistrict = reader.ReadByte();
-            mu8Flags = reader.ReadByte();
+            base.Read(br);
+            long startingGridOffset = br.ReadUInt32();
+            int miStartingGridCount = br.ReadByte();
+            muDesignIndex = br.ReadByte();
+            muDistrict = br.ReadByte();
+            mu8Flags = br.ReadByte();
 
-            long currentPosition = reader.BaseStream.Position;
-            reader.BaseStream.Position = startingGridOffset;
+            long currentPosition = br.BaseStream.Position;
+            br.BaseStream.Position = startingGridOffset;
 
             for (int i = 0; i < miStartingGridCount; i++)
             {
                 StartingGrid startingGrid = new StartingGrid();
-                startingGrid.Read(reader);
+                startingGrid.Read(br);
                 mpaStartingGrids.Add(startingGrid);
             }
-            reader.BaseStream.Position = currentPosition;
+            br.BaseStream.Position = currentPosition;
 
         }
 
-        public new void Write(BinaryWriter writer)
+        public new void Write(BinaryWriter2 bw)
         {
-            base.Write(writer);
-            startingGridOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write((byte)mpaStartingGrids.Count);
-            writer.Write(muDesignIndex);
-            writer.Write(muDistrict);
-            writer.Write(mu8Flags);
+            base.Write(bw);
+            startingGridOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write((byte)mpaStartingGrids.Count);
+            bw.Write(muDesignIndex);
+            bw.Write(muDistrict);
+            bw.Write(mu8Flags);
         }
 
-        public void WriteStartingGrid(BinaryWriter writer){
+        public void WriteStartingGrid(BinaryWriter2 bw){
 
-            long currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = startingGridOffsetPosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
+            long currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = startingGridOffsetPosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
             foreach (StartingGrid grid in mpaStartingGrids) {
-                grid.Write(writer);
+                grid.Write(bw);
             }
         }
     }
@@ -317,28 +320,28 @@ namespace BaseHandlers
         public Type GenericRegionType { get; set; } = Type.E_TYPE_JUNK_YARD;
         public sbyte IsOneWay { get; set; } = 0;
 
-        public new void Read(BinaryReader reader)
+        public new void Read(BinaryReader2 br)
         {
-            base.Read(reader);
-            GroupID = reader.ReadInt32();
-            CameraCut1 = reader.ReadInt16();
-            CameraCut2 = reader.ReadInt16();
-            CameraType1 = (StuntCameraType)reader.ReadSByte();
-            CameraType2 = (StuntCameraType)reader.ReadSByte();
-            GenericRegionType = (Type)reader.ReadByte();
-            IsOneWay = reader.ReadSByte();
+            base.Read(br);
+            GroupID = br.ReadInt32();
+            CameraCut1 = br.ReadInt16();
+            CameraCut2 = br.ReadInt16();
+            CameraType1 = (StuntCameraType)br.ReadSByte();
+            CameraType2 = (StuntCameraType)br.ReadSByte();
+            GenericRegionType = (Type)br.ReadByte();
+            IsOneWay = br.ReadSByte();
         }
 
-        public new void Write(BinaryWriter writer)
+        public new void Write(BinaryWriter2 bw)
         {
-            base.Write(writer);
-            writer.Write(GroupID);
-            writer.Write(CameraCut1);
-            writer.Write(CameraCut2);
-            writer.Write((sbyte)CameraType1);
-            writer.Write((sbyte)CameraType2);
-            writer.Write((byte)GenericRegionType);
-            writer.Write(IsOneWay);
+            base.Write(bw);
+            bw.Write(GroupID);
+            bw.Write(CameraCut1);
+            bw.Write(CameraCut2);
+            bw.Write((sbyte)CameraType1);
+            bw.Write((sbyte)CameraType2);
+            bw.Write((byte)GenericRegionType);
+            bw.Write(IsOneWay);
         }
     }
 
@@ -359,22 +362,22 @@ namespace BaseHandlers
         public ScoreType muScoreType { get; set; } = ScoreType.E_SCORE_TYPE_DISTANCE;
         public int miScoreAmount { get; set; } = 0;
 
-        public override void Read(BinaryReader reader)
+        public override void Read(BinaryReader2 br)
         {
-            base.Read(reader);
+            base.Read(br);
 
-            muScoreType = (ScoreType)reader.ReadByte();
-            reader.ReadBytes(3); // Padding
-            miScoreAmount = reader.ReadInt32();
+            muScoreType = (ScoreType)br.ReadByte();
+            br.ReadBytes(3); // Padding
+            miScoreAmount = br.ReadInt32();
         }
 
-        public override void Write(BinaryWriter writer)
+        public override void Write(BinaryWriter2 bw)
         {
-            base.Write(writer);
+            base.Write(bw);
 
-            writer.Write((byte)muScoreType);
-            writer.Write(new byte[3]); // Padding
-            writer.Write(miScoreAmount);
+            bw.Write((byte)muScoreType);
+            bw.Write(new byte[3]); // Padding
+            bw.Write(miScoreAmount);
         }
     }
 
@@ -387,84 +390,84 @@ namespace BaseHandlers
         private long TriggerOffsetPosition = 0;
 
         private long CGSIDOffsetPosition = 0;
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
             // Read the trigger pointer array
-            long genericRegionOffset = reader.ReadUInt32();
-            int TriggerCount = reader.ReadInt32();
+            long genericRegionOffset = br.ReadUInt32();
+            int TriggerCount = br.ReadInt32();
 
             // Read the region ID array
-            long cgsOffset = reader.ReadUInt32();
-            int RegionIdCount = reader.ReadInt32();
-            long currentPosition = reader.BaseStream.Position;
+            long cgsOffset = br.ReadUInt32();
+            int RegionIdCount = br.ReadInt32();
+            long currentPosition = br.BaseStream.Position;
 
-            reader.BaseStream.Position = genericRegionOffset;
+            br.BaseStream.Position = genericRegionOffset;
             uint[]  Triggers = new uint[TriggerCount];
             for (int i = 0; i < TriggerCount; i++)
             {
-                Triggers[i] = reader.ReadUInt32();
+                Triggers[i] = br.ReadUInt32();
             }
 
             TriggerIds = new List<int>();
             foreach (uint trigger in Triggers)
             {
-                reader.BaseStream.Position = trigger;
+                br.BaseStream.Position = trigger;
                 GenericRegion region = new GenericRegion();
-                region.Read(reader);
+                region.Read(br);
                 TriggerIds.Add(region.mId);
             }
 
-            reader.BaseStream.Position = cgsOffset;
+            br.BaseStream.Position = cgsOffset;
             RegionIds = new List<CgsID>();
             for (int i = 0; i < RegionIdCount; i++)
             {
                 CgsID id = new CgsID();
-                id.Read(reader);
+                id.Read(br);
                 RegionIds.Add(id);
             }
 
-            reader.BaseStream.Position = currentPosition;
+            br.BaseStream.Position = currentPosition;
         }
 
-        public void Write(BinaryWriter writer)
+        public void Write(BinaryWriter2 bw)
         {
-            TriggerOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(TriggerIds.Count);
-            CGSIDOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(RegionIds.Count);            
+            TriggerOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write(TriggerIds.Count);
+            CGSIDOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write(RegionIds.Count);            
         }
 
-        public void WritePointerStuff(BinaryWriter writer, Dictionary<int, uint> genericRegionOffsets) {
+        public void WritePointerStuff(BinaryWriter2 bw, Dictionary<int, uint> genericRegionOffsets) {
 
-            long currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = TriggerOffsetPosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
+            long currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = TriggerOffsetPosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
             foreach (int trigger in TriggerIds)
             {
-                writer.Write(genericRegionOffsets[trigger]);
+                bw.Write(genericRegionOffsets[trigger]);
             }
-            long paddingCount = 16 - (writer.BaseStream.Position % 16);
+            long paddingCount = 16 - (bw.BaseStream.Position % 16);
             if (paddingCount < 16)
             {
                 for (int i = 0; i < paddingCount; i++)
-                    writer.Write((byte)0);
+                    bw.Write((byte)0);
             }
-            currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = CGSIDOffsetPosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
+            currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = CGSIDOffsetPosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
             foreach (CgsID ids in RegionIds)
             {
-                ids.Write(writer);
+                ids.Write(bw);
             }
-            paddingCount = 16 - (writer.BaseStream.Position % 16);
+            paddingCount = 16 - (bw.BaseStream.Position % 16);
             if (paddingCount < 16)
             {
                 for (int i = 0; i < paddingCount; i++)
-                    writer.Write((byte)0);
+                    bw.Write((byte)0);
             }
         }
     }
@@ -478,52 +481,52 @@ namespace BaseHandlers
 
         private long StuntElementOffsetPosition = 0;
 
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
             mId = new CgsID();
-            mId.Read(reader);
-            miCamera = reader.ReadInt64();
+            mId.Read(br);
+            miCamera = br.ReadInt64();
 
-            uint mppStuntElementsOffset = reader.ReadUInt32();
-            int miStuntElementCount = reader.ReadInt32();
+            uint mppStuntElementsOffset = br.ReadUInt32();
+            int miStuntElementCount = br.ReadInt32();
 
-            long currentPosition = reader.BaseStream.Position;
-            reader.BaseStream.Position = mppStuntElementsOffset;
+            long currentPosition = br.BaseStream.Position;
+            br.BaseStream.Position = mppStuntElementsOffset;
             uint[] Triggers = new uint[miStuntElementCount];
             for (int i = 0; i < miStuntElementCount; i++)
             {
-                Triggers[i] = reader.ReadUInt32();
+                Triggers[i] = br.ReadUInt32();
             }
 
             stuntElementRegions = new List<int>();
             foreach (uint trigger in Triggers)
             {
-                reader.BaseStream.Position = trigger;
+                br.BaseStream.Position = trigger;
                 GenericRegion region = new GenericRegion();
-                region.Read(reader);
+                region.Read(br);
                 stuntElementRegions.Add(region.mId);
             }
-            reader.BaseStream.Position = currentPosition;
+            br.BaseStream.Position = currentPosition;
         }
 
         // Write something in triggerIds, because we dont have the actual positions yet
-        public void Write(BinaryWriter writer)
+        public void Write(BinaryWriter2 bw)
         {
-            mId.Write(writer);
-            writer.Write(miCamera);
-            StuntElementOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(stuntElementRegions.Count);
+            mId.Write(bw);
+            bw.Write(miCamera);
+            StuntElementOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write(stuntElementRegions.Count);
         }
 
-        public void WriteStuntElements(BinaryWriter writer, Dictionary<int, uint> genericRegionOffsets) {
-            long currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = StuntElementOffsetPosition;
-            writer.Write(currentPosition);
-            writer.BaseStream.Position = currentPosition;
+        public void WriteStuntElements(BinaryWriter2 bw, Dictionary<int, uint> genericRegionOffsets) {
+            long currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = StuntElementOffsetPosition;
+            bw.Write(currentPosition);
+            bw.BaseStream.Position = currentPosition;
             foreach (int trigger in stuntElementRegions)
             {
-                writer.Write(genericRegionOffsets[trigger]);
+                bw.Write(genericRegionOffsets[trigger]);
             }
         }
     }
@@ -531,31 +534,31 @@ namespace BaseHandlers
     public class RoamingLocation
     {
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public Vector3I Position { get; set; } = new Vector3I(0,0,0,0);
+        public Vector4 Position { get; set; } = new Vector4(0,0,0,0);
         public byte DistrictIndex { get; set; } = 0;
 
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
-            Position = new Vector3I(
-                reader.ReadSingle(),
-                reader.ReadSingle(),
-                reader.ReadSingle(),
-                reader.ReadSingle());
-            DistrictIndex = reader.ReadByte();
+            Position = new Vector4(
+                br.ReadSingle(),
+                br.ReadSingle(),
+                br.ReadSingle(),
+                br.ReadSingle());
+            DistrictIndex = br.ReadByte();
             // Read and discard padding
-            reader.ReadBytes(15);
+            br.ReadBytes(15);
         }
 
-        public void Write(BinaryWriter writer)
+        public void Write(BinaryWriter2 bw)
         {
-            writer.Write(Position.X);
-            writer.Write(Position.Y);
-            writer.Write(Position.Z);
-            writer.Write(Position.S);
-            writer.Write(DistrictIndex);
+            bw.Write(Position.X);
+            bw.Write(Position.Y);
+            bw.Write(Position.Z);
+            bw.Write(Position.W);
+            bw.Write(DistrictIndex);
 
             // Write padding
-            writer.Write(new byte[15]);
+            bw.Write(new byte[15]);
         }
     }
 
@@ -567,14 +570,14 @@ namespace BaseHandlers
             meType = RegionType.E_TYPE_VFXBOX_REGION;
         }
 
-        public override void Read(BinaryReader reader)
+        public override void Read(BinaryReader2 br)
         {
-            base.Read(reader);
+            base.Read(br);
         }
 
-        public override void Write(BinaryWriter writer)
+        public override void Write(BinaryWriter2 bw)
         {
-            base.Write(writer);
+            base.Write(bw);
         }
     }
 
@@ -589,37 +592,37 @@ namespace BaseHandlers
         }
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public Vector3I mPosition { get; set; } = new Vector3I(0, 0, 0, 0);
+        public Vector4 mPosition { get; set; } = new Vector4(0, 0, 0, 0);
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public Vector3I mDirection { get; set; } = new Vector3I(0, 0, 0, 0);
+        public Vector4 mDirection { get; set; } = new Vector4(0, 0, 0, 0);
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public CgsID mJunkyardId { get; set; } = new CgsID();
         public Type muType { get; set; } = 0;
         private byte[] padding = new byte[7];
 
-        public void Read(BinaryReader reader)
+        public void Read(BinaryReader2 br)
         {
-            mPosition = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            mDirection = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            mPosition = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            mDirection = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
             mJunkyardId = new CgsID();
-            mJunkyardId.Read(reader);
-            muType = (Type)reader.ReadByte();
-            padding = reader.ReadBytes(7);
+            mJunkyardId.Read(br);
+            muType = (Type)br.ReadByte();
+            padding = br.ReadBytes(7);
         }
 
-        public void Write(BinaryWriter writer)
+        public void Write(BinaryWriter2 bw)
         {
-            writer.Write(mPosition.X);
-            writer.Write(mPosition.Y);
-            writer.Write(mPosition.Z);
-            writer.Write(mPosition.S);
-            writer.Write(mDirection.X);
-            writer.Write(mDirection.Y);
-            writer.Write(mDirection.Z);
-            writer.Write(mDirection.S);
-            mJunkyardId.Write(writer);
-            writer.Write((byte)muType);
-            writer.Write(padding);
+            bw.Write(mPosition.X);
+            bw.Write(mPosition.Y);
+            bw.Write(mPosition.Z);
+            bw.Write(mPosition.W);
+            bw.Write(mDirection.X);
+            bw.Write(mDirection.Y);
+            bw.Write(mDirection.Z);
+            bw.Write(mDirection.W);
+            mJunkyardId.Write(bw);
+            bw.Write((byte)muType);
+            bw.Write(padding);
         }
     }
 
@@ -627,8 +630,8 @@ namespace BaseHandlers
     {
         public int miVersionNumber { get; set; }
         public uint muSize { get; set; }
-        public Vector3I mPlayerStartPosition { get; set; } 
-        public Vector3I mPlayerStartDirection { get; set; } 
+        public Vector4 mPlayerStartPosition { get; set; } 
+        public Vector4 mPlayerStartDirection { get; set; } 
         public List<Landmark> mpLandmarks { get; set; }
         public int miOnlineLandmarkCount { get; set; }
         public List<SignatureStunt> mpSignatureStunts { get; set; }
@@ -651,8 +654,8 @@ namespace BaseHandlers
             miVersionNumber = reader.ReadInt32();
             muSize = reader.ReadUInt32();
             reader.ReadBytes(8);// skip 8 bytes of padding
-            mPlayerStartPosition = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            mPlayerStartDirection = new Vector3I(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            mPlayerStartPosition = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            mPlayerStartDirection = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             // read landmarks
             long LandmarkTriggersOffset = reader.ReadUInt32();
             int miLandmarkCount = reader.ReadInt32();
@@ -797,172 +800,173 @@ namespace BaseHandlers
         public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
-            BinaryWriter writer = new BinaryWriter(ms);
-            writer.Write(miVersionNumber);
-            long SizePosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.WriteUniquePadding(8); //padding
-            writer.Write(mPlayerStartPosition.X);
-            writer.Write(mPlayerStartPosition.Y);
-            writer.Write(mPlayerStartPosition.Z);
-            writer.Write(mPlayerStartPosition.S);
-            writer.Write(mPlayerStartDirection.X);
-            writer.Write(mPlayerStartDirection.Y);
-            writer.Write(mPlayerStartDirection.Z);
-            writer.Write(mPlayerStartDirection.S);
+            BinaryWriter2 bw = new BinaryWriter2(ms);
+            bw.BigEndian = entry.Console;
+            bw.Write(miVersionNumber);
+            long SizePosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.WriteUniquePadding(8); //padding
+            bw.Write(mPlayerStartPosition.X);
+            bw.Write(mPlayerStartPosition.Y);
+            bw.Write(mPlayerStartPosition.Z);
+            bw.Write(mPlayerStartPosition.W);
+            bw.Write(mPlayerStartDirection.X);
+            bw.Write(mPlayerStartDirection.Y);
+            bw.Write(mPlayerStartDirection.Z);
+            bw.Write(mPlayerStartDirection.W);
 
-            long LandmarkOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(mpLandmarks.Count);
-            writer.Write(miOnlineLandmarkCount);
-            long SignatureStuntskOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(mpSignatureStunts.Count);
-            long GenericRegionsOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(mpGenericRegions.Count);
-            long KillzoneOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(mpKillzones.Count);
-            long BlackspotOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(mpBlackspots.Count);
-            long VFXBoxRegionsOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(mpVFXBoxRegions.Count);
-            long RoamingLocationsOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(mpRoamingLocations.Count);
-            long SpawnLocationsOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(mpSpawnLocations.Count);
-            long TriggerOffsetPosition = writer.BaseStream.Position;
-            writer.WriteUniquePadding(4);
-            writer.Write(mpLandmarks.Count + mpGenericRegions.Count + mpBlackspots.Count + mpVFXBoxRegions.Count);
-            writer.WriteUniquePadding(4); // padding
+            long LandmarkOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write(mpLandmarks.Count);
+            bw.Write(miOnlineLandmarkCount);
+            long SignatureStuntskOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write(mpSignatureStunts.Count);
+            long GenericRegionsOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write(mpGenericRegions.Count);
+            long KillzoneOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write(mpKillzones.Count);
+            long BlackspotOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write(mpBlackspots.Count);
+            long VFXBoxRegionsOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write(mpVFXBoxRegions.Count);
+            long RoamingLocationsOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write(mpRoamingLocations.Count);
+            long SpawnLocationsOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write(mpSpawnLocations.Count);
+            long TriggerOffsetPosition = bw.BaseStream.Position;
+            bw.WriteUniquePadding(4);
+            bw.Write(mpLandmarks.Count + mpGenericRegions.Count + mpBlackspots.Count + mpVFXBoxRegions.Count);
+            bw.WriteUniquePadding(4); // padding
 
-            long currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = LandmarkOffsetPosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
+            long currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = LandmarkOffsetPosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
             List<uint> landmarkOffsets = new List<uint>();
             foreach (Landmark landmark in mpLandmarks)
             {
-                landmarkOffsets.Add((uint)writer.BaseStream.Position);
-                landmark.Write(writer);
+                landmarkOffsets.Add((uint)bw.BaseStream.Position);
+                landmark.Write(bw);
             }
-            writer.WritePadding();
+            bw.WritePadding();
 
-            currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = SignatureStuntskOffsetPosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
+            currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = SignatureStuntskOffsetPosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
             foreach (SignatureStunt stunt in mpSignatureStunts)
             {
-                stunt.Write(writer);
+                stunt.Write(bw);
             }
-            writer.WritePadding();
+            bw.WritePadding();
 
-            currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = GenericRegionsOffsetPosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
+            currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = GenericRegionsOffsetPosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
             Dictionary<int, uint> genericRegionOffsets = new Dictionary<int, uint>();
             foreach (GenericRegion region in mpGenericRegions)
             {
-                genericRegionOffsets.Add(region.mId, (uint)writer.BaseStream.Position);
-                region.Write(writer);
+                genericRegionOffsets.Add(region.mId, (uint)bw.BaseStream.Position);
+                region.Write(bw);
             }
-            writer.WritePadding();
+            bw.WritePadding();
 
-            currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = KillzoneOffsetPosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
+            currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = KillzoneOffsetPosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
             foreach (Killzone killzone in mpKillzones)
             {
-                killzone.Write(writer);
+                killzone.Write(bw);
             };
-            writer.WritePadding();
+            bw.WritePadding();
 
-            currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = BlackspotOffsetPosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
+            currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = BlackspotOffsetPosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
             List<uint> blackspotOffsets = new List<uint>();
             foreach (Blackspot blackspot in mpBlackspots)
             {
-                blackspotOffsets.Add((uint)writer.BaseStream.Position);
-                blackspot.Write(writer);
+                blackspotOffsets.Add((uint)bw.BaseStream.Position);
+                blackspot.Write(bw);
             }
-            writer.WritePadding();
+            bw.WritePadding();
 
-            currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = VFXBoxRegionsOffsetPosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
+            currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = VFXBoxRegionsOffsetPosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
             List<uint> vfxBoxRegionOffsets = new List<uint>();
             foreach (VFXBoxRegion region in mpVFXBoxRegions)
             {
-                vfxBoxRegionOffsets.Add((uint)writer.BaseStream.Position);
-                region.Write(writer);
+                vfxBoxRegionOffsets.Add((uint)bw.BaseStream.Position);
+                region.Write(bw);
             }
-            writer.WritePadding();
+            bw.WritePadding();
 
-            currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = RoamingLocationsOffsetPosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
+            currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = RoamingLocationsOffsetPosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
             foreach (RoamingLocation location in mpRoamingLocations)
             {
-                location.Write(writer);
+                location.Write(bw);
             }
-            writer.WritePadding();
+            bw.WritePadding();
 
-            currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = SpawnLocationsOffsetPosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
+            currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = SpawnLocationsOffsetPosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
             foreach (SpawnLocation location in mpSpawnLocations)
             {
-                location.Write(writer);
+                location.Write(bw);
             }
-            writer.WritePadding();
+            bw.WritePadding();
 
             foreach (Landmark land in mpLandmarks) {
-                land.WriteStartingGrid(writer);
+                land.WriteStartingGrid(bw);
             }
 
             foreach (SignatureStunt stunt in mpSignatureStunts)
             {
-                stunt.WriteStuntElements(writer, genericRegionOffsets);
+                stunt.WriteStuntElements(bw, genericRegionOffsets);
             }
 
             foreach (Killzone killzone in mpKillzones)
             {
-                killzone.WritePointerStuff(writer, genericRegionOffsets);
+                killzone.WritePointerStuff(bw, genericRegionOffsets);
             };
 
-            currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = TriggerOffsetPosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
-            foreach (uint region in vfxBoxRegionOffsets) writer.Write(region);
-            foreach (uint region in blackspotOffsets) writer.Write(region);
-            foreach (uint region in genericRegionOffsets.Values) writer.Write(region);
-            foreach (uint region in landmarkOffsets) writer.Write(region);
+            currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = TriggerOffsetPosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
+            foreach (uint region in vfxBoxRegionOffsets) bw.Write(region);
+            foreach (uint region in blackspotOffsets) bw.Write(region);
+            foreach (uint region in genericRegionOffsets.Values) bw.Write(region);
+            foreach (uint region in landmarkOffsets) bw.Write(region);
 
-            currentPosition = writer.BaseStream.Position;
-            writer.BaseStream.Position = SizePosition;
-            writer.Write((uint)currentPosition);
-            writer.BaseStream.Position = currentPosition;
-            writer.WritePadding();
+            currentPosition = bw.BaseStream.Position;
+            bw.BaseStream.Position = SizePosition;
+            bw.Write((uint)currentPosition);
+            bw.BaseStream.Position = currentPosition;
+            bw.WritePadding();
 
-            writer.Flush();
+            bw.Flush();
 
             byte[] data = ms.ToArray();
 
-            writer.Close();
+            bw.Close();
             ms.Close();
 
             entry.EntryBlocks[0].Data = data;

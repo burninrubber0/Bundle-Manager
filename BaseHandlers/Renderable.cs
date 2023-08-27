@@ -128,7 +128,7 @@ namespace BaseHandlers
             Model = new Model(meshes);
         }
 
-        public VertexData ReadVertex(BinaryReader br, VertexAttribute attribute)
+        public VertexData ReadVertex(BinaryReader2 br, VertexAttribute attribute)
         {
             switch (attribute.Size) // We don't use type here. This is wrong tbh.
             {
@@ -196,7 +196,7 @@ namespace BaseHandlers
             return new VertexData();
         }
 
-        public void ReadBody(BinaryReader br)
+        public void ReadBody(BinaryReader2 br)
         {
             for (int i = 0; i < NumIndices; i++)
             {

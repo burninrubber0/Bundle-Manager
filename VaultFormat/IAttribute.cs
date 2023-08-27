@@ -13,6 +13,6 @@ namespace VaultFormat
 
         void Read(ILoader loader, BinaryReader2 br);
 
-        void Write(BinaryWriter wr);
+        void Write(BinaryWriter2 bw);
     }
 }

@@ -73,19 +73,19 @@ namespace VaultFormat
             AccelerationDampening = br.ReadSingle();
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(ZOffset);
-            wr.Write(YOffset);
-            wr.Write(YawSpring);
-            wr.Write(RollSpring);
-            wr.Write(PitchSpring);
-            wr.Write(FieldOfView);
-            wr.Write(BoostFieldOfView);
-            wr.Write(BodyRollScale);
-            wr.Write(BodyPitchScale);
-            wr.Write(AccelerationResponse);
-            wr.Write(AccelerationDampening);
+            bw.Write(ZOffset);
+            bw.Write(YOffset);
+            bw.Write(YawSpring);
+            bw.Write(RollSpring);
+            bw.Write(PitchSpring);
+            bw.Write(FieldOfView);
+            bw.Write(BoostFieldOfView);
+            bw.Write(BodyRollScale);
+            bw.Write(BodyPitchScale);
+            bw.Write(AccelerationResponse);
+            bw.Write(AccelerationDampening);
         }
     }
 }

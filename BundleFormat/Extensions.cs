@@ -1,5 +1,8 @@
 using System;
+using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using System.Text;
 using System.Windows.Forms;
 using Ionic.Zlib;
@@ -115,28 +118,24 @@ namespace BundleFormat
             return true;
         }
 
-        public static byte Peek(this BinaryReader self)
+        public static byte[] toBytes(this Vector4 vec, bool swap = false)
         {
-            byte b = self.ReadByte();
-            self.BaseStream.Seek(-1, SeekOrigin.Current);
-            return b;
-        }
-
-        public static bool VerifyMagic(this BinaryReader self, byte[] magic)
-        {
-            byte[] readMagic = self.ReadBytes(magic.Length);
-            if (readMagic.Matches(magic))
-                return true;
-            return false;
-        }
-
-        public static void Align(this BinaryWriter self, byte alignment)
-        {
-            if (self.BaseStream.Position % alignment == 0)
-                return;
-            self.BaseStream.Position = alignment * ((self.BaseStream.Position + (alignment - 1)) / alignment);
-            self.BaseStream.Position--;
-            self.Write((byte)0);
+            List<byte> bytes = new List<byte>();
+            if (swap)
+            {
+                bytes.AddRange(BitConverter.GetBytes(BinaryPrimitives.ReadSingleBigEndian(BitConverter.GetBytes(vec.X))));
+                bytes.AddRange(BitConverter.GetBytes(BinaryPrimitives.ReadSingleBigEndian(BitConverter.GetBytes(vec.Y))));
+                bytes.AddRange(BitConverter.GetBytes(BinaryPrimitives.ReadSingleBigEndian(BitConverter.GetBytes(vec.Z))));
+                bytes.AddRange(BitConverter.GetBytes(BinaryPrimitives.ReadSingleBigEndian(BitConverter.GetBytes(vec.W))));
+            }
+            else
+            {
+                bytes.AddRange(BitConverter.GetBytes(vec.X));
+                bytes.AddRange(BitConverter.GetBytes(vec.Y));
+                bytes.AddRange(BitConverter.GetBytes(vec.Z));
+                bytes.AddRange(BitConverter.GetBytes(vec.W));
+            }
+            return bytes.ToArray();
         }
     }
 }

@@ -181,17 +181,17 @@ namespace VaultFormat
             Strings = new List<string>();
         }
 
-        private void ReadChunk(ILoader loader, BinaryReader br)
+        private void ReadChunk(ILoader loader, BinaryReader2 br)
         {
             long initialPos = br.BaseStream.Position;
-            string fourcc = Encoding.ASCII.GetString(BitConverter.GetBytes(br.ReadInt32()).Flip());
+            uint fourcc = br.ReadUInt32();
             int size = br.ReadInt32();
             switch (fourcc)
             {
-                case "Vers":
+                case 0x56657273: // Vers
                     VersionHash = br.ReadUInt64();
                     break;
-                case "DepN":
+                case 0x4465704E: // DepN
                     long entryCount = br.ReadInt64();
                     DepHash1 = br.ReadUInt64();
                     DepHash2 = br.ReadUInt64();
@@ -204,13 +204,13 @@ namespace VaultFormat
                     }
 
                     break;
-                case "StrN":
+                case 0x5374724E: // StrN
                     StrUnknown1 = br.ReadInt64();
                     break;
-                case "DatN":
+                case 0x4461744E: // DatN
                     // Handled in ExpN
                     break;
-                case "ExpN":
+                case 0x4578704E: // ExpN
                     long nestedChunkCount = br.ReadInt64();
                     for (long i = 0; i < nestedChunkCount; i++)
                     {
@@ -259,7 +259,7 @@ namespace VaultFormat
                         br.BaseStream.Position = pos;
                     }
                     break;
-                case "PtrN":
+                case 0x5074724E: // PtrN
                     // Unknown
                     int dataSize = size - 8;
                     PtrN = new PtrChunk();
@@ -278,17 +278,13 @@ namespace VaultFormat
                     throw new ReadFailedError("Unknown Chunk: " + fourcc);
             }
 
-
             br.BaseStream.Position = initialPos + size;
-
         }
 
-        private void ReadVlt(ILoader loader, BinaryReader br)
+        private void ReadVlt(ILoader loader, BinaryReader2 br)
         {
             while (!br.EOF())
-            {
                 ReadChunk(loader, br);
-            }
         }
 
         private void ReadBin(ILoader loader, BinaryReader2 br)
@@ -296,7 +292,7 @@ namespace VaultFormat
             try
             {
                 long initialPos = br.BaseStream.Position;
-                string fourcc = Encoding.ASCII.GetString(br.ReadBytes(4).Flip());
+                uint fourcc = br.ReadUInt32();
                 // StrE
                 int size = br.ReadInt32(); // Size of Strings Array in hex
                 while (br.BaseStream.Position < initialPos + size)
@@ -321,24 +317,20 @@ namespace VaultFormat
             }
         }
 
-        private void WriteBin(BinaryWriter wr)
+        private void WriteBin(BinaryWriter2 bw)
         {
             try
             {
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("StrE")));
-                wr.Write(getSizeOfStrE());
+                bw.Write(0x53747245); // StrE
+                bw.Write(getSizeOfStrE());
                 foreach (string String in Strings)
-                {
-                    wr.WriteCStr(String);
-                }
-                wr.WritePadding();
+                    bw.WriteCStr(String);
+                bw.WritePadding();
                 foreach (IAttribute attribute in Attributes)
-                {
-                    attribute.Write(wr);
-                }
+                    attribute.Write(bw);
                 // Write Data of Unimplemented types
-                wr.Write(Data);
-                wr.WritePadding();
+                bw.Write(Data);
+                bw.WritePadding();
             }
             catch (IOException ex)
             {
@@ -349,20 +341,16 @@ namespace VaultFormat
         public int addPadding(List<byte[]> bytes)
         {
             if (bytes.SelectMany(i => i).Count() % 16 == 0)
-            {
                 return bytes.SelectMany(i => i).Count();
-            }
             else
-            {
                 return ((bytes.SelectMany(i => i).Count() / 16) * 16) + 16;
-            }
         }
 
         private int getSizeOfStrE()
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("StrE")),
+                Encoding.ASCII.GetBytes("StrE"),
                 BitConverter.GetBytes(16)
             };
             foreach (string String in Strings)
@@ -377,7 +365,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("Vers")),
+                Encoding.ASCII.GetBytes("Vers"),
                 BitConverter.GetBytes(16),
                 BitConverter.GetBytes(VersionHash)
             };
@@ -388,7 +376,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("DepN")),
+                Encoding.ASCII.GetBytes("DepN"),
                 BitConverter.GetBytes(96),
                 BitConverter.GetBytes((UInt64)Dependencies.Count()),
                 BitConverter.GetBytes(DepHash1),
@@ -408,7 +396,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("DatN"))
+                Encoding.ASCII.GetBytes("DatN")
             };
             foreach (AttributeHeader dataChunk in Attributes.Select(x => x.getHeader()))
             {
@@ -425,8 +413,7 @@ namespace VaultFormat
                     bytes.Add(BitConverter.GetBytes((dataChunk.ParameterTypeHashes[j])));
                 for (int j = 0; j < (dataChunk.ParametersToRead - dataChunk.ParameterCount); j++)
                 {
-                    UInt64 zero = 0;
-                    bytes.Add(BitConverter.GetBytes(zero)); // zero
+                    bytes.Add(BitConverter.GetBytes((ulong)0));
                 }
                 foreach (DataItem item in dataChunk.Items)
                 {
@@ -443,7 +430,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("ExpN")),
+                Encoding.ASCII.GetBytes("ExpN"),
                 BitConverter.GetBytes(16),
                 BitConverter.GetBytes((UInt64)Attributes.Select(x => x.getInfo()).Count())
             };
@@ -461,7 +448,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("StrN")),
+                Encoding.ASCII.GetBytes("StrN"),
                 BitConverter.GetBytes(16),
                 BitConverter.GetBytes(StrUnknown1)
             };
@@ -472,7 +459,7 @@ namespace VaultFormat
         {
             List<byte[]> bytes = new List<byte[]>
             {
-                Utilities.Flip(Encoding.ASCII.GetBytes("PtrN")),
+                Encoding.ASCII.GetBytes("PtrN"),
                 BitConverter.GetBytes(16)
             };
             foreach (PtrChunkData data in PtrN.allData)
@@ -485,87 +472,81 @@ namespace VaultFormat
             return addPadding(bytes);
         }
 
-
-        private void WriteVlt(BinaryWriter wr)
+        private void WriteVlt(BinaryWriter2 bw)
         {
             try
             {
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("Vers")));
-                wr.Write(getSizeOfVers());
-                wr.Write(VersionHash);
-                wr.WritePadding();
+                bw.Write(0x56657273); // Vers
+                bw.Write(getSizeOfVers());
+                bw.Write(VersionHash);
+                bw.WritePadding();
 
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("DepN")));
-                wr.Write(getSizeOfDepN());
-                wr.Write((UInt64)Dependencies.Count());
-                wr.Write(DepHash1);
-                wr.Write(DepHash2);
-                wr.Write(DepNop);
+                bw.Write(0x4465704E); // DepN
+                bw.Write(getSizeOfDepN());
+                bw.Write((UInt64)Dependencies.Count());
+                bw.Write(DepHash1);
+                bw.Write(DepHash2);
+                bw.Write(DepNop);
                 // Have to add null terminating byte to length
-                wr.Write(Dependencies[0].Length + 1);
+                bw.Write(Dependencies[0].Length + 1);
                 foreach (string d in Dependencies)
-                {
-                    wr.WriteCStr(d);
-                }
-                wr.WritePadding();
+                    bw.WriteCStr(d);
+                bw.WritePadding();
 
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("StrN")));
-                wr.Write(getSizeOfStrN());
-                wr.Write(StrUnknown1);
-                wr.WritePadding();
+                bw.Write(0x5374724E); // StrN
+                bw.Write(getSizeOfStrN());
+                bw.Write(StrUnknown1);
+                bw.WritePadding();
 
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("DatN")));
-                wr.Write(getSizeOfDatN());
+                bw.Write(0x4461744E); // DatN
+                bw.Write(getSizeOfDatN());
                 foreach (AttributeHeader dataChunk in Attributes.Select(x => x.getHeader()))
                 {
-                    wr.Write(dataChunk.CollectionHash);
-                    wr.Write(dataChunk.ClassHash);
-                    wr.Write(dataChunk.Unknown1);
-                    wr.Write(dataChunk.ItemCount);
-                    wr.Write(dataChunk.Unknown2);
-                    wr.Write(dataChunk.ItemCountDup);
-                    wr.Write(dataChunk.ParameterCount);
-                    wr.Write(dataChunk.ParametersToRead);
-                    wr.Write(dataChunk.Unknown3);
+                    bw.Write(dataChunk.CollectionHash);
+                    bw.Write(dataChunk.ClassHash);
+                    bw.Write(dataChunk.Unknown1);
+                    bw.Write(dataChunk.ItemCount);
+                    bw.Write(dataChunk.Unknown2);
+                    bw.Write(dataChunk.ItemCountDup);
+                    bw.Write(dataChunk.ParameterCount);
+                    bw.Write(dataChunk.ParametersToRead);
+                    bw.Write(dataChunk.Unknown3);
                     for (int j = 0; j < dataChunk.ParameterCount; j++)
-                        wr.Write(dataChunk.ParameterTypeHashes[j]);
+                        bw.Write(dataChunk.ParameterTypeHashes[j]);
                     for (int j = 0; j < (dataChunk.ParametersToRead - dataChunk.ParameterCount); j++)
-                    {
-                        UInt64 zero = 0;
-                        wr.Write(zero); // zero
-                    }
+                        bw.Write((ulong)0);
                     foreach (DataItem item in dataChunk.Items)
                     {
-                        wr.Write(item.Hash);
-                        wr.Write(item.Unknown1);
-                        wr.Write(item.ParameterIdx);
-                        wr.Write(item.Unknown2);
+                        bw.Write(item.Hash);
+                        bw.Write(item.Unknown1);
+                        bw.Write(item.ParameterIdx);
+                        bw.Write(item.Unknown2);
                     }
                 }
-                wr.WritePadding();
+                bw.WritePadding();
 
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("ExpN")));
-                wr.Write(getSizeOfExpN());
-                wr.Write((UInt64)Attributes.Select(x => x.getInfo()).Count());
+                bw.Write(0x4578704E); // ExpN
+                bw.Write(getSizeOfExpN());
+                bw.Write((ulong)Attributes.Select(x => x.getInfo()).Count());
                 foreach (SizeAndPositionInformation chunk in Attributes.Select(x => x.getInfo()))
                 {
-                    wr.Write(chunk.Hash);
-                    wr.Write(chunk.EntryTypeHash);
-                    wr.Write(chunk.DataChunkSize);
-                    wr.Write(chunk.DataChunkPosition);
+                    bw.Write(chunk.Hash);
+                    bw.Write(chunk.EntryTypeHash);
+                    bw.Write(chunk.DataChunkSize);
+                    bw.Write(chunk.DataChunkPosition);
                 }
-                wr.WritePadding();
+                bw.WritePadding();
 
-                wr.Write(Utilities.Flip(Encoding.ASCII.GetBytes("PtrN")));
-                wr.Write(getSizeOfPtrN());
+                bw.Write(0x5074724E); // PtrN
+                bw.Write(getSizeOfPtrN());
                 foreach (PtrChunkData data in PtrN.allData)
                 {
-                    wr.Write(data.Ptr);
-                    wr.Write(data.type);
-                    wr.Write(data.flag);
-                    wr.Write(data.Data);
+                    bw.Write(data.Ptr);
+                    bw.Write(data.type);
+                    bw.Write(data.flag);
+                    bw.Write(data.Data);
                 }
-                wr.WritePadding();
+                bw.WritePadding();
             }
             catch (IOException ex)
             {
@@ -628,7 +609,8 @@ namespace VaultFormat
         public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(ms);
+            BinaryWriter2 bw = new BinaryWriter2(ms);
+            bw.BigEndian = entry.Console;
 
             int vltPos = 16; // Because vlt begins after the sizes
             int vltSize = getSizeOfDatN() + getSizeOfDepN() + getSizeOfExpN() + getSizeOfPtrN() + getSizeOfStrN() + getSizeOfVers();

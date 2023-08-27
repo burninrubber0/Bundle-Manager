@@ -25,7 +25,7 @@ namespace BaseHandlers
 
         public Vector4 Rotation => Transform.ExtractRotation().ToAxisAngle();
 
-        public static ModelInstance Read(BinaryReader br)
+        public static ModelInstance Read(BinaryReader2 br)
         {
             ModelInstance result = new ModelInstance();
 
@@ -38,7 +38,7 @@ namespace BaseHandlers
             return result;
         }
 
-        public void Write(BinaryWriter bw)
+        public void Write(BinaryWriter2 bw)
         {
             bw.Write(ModelEntryPtr);
             bw.Write(Unknown2);
@@ -120,7 +120,8 @@ namespace BaseHandlers
         public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(ms);
+            BinaryWriter2 bw = new BinaryWriter2(ms);
+            bw.BigEndian = entry.Console;
 
             bw.Write(Unknown1);
             bw.Write(Instances.Count);

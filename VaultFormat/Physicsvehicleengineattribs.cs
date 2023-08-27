@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Numerics;
+using BundleFormat;
 using BundleUtilities;
 
 namespace VaultFormat
@@ -10,12 +11,12 @@ namespace VaultFormat
         public AttributeHeader header { get; set; }
         public SizeAndPositionInformation info { get; set; }
 
-        public Vector3I TorqueScales2 { get; set; }
-        public Vector3I TorqueScales1 { get; set; }
-        public Vector3I GearUpRPMs2 { get; set; }
-        public Vector3I GearUpRPMs1 { get; set; }
-        public Vector3I GearRatios2 { get; set; }
-        public Vector3I GearRatios1 { get; set; }
+        public Vector4 TorqueScales2 { get; set; }
+        public Vector4 TorqueScales1 { get; set; }
+        public Vector4 GearUpRPMs2 { get; set; }
+        public Vector4 GearUpRPMs1 { get; set; }
+        public Vector4 GearRatios2 { get; set; }
+        public Vector4 GearRatios1 { get; set; }
         public float TransmissionEfficiency { get; set; }
         public float TorqueFallOffRPM { get; set; }
         public float MaxTorque { get; set; }
@@ -59,36 +60,36 @@ namespace VaultFormat
             return CountingUtilities.AddPadding(bytes);
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(TorqueScales2.toBytes());
-            wr.Write(TorqueScales1.toBytes());
-            wr.Write(GearUpRPMs2.toBytes());
-            wr.Write(GearUpRPMs1.toBytes());
-            wr.Write(GearRatios2.toBytes());
-            wr.Write(GearRatios1.toBytes());
-            wr.Write(TransmissionEfficiency);
-            wr.Write(TorqueFallOffRPM);
-            wr.Write(MaxTorque);
-            wr.Write(MaxRPM);
-            wr.Write(LSDMGearUpSpeed);
-            wr.Write(GearChangeTime);
-            wr.Write(FlyWheelInertia);
-            wr.Write(FlyWheelFriction);
-            wr.Write(EngineResistance);
-            wr.Write(EngineLowEndTorqueFactor);
-            wr.Write(EngineBraking);
-            wr.Write(Differential);
+            bw.Write(TorqueScales2.toBytes(bw.BigEndian));
+            bw.Write(TorqueScales1.toBytes(bw.BigEndian));
+            bw.Write(GearUpRPMs2.toBytes(bw.BigEndian));
+            bw.Write(GearUpRPMs1.toBytes(bw.BigEndian));
+            bw.Write(GearRatios2.toBytes(bw.BigEndian));
+            bw.Write(GearRatios1.toBytes(bw.BigEndian));
+            bw.Write(TransmissionEfficiency);
+            bw.Write(TorqueFallOffRPM);
+            bw.Write(MaxTorque);
+            bw.Write(MaxRPM);
+            bw.Write(LSDMGearUpSpeed);
+            bw.Write(GearChangeTime);
+            bw.Write(FlyWheelInertia);
+            bw.Write(FlyWheelFriction);
+            bw.Write(EngineResistance);
+            bw.Write(EngineLowEndTorqueFactor);
+            bw.Write(EngineBraking);
+            bw.Write(Differential);
         }
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
-            TorqueScales2 = br.ReadVector3I();
-            TorqueScales1 = br.ReadVector3I();
-            GearUpRPMs2 = br.ReadVector3I();
-            GearUpRPMs1 = br.ReadVector3I();
-            GearRatios2 = br.ReadVector3I();
-            GearRatios1 = br.ReadVector3I();
+            TorqueScales2 = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            TorqueScales1 = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            GearUpRPMs2 = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            GearUpRPMs1 = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            GearRatios2 = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            GearRatios1 = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
             TransmissionEfficiency = br.ReadSingle();
             TorqueFallOffRPM = br.ReadSingle();
             MaxTorque = br.ReadSingle();

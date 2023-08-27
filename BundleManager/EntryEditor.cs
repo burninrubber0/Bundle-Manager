@@ -653,7 +653,7 @@ namespace BundleManager
             string value = InputDialog.ShowInput(this, "Please enter the value to get the lookup 8.");
             if (value == null)
                 return;
-            ulong result = Utilities.calcLookup8(value);
+            ulong result = Utilities.CalcLookup8(value);
             Task.Run(() => UpdateDisplay());
             MessageBox.Show(this, "The lookup 8 hashed value is: " + result.ToString("X16"), "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

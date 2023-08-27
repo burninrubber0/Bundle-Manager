@@ -44,12 +44,12 @@ namespace VaultFormat
             bytes.Add(padding.ToArray());
             return bytes.SelectMany(i => i).ToArray();
         }
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(ClassKey);
-            wr.Write(CollectionKey);
-            wr.Write(CollectionPtr);
-            wr.WriteUniquePadding(4);
+            bw.Write(ClassKey);
+            bw.Write(CollectionKey);
+            bw.Write(CollectionPtr);
+            bw.WriteUniquePadding(4);
         }
 
 

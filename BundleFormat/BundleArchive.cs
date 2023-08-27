@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -429,7 +430,7 @@ namespace BundleFormat
             br2.BigEndian = false;
 
             // TODO: Store only the debug info and not the full string
-            ResourceStringTable = br2.ReadLenString();
+            ResourceStringTable = br2.ReadLenString(br2.ReadInt32());
 
             br2.Close();
 
@@ -454,7 +455,7 @@ namespace BundleFormat
 
             int platform = br.ReadInt32();
             if (platform != 1)
-                platform = Util.ReverseBytes(platform);
+                platform = BinaryPrimitives.ReverseEndianness(platform);
             Platform = (BundlePlatform)platform;
             br.BigEndian = Console;
 
@@ -568,7 +569,8 @@ namespace BundleFormat
         public void Write(string path)
         {
             Stream s = File.Open(path, FileMode.Create);
-            BinaryWriter bw = new BinaryWriter(s);
+            BinaryWriter2 bw = new BinaryWriter2(s);
+            bw.BigEndian = Console;
 
             Write(bw);
 
@@ -576,19 +578,19 @@ namespace BundleFormat
             bw.Close();
         }
 
-        public void Write(BinaryWriter bw)
+        public void Write(BinaryWriter2 bw)
         {
-            bw.Write(BundleArchive.BND2Magic);
-            bw.Write(this.Version);
-            bw.Write((int)this.Platform);
+            bw.Write(BND2Magic);
+            bw.Write(Version);
+            bw.Write((int)Platform);
 
             long rstOffset = bw.BaseStream.Position;
-            bw.Write((int)0);
+            bw.Write(0);
 
-            bw.Write(this.Entries.Count);
+            bw.Write(Entries.Count);
 
             long idBlockOffsetPos = bw.BaseStream.Position;
-            bw.Write((int)0);
+            bw.Write(0);
 
             long[] fileBlockOffsetsPos = new long[3];
 
@@ -598,7 +600,7 @@ namespace BundleFormat
                 bw.BaseStream.Position += 4;
             }
 
-            bw.Write((int)this.Flags);
+            bw.Write((int)Flags);
 
             bw.Align(16);
 
@@ -607,10 +609,10 @@ namespace BundleFormat
             bw.Write((uint)currentOffset);
             bw.BaseStream.Position = currentOffset;
 
-            if (this.Flags.HasFlag(Flags.HasResourceStringTable))
+            if (Flags.HasFlag(Flags.HasResourceStringTable))
             {
                 // TODO: Rebuild RST from DebugInfo
-                bw.WriteCStr(this.ResourceStringTable);
+                bw.WriteCStr(ResourceStringTable);
 
                 bw.Align(16);
             }
@@ -678,11 +680,11 @@ namespace BundleFormat
                 bw.Write((uint)blockStart);
                 bw.BaseStream.Position = blockStart;
 
-                for (int j = 0; j < this.Entries.Count; j++)
+                for (int j = 0; j < Entries.Count; j++)
                 {
-                    BundleEntry entry = this.Entries[j];
+                    BundleEntry entry = Entries[j];
                     EntryBlock entryBlock = entry.EntryBlocks[i];
-                    bool compressed = this.Flags.HasFlag(Flags.Compressed);
+                    bool compressed = Flags.HasFlag(Flags.Compressed);
                     uint size = compressed ? (compressedBlocks[j][i] == null ? 0 : (uint)compressedBlocks[j][i].Length) : (uint)entryBlock.Data.Length;
 
                     if (size > 0)
@@ -697,13 +699,21 @@ namespace BundleFormat
                         else
                             bw.Write(entryBlock.Data);
 
-                        bw.Align((i != 0 && j != this.Entries.Count - 1) ? (byte)0x80 : (byte)16);
+                        bw.Align((i != 0 && j != Entries.Count - 1) ? (byte)0x80 : (byte)16);
                     }
                 }
 
                 if (i != 2)
                     bw.Align(0x80);
             }
+        }
+
+        public static bool VerifyMagic(BinaryReader2 br, byte[] magic)
+        {
+            byte[] readMagic = br.ReadBytes(magic.Length);
+            if (readMagic.Matches(magic))
+                return true;
+            return false;
         }
 
         public static bool IsBundle(string path)
@@ -715,7 +725,7 @@ namespace BundleFormat
                 Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
                 BinaryReader2 br = new BinaryReader2(s);
 
-                result = br.VerifyMagic(BND2Magic);
+                result = VerifyMagic(br, BND2Magic);
 
                 br.Close();
                 s.Close();
@@ -736,7 +746,7 @@ namespace BundleFormat
             Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
             BinaryReader2 br = new BinaryReader2(s);
 
-            if (!br.VerifyMagic(BND2Magic))
+            if (!VerifyMagic(br, BND2Magic))
             {
                 br.Close();
                 s.Close();
@@ -747,7 +757,7 @@ namespace BundleFormat
 
             int platformInt = br.ReadInt32();
             if (platformInt != 1)
-                platformInt = Util.ReverseBytes(platformInt);
+                platformInt = BinaryPrimitives.ReverseEndianness(platformInt);
             BundlePlatform platform = (BundlePlatform)platformInt;
             br.BigEndian = platform == BundlePlatform.X360 || platform == BundlePlatform.PS3;
 
@@ -778,7 +788,7 @@ namespace BundleFormat
             Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
             BinaryReader2 br = new BinaryReader2(s);
 
-            if (!br.VerifyMagic(BND2Magic))
+            if (!VerifyMagic(br, BND2Magic))
             {
                 br.Close();
                 s.Close();
@@ -789,7 +799,7 @@ namespace BundleFormat
 
             int platformInt = br.ReadInt32();
             if (platformInt != 1)
-                platformInt = Util.ReverseBytes(platformInt);
+                platformInt = BinaryPrimitives.ReverseEndianness(platformInt);
             BundlePlatform platform = (BundlePlatform)platformInt;
             br.BigEndian = platform == BundlePlatform.X360 || platform == BundlePlatform.PS3;
             
@@ -844,7 +854,7 @@ namespace BundleFormat
             Stream s = File.Open(path, FileMode.Open, FileAccess.Read);
             BinaryReader2 br = new BinaryReader2(s);
 
-            if (!br.VerifyMagic(BND2Magic))
+            if (!VerifyMagic(br, BND2Magic))
             {
                 timer.StopLog();
                 br.Close();
@@ -856,7 +866,7 @@ namespace BundleFormat
 
             int platformInt = br.ReadInt32();
             if (platformInt != 1)
-                platformInt = Util.ReverseBytes(platformInt);
+                platformInt = BinaryPrimitives.ReverseEndianness(platformInt);
             BundlePlatform platform = (BundlePlatform)platformInt;
             br.BigEndian = platform == BundlePlatform.X360 || platform == BundlePlatform.PS3;
             

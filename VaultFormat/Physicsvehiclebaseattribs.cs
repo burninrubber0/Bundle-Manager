@@ -2,16 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
+using BundleFormat;
 using BundleUtilities;
 
 namespace VaultFormat
 {
     public class Physicsvehiclebaseattribs : IAttribute
     {
-        public Vector3I RearRightWheelPosition { get; set; }
-        public Vector3I FrontRightWheelPosition { get; set; }
-        public Vector3I CoMOffset { get; set; }
-        public Vector3I BrakeScaleToFactor { get; set; }
+        public Vector4 RearRightWheelPosition { get; set; }
+        public Vector4 FrontRightWheelPosition { get; set; }
+        public Vector4 CoMOffset { get; set; }
+        public Vector4 BrakeScaleToFactor { get; set; }
         public float YawDampingOnTakeOff { get; set; }
         public float TractionLineLength { get; set; }
         public float TimeForFullBrake { get; set; }
@@ -168,10 +170,10 @@ namespace VaultFormat
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
-            RearRightWheelPosition = br.ReadVector3I();
-            FrontRightWheelPosition = br.ReadVector3I();
-            CoMOffset = br.ReadVector3I();
-            BrakeScaleToFactor = br.ReadVector3I();
+            RearRightWheelPosition = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            FrontRightWheelPosition = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            CoMOffset = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+            BrakeScaleToFactor = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
             YawDampingOnTakeOff = br.ReadSingle();
             TractionLineLength = br.ReadSingle();
             TimeForFullBrake = br.ReadSingle();
@@ -235,73 +237,73 @@ namespace VaultFormat
             AngularDrag = br.ReadSingle();
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(RearRightWheelPosition.toBytes());
-            wr.Write(FrontRightWheelPosition.toBytes());
-            wr.Write(CoMOffset.toBytes());
-            wr.Write(BrakeScaleToFactor.toBytes());
-            wr.Write(YawDampingOnTakeOff);
-            wr.Write(TractionLineLength);
-            wr.Write(TimeForFullBrake);
-            wr.Write(SurfaceRoughnessFactor);
-            wr.Write(SurfaceRearGripFactor);
-            wr.Write(SurfaceFrontGripFactor);
-            wr.Write(SurfaceDragFactor);
-            wr.Write(RollLimitOnTakeOff);
-            wr.Write(RollDampingOnTakeOff);
-            wr.Write(RearWheelMass);
-            wr.Write(RearTireStaticFrictionCoefficient);
-            wr.Write(RearTireLongForceBias);
-            wr.Write(RearTireDynamicFrictionCoefficient);
-            wr.Write(RearTireAdhesiveLimit);
-            wr.Write(RearLongGripCurvePeakSlipRatio);
-            wr.Write(RearLongGripCurvePeakCoefficient);
-            wr.Write(RearLongGripCurveFloorSlipRatio);
-            wr.Write(RearLongGripCurveFallCoefficient);
-            wr.Write(RearLatGripCurvePeakSlipRatio);
-            wr.Write(RearLatGripCurvePeakCoefficient);
-            wr.Write(RearLatGripCurveFloorSlipRatio);
-            wr.Write(RearLatGripCurveFallCoefficient);
-            wr.Write(RearLatGripCurveDriftPeakSlipRatio);
-            wr.Write(PowerToRear);
-            wr.Write(PowerToFront);
-            wr.Write(PitchDampingOnTakeOff);
-            wr.Write(MaxSpeed);
-            wr.Write(MagicBrakeFactorTurning);
-            wr.Write(MagicBrakeFactorStraightLine);
-            wr.Write(LowSpeedTyreFrictionTractionControl);
-            wr.Write(LowSpeedThrottleTractionControl);
-            wr.Write(LowSpeedDrivingSpeed);
-            wr.Write(LockBrakeScale);
-            wr.Write(LinearDrag);
-            wr.Write(HighSpeedAngularDamping);
-            wr.Write(FrontWheelMass);
-            wr.Write(FrontTireStaticFrictionCoefficient);
-            wr.Write(FrontTireLongForceBias);
-            wr.Write(FrontTireDynamicFrictionCoefficient);
-            wr.Write(FrontTireAdhesiveLimit);
-            wr.Write(FrontLongGripCurvePeakSlipRatio);
-            wr.Write(FrontLongGripCurvePeakCoefficient);
-            wr.Write(FrontLongGripCurveFloorSlipRatio);
-            wr.Write(FrontLongGripCurveFallCoefficient);
-            wr.Write(FrontLatGripCurvePeakSlipRatio);
-            wr.Write(FrontLatGripCurvePeakCoefficient);
-            wr.Write(FrontLatGripCurveFloorSlipRatio);
-            wr.Write(FrontLatGripCurveFallCoefficient);
-            wr.Write(FrontLatGripCurveDriftPeakSlipRatio);
-            wr.Write(DrivingMass);
-            wr.Write(DriveTimeDeformLimitX);
-            wr.Write(DriveTimeDeformLimitPosZ);
-            wr.Write(DriveTimeDeformLimitNegZ);
-            wr.Write(DriveTimeDeformLimitNegY);
-            wr.Write(DownForceZOffset);
-            wr.Write(DownForce);
-            wr.Write(CrashExtraYawVelocityFactor);
-            wr.Write(CrashExtraRollVelocityFactor);
-            wr.Write(CrashExtraPitchVelocityFactor);
-            wr.Write(CrashExtraLinearVelocityFactor);
-            wr.Write(AngularDrag);
+            bw.Write(RearRightWheelPosition.toBytes(bw.BigEndian));
+            bw.Write(FrontRightWheelPosition.toBytes(bw.BigEndian));
+            bw.Write(CoMOffset.toBytes(bw.BigEndian));
+            bw.Write(BrakeScaleToFactor.toBytes(bw.BigEndian));
+            bw.Write(YawDampingOnTakeOff);
+            bw.Write(TractionLineLength);
+            bw.Write(TimeForFullBrake);
+            bw.Write(SurfaceRoughnessFactor);
+            bw.Write(SurfaceRearGripFactor);
+            bw.Write(SurfaceFrontGripFactor);
+            bw.Write(SurfaceDragFactor);
+            bw.Write(RollLimitOnTakeOff);
+            bw.Write(RollDampingOnTakeOff);
+            bw.Write(RearWheelMass);
+            bw.Write(RearTireStaticFrictionCoefficient);
+            bw.Write(RearTireLongForceBias);
+            bw.Write(RearTireDynamicFrictionCoefficient);
+            bw.Write(RearTireAdhesiveLimit);
+            bw.Write(RearLongGripCurvePeakSlipRatio);
+            bw.Write(RearLongGripCurvePeakCoefficient);
+            bw.Write(RearLongGripCurveFloorSlipRatio);
+            bw.Write(RearLongGripCurveFallCoefficient);
+            bw.Write(RearLatGripCurvePeakSlipRatio);
+            bw.Write(RearLatGripCurvePeakCoefficient);
+            bw.Write(RearLatGripCurveFloorSlipRatio);
+            bw.Write(RearLatGripCurveFallCoefficient);
+            bw.Write(RearLatGripCurveDriftPeakSlipRatio);
+            bw.Write(PowerToRear);
+            bw.Write(PowerToFront);
+            bw.Write(PitchDampingOnTakeOff);
+            bw.Write(MaxSpeed);
+            bw.Write(MagicBrakeFactorTurning);
+            bw.Write(MagicBrakeFactorStraightLine);
+            bw.Write(LowSpeedTyreFrictionTractionControl);
+            bw.Write(LowSpeedThrottleTractionControl);
+            bw.Write(LowSpeedDrivingSpeed);
+            bw.Write(LockBrakeScale);
+            bw.Write(LinearDrag);
+            bw.Write(HighSpeedAngularDamping);
+            bw.Write(FrontWheelMass);
+            bw.Write(FrontTireStaticFrictionCoefficient);
+            bw.Write(FrontTireLongForceBias);
+            bw.Write(FrontTireDynamicFrictionCoefficient);
+            bw.Write(FrontTireAdhesiveLimit);
+            bw.Write(FrontLongGripCurvePeakSlipRatio);
+            bw.Write(FrontLongGripCurvePeakCoefficient);
+            bw.Write(FrontLongGripCurveFloorSlipRatio);
+            bw.Write(FrontLongGripCurveFallCoefficient);
+            bw.Write(FrontLatGripCurvePeakSlipRatio);
+            bw.Write(FrontLatGripCurvePeakCoefficient);
+            bw.Write(FrontLatGripCurveFloorSlipRatio);
+            bw.Write(FrontLatGripCurveFallCoefficient);
+            bw.Write(FrontLatGripCurveDriftPeakSlipRatio);
+            bw.Write(DrivingMass);
+            bw.Write(DriveTimeDeformLimitX);
+            bw.Write(DriveTimeDeformLimitPosZ);
+            bw.Write(DriveTimeDeformLimitNegZ);
+            bw.Write(DriveTimeDeformLimitNegY);
+            bw.Write(DownForceZOffset);
+            bw.Write(DownForce);
+            bw.Write(CrashExtraYawVelocityFactor);
+            bw.Write(CrashExtraRollVelocityFactor);
+            bw.Write(CrashExtraPitchVelocityFactor);
+            bw.Write(CrashExtraLinearVelocityFactor);
+            bw.Write(AngularDrag);
         }
     }
 }

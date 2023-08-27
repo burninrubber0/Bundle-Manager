@@ -72,7 +72,8 @@ namespace LangEditor
         public bool Write(BundleEntry entry)
         {
             MemoryStream ms = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(ms);
+            BinaryWriter2 bw = new BinaryWriter2(ms);
+            bw.BigEndian = entry.Console;
 
             bw.Write((uint)meLanguageID);
             bw.Write(mpEntries.Count);

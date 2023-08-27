@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
+using BundleFormat;
 using BundleUtilities;
 
 namespace VaultFormat
@@ -11,7 +13,7 @@ namespace VaultFormat
         public AttributeHeader header { get; set; }
         public SizeAndPositionInformation info { get; set; }
 
-        public Vector3I BodyBox { get; set; }
+        public Vector4 BodyBox { get; set; }
         public Physicsvehiclecollisionattribs(SizeAndPositionInformation chunk, AttributeHeader dataChunk)
         {
             header = dataChunk;
@@ -40,12 +42,12 @@ namespace VaultFormat
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
-            BodyBox = br.ReadVector3I();
+            BodyBox = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(BodyBox.toBytes());
+            bw.Write(BodyBox.toBytes(bw.BigEndian));
         }
     }
 }

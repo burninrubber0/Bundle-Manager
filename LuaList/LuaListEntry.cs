@@ -49,7 +49,7 @@ namespace LuaList
         }
 
         public void Read(ILoader loader, BinaryReader2 br) {
-            CgsId = br.ReadEncryptedString();
+            CgsId = new EncryptedString(br.ReadUInt64());
             Name = br.ReadLenString(128);
             Goal = br.ReadLenString(128);
             Description = br.ReadLenString(256);
@@ -60,17 +60,17 @@ namespace LuaList
             br.ReadBytes(8); // padding
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.WriteEncryptedString(CgsId);
-            wr.Write(Encoding.ASCII.GetBytes((Name.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
-            wr.Write(Encoding.ASCII.GetBytes((Goal.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
-            wr.Write(Encoding.ASCII.GetBytes((Description.PadRight(256, '\0').Substring(0, 256).ToCharArray())));
-            wr.Write((int)ScoreMultiplier);
-            wr.Write((int)ScoringMethod);
-            wr.Write(Type);
-            wr.Write(Variables);
-            wr.WriteUniquePadding(8);
+            bw.Write(CgsId.Encrypted);
+            bw.Write(Encoding.ASCII.GetBytes((Name.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
+            bw.Write(Encoding.ASCII.GetBytes((Goal.PadRight(128, '\0').Substring(0, 128).ToCharArray())));
+            bw.Write(Encoding.ASCII.GetBytes((Description.PadRight(256, '\0').Substring(0, 256).ToCharArray())));
+            bw.Write((int)ScoreMultiplier);
+            bw.Write((int)ScoringMethod);
+            bw.Write(Type);
+            bw.Write(Variables);
+            bw.WriteUniquePadding(8);
         }
     }
 }

@@ -103,21 +103,21 @@ namespace VaultFormat
             Dampening = br.ReadSingle();
         }
 
-        public void Write(BinaryWriter wr)
+        public void Write(BinaryWriter2 bw)
         {
-            wr.Write(UpwardMovement);
-            wr.Write(TimeToDampAfterLanding);
-            wr.Write(Strength);
-            wr.Write(SpringLength);
-            wr.Write(RearHeight);
-            wr.Write(MaxYawDampingOnLanding);
-            wr.Write(MaxVertVelocityDampingOnLanding);
-            wr.Write(MaxRollDampingOnLanding);
-            wr.Write(MaxPitchDampingOnLanding);
-            wr.Write(InAirDamping);
-            wr.Write(FrontHeight);
-            wr.Write(DownwardMovement);
-            wr.Write(Dampening);
+            bw.Write(UpwardMovement);
+            bw.Write(TimeToDampAfterLanding);
+            bw.Write(Strength);
+            bw.Write(SpringLength);
+            bw.Write(RearHeight);
+            bw.Write(MaxYawDampingOnLanding);
+            bw.Write(MaxVertVelocityDampingOnLanding);
+            bw.Write(MaxRollDampingOnLanding);
+            bw.Write(MaxPitchDampingOnLanding);
+            bw.Write(InAirDamping);
+            bw.Write(FrontHeight);
+            bw.Write(DownwardMovement);
+            bw.Write(Dampening);
         }
     }
 }

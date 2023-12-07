@@ -113,16 +113,23 @@ namespace LangEditor
                 MessageBoxButtons.OK);
         }
 
-        public void RebuildLanguage()
+        public int RebuildLanguage()
         {
             if (_ignoreChanges)
-                return;
+                return 1;
 
             Dictionary<uint, string> data = new Dictionary<uint, string>();
 
             for (int i = 0; i < dgvMain.Rows.Count - 1; ++i)
             {
                 string idString = (string)dgvMain.Rows[i].Cells[0].Value;
+
+                if (idString == null)
+                {
+                    MessageBox.Show(this, "ID cannot be left blank", "Warning",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return 2;
+                }
 
                 uint id;
                 if (idString.StartsWith("0x") && idString.Length == 10) // Hash
@@ -131,7 +138,7 @@ namespace LangEditor
                     {
                         MessageBox.Show(this, "Failed to parse ID \"" + idString + "\"", "Warning",
                             MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
+                        return 3;
                     }
                 }
                 else // String
@@ -144,7 +151,7 @@ namespace LangEditor
                 {
                     MessageBox.Show(this, "ID " + idString + " already in use", "Warning",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
+                    return 4;
                 }
                 data.Add(id, value);
             }
@@ -152,6 +159,8 @@ namespace LangEditor
             _lang.mpEntries = data;
 
             Changed?.Invoke();
+
+            return 0;
         }
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
@@ -232,9 +241,10 @@ namespace LangEditor
 
         private void applyChangesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            RebuildLanguage();
+            int result = RebuildLanguage();
 
-            MessageBox.Show(this, "Done!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (result == 0)
+                MessageBox.Show(this, "Done!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void findToolStripMenuItem_Click(object sender, EventArgs e)
@@ -247,8 +257,8 @@ namespace LangEditor
 
             foreach (DataGridViewRow row in dgvMain.Rows)
             {
-                if (((string)row.Cells[0].Value).Contains(value, StringComparison.CurrentCultureIgnoreCase)
-                    || ((string)row.Cells[1].Value).Contains(value, StringComparison.CurrentCultureIgnoreCase))
+                if ((row.Cells[0].Value != null && ((string)row.Cells[0].Value).Contains(value, StringComparison.CurrentCultureIgnoreCase))
+                    || (row.Cells[1].Value != null && ((string)row.Cells[1].Value).Contains(value, StringComparison.CurrentCultureIgnoreCase)))
                 {
                     dgvMain.ClearSelection();
                     dgvMain.CurrentCell = row.Cells[0];

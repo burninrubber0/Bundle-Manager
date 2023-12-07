@@ -247,8 +247,8 @@ namespace LangEditor
 
             foreach (DataGridViewRow row in dgvMain.Rows)
             {
-                if (((string)row.Cells[0].Value).Contains(value, StringComparison.CurrentCultureIgnoreCase)
-                    || ((string)row.Cells[1].Value).Contains(value, StringComparison.CurrentCultureIgnoreCase))
+                if ((row.Cells[0].Value != null && ((string)row.Cells[0].Value).Contains(value, StringComparison.CurrentCultureIgnoreCase))
+                    || (row.Cells[1].Value != null && ((string)row.Cells[1].Value).Contains(value, StringComparison.CurrentCultureIgnoreCase)))
                 {
                     dgvMain.ClearSelection();
                     dgvMain.CurrentCell = row.Cells[0];

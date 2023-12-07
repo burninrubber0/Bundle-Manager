@@ -92,7 +92,8 @@ namespace LangEditor
                 bw.Write((uint)ms.Length); // String pointer
                 lastPos = ms.Position;
                 ms.Position = ms.Length;
-                bw.Write(langEntry.Value.ToCharArray()); // String data
+                if (langEntry.Value != null)
+                    bw.Write(langEntry.Value.ToCharArray()); // String data
                 bw.Write((byte)0); // Null terminator
                 ms.Position = lastPos;
             }

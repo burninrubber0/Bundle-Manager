@@ -86,6 +86,13 @@ namespace BundleUtilities
             return BinaryPrimitives.ReadDoubleLittleEndian(ReadBytes(8));
         }
 
+        public void Align(int alignment)
+        {
+            if (BaseStream.Position % alignment == 0)
+                return;
+            BaseStream.Position = alignment * ((BaseStream.Position + (alignment - 1)) / alignment);
+        }
+
         public string ReadCStr()
         {
             List<byte> bytes = new List<byte>();

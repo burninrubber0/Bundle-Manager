@@ -170,6 +170,7 @@ namespace VaultFormat
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
+            br.Align(0x10);
             RearRightWheelPosition = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
             FrontRightWheelPosition = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
             CoMOffset = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
@@ -239,6 +240,7 @@ namespace VaultFormat
 
         public void Write(BinaryWriter2 bw)
         {
+            bw.Align(0x10);
             bw.Write(RearRightWheelPosition.toBytes(bw.BigEndian));
             bw.Write(FrontRightWheelPosition.toBytes(bw.BigEndian));
             bw.Write(CoMOffset.toBytes(bw.BigEndian));

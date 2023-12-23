@@ -76,6 +76,7 @@ namespace VaultFormat
         public float CrashExtraPitchVelocityFactor { get; set; }
         public float CrashExtraLinearVelocityFactor { get; set; }
         public float AngularDrag { get; set; }
+        public int PaddingLength { get; set; }
         public AttributeHeader header { get; set; }
         public SizeAndPositionInformation info { get; set; }
         public Physicsvehiclebaseattribs(SizeAndPositionInformation chunk, AttributeHeader dataChunk)
@@ -155,7 +156,7 @@ namespace VaultFormat
                 BitConverter.GetBytes(AngularDrag)
             };
             // No padding needed
-            return bytes.SelectMany(i => i).Count();
+            return bytes.SelectMany(i => i).Count() + PaddingLength;
         }
 
         public AttributeHeader getHeader()
@@ -170,7 +171,9 @@ namespace VaultFormat
 
         public void Read(ILoader loader, BinaryReader2 br)
         {
+            int pos = (int)br.BaseStream.Position;
             br.Align(0x10);
+            PaddingLength = (int)br.BaseStream.Position - pos;
             RearRightWheelPosition = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
             FrontRightWheelPosition = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
             CoMOffset = new Vector4(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());

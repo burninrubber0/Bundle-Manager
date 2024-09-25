@@ -10,15 +10,15 @@ namespace VaultFormat
     {
         public int PlayerPalletteIndex { get; set; }
         public int PlayerColourIndex { get; set; }
-        public short Alloc { get; set; }   //Allocate space for x* Size   Always 1 in VEH_P*	
-        public short Num_RandomTrafficColours { get; set; }   // Count
-        public short Size { get; set; }   // Size of each entry
-        public short EncodedTypePad { get; set; }  // padding
+        public short Alloc { get; set; } // Allocate space for x* Size. Always 1 in VEH_P*	
+        public short Num_RandomTrafficColours { get; set; } // Count
+        public short Size { get; set; } // Size of each entry
+        public short EncodedTypePad { get; set; } // Padding
         public List<int> RandomTrafficColours { get; set; }
-        public short Alloc_Offences { get; set; }   // Allocate space for x* Size
-        public short Num_Offences { get; set; }  //  Count
-        public short Size_Offences { get; set; }    //  Size of ea // ch entry
-        public short EncodedTypePad_Offences { get; set; } //padding
+        public short Alloc_Offences { get; set; } // Allocate space for x* Size
+        public short Num_Offences { get; set; } // Count
+        public short Size_Offences { get; set; } // Size of each entry
+        public short EncodedTypePad_Offences { get; set; } // Padding
 
         public AttributeHeader header { get; set; }
         public SizeAndPositionInformation info { get; set; }
@@ -41,6 +41,8 @@ namespace VaultFormat
             bytes.Add(BitConverter.GetBytes(EncodedTypePad));
             for (int i = 0; i < Num_RandomTrafficColours; i++)
                 bytes.Add(BitConverter.GetBytes(RandomTrafficColours[i]));
+            for (int i = Num_RandomTrafficColours; i < Alloc; i++)
+                bytes.Add(BitConverter.GetBytes(0));
             bytes.Add(BitConverter.GetBytes(Alloc_Offences));
             bytes.Add(BitConverter.GetBytes(Num_Offences));
             bytes.Add(BitConverter.GetBytes(Size_Offences));
@@ -70,6 +72,8 @@ namespace VaultFormat
             EncodedTypePad = br.ReadInt16();
             for (int i = 0; i < Num_RandomTrafficColours; i++)
                 RandomTrafficColours.Add(br.ReadInt32());
+            for (int i = Num_RandomTrafficColours; i < Alloc; i++)
+                br.SkipUniquePadding(4);
             Alloc_Offences = br.ReadInt16();
             Num_Offences = br.ReadInt16();
             Size_Offences = br.ReadInt16();
@@ -80,16 +84,22 @@ namespace VaultFormat
         {
             bw.Write(PlayerPalletteIndex);
             bw.Write(PlayerColourIndex);
-            bw.Write(Alloc);   //Allocate space for x* Size   Always 1 in VEH_P*	
-            bw.Write(Num_RandomTrafficColours);   // Count
-            bw.Write(Size);   // Size of each entry
-            bw.Write(EncodedTypePad);  // padding
+            // Allocate space for x* Size. Always 1 in VEH_P*
+            if (Alloc < Num_RandomTrafficColours)
+                bw.Write(Num_RandomTrafficColours);
+            else
+                bw.Write(Alloc);
+            bw.Write(Num_RandomTrafficColours); // Count
+            bw.Write(Size); // Size of each entry
+            bw.Write(EncodedTypePad); // Padding
             for (int i = 0; i < Num_RandomTrafficColours; i++)
                 bw.Write(RandomTrafficColours[i]);
-            bw.Write(Alloc_Offences);   // Allocate space for x* Size
-            bw.Write(Num_Offences);  //  Count
-            bw.Write(Size_Offences);    //  Size of ea // ch entry
-            bw.Write(EncodedTypePad_Offences); //padding
+            for (int i = Num_RandomTrafficColours; i < Alloc; i++)
+                bw.Write(0);
+            bw.Write(Alloc_Offences); // Allocate space for x* Size
+            bw.Write(Num_Offences); // Count
+            bw.Write(Size_Offences); // Size of each entry
+            bw.Write(EncodedTypePad_Offences); // Padding
         }
     }
 }

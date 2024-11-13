@@ -287,8 +287,8 @@ namespace PVSFormat
             point2YNumericUpDown.DecimalPlaces = 3;
             point2YNumericUpDown.Enabled = false;
             point2YNumericUpDown.Location = new System.Drawing.Point(115, 265);
-            point2YNumericUpDown.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
-            point2YNumericUpDown.Minimum = new decimal(new int[] { 10000, 0, 0, int.MinValue });
+            point2YNumericUpDown.Maximum = new decimal(new int[] { 50000, 0, 0, 0 });
+            point2YNumericUpDown.Minimum = new decimal(new int[] { 50000, 0, 0, int.MinValue });
             point2YNumericUpDown.Name = "point2YNumericUpDown";
             point2YNumericUpDown.Size = new System.Drawing.Size(70, 23);
             point2YNumericUpDown.TabIndex = 11;
@@ -299,8 +299,8 @@ namespace PVSFormat
             point2XNumericUpDown.DecimalPlaces = 3;
             point2XNumericUpDown.Enabled = false;
             point2XNumericUpDown.Location = new System.Drawing.Point(24, 265);
-            point2XNumericUpDown.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
-            point2XNumericUpDown.Minimum = new decimal(new int[] { 10000, 0, 0, int.MinValue });
+            point2XNumericUpDown.Maximum = new decimal(new int[] { 50000, 0, 0, 0 });
+            point2XNumericUpDown.Minimum = new decimal(new int[] { 50000, 0, 0, int.MinValue });
             point2XNumericUpDown.Name = "point2XNumericUpDown";
             point2XNumericUpDown.Size = new System.Drawing.Size(70, 23);
             point2XNumericUpDown.TabIndex = 10;
@@ -320,8 +320,8 @@ namespace PVSFormat
             point3YNumericUpDown.DecimalPlaces = 3;
             point3YNumericUpDown.Enabled = false;
             point3YNumericUpDown.Location = new System.Drawing.Point(115, 294);
-            point3YNumericUpDown.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
-            point3YNumericUpDown.Minimum = new decimal(new int[] { 10000, 0, 0, int.MinValue });
+            point3YNumericUpDown.Maximum = new decimal(new int[] { 50000, 0, 0, 0 });
+            point3YNumericUpDown.Minimum = new decimal(new int[] { 50000, 0, 0, int.MinValue });
             point3YNumericUpDown.Name = "point3YNumericUpDown";
             point3YNumericUpDown.Size = new System.Drawing.Size(70, 23);
             point3YNumericUpDown.TabIndex = 8;
@@ -332,8 +332,8 @@ namespace PVSFormat
             point3XNumericUpDown.DecimalPlaces = 3;
             point3XNumericUpDown.Enabled = false;
             point3XNumericUpDown.Location = new System.Drawing.Point(24, 294);
-            point3XNumericUpDown.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
-            point3XNumericUpDown.Minimum = new decimal(new int[] { 10000, 0, 0, int.MinValue });
+            point3XNumericUpDown.Maximum = new decimal(new int[] { 50000, 0, 0, 0 });
+            point3XNumericUpDown.Minimum = new decimal(new int[] { 50000, 0, 0, int.MinValue });
             point3XNumericUpDown.Name = "point3XNumericUpDown";
             point3XNumericUpDown.Size = new System.Drawing.Size(70, 23);
             point3XNumericUpDown.TabIndex = 7;
@@ -353,8 +353,8 @@ namespace PVSFormat
             point4YNumericUpDown.DecimalPlaces = 3;
             point4YNumericUpDown.Enabled = false;
             point4YNumericUpDown.Location = new System.Drawing.Point(115, 323);
-            point4YNumericUpDown.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
-            point4YNumericUpDown.Minimum = new decimal(new int[] { 10000, 0, 0, int.MinValue });
+            point4YNumericUpDown.Maximum = new decimal(new int[] { 50000, 0, 0, 0 });
+            point4YNumericUpDown.Minimum = new decimal(new int[] { 50000, 0, 0, int.MinValue });
             point4YNumericUpDown.Name = "point4YNumericUpDown";
             point4YNumericUpDown.Size = new System.Drawing.Size(70, 23);
             point4YNumericUpDown.TabIndex = 5;
@@ -365,8 +365,8 @@ namespace PVSFormat
             point4XNumericUpDown.DecimalPlaces = 3;
             point4XNumericUpDown.Enabled = false;
             point4XNumericUpDown.Location = new System.Drawing.Point(24, 323);
-            point4XNumericUpDown.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
-            point4XNumericUpDown.Minimum = new decimal(new int[] { 10000, 0, 0, int.MinValue });
+            point4XNumericUpDown.Maximum = new decimal(new int[] { 50000, 0, 0, 0 });
+            point4XNumericUpDown.Minimum = new decimal(new int[] { 50000, 0, 0, int.MinValue });
             point4XNumericUpDown.Name = "point4XNumericUpDown";
             point4XNumericUpDown.Size = new System.Drawing.Size(70, 23);
             point4XNumericUpDown.TabIndex = 4;
@@ -386,8 +386,8 @@ namespace PVSFormat
             point1YNumericUpDown.DecimalPlaces = 3;
             point1YNumericUpDown.Enabled = false;
             point1YNumericUpDown.Location = new System.Drawing.Point(115, 236);
-            point1YNumericUpDown.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
-            point1YNumericUpDown.Minimum = new decimal(new int[] { 10000, 0, 0, int.MinValue });
+            point1YNumericUpDown.Maximum = new decimal(new int[] { 50000, 0, 0, 0 });
+            point1YNumericUpDown.Minimum = new decimal(new int[] { 50000, 0, 0, int.MinValue });
             point1YNumericUpDown.Name = "point1YNumericUpDown";
             point1YNumericUpDown.Size = new System.Drawing.Size(70, 23);
             point1YNumericUpDown.TabIndex = 2;
@@ -398,8 +398,8 @@ namespace PVSFormat
             point1XNumericUpDown.DecimalPlaces = 3;
             point1XNumericUpDown.Enabled = false;
             point1XNumericUpDown.Location = new System.Drawing.Point(24, 236);
-            point1XNumericUpDown.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
-            point1XNumericUpDown.Minimum = new decimal(new int[] { 10000, 0, 0, int.MinValue });
+            point1XNumericUpDown.Maximum = new decimal(new int[] { 50000, 0, 0, 0 });
+            point1XNumericUpDown.Minimum = new decimal(new int[] { 50000, 0, 0, int.MinValue });
             point1XNumericUpDown.Name = "point1XNumericUpDown";
             point1XNumericUpDown.Size = new System.Drawing.Size(70, 23);
             point1XNumericUpDown.TabIndex = 1;

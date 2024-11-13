@@ -4,7 +4,7 @@ A Program to work with Burnout Paradise Bundle files.
 # Libraries Used
 * [BCnEncoder](https://github.com/Nominom/BCnEncoder.NET)
 * [DebugHelper](https://gitlab.com/mattparizeau/DebugHelper)
-* [DotNetZip](https://github.com/haf/DotNetZip.Semverd)
+* [LibDeflate.NET](https://github.com/jzebedee/LibDeflate.NET)
 * [OpenTK](https://github.com/opentk/opentk)
 
 # Credits

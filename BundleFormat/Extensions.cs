@@ -1,16 +1,19 @@
 using System;
+using System.Buffers;
 using System.Buffers.Binary;
 using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
 using System.Text;
 using System.Windows.Forms;
-using Ionic.Zlib;
+using LibDeflate;
 
 namespace BundleFormat
 {
     public static class Extensions
     {
+        private static Decompressor decompressor = new ZlibDecompressor();
+        private static Compressor compressor = new ZlibCompressor(9);
+
         public static string AsString(this byte[] self)
         {
             if (self == null)
@@ -42,64 +45,18 @@ namespace BundleFormat
 
         public static byte[] Compress(this byte[] self)
         {
-            byte[] compressedData = new byte[self.Length]; // Size not known yet, use uncompressed size as upper bound
-            ZlibStream zlibStream = new ZlibStream(new MemoryStream(self), CompressionMode.Compress, CompressionLevel.BestCompression);
-            zlibStream.Read(compressedData, 0, self.Length);
-            return new ArraySegment<byte>(compressedData, 0, (int)zlibStream.TotalOut).ToArray(); // Size known, return correctly sized segment
+            return compressor.Compress(self).Memory.ToArray();
         }
         
         public static byte[] Decompress(this byte[] self, int uncompressedSize)
         {
-            byte[] uncompressedData = new byte[uncompressedSize];
-            ZlibStream zlibStream = new ZlibStream(new MemoryStream(uncompressedData), CompressionMode.Decompress);
-            try
+            var status = decompressor.Decompress(self, uncompressedSize, out var owner, out var bytesRead);
+            if (status != OperationStatus.Done)
             {
-                zlibStream.Write(self, 0, self.Length);
-            }
-            catch (Exception e)
-            {
-                if (self[self.Length - 1] == 0
-                    && e.Message == "Bad state (incorrect data check)") // Likely a bugged resource
-                {
-                    uncompressedData = GetDataFromBadAlignedResource(self, uncompressedSize);
-                    if (uncompressedData != null)
-                        return uncompressedData;
-                }
-                MessageBox.Show(e.ToString(), e.Source, MessageBoxButtons.OK);
+                MessageBox.Show("Error decompressing data, status: " + status.ToString() + ", read: " + bytesRead.ToString(), "Error", MessageBoxButtons.OK);
                 return null;
             }
-            return uncompressedData;
-        }
-
-        // Validate resources from BM versions <0.3.0 where alignment corrupted the checksum
-        public static byte[] GetDataFromBadAlignedResource(byte[] original, int uncompressedSize)
-        {
-            // For some reason, the data validates when length is 1 less than it should be.
-            // Use this to get the correct uncompressed data.
-            byte[] uncompressedData = new byte[uncompressedSize];
-            ZlibStream zlibStream = new ZlibStream(new MemoryStream(uncompressedData), CompressionMode.Decompress);
-            byte[] trimmed = new ArraySegment<byte>(original, 0, original.Length - 1).ToArray();
-            try
-            {
-                zlibStream.Write(trimmed, 0, trimmed.Length);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
-            byte[] compressed = Compress(uncompressedData);
-
-            // Test first three checksum bytes
-            if (original[original.Length - 4] == compressed[compressed.Length - 4]
-                && original[original.Length - 3] == compressed[compressed.Length - 3]
-                && original[original.Length - 2] == compressed[compressed.Length - 2])
-            {
-                // Testing of data not necessary, likelihood of 24 bits matching without data matching is negligible
-                return uncompressedData;
-            }
-
-            return null;
+            return owner.Memory.ToArray();
         }
 
         public static bool Matches(this byte[] self, byte[] other)

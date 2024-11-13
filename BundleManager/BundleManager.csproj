@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DebugHelper" Version="1.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.9" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(SolutionDir)libs\*&quot; &quot;$(ProjectDir)$(OutDir)&quot; /s /e /y&#xD;&#xA;xcopy &quot;$(SolutionDir)resources\*&quot; &quot;$(ProjectDir)$(OutDir)&quot; /s /e /y" />

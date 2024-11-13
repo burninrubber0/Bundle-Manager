@@ -7,9 +7,9 @@
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BundleUtilities\BundleUtilities.csproj" />
+    <PackageReference Include="LibDeflate.NET" Version="1.19.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DotNetZip" Version="1.16.0" />
+    <ProjectReference Include="..\BundleUtilities\BundleUtilities.csproj" />
   </ItemGroup>
 </Project>
